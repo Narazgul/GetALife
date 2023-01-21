@@ -4,6 +4,6 @@
 * For more info, see https://www.jetbrains.com/help/space/automation.html
 */
 
-job("Hello World!") {
-    container(displayName = "Say Hello", image = "hello-world")
+job("Build and run  tests") {
+    gradlew("amazoncorretto:11.0.18", "build")
 }
