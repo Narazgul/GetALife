@@ -5,5 +5,5 @@
 */
 
 job("Build and run  tests") {
-    gradlew("amazoncorretto:11.0.18", "build")
+    gradlew("cimg/android:2022.12", "build")
 }
