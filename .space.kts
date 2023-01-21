@@ -5,5 +5,5 @@
 */
 
 job("Build and run  tests") {
-    gradlew("cimg/android:2022.12", "build")
+    gradlew("alvrme/alpine-android-base:latest", "build")
 }
