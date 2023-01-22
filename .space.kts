@@ -13,7 +13,7 @@ job("Qodana") {
         }
         codeReviewOpened{}
     }
-    container("jetbrains/qodana-jvm-android:2022.3") {
+    container("jetbrains/qodana-jvm-android:2022.3-eap") {
         env["QODANA_TOKEN"] = Secrets("qodana-token")
         shellScript {
             content = """
