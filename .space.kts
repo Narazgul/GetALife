@@ -13,7 +13,7 @@ job("Qodana") {
         }
         codeReviewOpened{}
     }
-    container("jetbrains/qodana-<linter>") {
+    container("jetbrains/qodana-jvm-android:2022.3") {
         env["QODANA_TOKEN"] = Secrets("qodana-token")
         shellScript {
             content = """
@@ -21,8 +21,6 @@ job("Qodana") {
             QODANA_BRANCH=${'$'}JB_SPACE_GIT_BRANCH \
             QODANA_REVISION=${'$'}JB_SPACE_GIT_REVISION \
             qodana
-            --fail-threshold <number>
-            --profile-name <profile-name>
             """.trimIndent()
         }
     }
