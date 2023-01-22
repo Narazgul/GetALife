@@ -6,12 +6,17 @@
 
 job("Qodana") {
     startOn {
+        // Disabled until Qodana supports AGP 7.4.0
+        gitPush { enabled = false }
+
+        /*
         gitPush {
             branchFilter {
                 +"refs/heads/feature"
             }
         }
         codeReviewOpened{}
+        */
     }
     container("jetbrains/qodana-jvm-android:2022.3") {
         env["QODANA_TOKEN"] = Secrets("qodana-token")
@@ -27,6 +32,11 @@ job("Qodana") {
 }
 
 job("Build and run  tests") {
+    // Only manually triggered in CI/CD buildUp phase
+    startOn {
+        gitPush { enabled = false }
+    }
+
     requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
 
     gradlew("alvrme/alpine-android-base:latest", "build")
