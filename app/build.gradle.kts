@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.firebase.appdistribution")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -55,6 +57,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.0-alpha04")
     implementation("androidx.compose.material3:material3:1.1.0-alpha04")
     implementation("androidx.core:core-ktx:1.9.0")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
     // testing
     testImplementation("junit:junit:4.13.2")
