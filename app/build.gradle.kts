@@ -6,6 +6,7 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 
+@Suppress("UnstableApiUsage")
 android {
     namespace = "app.tinygiants.getalife"
     compileSdk = 33
