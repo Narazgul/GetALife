@@ -4,6 +4,7 @@ plugins {
     id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
 }
 
 @Suppress("UnstableApiUsage")
@@ -64,6 +65,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-perf-ktx")
 
     // testing
     testImplementation("junit:junit:4.13.2")
