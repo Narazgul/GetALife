@@ -1,8 +1,10 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
+    id("com.google.firebase.appdistribution")
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
 }
@@ -54,11 +56,11 @@ android {
 dependencies {
     // core
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-alpha04")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-alpha05")
     implementation("androidx.activity:activity-compose:1.6.1")
-    implementation("androidx.compose.ui:ui:1.4.0-alpha04")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0-alpha04")
-    implementation("androidx.compose.material3:material3:1.1.0-alpha04")
+    implementation("androidx.compose.ui:ui:1.4.0-alpha05")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0-alpha05")
+    implementation("androidx.compose.material3:material3:1.1.0-alpha05")
     implementation("androidx.core:core-ktx:1.9.0")
 
     // firebase
@@ -71,9 +73,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha04")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha05")
 
     // debug build
-    debugImplementation("androidx.compose.ui:ui-tooling:1.4.0-alpha04")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0-alpha04")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.4.0-alpha05")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0-alpha05")
 }
