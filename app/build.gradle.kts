@@ -28,9 +28,17 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            manifestPlaceholders["appName"] = "GetALife Debug"
+            buildConfigField(type = "String", name = "FIREBASE_ROOT_COLLECTION", value = "\"debug\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            manifestPlaceholders["appName"] = "GetALife"
+            buildConfigField(type = "String", name = "FIREBASE_ROOT_COLLECTION", value = "\"release\"")
         }
     }
     compileOptions {
