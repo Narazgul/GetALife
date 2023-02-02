@@ -1,5 +1,3 @@
-import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -22,9 +20,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        vectorDrawables { useSupportLibrary = true }
     }
 
     buildTypes {
@@ -73,6 +69,7 @@ dependencies {
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-perf-ktx")
