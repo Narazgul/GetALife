@@ -1,3 +1,5 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -17,22 +19,39 @@ android {
         minSdk = 28
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        versionName = "Ausbrühten 0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("/Users/hofi/AndroidStudioProjects/keystore")
+            storePassword = System.getenv("KEYSTORE_PW")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PW")
+        }
+    }
+
+    firebaseAppDistribution {
+        serviceCredentialsFile = "firebase/googleServiceCredentials.json"
+        groups = "internal"
     }
 
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+
             manifestPlaceholders["appName"] = "GetALife Debug"
             buildConfigField(type = "String", name = "FIREBASE_ROOT_COLLECTION", value = "\"debug\"")
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
+
             manifestPlaceholders["appName"] = "GetALife"
             buildConfigField(type = "String", name = "FIREBASE_ROOT_COLLECTION", value = "\"release\"")
         }
