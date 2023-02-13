@@ -19,7 +19,7 @@ android {
         minSdk = 28
         targetSdk = 33
         versionCode = 1
-        versionName = "Ausbrühten 0.0.1"
+        versionName = "Ausbrühten 1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -45,7 +45,7 @@ android {
             versionNameSuffix = "-debug"
 
             manifestPlaceholders["appName"] = "GetALife Debug"
-            buildConfigField(type = "String", name = "FIREBASE_ROOT_COLLECTION", value = "\"debug\"")
+            buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"debug\"")
         }
         release {
             isMinifyEnabled = false
@@ -53,7 +53,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
 
             manifestPlaceholders["appName"] = "GetALife"
-            buildConfigField(type = "String", name = "FIREBASE_ROOT_COLLECTION", value = "\"release\"")
+            buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"release\"")
         }
     }
     compileOptions {
@@ -79,12 +79,12 @@ android {
 dependencies {
     // core
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-alpha05")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-beta01")
     implementation("androidx.activity:activity-compose:1.6.1")
     implementation("androidx.compose.ui:ui:1.4.0-alpha05")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.0-alpha05")
     implementation("androidx.compose.material3:material3:1.1.0-alpha05")
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:31.2.0"))
@@ -97,7 +97,6 @@ dependencies {
     // testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha05")
 
     // debug build
