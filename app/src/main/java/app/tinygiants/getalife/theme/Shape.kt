@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.ui.theme
+package app.tinygiants.getalife.theme
 
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape

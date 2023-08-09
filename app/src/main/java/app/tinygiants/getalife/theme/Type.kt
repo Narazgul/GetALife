@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.ui.theme
+package app.tinygiants.getalife.theme
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
