@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.util.toCurrency
+import app.tinygiants.getalife.util.toCurrencyFormattedString
 
 @Composable
 fun CategoryHeader(
@@ -57,7 +57,7 @@ fun CategoryHeader(
         val alignment = if (isExtended) Alignment.CenterHorizontally else Alignment.End
         Column(horizontalAlignment = alignment) {
             Text(text = "Available")
-            val text = if (isExtended) "to spend" else sumOfAvailableMoney.toCurrency()
+            val text = if (isExtended) "to spend" else sumOfAvailableMoney.toCurrencyFormattedString()
             val style = if (!isExtended) MaterialTheme.typography.titleMedium else LocalTextStyle.current
             Text(text = text, style = style)
         }

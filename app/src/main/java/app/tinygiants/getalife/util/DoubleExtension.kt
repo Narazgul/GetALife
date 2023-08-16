@@ -4,7 +4,7 @@ import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
 
-fun Double.toCurrency(maximumDigits: Int = 2, locale: Locale = Locale.getDefault()): String {
+fun Double.toCurrencyFormattedString(maximumDigits: Int = 2, locale: Locale = Locale.getDefault()): String {
     val numberFormat = NumberFormat.getCurrencyInstance()
     numberFormat.maximumFractionDigits = maximumDigits
     numberFormat.currency = Currency.getInstance(locale)

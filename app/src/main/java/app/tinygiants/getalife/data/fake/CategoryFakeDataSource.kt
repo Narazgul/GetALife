@@ -3,7 +3,7 @@ package app.tinygiants.getalife.data.fake
 import app.tinygiants.getalife.di.Io
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.CategoryHeader
-import app.tinygiants.getalife.util.toCurrency
+import app.tinygiants.getalife.util.toCurrencyFormattedString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -65,7 +65,7 @@ val gym = Category(
     name = "Gym",
     budgetTarget = 29.00,
     availableMoney = 10.00,
-    optionalText = "${(29.00 - 10.00).toCurrency()} more needed by the 30th"
+    optionalText = "${(29.00 - 10.00).toCurrencyFormattedString()} more needed by the 30th"
 )
 
 val netflix = Category(

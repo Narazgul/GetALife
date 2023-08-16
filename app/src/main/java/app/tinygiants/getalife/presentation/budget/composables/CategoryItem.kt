@@ -29,7 +29,7 @@ import app.tinygiants.getalife.theme.success
 import app.tinygiants.getalife.theme.successBackground
 import app.tinygiants.getalife.theme.warning
 import app.tinygiants.getalife.theme.warningBackground
-import app.tinygiants.getalife.util.toCurrency
+import app.tinygiants.getalife.util.toCurrencyFormattedString
 
 @Composable
 fun Category(
@@ -71,7 +71,7 @@ fun Category(
                     .background(budgetTargetBackground, RoundedCornerShape(16.dp))
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             ) {
-                val formattedBudgetTarget = availableMoney.toCurrency()
+                val formattedBudgetTarget = availableMoney.toCurrencyFormattedString()
                 val availableMoneyColor = when {
                     availableMoney > 0.00 -> MaterialTheme.colorScheme.scrim
                     else -> MaterialTheme.colorScheme.onSurface
@@ -164,4 +164,4 @@ fun EmptyCategoryPreview() {
     }
 }
 
-fun optionalExampleText(gap: Double) = "${gap.toCurrency()} more needed by the 30th"
+fun optionalExampleText(gap: Double) = "${gap.toCurrencyFormattedString()} more needed by the 30th"
