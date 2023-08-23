@@ -2,6 +2,7 @@ import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
 
 plugins {
     kotlin("kapt")
+    id("com.google.devtools.ksp")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
@@ -61,7 +62,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -79,6 +80,7 @@ android {
 
 kapt {
     correctErrorTypes = true
+    useBuildCache = true
 }
 
 dependencies {
@@ -87,10 +89,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation("androidx.navigation:navigation-compose:2.7.0")
 
     // Compose tools
-    implementation(platform("androidx.compose:compose-bom:2023.06.01"))
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
@@ -98,9 +100,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Hilt
-    kapt("com.google.dagger:hilt-android-compiler:2.47")
     implementation("com.google.dagger:hilt-android:2.47")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    kapt("com.google.dagger:hilt-android-compiler:2.47")
 
     // Room
     val roomVersion = "2.5.2"
@@ -115,9 +117,6 @@ dependencies {
     implementation("com.google.firebase:firebase-perf-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-
-    // Lottie Animation library
-    implementation("com.airbnb.android:lottie-compose:6.1.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
