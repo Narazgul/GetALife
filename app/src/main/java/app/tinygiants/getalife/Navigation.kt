@@ -20,11 +20,11 @@ fun GetALifeNavHost(
 }
 
 sealed class NestedNavigation(val route: String) {
-    object BudgetNavigation : NestedNavigation("budgetNavigation")
-    object AccountNavigation : NestedNavigation("accountNavigation")
+    data object BudgetNavigation : NestedNavigation("budgetNavigation")
+    data object AccountNavigation : NestedNavigation("accountNavigation")
 }
 
 sealed class Screens(val label: String, val iconId: Int, val route: String) {
-    object Budget : Screens(label = "Budget", iconId = R.drawable.ic_dashboard, route = "budget")
-    object Account : Screens(label = "Account", iconId = R.drawable.ic_account, route = "account")
+    data object Budget : Screens(label = "Budget", iconId = R.drawable.ic_dashboard, route = "budget")
+    data object Account : Screens(label = "Account", iconId = R.drawable.ic_account, route = "account")
 }
