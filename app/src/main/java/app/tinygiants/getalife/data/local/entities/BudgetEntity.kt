@@ -8,10 +8,5 @@ import androidx.room.Relation
 data class BudgetEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String?,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "budgetId"
-    )
-    val categoryGroups: List<CategoryGroupEntity>?
+    val name: String?
 )

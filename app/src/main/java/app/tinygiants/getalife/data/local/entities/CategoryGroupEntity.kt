@@ -9,10 +9,5 @@ data class CategoryGroupEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val headerId: Int,
-    val budgetId: Int,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "groupId"
-    )
-    val items: List<ItemEntity>?
+    val budgetId: Int
 )
