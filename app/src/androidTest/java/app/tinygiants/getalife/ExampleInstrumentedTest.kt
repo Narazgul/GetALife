@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("app.tinygiants.getalife", appContext.packageName)
+        assertEquals("app.tinygiants.getalife.debug", appContext.packageName)
     }
 }
