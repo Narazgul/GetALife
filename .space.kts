@@ -18,6 +18,9 @@ job("Qodana") {
         codeReviewOpened{}
         */
     }
+
+    requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
+
     container("jetbrains/qodana-jvm-android:latest") {
         env["QODANA_TOKEN"] = Secrets("qodana-token")
         shellScript {
