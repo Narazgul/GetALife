@@ -42,5 +42,5 @@ job("Build and run tests") {
 
     requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
 
-    gradlew("alvrme/alpine-android:android-30-jdk17", "build")
+    gradlew("jetbrains/qodana-jvm-android:latest", "build")
 }
