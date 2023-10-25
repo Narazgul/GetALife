@@ -42,5 +42,5 @@ job("Build and run tests") {
 
     requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
 
-    gradlew("saschpe/android-ndk:34-jdk17.0.8_7-ndk25.2.9519653-cmake3.22.1", "build")
+    gradlew("amazoncorretto:17-alpine", "build")
 }
