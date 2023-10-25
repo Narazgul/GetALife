@@ -18,7 +18,7 @@ job("Qodana") {
         codeReviewOpened{}
         */
     }
-    container("jetbrains/qodana-jvm-android:2022.3-eap") {
+    container("jetbrains/qodana-jvm-android:latest") {
         env["QODANA_TOKEN"] = Secrets("qodana-token")
         shellScript {
             content = """
@@ -31,7 +31,7 @@ job("Qodana") {
     }
 }
 
-job("Build and run  tests") {
+job("Build and run tests") {
     // Only manually triggered in CI/CD buildUp phase
     startOn {
         gitPush { enabled = false }
