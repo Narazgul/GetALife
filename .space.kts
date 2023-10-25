@@ -42,5 +42,5 @@ job("Build and run tests") {
 
     requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
 
-    gradlew("lvrme/alpine-android:android-30-jdk17-v2023.09.10", "build")
+    gradlew("alvrme/alpine-android:android-30-jdk17", "build")
 }
