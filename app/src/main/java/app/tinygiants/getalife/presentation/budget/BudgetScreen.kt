@@ -70,8 +70,8 @@ fun BudgetContent(
                     items(items = items, key = { item -> item.id }) { item ->
                         AnimatedVisibility(
                             visible = header.isExpanded,
-                            enter = slideInVertically() + fadeIn(),
-                            exit = slideOutVertically() + fadeOut()
+                            enter = fadeIn(),
+                            exit = fadeOut()
                         ) {
                             Category(
                                 name = item.name,
