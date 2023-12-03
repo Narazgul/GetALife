@@ -1,7 +1,6 @@
 import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
 
 plugins {
-    kotlin("kapt")
     id("com.google.devtools.ksp")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
