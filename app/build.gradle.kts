@@ -76,42 +76,21 @@ kotlin {
 }
 
 dependencies {
-    // Core
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation(libs.bundles.core)
 
-    // Compose tools
-    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    debugImplementation(libs.bundles.compose.debug)
 
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-    ksp("com.google.dagger:hilt-android-compiler:2.48.1")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
 
-    // Room
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.bundles.hilt)
+    ksp(libs.hilt.android.compiler)
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-perf-ktx")
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
 
-    // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+    testImplementation(libs.junit4)
+    androidTestImplementation(libs.bundles.junit4)
 }
