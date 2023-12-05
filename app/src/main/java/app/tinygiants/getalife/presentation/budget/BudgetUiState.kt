@@ -3,7 +3,12 @@ package app.tinygiants.getalife.presentation.budget
 data class BudgetUiState(
     val categories: Map<Header, List<Category>>,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: ErrorMessage? = null
+)
+
+data class ErrorMessage(
+    val title: String?,
+    val subtitle: String?
 )
 
 data class Header(

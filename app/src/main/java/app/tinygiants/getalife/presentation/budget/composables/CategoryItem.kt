@@ -4,14 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -24,11 +17,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.success
-import app.tinygiants.getalife.theme.successBackground
-import app.tinygiants.getalife.theme.warning
-import app.tinygiants.getalife.theme.warningBackground
+import app.tinygiants.getalife.theme.*
 import app.tinygiants.getalife.util.toCurrencyFormattedString
 
 @Composable
@@ -63,8 +52,8 @@ fun Category(
             )
             val budgetTargetBackground = when {
                 availableMoney == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-                availableMoney < budgetTarget -> warningBackground
-                else -> successBackground
+                availableMoney < budgetTarget -> onWarning
+                else -> onSuccess
             }
             Box(
                 modifier = Modifier

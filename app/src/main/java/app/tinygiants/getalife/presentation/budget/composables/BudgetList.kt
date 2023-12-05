@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.presentation.budget.Category
+import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.Header
 
 const val ANIMATION_TIME_300 = 300
@@ -18,10 +19,10 @@ const val ANIMATION_TIME_300 = 300
 fun BudgetsList(
     categories: Map<Header, List<Category>>,
     isLoading: Boolean,
-    errorMessage: String?
+    errorMessage: ErrorMessage?
 ) {
     AnimatedVisibility(
-        visible = !isLoading && errorMessage.isNullOrBlank(),
+        visible = !isLoading && errorMessage == null,
         enter = slideInVertically(),
         exit = slideOutVertically()
     ) {

@@ -8,11 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.tinygiants.getalife.presentation.budget.ErrorMessage
 
 @Composable
-fun BoxScope.LoadingIndicator(isLoading: Boolean, errorMessage: String?) {
+fun BoxScope.LoadingIndicator(isLoading: Boolean, errorMessage: ErrorMessage?) {
     AnimatedVisibility(
-        visible = isLoading && errorMessage.isNullOrBlank(),
+        visible = isLoading && errorMessage == null,
         modifier = Modifier.align(Alignment.TopCenter)
     ) {
         CircularProgressIndicator(

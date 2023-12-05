@@ -42,7 +42,10 @@ class BudgetViewModel @Inject constructor(
                     _uiState.value = BudgetUiState(
                         categories = emptyMap(),
                         isLoading = false,
-                        errorMessage = it.localizedMessage
+                        errorMessage = ErrorMessage(
+                            title =  "Zefix",
+                            subtitle = "Ein fürchterlicher Fehler ist aufgetreten."
+                        )
                     )
                 }
                 .collect { categories ->

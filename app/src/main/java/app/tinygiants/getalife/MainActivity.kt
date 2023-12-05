@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation
+package app.tinygiants.getalife
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,8 +15,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import app.tinygiants.getalife.GetALifeNavHost
-import app.tinygiants.getalife.Screens
+import app.tinygiants.getalife.navigation.GetALifeNavHost
+import app.tinygiants.getalife.navigation.Screens
 import app.tinygiants.getalife.theme.GetALifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 

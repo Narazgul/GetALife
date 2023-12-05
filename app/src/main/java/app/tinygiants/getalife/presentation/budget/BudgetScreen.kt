@@ -12,9 +12,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
 import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
+import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Composable
@@ -26,7 +26,10 @@ fun BudgetScreen() {
 
 @Composable
 fun BudgetScreen(uiState: BudgetUiState) {
-    Box(modifier = Modifier.fillMaxSize().padding(8.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
         BudgetsList(
             categories = uiState.categories,
@@ -51,7 +54,10 @@ fun BudgetScreenPreview() {
                 BudgetUiState(
                     categories = emptyMap(),
                     isLoading = true,
-                    errorMessage = "zefix"
+                    errorMessage = ErrorMessage(
+                        title = "Zefix",
+                        subtitle = "Ein fürchterlicher Fehler ist aufgetreten."
+                    )
                 )
             )
         }

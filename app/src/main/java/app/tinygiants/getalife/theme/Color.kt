@@ -63,6 +63,6 @@ val md_theme_dark_outlineVariant = Color(0xFF49454F)
 val md_theme_dark_scrim = Color(0xFF000000)
 
 val success = Color(0xFF82B73E)
-val successBackground = Color(0xFFCEEA9F)
+val onSuccess = Color(0xFFCEEA9F)
 val warning = Color(0xFFDFA41A)
-val warningBackground = Color(0xFFFFD370)
+val onWarning = Color(0xFFFFD370)
