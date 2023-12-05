@@ -1,15 +1,15 @@
 [versions]
-google-services = "4.4.0"
-firebase-appdistribution-gradle = "4.0.1"
-firebase-crashlytics-gradle = "2.9.9"
-firebase-perf-plugin = "1.4.2"
-junit = "1.1.5"
 kotlinVersion = "1.9.20"
 ksp-version = "1.9.20-1.0.14"
+googleServicesVersion = "4.4.0"
+firebase-appdistribution-gradle = "4.0.1"
+firebaseCrashlytics = "2.9.9"
+firebase-perf-plugin = "1.4.2"
+junit = "1.1.5"
 android-gradle-plugin = "8.2.0"
-hilt-version = "2.48.1"
+hiltVersion = "2.48.1"
 hilt-navigation-compose = "1.1.0"
-activity-compose = "1.8.1"
+activityCompose = "1.8.1"
 core-ktx = "1.12.0"
 lifecycleRuntimeCompose = "2.6.2"
 navigationCompose = "2.7.5"
@@ -23,16 +23,16 @@ uiTestJunit4 = "1.5.4"
 
 [libraries]
 # Top-level `build.gradle.kts` file
-google-services = { module = "com.google.gms:google-services", version.ref = "google-services" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesVersion" }
 firebase-appdistribution-gradle = { module = "com.google.firebase:firebase-appdistribution-gradle", version.ref = "firebase-appdistribution-gradle" }
-firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebase-crashlytics-gradle" }
+firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlytics" }
 firebase-perf-plugin = { module = "com.google.firebase:perf-plugin", version.ref = "firebase-perf-plugin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 
 # Core
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
@@ -53,9 +53,9 @@ firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
 
 # Hilt
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-version" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt-version" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 
 # Room
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
@@ -81,9 +81,9 @@ junit4 = ["junit4-androidx", "ui-test-junit4"]
 ####################################################################################################
 
 [plugins]
-# Top-level `build.gradle.kts` file
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
-hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt-version" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics"}
+hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-version" }
