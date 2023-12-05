@@ -22,6 +22,7 @@ class CategoryFakeDataSource @Inject constructor(
             qualityOfLife to listOf(hobbies, entertainment, healthAndWellness)
         )
     )
+
     fun fetchFakeCategories(): StateFlow<Map<CategoryHeader, List<Category>>> = fakeCategories
 
     suspend fun toggleIsExpended(categoryId: Int) {
@@ -29,7 +30,7 @@ class CategoryFakeDataSource @Inject constructor(
             val updatedCategories = fakeCategories.value.map { (categoryHeader, categoryList) ->
                 if (categoryHeader.id == categoryId) {
                     categoryHeader.copy(isExpanded = !categoryHeader.isExpanded) to categoryList
-                }  else {
+                } else {
                     categoryHeader to categoryList
                 }
             }.toMap()
@@ -196,4 +197,3 @@ val healthAndWellness = Category(
 )
 
 // endregion
-

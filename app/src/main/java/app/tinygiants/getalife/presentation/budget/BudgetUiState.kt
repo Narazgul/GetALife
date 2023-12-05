@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.presentation.budget
 
-data class BudgetState(
+data class BudgetUiState(
     val categories: Map<Header, List<Category>>,
     val isLoading: Boolean = false,
     val errorMessage: String? = null

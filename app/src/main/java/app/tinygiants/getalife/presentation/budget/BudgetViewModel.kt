@@ -7,11 +7,7 @@ import app.tinygiants.getalife.domain.model.CategoryHeader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,8 +16,8 @@ class BudgetViewModel @Inject constructor(
     private val categoryRepository: CategoryRepositoryImpl
 ) : ViewModel() {
 
-    private val _budgetState = MutableStateFlow(BudgetState(categories = emptyMap(), isLoading = true, errorMessage = null))
-    val uiState = _budgetState.asStateFlow()
+    private val _uiState = MutableStateFlow(BudgetUiState(categories = emptyMap(), isLoading = true, errorMessage = null))
+    val uiState = _uiState.asStateFlow()
 
     private var fetchJob: Job? = null
 
@@ -41,22 +37,25 @@ class BudgetViewModel @Inject constructor(
 
             delay(1000)
             val categoriesModel = categoryRepository.fetchCategories()
-            mapCategoryMapToUiState(categoriesModel)
+            mapToUiState(categoriesModel)
                 .catch {
-                    _budgetState.value = BudgetState(
+                    _uiState.value = BudgetUiState(
                         categories = emptyMap(),
                         isLoading = false,
                         errorMessage = it.localizedMessage
                     )
                 }
                 .collect { categories ->
-                    _budgetState.value =
-                        BudgetState(categories = categories, isLoading = false, errorMessage = null)
+                    _uiState.value =
+                        BudgetUiState(
+                            categories = categories,
+                            isLoading = false,
+                            errorMessage = null)
                 }
         }
     }
 
-    private fun mapCategoryMapToUiState(categoriesModel: Flow<Map<CategoryHeader, List<app.tinygiants.getalife.domain.model.Category>>>) =
+    private fun mapToUiState(categoriesModel: Flow<Map<CategoryHeader, List<app.tinygiants.getalife.domain.model.Category>>>) =
         categoriesModel.map {
             it.map { (key, value) ->
                 val headerKey = Header(

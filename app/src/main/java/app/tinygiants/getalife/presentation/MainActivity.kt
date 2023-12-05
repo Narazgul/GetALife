@@ -5,13 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -64,7 +58,12 @@ fun BottomNavigation(navController: NavHostController) {
                         contentDescription = "${screen.label} Icon"
                     )
                 },
-                label = { Text(text = screen.label, style = MaterialTheme.typography.bodyMedium) },
+                label = {
+                    Text(
+                        text = screen.label,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 selected = currentDestination?.hierarchy?.any { navDestination ->
                     navDestination.route == screen.route
                 } == true,
