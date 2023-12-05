@@ -33,7 +33,7 @@ fun BudgetsList(
                 stickyHeader(key = header.id) {
                     CategoryHeader(
                         name = header.name,
-                        sumOfAvailableMoney = items.sumOf { category -> category.availableMoney },
+                        sumOfAvailableMoney = header.sumOfAvailableMoney,
                         isExtended = header.isExpanded,
                         onHeaderClicked = header.toggleExpanded
                     )
@@ -50,6 +50,7 @@ fun BudgetsList(
                             name = item.name,
                             budgetTarget = item.budgetTarget,
                             availableMoney = item.availableMoney,
+                            progress = item.progress,
                             optionalText = item.optionalText
                         )
                     }

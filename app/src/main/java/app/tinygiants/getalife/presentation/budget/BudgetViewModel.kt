@@ -61,9 +61,11 @@ class BudgetViewModel @Inject constructor(
     private fun mapToUiState(categoriesModel: Flow<Map<CategoryHeader, List<app.tinygiants.getalife.domain.model.Category>>>) =
         categoriesModel.map {
             it.map { (key, value) ->
+                val sumOfAvailableMoneyInCategory = value.sumOf { category -> category.availableMoney }
                 val headerKey = Header(
                     id = key.id,
                     name = key.name,
+                    sumOfAvailableMoney = Money(value = sumOfAvailableMoneyInCategory),
                     isExpanded = key.isExpanded,
                     toggleExpanded = {
                         viewModelScope.launch {
@@ -72,11 +74,13 @@ class BudgetViewModel @Inject constructor(
                     }
                 )
                 val categoryValue = value.map { category ->
+                val progress = (category.availableMoney / category.budgetTarget).toFloat()
                     Category(
                         id = category.id,
                         name = category.name,
-                        budgetTarget = category.budgetTarget,
-                        availableMoney = category.availableMoney,
+                        budgetTarget = Money(value = category.budgetTarget),
+                        availableMoney = Money(value = category.availableMoney),
+                        progress = progress,
                         optionalText = category.optionalText
                     )
                 }

@@ -17,14 +17,16 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.tinygiants.getalife.presentation.budget.Money
 import app.tinygiants.getalife.theme.*
 import app.tinygiants.getalife.util.toCurrencyFormattedString
 
 @Composable
 fun Category(
-    name: String,
-    budgetTarget: Double,
-    availableMoney: Double,
+    name: String = "",
+    budgetTarget: Money = Money(value =  0.0),
+    availableMoney: Money = Money(value =  0.0),
+    progress: Float = 0f,
     optionalText: String? = null
 ) {
     Column(
@@ -51,8 +53,8 @@ fun Category(
                 modifier = Modifier.weight(1f)
             )
             val budgetTargetBackground = when {
-                availableMoney == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-                availableMoney < budgetTarget -> onWarning
+                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
+                availableMoney.value < budgetTarget.value -> onWarning
                 else -> onSuccess
             }
             Box(
@@ -60,9 +62,9 @@ fun Category(
                     .background(budgetTargetBackground, RoundedCornerShape(16.dp))
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             ) {
-                val formattedBudgetTarget = availableMoney.toCurrencyFormattedString()
+                val formattedBudgetTarget = availableMoney.formattedMoney
                 val availableMoneyColor = when {
-                    availableMoney > 0.00 -> MaterialTheme.colorScheme.scrim
+                    availableMoney.value > 0.00 -> MaterialTheme.colorScheme.scrim
                     else -> MaterialTheme.colorScheme.onSurface
                 }
 
@@ -81,12 +83,12 @@ fun Category(
         ) {
             val progressBackground = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
             val progressColor = when {
-                availableMoney == 0.0 -> MaterialTheme.colorScheme.secondary
-                availableMoney < budgetTarget -> warning
+                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.secondary
+                availableMoney.value < budgetTarget.value -> warning
                 else -> success
             }
             LinearProgressIndicator(
-                progress = (availableMoney / budgetTarget).toFloat(),
+                progress = progress,
                 modifier = Modifier.fillMaxWidth(),
                 color = progressColor,
                 trackColor = progressBackground,
@@ -113,8 +115,9 @@ fun FullCategoryPreview() {
         Surface {
             Category(
                 name = "Rent",
-                budgetTarget = 940.00,
-                availableMoney = 940.00,
+                budgetTarget = Money(940.00),
+                availableMoney = Money(940.00),
+                progress = 1f,
                 optionalText = optionalExampleText(0.00)
             )
         }
@@ -129,8 +132,9 @@ fun SemiFilledCategoryPreview() {
         Surface {
             Category(
                 name = "Rent",
-                budgetTarget = 940.00,
-                availableMoney = 470.00,
+                budgetTarget = Money(940.00),
+                availableMoney = Money(470.00),
+                progress = (470.00 / 940.00).toFloat(),
                 optionalText = optionalExampleText(gap = 940.00 - 470.00)
             )
         }
@@ -145,8 +149,9 @@ fun EmptyCategoryPreview() {
         Surface {
             Category(
                 name = "Rent",
-                budgetTarget = 940.00,
-                availableMoney = 0.0,
+                budgetTarget = Money(940.00),
+                availableMoney = Money(0.0),
+                progress = (0.0 / 940.00).toFloat(),
                 optionalText = optionalExampleText(gap = 940.00 - 0.0)
             )
         }
