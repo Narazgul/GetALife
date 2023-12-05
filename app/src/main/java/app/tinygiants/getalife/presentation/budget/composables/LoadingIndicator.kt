@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BoxScope.AnimatedCircularProgressIndicator(isLoading: Boolean, errorMessage: String?) {
+fun BoxScope.LoadingIndicator(isLoading: Boolean, errorMessage: String?) {
     AnimatedVisibility(
         visible = isLoading && errorMessage.isNullOrBlank(),
         modifier = Modifier.align(Alignment.TopCenter)
