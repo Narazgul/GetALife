@@ -12,6 +12,7 @@ import app.tinygiants.getalife.presentation.budget.Category
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.Header
 
+const val ANIMATION_TIME_1_SECOND = 1000
 const val ANIMATION_TIME_300 = 300
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -41,10 +42,9 @@ fun BudgetsList(
                 items(items = items, key = { item -> item.id }) { item ->
                     AnimatedVisibility(
                         visible = header.isExpanded,
-                        enter = fadeIn(animationSpec = tween(ANIMATION_TIME_300)) +
+                        enter = fadeIn(animationSpec = tween(ANIMATION_TIME_1_SECOND)) +
                                 expandVertically(animationSpec = tween(ANIMATION_TIME_300)),
-                        exit = fadeOut(animationSpec = tween(ANIMATION_TIME_300)) +
-                                shrinkVertically(animationSpec = tween(ANIMATION_TIME_300))
+                        exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300))
                     ) {
                         Category(
                             name = item.name,
