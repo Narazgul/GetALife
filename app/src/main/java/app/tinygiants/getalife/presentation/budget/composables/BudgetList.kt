@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
+import android.content.res.Configuration
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -8,11 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import app.tinygiants.getalife.presentation.budget.Category
-import app.tinygiants.getalife.presentation.budget.ErrorMessage
-import app.tinygiants.getalife.presentation.budget.Header
+import androidx.compose.ui.tooling.preview.Preview
+import app.tinygiants.getalife.presentation.budget.*
+import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
 const val ANIMATION_TIME_1_SECOND = 1000
@@ -70,12 +72,26 @@ private fun LazyListScope.items(isHeaderExpanded: Boolean, items: List<Category>
                 bottom = if (item == lastCategoryItem) spacing.tiny else spacing.halfDp
             )
         ) {
-            Category(
+            if (items.isEmpty()) AddCategoryItem { 1 }
+            else Category(
                 name = item.name,
                 budgetTarget = item.budgetTarget,
                 availableMoney = item.availableMoney,
                 progress = item.progress,
                 optionalText = item.optionalText
+            )
+        }
+    }
+}
+
+@Preview(name = "Light", widthDp = 400)
+@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun BudgetListPreview() {
+    GetALifeTheme {
+        Surface {
+            BudgetScreen(
+                BudgetUiState(categories = exampleMap())
             )
         }
     }
