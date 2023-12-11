@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
+import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun BoxScope.LoadingIndicator(isLoading: Boolean, errorMessage: ErrorMessage?) {
@@ -17,7 +18,7 @@ fun BoxScope.LoadingIndicator(isLoading: Boolean, errorMessage: ErrorMessage?) {
         modifier = Modifier.align(Alignment.TopCenter)
     ) {
         CircularProgressIndicator(
-            strokeWidth = 2.dp,
+            strokeWidth = spacing.extraSmall,
             modifier = Modifier.size(20.dp)
         )
     }

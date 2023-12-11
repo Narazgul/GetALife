@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.presentation.budget.Money
 import app.tinygiants.getalife.theme.*
 import app.tinygiants.getalife.util.toCurrencyFormattedString
@@ -34,13 +33,18 @@ fun Category(
             .fillMaxWidth()
             .background(
                 MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(spacing.small)
             )
             .border(
-                BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                RoundedCornerShape(4.dp)
+                BorderStroke(
+                    width = spacing.tiny,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                ),
+                RoundedCornerShape(spacing.small)
             )
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(
+                horizontal = spacing.large,
+                vertical = spacing.default)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -59,8 +63,14 @@ fun Category(
             }
             Box(
                 modifier = Modifier
-                    .background(budgetTargetBackground, RoundedCornerShape(16.dp))
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                    .background(
+                        color = budgetTargetBackground,
+                        shape = RoundedCornerShape(spacing.large)
+                    )
+                    .padding(
+                        horizontal = spacing.default,
+                        vertical = spacing.extraSmall
+                    )
             ) {
                 val formattedBudgetTarget = availableMoney.formattedMoney
                 val availableMoneyColor = when {
@@ -75,11 +85,11 @@ fun Category(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(spacing.default))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(4.dp)
+                .height(spacing.small)
         ) {
             val progressBackground = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
             val progressColor = when {
@@ -95,7 +105,7 @@ fun Category(
                 strokeCap = StrokeCap.Round
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(spacing.default))
         if (!optionalText.isNullOrBlank()) {
             Text(
                 text = optionalText,

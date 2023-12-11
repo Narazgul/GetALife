@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
 import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun BudgetScreen() {
@@ -29,7 +29,7 @@ fun BudgetScreen(uiState: BudgetUiState) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(spacing.default)
     ) {
         BudgetsList(
             categories = uiState.categories,

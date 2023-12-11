@@ -16,12 +16,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.presentation.budget.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun CategoryHeader(
     name: String = "",
     sumOfAvailableMoney: Money = Money(value = 0.00),
-    isExtended: Boolean = true,
+    isExpanded: Boolean = true,
     onHeaderClicked: () -> Unit = { }
 ) {
     Row(
@@ -29,41 +30,30 @@ fun CategoryHeader(
             .fillMaxWidth()
             .clickable { onHeaderClicked() }
             .height(50.dp)
-            .background(MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(4.dp))
-            .padding(horizontal = 16.dp),
+            .background(
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                shape = RoundedCornerShape(size = spacing.small)
+            )
+            .padding(horizontal = spacing.large),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = if (isExtended) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+            imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
         Text(
             text = name,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.padding(start = spacing.default)
         )
         Spacer(modifier = Modifier.weight(1f))
-        val alignment = if (isExtended) Alignment.CenterHorizontally else Alignment.End
+        val alignment = if (isExpanded) Alignment.CenterHorizontally else Alignment.End
         Column(horizontalAlignment = alignment) {
             Text(text = "Available")
-            val text = if (isExtended) "to spend" else sumOfAvailableMoney.formattedMoney
-            val style = if (!isExtended) MaterialTheme.typography.titleMedium else LocalTextStyle.current
+            val text = if (isExpanded) "to spend" else sumOfAvailableMoney.formattedMoney
+            val style = if (!isExpanded) MaterialTheme.typography.titleMedium else LocalTextStyle.current
             Text(text = text, style = style)
-        }
-    }
-}
-
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun CategoryHeaderExtendedPreview() {
-    GetALifeTheme {
-        Surface {
-            CategoryHeader(
-                name = "Quality of Life",
-                sumOfAvailableMoney = Money(value = 100.00)
-            )
         }
     }
 }
@@ -77,7 +67,21 @@ fun CategoryHeaderPreview() {
             CategoryHeader(
                 name = "Quality of Life",
                 sumOfAvailableMoney = Money(value = 12345.67),
-                isExtended = false
+                isExpanded = false
+            )
+        }
+    }
+}
+
+@Preview(name = "Light", widthDp = 400)
+@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun CategoryHeaderExtendedPreview() {
+    GetALifeTheme {
+        Surface {
+            CategoryHeader(
+                name = "Quality of Life",
+                sumOfAvailableMoney = Money(value = 100.00)
             )
         }
     }

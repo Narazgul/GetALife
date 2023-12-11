@@ -4,18 +4,20 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
 import app.tinygiants.getalife.presentation.budget.Category
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.Header
+import app.tinygiants.getalife.theme.spacing
 
 const val ANIMATION_TIME_1_SECOND = 1000
-const val ANIMATION_TIME_300 = 300
+const val ANIMATION_TIME_300_MILLISECONDS = 300
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BudgetsList(
     categories: Map<Header, List<Category>>,
@@ -28,34 +30,53 @@ fun BudgetsList(
         exit = slideOutVertically()
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(0.5.dp)
+            verticalArrangement = Arrangement.spacedBy(spacing.halfDp)
         ) {
             categories.forEach { (header, items) ->
-                stickyHeader(key = header.id) {
-                    CategoryHeader(
-                        name = header.name,
-                        sumOfAvailableMoney = header.sumOfAvailableMoney,
-                        isExtended = header.isExpanded,
-                        onHeaderClicked = header.toggleExpanded
-                    )
-                }
-                items(items = items, key = { item -> item.id }) { item ->
-                    AnimatedVisibility(
-                        visible = header.isExpanded,
-                        enter = fadeIn(animationSpec = tween(ANIMATION_TIME_1_SECOND)) +
-                                expandVertically(animationSpec = tween(ANIMATION_TIME_300)),
-                        exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300))
-                    ) {
-                        Category(
-                            name = item.name,
-                            budgetTarget = item.budgetTarget,
-                            availableMoney = item.availableMoney,
-                            progress = item.progress,
-                            optionalText = item.optionalText
-                        )
-                    }
-                }
+
+                stickyHeader(header = header)
+                items(isHeaderExpanded = header.isExpanded, items = items)
+
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun LazyListScope.stickyHeader(header: Header) {
+    this.stickyHeader(key = header.id) {
+        CategoryHeader(
+            name = header.name,
+            sumOfAvailableMoney = header.sumOfAvailableMoney,
+            isExpanded = header.isExpanded,
+            onHeaderClicked = header.toggleExpanded
+        )
+    }
+}
+
+private fun LazyListScope.items(isHeaderExpanded: Boolean, items: List<Category>) {
+
+    val firstCategoryItem = items.firstOrNull()
+    val lastCategoryItem = items.lastOrNull()
+
+    this.items(items = items, key = { item -> item.id }) { item ->
+        AnimatedVisibility(
+            visible = isHeaderExpanded,
+            enter = fadeIn(animationSpec = tween(ANIMATION_TIME_1_SECOND)) +
+                    expandVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
+            exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
+            modifier = Modifier.padding(
+                top = if (item == firstCategoryItem) spacing.tiny else spacing.halfDp,
+                bottom = if (item == lastCategoryItem) spacing.tiny else spacing.halfDp
+            )
+        ) {
+            Category(
+                name = item.name,
+                budgetTarget = item.budgetTarget,
+                availableMoney = item.availableMoney,
+                progress = item.progress,
+                optionalText = item.optionalText
+            )
         }
     }
 }
