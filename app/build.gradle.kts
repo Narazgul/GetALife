@@ -45,7 +45,7 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
 
-            manifestPlaceholders["appName"] = "GetALife Debug"
+            manifestPlaceholders["appName"] = "Get a Life Debug"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"debug\"")
         }
         release {
@@ -53,7 +53,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
 
-            manifestPlaceholders["appName"] = "GetALife"
+            manifestPlaceholders["appName"] = "Get a Life"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"release\"")
         }
     }
