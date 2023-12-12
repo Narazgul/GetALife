@@ -1,4 +1,4 @@
-package app.tinygiants.getalife
+package app.tinygiants.getalife.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
