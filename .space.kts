@@ -44,3 +44,25 @@ job("Build and run tests") {
 
     gradlew("amazoncorretto:17-alpine", "build")
 }
+
+job("Upload GetALife Debug APK to Firebase Distribution") {
+    // Only manually triggered in CI/CD buildUp phase
+    startOn {
+        gitPush { enabled = false }
+    }
+
+    requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
+
+    gradlew("amazoncorretto:17-alpine", "assembleDebug appDistributionUploadDebug")
+}
+
+job("Upload GetALife Release Bundle to Firebase Distribution") {
+    // Only manually triggered in CI/CD buildUp phase
+    startOn {
+        gitPush { enabled = false }
+    }
+
+    requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
+
+    gradlew("amazoncorretto:17-alpine", "bundleRelease appDistributionUploadRelease")
+}

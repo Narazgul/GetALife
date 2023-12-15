@@ -47,6 +47,11 @@ android {
 
             manifestPlaceholders["appName"] = "Get A Life Debug"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"debug\"")
+
+            firebaseAppDistribution {
+                artifactType = "APK"
+                groups = "internal"
+            }
         }
         release {
             isMinifyEnabled = true
@@ -55,6 +60,11 @@ android {
 
             manifestPlaceholders["appName"] = "Get A Life"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"release\"")
+
+            firebaseAppDistribution {
+                artifactType = "AAB"
+                groups = "internal"
+            }
         }
     }
 
