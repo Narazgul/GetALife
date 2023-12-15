@@ -45,7 +45,7 @@ job("Build and run tests") {
     gradlew("amazoncorretto:17-alpine", "build")
 }
 
-job("Upload GetALife Debug APK to Firebase Distribution") {
+job("Upload Debug APK") {
     // Only manually triggered in CI/CD buildUp phase
     startOn {
         gitPush { enabled = false }
@@ -56,7 +56,7 @@ job("Upload GetALife Debug APK to Firebase Distribution") {
     gradlew("amazoncorretto:17-alpine", "assembleDebug appDistributionUploadDebug")
 }
 
-job("Upload GetALife Release Bundle to Firebase Distribution") {
+job("Upload Release AAB") {
     // Only manually triggered in CI/CD buildUp phase
     startOn {
         gitPush { enabled = false }
