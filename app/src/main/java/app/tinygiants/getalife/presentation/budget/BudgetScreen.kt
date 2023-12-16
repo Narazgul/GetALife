@@ -6,23 +6,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
 import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
-
-@Composable
-fun BudgetScreen() {
-    val viewModel: BudgetViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    BudgetScreen(uiState)
-}
 
 @Composable
 fun BudgetScreen(uiState: BudgetUiState) {

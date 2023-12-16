@@ -1,14 +1,19 @@
 package app.tinygiants.getalife
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.tinygiants.getalife.presentation.account.AccountScreen
+import app.tinygiants.getalife.presentation.account.AccountViewModel
 import app.tinygiants.getalife.presentation.budget.BudgetScreen
+import app.tinygiants.getalife.presentation.budget.BudgetViewModel
 
 @Composable
 fun GetALifeNavHost(
@@ -32,7 +37,11 @@ fun NavGraphBuilder.budgetGraph() {
         startDestination = Screens.Budget.route,
         route = NestedNavGraph.BudgetNavGraph.route
     ) {
-        composable(Screens.Budget.route) { BudgetScreen() }
+        composable(Screens.Budget.route) {
+            val viewModel: BudgetViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            BudgetScreen(uiState)
+        }
     }
 }
 
@@ -41,7 +50,11 @@ fun NavGraphBuilder.accountGraph() {
         startDestination = Screens.Account.route,
         route = NestedNavGraph.AccountNavGraph.route
     ) {
-        composable(Screens.Account.route) { AccountScreen() }
+        composable(Screens.Account.route) {
+            val viewModel: AccountViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            AccountScreen(uiState)
+        }
     }
 }
 
