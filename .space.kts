@@ -54,6 +54,7 @@ job("Upload Debug APK") {
     requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
 
     gradlew("amazoncorretto:17-alpine", "assembleDebug appDistributionUploadDebug")
+    gradlew("amazoncorretto:17-alpine", "appDistributionUploadDebug")
 }
 
 job("Upload Release AAB") {
@@ -64,5 +65,6 @@ job("Upload Release AAB") {
 
     requirements { workerType = WorkerTypes.SPACE_CLOUD_UBUNTU_LTS_LARGE }
 
-    gradlew("amazoncorretto:17-alpine", "bundleRelease appDistributionUploadRelease")
+    gradlew("amazoncorretto:17-alpine", "bundleRelease")
+    gradlew("amazoncorretto:17-alpine", "appDistributionUploadRelease")
 }
