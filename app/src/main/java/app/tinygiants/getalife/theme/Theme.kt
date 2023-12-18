@@ -1,6 +1,7 @@
 package app.tinygiants.getalife.theme
 
 import android.app.Activity
+import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
@@ -9,6 +10,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 
 private val lightColors = lightColorScheme(
@@ -108,3 +110,7 @@ fun GetALifeTheme(
         content = content
     )
 }
+
+@Preview(name = "Light", widthDp = 400)
+@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+annotation class LightAndDarkPreviews

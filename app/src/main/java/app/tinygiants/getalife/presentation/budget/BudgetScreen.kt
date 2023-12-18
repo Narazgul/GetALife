@@ -1,16 +1,15 @@
 package app.tinygiants.getalife.presentation.budget
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
 import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.LightAndDarkPreviews
 
 @Composable
 fun BudgetScreen(uiState: BudgetUiState) {
@@ -28,10 +27,10 @@ fun BudgetScreen(uiState: BudgetUiState) {
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
-fun BudgetScreenPreview() {
+fun BudgetScreenPreview(
+) {
     GetALifeTheme {
         Surface {
             BudgetScreen(
@@ -41,8 +40,7 @@ fun BudgetScreenPreview() {
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun BudgetScreenLoadingPreview() {
     GetALifeTheme {
@@ -57,8 +55,7 @@ fun BudgetScreenLoadingPreview() {
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun BudgetScreenErrorPreview() {
     GetALifeTheme {

@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +14,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.tooling.preview.Preview
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
@@ -54,8 +53,7 @@ fun AddCategoryItem(
     )
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun AddCategoryPreview() {
     GetALifeTheme {

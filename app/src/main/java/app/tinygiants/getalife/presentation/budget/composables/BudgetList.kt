@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import android.content.res.Configuration
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -13,12 +12,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import app.tinygiants.getalife.presentation.budget.Category
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.Header
 import app.tinygiants.getalife.presentation.budget.exampleMap
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 const val ANIMATION_TIME_1_SECOND = 1000
@@ -89,8 +88,7 @@ private fun LazyListScope.items(isHeaderExpanded: Boolean, items: List<Category>
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun BudgetListPreview() {
     GetALifeTheme {

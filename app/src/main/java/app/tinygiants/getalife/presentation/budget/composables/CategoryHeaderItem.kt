@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,17 +11,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.presentation.budget.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun CategoryHeader(
     name: String = "",
     sumOfAvailableMoney: Money = Money(value = 0.00),
-    isExpanded: Boolean = true,
+    isExpanded: Boolean = false,
     onHeaderClicked: () -> Unit = { }
 ) {
     Row(
@@ -58,30 +57,28 @@ fun CategoryHeader(
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun CategoryHeaderPreview() {
     GetALifeTheme {
         Surface {
             CategoryHeader(
                 name = "Quality of Life",
-                sumOfAvailableMoney = Money(value = 12345.67),
-                isExpanded = false
+                sumOfAvailableMoney = Money(value = 12345.67)
             )
         }
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
-fun CategoryHeaderExtendedPreview() {
+fun CategoryHeaderExpandedPreview() {
     GetALifeTheme {
         Surface {
             CategoryHeader(
                 name = "Quality of Life",
-                sumOfAvailableMoney = Money(value = 100.00)
+                sumOfAvailableMoney = Money(value = 100.00),
+                isExpanded = true
             )
         }
     }

@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import app.tinygiants.getalife.presentation.budget.Money
 import app.tinygiants.getalife.theme.*
 import app.tinygiants.getalife.util.toCurrencyFormattedString
@@ -117,8 +115,7 @@ fun Category(
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun FullCategoryPreview() {
     GetALifeTheme {
@@ -134,8 +131,7 @@ fun FullCategoryPreview() {
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun SemiFilledCategoryPreview() {
     GetALifeTheme {
@@ -151,8 +147,7 @@ fun SemiFilledCategoryPreview() {
     }
 }
 
-@Preview(name = "Light", widthDp = 400)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@LightAndDarkPreviews
 @Composable
 fun EmptyCategoryPreview() {
     GetALifeTheme {
