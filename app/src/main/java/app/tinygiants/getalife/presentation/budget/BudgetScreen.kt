@@ -3,7 +3,6 @@ package app.tinygiants.getalife.presentation.budget
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,15 +11,10 @@ import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
 import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun BudgetScreen(uiState: BudgetUiState) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(spacing.default)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         BudgetsList(
             categories = uiState.categories,
             isLoading = uiState.isLoading,

@@ -5,6 +5,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -13,7 +14,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import app.tinygiants.getalife.presentation.budget.*
+import app.tinygiants.getalife.presentation.budget.Category
+import app.tinygiants.getalife.presentation.budget.ErrorMessage
+import app.tinygiants.getalife.presentation.budget.Header
+import app.tinygiants.getalife.presentation.budget.exampleMap
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
@@ -32,7 +36,8 @@ fun BudgetsList(
         exit = slideOutVertically()
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(spacing.halfDp)
+            verticalArrangement = Arrangement.spacedBy(spacing.halfDp),
+            contentPadding = PaddingValues(spacing.default)
         ) {
             categories.forEach { (header, items) ->
 
@@ -90,8 +95,10 @@ private fun LazyListScope.items(isHeaderExpanded: Boolean, items: List<Category>
 fun BudgetListPreview() {
     GetALifeTheme {
         Surface {
-            BudgetScreen(
-                BudgetUiState(categories = exampleMap())
+            BudgetsList(
+                categories = exampleMap(),
+                isLoading = false,
+                errorMessage = null
             )
         }
     }
