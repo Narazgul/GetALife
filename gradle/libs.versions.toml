@@ -1,21 +1,27 @@
 [versions]
-kotlinVersion = "1.9.20"
+
+kotlinVersion = "1.9.22"
 ksp-version = "1.9.20-1.0.14"
+android-gradle-plugin = "8.2.1"
+
 googleServicesVersion = "4.4.0"
+
+firebaseBomVersion = "32.7.0"
 firebase-appdistribution-gradle = "4.0.1"
 firebaseCrashlytics = "2.9.9"
 firebase-perf-plugin = "1.4.2"
-junit = "1.1.5"
-android-gradle-plugin = "8.2.0"
-hiltVersion = "2.49"
+
+hiltVersion = "2.50"
 hilt-navigation-compose = "1.1.0"
+
+composeBomVersion = "2023.10.01"
 activityCompose = "1.8.2"
 core-ktx = "1.12.0"
-lifecycleRuntimeCompose = "2.6.2"
+lifecycleRuntimeCompose = "2.7.0"
 navigationCompose = "2.7.6"
 roomVersion = "2.6.1"
-composeBomVersion = "2023.10.01"
-firebaseBomVersion = "32.7.0"
+
+junit = "1.1.5"
 jUnit4Version = "4.13.2"
 uiTestJunit4 = "1.5.4"
 
@@ -62,6 +68,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
+room-test-helpers = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
 # Testing
 junit4 = { module = "junit:junit", version.ref = "jUnit4Version" }
