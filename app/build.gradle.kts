@@ -72,7 +72,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     packaging {
@@ -89,19 +89,25 @@ kotlin {
 dependencies {
     implementation(libs.bundles.core)
 
+    // Jetpack Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
     debugImplementation(libs.bundles.compose.debug)
 
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
+    // Hilt
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.android.compiler)
 
+    // Room
     implementation(libs.bundles.room)
+    testImplementation(libs.room.test.helpers)
     ksp(libs.room.compiler)
 
+    // Junit
     testImplementation(libs.junit4)
     androidTestImplementation(libs.bundles.junit4)
 }
