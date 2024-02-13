@@ -1,10 +1,13 @@
 package app.tinygiants.getalife.di
 
+import android.content.Context
+import app.tinygiants.getalife.data.local.AppDatabase
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
@@ -18,9 +21,15 @@ object AppModule {
     @Provides
     fun provideFirebaseFirestore() = Firebase.firestore
 
+    @Provides
+    fun provideHeaderDao(@ApplicationContext appContext: Context) = AppDatabase.getDatabase(appContext).headerDao()
+
+    @Provides
+    fun provideCategoryDao(@ApplicationContext appContext: Context) = AppDatabase.getDatabase(appContext).categoryDao()
+
     // endregion
 
-    // region Dispatcher
+    // region Dispatchers
 
     @Main
     @Provides

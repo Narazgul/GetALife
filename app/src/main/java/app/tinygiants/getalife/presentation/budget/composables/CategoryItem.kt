@@ -1,48 +1,84 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import app.tinygiants.getalife.domain.usecase.toCurrencyFormattedString
 import app.tinygiants.getalife.presentation.budget.Money
-import app.tinygiants.getalife.theme.*
-import app.tinygiants.getalife.util.toCurrencyFormattedString
+import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.LightAndDarkPreviews
+import app.tinygiants.getalife.theme.onSuccess
+import app.tinygiants.getalife.theme.onWarning
+import app.tinygiants.getalife.theme.spacing
+import app.tinygiants.getalife.theme.success
+import app.tinygiants.getalife.theme.warning
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Category(
     name: String = "",
-    budgetTarget: Money = Money(value =  0.0),
-    availableMoney: Money = Money(value =  0.0),
+    budgetTarget: Money = Money(value = 0.0),
+    availableMoney: Money = Money(value = 0.0),
     progress: Float = 0f,
-    optionalText: String? = null
+    optionalText: String? = null,
+    onUpdateCategoryClicked: (String) -> Unit = { },
+    onUpdateBudgetTargetClicked: (Money) -> Unit = { },
+    onUpdateAvailableMoneyClicked: (Money) -> Unit = { },
+    onDeleteCategoryClicked: () -> Unit = { }
 ) {
+
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var categoryNameUserInput by rememberSaveable { mutableStateOf(name) }
+    var budget by remember { mutableStateOf(budgetTarget) }
+    var money by remember { mutableStateOf(availableMoney) }
+    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budget.value.toString()) }
+    var availableMoneyUserInput by rememberSaveable { mutableStateOf(money.value.toString()) }
+    val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(spacing.small)
-            )
-            .border(
-                BorderStroke(
-                    width = spacing.tiny,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                ),
-                RoundedCornerShape(spacing.small)
+            .combinedClickable(
+                onClick = { },
+                onLongClick = { showBottomSheet = true }
             )
             .padding(
                 horizontal = spacing.large,
-                vertical = spacing.default)
+                vertical = spacing.default
+            )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -96,11 +132,11 @@ fun Category(
                 else -> success
             }
             LinearProgressIndicator(
-                progress = progress,
+                progress = { animatedProgress },
                 modifier = Modifier.fillMaxWidth(),
                 color = progressColor,
                 trackColor = progressBackground,
-                strokeCap = StrokeCap.Round
+                strokeCap = StrokeCap.Round,
             )
         }
         Spacer(modifier = Modifier.height(spacing.default))
@@ -111,6 +147,93 @@ fun Category(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Start
             )
+        }
+    }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = spacing.large)
+            ) {
+                Row {
+                    TextField(
+                        value = categoryNameUserInput,
+                        onValueChange = { userInput ->
+                            categoryNameUserInput = if (userInput.toDouble().isNaN()) categoryNameUserInput else userInput.replace(",", ".")
+                        },
+                        label = { Text("Kategorie umbenennen") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(spacing.default))
+                    Button(
+                        onClick = {
+                            if (categoryNameUserInput.isNotBlank()) {
+                                onUpdateCategoryClicked(categoryNameUserInput)
+                                categoryNameUserInput = ""
+                            }
+                        }
+                    ) { Text(text = "Speichern") }
+                }
+                Spacer(modifier = Modifier.height(spacing.default))
+                Row {
+                    TextField(
+                        value = budgetTargetUserInput,
+                        onValueChange = { userInput ->
+                            budgetTargetUserInput = userInput
+                            budget = Money(userInput.toDoubleOrNull() ?: budget.value)
+                        },
+                        prefix = { Text(availableMoney.currencySymbol) },
+                        label = { Text("Budget Ziel ändern") },
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .weight(1f)
+                            .onFocusChanged { focusState ->
+                                budgetTargetUserInput = if (focusState.hasFocus) "" else budget.value.toString()
+                            }
+                    )
+                    Spacer(modifier = Modifier.width(spacing.default))
+                    Button(onClick = { onUpdateBudgetTargetClicked(Money(value = budget.value)) }) { Text(text = "Speichern") }
+                }
+                Spacer(modifier = Modifier.height(spacing.default))
+                Row {
+                    TextField(
+                        value = availableMoneyUserInput,
+                        onValueChange = { userInput ->
+                            availableMoneyUserInput = userInput
+                            money = Money(userInput.toDoubleOrNull() ?: money.value)
+                        },
+                        prefix = { Text(availableMoney.currencySymbol) },
+                        label = { Text("Verfügbares Geld ändern") },
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .weight(1f)
+                            .onFocusChanged { focusState ->
+                                availableMoneyUserInput = if (focusState.hasFocus) "" else money.value.toString()
+                            }
+                    )
+                    Spacer(modifier = Modifier.width(spacing.default))
+                    Button(onClick = { onUpdateAvailableMoneyClicked(Money(value = money.value)) }) { Text(text = "Speichern") }
+                }
+                Spacer(modifier = Modifier.height(spacing.default))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = { onDeleteCategoryClicked() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text(
+                            text = "$name löschen",
+                            color = MaterialTheme.colorScheme.onError
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(spacing.extraLarge))
         }
     }
 }

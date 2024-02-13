@@ -19,7 +19,7 @@ import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
-fun AddCategoryItem(
+fun EmptyCategoryItem(
     onItemClick: () -> Int
 ) {
     val color = MaterialTheme.colorScheme.outline
@@ -58,7 +58,7 @@ fun AddCategoryItem(
 fun AddCategoryPreview() {
     GetALifeTheme {
         Surface {
-            AddCategoryItem { 0 }
+            EmptyCategoryItem { 0 }
         }
     }
 }

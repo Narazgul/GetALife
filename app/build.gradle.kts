@@ -100,14 +100,15 @@ dependencies {
 
     // Hilt
     implementation(libs.bundles.hilt)
-    ksp(libs.hilt.android.compiler)
+    ksp(libs.hilt.compiler)
 
     // Room
     implementation(libs.bundles.room)
-    testImplementation(libs.room.test.helpers)
+    testImplementation(libs.room.test)
     ksp(libs.room.compiler)
 
     // Junit
-    testImplementation(libs.junit4)
+    testRuntimeOnly(libs.junit5.engine)
+    testImplementation(libs.bundles.testing)
     androidTestImplementation(libs.bundles.junit4)
 }

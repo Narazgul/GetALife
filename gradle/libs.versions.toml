@@ -1,29 +1,31 @@
 [versions]
 
 kotlinVersion = "1.9.22"
-ksp-version = "1.9.20-1.0.14"
-android-gradle-plugin = "8.2.1"
+ksp-version = "1.9.22-1.0.16"
+android-gradle-plugin = "8.2.2"
 
-googleServicesVersion = "4.4.0"
+googleServicesVersion = "4.4.1"
 
-firebaseBomVersion = "32.7.0"
-firebase-appdistribution-gradle = "4.0.1"
+firebaseBomVersion = "32.7.2"
+firebase-appdistribution-gradle = "4.1.0"
 firebaseCrashlytics = "2.9.9"
 firebase-perf-plugin = "1.4.2"
 
 hiltVersion = "2.50"
 hilt-navigation-compose = "1.1.0"
 
-composeBomVersion = "2023.10.01"
+composeBomVersion = "2024.02.00"
 activityCompose = "1.8.2"
 core-ktx = "1.12.0"
 lifecycleRuntimeCompose = "2.7.0"
-navigationCompose = "2.7.6"
+navigationCompose = "2.7.7"
 roomVersion = "2.6.1"
 
 junit = "1.1.5"
 jUnit4Version = "4.13.2"
-uiTestJunit4 = "1.5.4"
+uiTestJunit4 = "1.6.1"
+junit5Version = "5.10.2"
+assertk = "0.28.0"
 
 ####################################################################################################
 
@@ -53,27 +55,31 @@ debug-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifes
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
-firebase-perf = { module = "com.google.firebase:firebase-perf-ktx" }
-firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
-firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-perf = { module = "com.google.firebase:firebase-perf" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 
 # Hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
+hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 
 # Room
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
-room-test-helpers = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
+room-test = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
 # Testing
 junit4 = { module = "junit:junit", version.ref = "jUnit4Version" }
 junit4-androidx = { module = "androidx.test.ext:junit", version.ref = "junit" }
-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
+junit4-ui = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
+junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5Version" }
+junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5Version" }
+junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5Version" }
+assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 
 ####################################################################################################
 
@@ -84,7 +90,8 @@ room = ["room-ktx", "room-runtime"]
 compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
 compose-debug = ["debug-compose-ui-tooling", "debug-compose-ui-tooling-preview", "debug-compose-ui-test-manifest"]
 firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "firebase-auth", "firebase-firestore"]
-junit4 = ["junit4-androidx", "ui-test-junit4"]
+junit4 = ["junit4-androidx", "junit4-ui"]
+testing = ["junit4", "junit5-api", "junit5-params", "assertk"]
 
 ####################################################################################################
 
