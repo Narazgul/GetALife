@@ -58,19 +58,18 @@ fun CategoryHeader(
     var categoryNameUserInput by rememberSaveable { mutableStateOf("") }
 
     Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = onHeaderClicked,
                 onLongClick = { showBottomSheet = true }
             )
-            .height(50.dp)
             .background(
                 color = MaterialTheme.colorScheme.tertiaryContainer,
                 shape = RoundedCornerShape(size = spacing.small)
             )
             .padding(horizontal = spacing.large),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
@@ -93,10 +92,7 @@ fun CategoryHeader(
     }
 
     if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        ) {
+        ModalBottomSheet(onDismissRequest = { showBottomSheet = false }) {
             Column(
                 modifier = Modifier.padding(horizontal = spacing.large)
             ) {
@@ -105,7 +101,9 @@ fun CategoryHeader(
                         value = categoryNameUserInput,
                         onValueChange = { userInput -> categoryNameUserInput = userInput },
                         label = { Text("Neue Kategorie hinzufügen") },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(color = MaterialTheme.colorScheme.background)
                     )
                     Spacer(modifier = Modifier.width(spacing.default))
                     Button(

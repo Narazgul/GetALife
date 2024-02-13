@@ -76,8 +76,9 @@ fun Category(
                 onLongClick = { showBottomSheet = true }
             )
             .padding(
-                horizontal = spacing.large,
-                vertical = spacing.default
+                horizontal = spacing.default,
+                vertical = spacing.small
+
             )
     ) {
         Row(

@@ -57,9 +57,8 @@ fun BudgetScreen(
 
         var headerName by rememberSaveable { mutableStateOf("") }
         val keyboardController = LocalSoftwareKeyboardController.current
-        Row(modifier = Modifier
-            .align(Alignment.BottomCenter)
-        ) {
+
+        Row(modifier = Modifier.align(Alignment.BottomCenter)) {
             TextField(
                 value = headerName,
                 onValueChange = { newText -> headerName = newText },

@@ -8,8 +8,9 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -42,16 +43,14 @@ fun BudgetsList(
         enter = slideInVertically(),
         exit = slideOutVertically()
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(spacing.halfDp),
-            contentPadding = PaddingValues(spacing.default)
-        ) {
+        LazyColumn(contentPadding = PaddingValues(spacing.extraSmall)) {
             groups.forEach { (header, items) ->
 
                 stickyHeader(
                     header = header,
                     onUserClickEvent = onUserClickEvent
                 )
+
                 items(
                     isHeaderExpanded = header.isExpanded,
                     uiCategories = items,
@@ -84,6 +83,7 @@ private fun LazyListScope.stickyHeader(
             onDeleteHeaderClicked = onDeleteHeaderClicked,
             onAddCategoryClicked = onAddCategoryClicked
         )
+        Spacer(modifier = Modifier.height(spacing.tiny))
     }
 }
 
