@@ -13,8 +13,9 @@ fun Double.toCurrencyFormattedString(maximumDigits: Int = 2, locale: Locale = Lo
 
 class CurrencyUseCase {
     companion object {
-        fun getCurrencyCode(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).currencyCode
 
+        fun getCurrencyCode(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).currencyCode
         fun getCurrencySymbol(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).symbol
+
     }
 }
