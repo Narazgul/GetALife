@@ -85,7 +85,7 @@ private val darkColors = darkColorScheme(
 fun GetALifeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -115,6 +115,6 @@ fun GetALifeTheme(
     )
 }
 
-@Preview(name = "Light", widthDp = 400, apiLevel = 33)
-@Preview(name = "Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES, apiLevel = 33)
+@Preview(name = "A-Light", widthDp = 400, apiLevel = 33)
+@Preview(name = "B-Dark", widthDp = 400, uiMode = Configuration.UI_MODE_NIGHT_YES, apiLevel = 33)
 annotation class LightAndDarkPreviews

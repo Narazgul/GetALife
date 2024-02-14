@@ -66,7 +66,7 @@ fun CategoryHeader(
                 onLongClick = { showBottomSheet = true }
             )
             .background(
-                color = MaterialTheme.colorScheme.tertiaryContainer,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(size = spacing.small)
             )
             .padding(horizontal = spacing.large),
@@ -74,20 +74,22 @@ fun CategoryHeader(
         Icon(
             imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
             contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.size(24.dp)
         )
         Text(
             text = name,
             style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.padding(start = spacing.default)
         )
         Spacer(modifier = Modifier.weight(1f))
         val alignment = if (isExpanded) Alignment.CenterHorizontally else Alignment.End
         Column(horizontalAlignment = alignment) {
-            Text(text = "Available")
+            Text(text = "Available", color = MaterialTheme.colorScheme.onPrimaryContainer)
             val text = if (isExpanded) "to spend" else sumOfAvailableMoney.formattedMoney
             val style = if (!isExpanded) MaterialTheme.typography.titleMedium else LocalTextStyle.current
-            Text(text = text, style = style)
+            Text(text = text, style = style, color = MaterialTheme.colorScheme.onPrimaryContainer)
         }
     }
 

@@ -126,9 +126,9 @@ fun Category(
                 .fillMaxWidth()
                 .height(spacing.small)
         ) {
-            val progressBackground = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+            val progressBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             val progressColor = when {
-                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.secondary
+                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.primary
                 availableMoney.value < budgetTarget.value -> warning
                 else -> success
             }
@@ -154,7 +154,7 @@ fun Category(
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ) {
             Column(
                 modifier = Modifier.padding(horizontal = spacing.large)
