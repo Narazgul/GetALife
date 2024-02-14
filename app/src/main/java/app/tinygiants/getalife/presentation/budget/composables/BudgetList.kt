@@ -8,13 +8,17 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -73,7 +77,7 @@ private fun LazyListScope.stickyHeader(
     val onAddCategoryClicked =
         { categoryName: String -> onUserClickEvent(UserClickEvent.AddCategory(headerId = header.id, categoryName = categoryName)) }
 
-    this.stickyHeader(key = header.id) {
+    stickyHeader(key = header.id) {
         CategoryHeader(
             name = header.name,
             sumOfAvailableMoney = header.sumOfAvailableMoney,
@@ -96,7 +100,7 @@ private fun LazyListScope.items(
     val firstCategoryItem = uiCategories.firstOrNull()
     val lastCategoryItem = uiCategories.lastOrNull()
 
-    this.items(
+    items(
         items = uiCategories,
         key = { uiCategory -> uiCategory.id }
     ) { uiCategory ->
@@ -124,17 +128,25 @@ private fun LazyListScope.items(
                 bottom = if (uiCategory == lastCategoryItem) spacing.tiny else spacing.halfDp
             )
         ) {
-            Category(
-                name = uiCategory.name,
-                budgetTarget = uiCategory.budgetTarget,
-                availableMoney = uiCategory.availableMoney,
-                progress = uiCategory.progress,
-                optionalText = uiCategory.optionalText,
-                onUpdateCategoryClicked = onUpdateNameClicked,
-                onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
-                onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
-                onDeleteCategoryClicked = onDeleteCategoryClicked
-            )
+            Column {
+                Category(
+                    name = uiCategory.name,
+                    budgetTarget = uiCategory.budgetTarget,
+                    availableMoney = uiCategory.availableMoney,
+                    progress = uiCategory.progress,
+                    optionalText = uiCategory.optionalText,
+                    onUpdateCategoryClicked = onUpdateNameClicked,
+                    onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
+                    onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
+                    onDeleteCategoryClicked = onDeleteCategoryClicked
+                )
+                if (uiCategory != lastCategoryItem) Spacer(
+                    modifier = Modifier
+                        .height(spacing.tiny)
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f))
+                )
+            }
         }
     }
 }
