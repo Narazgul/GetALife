@@ -7,13 +7,15 @@ import java.util.Locale
 
 @Immutable
 data class Money(
-    val value: Double
+    val value: Double,
+    val maximumDigits: Int = 2,
+    val locale: Locale = Locale.getDefault()
 ) {
     val currencyCode: String = getCurrencyCode()
     val currencySymbol: String = getCurrencySymbol()
     val formattedMoney: String = value.toCurrencyFormattedString()
 
-    private fun Double.toCurrencyFormattedString(maximumDigits: Int = 2, locale: Locale = Locale.getDefault()): String {
+    private fun Double.toCurrencyFormattedString(): String {
         val numberFormat = NumberFormat.getCurrencyInstance()
         numberFormat.maximumFractionDigits = maximumDigits
         numberFormat.currency = Currency.getInstance(locale)
