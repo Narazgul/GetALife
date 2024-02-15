@@ -61,8 +61,8 @@ class FirebaseRemoteDataSource @Inject constructor() {
                 item.id to CategoryDto(
                     id = item.id.toString(),
                     name = item.name,
-                    budgetTarget = item.budgetTarget,
-                    availableMoney = item.availableMoney,
+                    budgetTarget = item.budgetTarget.value,
+                    availableMoney = item.availableMoney.value,
                     position = index
                 )
             }.toMap()
@@ -91,8 +91,8 @@ class FirebaseRemoteDataSource @Inject constructor() {
                 item.id to CategoryDto(
                     id = item.id.toString(),
                     name = item.name,
-                    budgetTarget = item.budgetTarget,
-                    availableMoney = item.availableMoney,
+                    budgetTarget = item.budgetTarget.value,
+                    availableMoney = item.availableMoney.value,
                     position = index
                 )
             }.toMap()

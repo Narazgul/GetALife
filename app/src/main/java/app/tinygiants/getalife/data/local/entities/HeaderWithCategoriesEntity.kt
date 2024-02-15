@@ -3,7 +3,7 @@ package app.tinygiants.getalife.data.local.entities
 import androidx.room.Embedded
 import androidx.room.Relation
 
-data class HeaderWithCategories(
+data class HeaderWithCategoriesEntity(
     @Embedded val header: HeaderEntity,
     @Relation(
         parentColumn = "id",

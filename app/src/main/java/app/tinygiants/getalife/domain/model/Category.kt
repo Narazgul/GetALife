@@ -1,12 +1,14 @@
 package app.tinygiants.getalife.domain.model
 
-import kotlin.random.Random
+import androidx.compose.runtime.Immutable
 
+@Immutable
 data class Category(
-    val id: Long = Random.nextLong(),
+    val id: Long,
     val headerId: Long,
-    val name: String = "kein Name vergeben",
-    val budgetTarget: Double = 0.00,
-    val availableMoney: Double = 0.00,
-    val optionalText: String = ""
+    val name: String,
+    val budgetTarget: Money,
+    val availableMoney: Money,
+    val progress: Float,
+    val optionalText: String
 )

@@ -22,10 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
-import app.tinygiants.getalife.presentation.budget.Money
-import app.tinygiants.getalife.presentation.budget.UiCategory
-import app.tinygiants.getalife.presentation.budget.UiHeader
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.budget.fakeCategories
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -37,7 +37,7 @@ const val ANIMATION_TIME_300_MILLISECONDS = 300
 
 @Composable
 fun BudgetsList(
-    groups: Map<UiHeader, List<UiCategory>>,
+    groups: Map<Header, List<Category>>,
     isLoading: Boolean,
     errorMessage: ErrorMessage?,
     onUserClickEvent: (UserClickEvent) -> Unit
@@ -57,7 +57,7 @@ fun BudgetsList(
 
                 items(
                     isHeaderExpanded = header.isExpanded,
-                    uiCategories = items,
+                    categories = items,
                     onUserClickEvent = onUserClickEvent
                 )
             }
@@ -67,13 +67,16 @@ fun BudgetsList(
 
 @OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.stickyHeader(
-    header: UiHeader,
+    header: Header,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
-    val onHeaderClicked = { onUserClickEvent(UserClickEvent.ToggleCategoryGroupExpandedState(header = header.copy(isExpanded = !header.isExpanded))) }
+    val onHeaderClicked = { onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(isExpanded = !header.isExpanded))) }
+
     val onUpdateHeaderNameClicked =
-        { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateHeaderName(header = header.copy(name = updatedCategoryName))) }
+        { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(name = updatedCategoryName))) }
+
     val onDeleteHeaderClicked = { onUserClickEvent(UserClickEvent.DeleteHeader(header = header)) }
+
     val onAddCategoryClicked =
         { categoryName: String -> onUserClickEvent(UserClickEvent.AddCategory(headerId = header.id, categoryName = categoryName)) }
 
@@ -93,15 +96,15 @@ private fun LazyListScope.stickyHeader(
 
 private fun LazyListScope.items(
     isHeaderExpanded: Boolean,
-    uiCategories: List<UiCategory>,
+    categories: List<Category>,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
 
-    val firstCategoryItem = uiCategories.firstOrNull()
-    val lastCategoryItem = uiCategories.lastOrNull()
+    val firstCategoryItem = categories.firstOrNull()
+    val lastCategoryItem = categories.lastOrNull()
 
     items(
-        items = uiCategories,
+        items = categories,
         key = { uiCategory -> uiCategory.id }
     ) { uiCategory ->
         val onUpdateNameClicked = { updatedCategoryName: String ->

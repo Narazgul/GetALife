@@ -1,20 +1,19 @@
 package app.tinygiants.getalife.domain.repository
 
-import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Group
-import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.data.local.entities.CategoryEntity
+import app.tinygiants.getalife.data.local.entities.HeaderEntity
+import app.tinygiants.getalife.data.local.entities.HeaderWithCategoriesEntity
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {
 
-    fun getBudget(): Flow<Result<List<Group>>>
+    fun getBudget(): Flow<Result<List<HeaderWithCategoriesEntity>>>
 
-    suspend fun addHeader(name: String)
-    suspend fun toggleIsExpanded(header: Header)
-    suspend fun updateHeader(header: Header)
-    suspend fun deleteHeader(header: Header)
+    suspend fun addHeader(headerEntity: HeaderEntity)
+    suspend fun updateHeader(headerEntity: HeaderEntity)
+    suspend fun deleteHeader(headerEntity: HeaderEntity)
 
-    suspend fun addCategory(headerId: Long, categoryName: String)
-    suspend fun updateCategory(category: Category)
-    suspend fun deleteCategory(category: Category)
+    suspend fun addCategory(categoryEntity: CategoryEntity)
+    suspend fun updateCategory(categoryEntity: CategoryEntity)
+    suspend fun deleteCategory(categoryEntity: CategoryEntity)
 }

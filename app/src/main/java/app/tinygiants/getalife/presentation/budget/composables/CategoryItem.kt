@@ -36,8 +36,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import app.tinygiants.getalife.domain.usecase.toCurrencyFormattedString
-import app.tinygiants.getalife.presentation.budget.Money
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.onSuccess
@@ -162,9 +161,7 @@ fun Category(
                 Row {
                     TextField(
                         value = categoryNameUserInput,
-                        onValueChange = { userInput ->
-                            categoryNameUserInput = if (userInput.toDouble().isNaN()) categoryNameUserInput else userInput.replace(",", ".")
-                        },
+                        onValueChange = { userInput -> categoryNameUserInput = userInput },
                         label = { Text("Kategorie umbenennen") },
                         modifier = Modifier.weight(1f)
                     )
@@ -281,10 +278,10 @@ fun EmptyCategoryPreview() {
                 budgetTarget = Money(940.00),
                 availableMoney = Money(0.0),
                 progress = (0.0 / 940.00).toFloat(),
-                optionalText = optionalExampleText(gap = 940.00 - 0.0)
+                optionalText = optionalExampleText(gap = 940.00 - 0.00)
             )
         }
     }
 }
 
-fun optionalExampleText(gap: Double) = "${gap.toCurrencyFormattedString()} more needed by the 30th"
+fun optionalExampleText(gap: Double) = "$gap more needed by the 30th"
