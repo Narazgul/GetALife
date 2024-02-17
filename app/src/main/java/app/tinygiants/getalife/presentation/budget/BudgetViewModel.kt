@@ -11,14 +11,8 @@ import app.tinygiants.getalife.domain.usecase.category.UpdateCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.header.AddHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.header.DeleteHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.header.UpdateHeaderUseCase
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddHeader
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteHeader
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateHeader
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -54,17 +48,12 @@ class BudgetViewModel @Inject constructor(
 
     private fun loadCategories() {
         viewModelScope.launch {
-            launch {
-
-                delay(1000L)
-
-                getBudget()
-                    .catch { throwable -> displayErrorState(throwable) }
-                    .collect { result ->
-                        result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
-                        result.onFailure { throwable -> displayErrorState(throwable) }
-                    }
-            }
+            getBudget()
+                .catch { throwable -> displayErrorState(throwable) }
+                .collect { result ->
+                    result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
+                    result.onFailure { throwable -> displayErrorState(throwable) }
+                }
         }
     }
 
@@ -76,14 +65,15 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch {
             when (clickEvent) {
 
-                is AddHeader -> addHeader(headerName = clickEvent.name)
-                is UpdateHeader -> updateHeader(header = clickEvent.header)
-                is DeleteHeader -> deleteHeader(header = clickEvent.header)
+                is AddHeader      -> addHeader(headerName = clickEvent.name)
+                is UpdateHeader   -> updateHeader(header = clickEvent.header)
+                is DeleteHeader   -> deleteHeader(header = clickEvent.header)
 
-                is AddCategory -> addCategory(headerId = clickEvent.headerId, categoryName = clickEvent.categoryName)
+                is ReplaceEmptyCategory -> updateCategory(clickEvent.category)
+
+                is AddCategory    -> addCategory(headerId = clickEvent.headerId, categoryName = clickEvent.categoryName)
                 is UpdateCategory -> updateCategory(category = clickEvent.category)
                 is DeleteCategory -> deleteCategory(category = clickEvent.category)
-
             }
         }
     }

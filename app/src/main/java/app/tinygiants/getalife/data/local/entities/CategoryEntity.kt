@@ -11,5 +11,7 @@ data class CategoryEntity(
     val name: String,
     val budgetTarget: Double,
     val availableMoney: Double,
-    val optionalText: String
+    val optionalText: String,
+    val listPosition: Int,
+    val isEmptyCategory: Boolean
 )

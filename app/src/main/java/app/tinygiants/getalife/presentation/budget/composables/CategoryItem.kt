@@ -4,32 +4,12 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -37,13 +17,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
-import app.tinygiants.getalife.theme.onSuccess
-import app.tinygiants.getalife.theme.onWarning
-import app.tinygiants.getalife.theme.spacing
-import app.tinygiants.getalife.theme.success
-import app.tinygiants.getalife.theme.warning
+import app.tinygiants.getalife.theme.*
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +39,7 @@ fun Category(
     var money by remember { mutableStateOf(availableMoney) }
     var budgetTargetUserInput by rememberSaveable { mutableStateOf(budget.value.toString()) }
     var availableMoneyUserInput by rememberSaveable { mutableStateOf(money.value.toString()) }
+
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
 
     Column(
@@ -75,9 +50,8 @@ fun Category(
                 onLongClick = { showBottomSheet = true }
             )
             .padding(
-                horizontal = spacing.default,
-                vertical = spacing.small
-
+                horizontal = spacing.large,
+                vertical = spacing.default
             )
     ) {
         Row(

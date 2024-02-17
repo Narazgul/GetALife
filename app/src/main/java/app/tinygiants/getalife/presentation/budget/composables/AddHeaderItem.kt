@@ -17,38 +17,45 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
-fun EmptyCategoryItem(
-    onReplaceEmptyClicked: (String) -> Unit = { },
+fun AddHeaderItem(
+    onUserClickEvent: (UserClickEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var categoryName by rememberSaveable { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+
+    var headerName by rememberSaveable { mutableStateOf("") }
+
+    val onNameChanged = { newName: String -> headerName = newName }
+    val onAddHeaderClicked = { onUserClickEvent(UserClickEvent.AddHeader(name = headerName)) }
 
     Row(
-        modifier = Modifier.padding(
-            start = spacing.large,
-            end = spacing.large,
-            bottom = spacing.medium
-        )
+        modifier = modifier.padding(spacing.medium)
     ) {
         OutlinedTextField(
-            value = categoryName,
-            onValueChange = { textInput -> categoryName = textInput },
-            label = { Text("Jetzt Kategorie hinzufügen") },
+            value = headerName,
+            onValueChange = { newName -> onNameChanged(newName) },
+            label = { Text("Gruppenname eingeben") },
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(spacing.default))
         Button(
             onClick = {
-                if (categoryName.isBlank()) {
+                if (headerName.isBlank()) {
                     Toast.makeText(context, "kein Name eingegeben", Toast.LENGTH_SHORT).show()
                     return@Button
                 }
-                onReplaceEmptyClicked(categoryName)
+
+                onAddHeaderClicked()
+                onNameChanged("")
+                focusManager.clearFocus()
             },
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {
@@ -59,10 +66,10 @@ fun EmptyCategoryItem(
 
 @LightAndDarkPreviews
 @Composable
-fun AddCategoryPreview() {
+fun AddHeaderItemPreview() {
     GetALifeTheme {
         Surface {
-            EmptyCategoryItem()
+            AddHeaderItem( onUserClickEvent = { } )
         }
     }
 }

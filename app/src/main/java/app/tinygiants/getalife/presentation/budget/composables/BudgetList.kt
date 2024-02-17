@@ -1,20 +1,10 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -56,7 +46,7 @@ fun BudgetsList(
                 )
 
                 items(
-                    isHeaderExpanded = header.isExpanded,
+                    header = header,
                     categories = items,
                     onUserClickEvent = onUserClickEvent
                 )
@@ -95,7 +85,7 @@ private fun LazyListScope.stickyHeader(
 }
 
 private fun LazyListScope.items(
-    isHeaderExpanded: Boolean,
+    header: Header,
     categories: List<Category>,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
@@ -105,51 +95,60 @@ private fun LazyListScope.items(
 
     items(
         items = categories,
-        key = { uiCategory -> uiCategory.id }
-    ) { uiCategory ->
+        key = { category -> category.id }
+    ) { category ->
+        val onCreateCategoryClicked = { categoryName: String ->
+            val updateCategory = category.copy(name = categoryName)
+            onUserClickEvent(UserClickEvent.ReplaceEmptyCategory(updateCategory))
+        }
         val onUpdateNameClicked = { updatedCategoryName: String ->
-            val updatedCategory = uiCategory.copy(name = updatedCategoryName)
+            val updatedCategory = category.copy(name = updatedCategoryName)
             onUserClickEvent(UserClickEvent.UpdateCategory(category = updatedCategory))
         }
         val onUpdateBudgetTargetClicked = { newBudgetTarget: Money ->
-            val updateCategory = uiCategory.copy(budgetTarget = newBudgetTarget)
+            val updateCategory = category.copy(budgetTarget = newBudgetTarget)
             onUserClickEvent(UserClickEvent.UpdateCategory(category = updateCategory))
         }
         val onUpdateAvailableMoneyClicked = { newAvailableMoney: Money ->
-            val updatedCategory = uiCategory.copy(availableMoney = newAvailableMoney)
+            val updatedCategory = category.copy(availableMoney = newAvailableMoney)
             onUserClickEvent(UserClickEvent.UpdateCategory(category = updatedCategory))
         }
-        val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = uiCategory)) }
+        val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category)) }
 
         AnimatedVisibility(
-            visible = isHeaderExpanded,
+            visible = header.isExpanded,
             enter = fadeIn(animationSpec = tween(ANIMATION_TIME_1_SECOND)) +
                     expandVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             modifier = Modifier.padding(
-                top = if (uiCategory == firstCategoryItem) spacing.tiny else spacing.halfDp,
-                bottom = if (uiCategory == lastCategoryItem) spacing.tiny else spacing.halfDp
+                top = if (category == firstCategoryItem) spacing.tiny else spacing.halfDp,
+                bottom = if (category == lastCategoryItem) spacing.tiny else spacing.halfDp
             )
         ) {
-            Column {
-                Category(
-                    name = uiCategory.name,
-                    budgetTarget = uiCategory.budgetTarget,
-                    availableMoney = uiCategory.availableMoney,
-                    progress = uiCategory.progress,
-                    optionalText = uiCategory.optionalText,
-                    onUpdateCategoryClicked = onUpdateNameClicked,
-                    onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
-                    onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
-                    onDeleteCategoryClicked = onDeleteCategoryClicked
+            if (category.isEmptyCategory) {
+                EmptyCategoryItem(
+                    onReplaceEmptyClicked = onCreateCategoryClicked
                 )
-                if (uiCategory != lastCategoryItem) Spacer(
-                    modifier = Modifier
-                        .height(spacing.tiny)
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f))
-                )
-            }
+            } else
+                Column {
+                    Category(
+                        name = category.name,
+                        budgetTarget = category.budgetTarget,
+                        availableMoney = category.availableMoney,
+                        progress = category.progress,
+                        optionalText = category.optionalText,
+                        onUpdateCategoryClicked = onUpdateNameClicked,
+                        onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
+                        onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
+                        onDeleteCategoryClicked = onDeleteCategoryClicked
+                    )
+                    if (category != lastCategoryItem) Spacer(
+                        modifier = Modifier
+                            .height(spacing.tiny)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f))
+                    )
+                }
         }
     }
 }

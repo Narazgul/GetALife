@@ -10,5 +10,7 @@ data class Category(
     val budgetTarget: Money,
     val availableMoney: Money,
     val progress: Float,
-    val optionalText: String
+    val optionalText: String,
+    val listPosition: Int,
+    val isEmptyCategory: Boolean
 )

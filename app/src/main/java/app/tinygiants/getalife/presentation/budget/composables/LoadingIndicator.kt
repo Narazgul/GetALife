@@ -1,24 +1,24 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
-fun BoxScope.LoadingIndicator(isLoading: Boolean, errorMessage: ErrorMessage?) {
+fun LoadingIndicator(
+    isLoading: Boolean,
+    errorMessage: ErrorMessage?,
+    modifier: Modifier = Modifier
+) {
     AnimatedVisibility(
         visible = isLoading && errorMessage == null,
-        modifier = Modifier
-            .align(Alignment.TopCenter)
-            .padding(top = spacing.default)
+        modifier = modifier.padding(top = spacing.default)
     ) {
         CircularProgressIndicator(
             strokeWidth = spacing.extraSmall,

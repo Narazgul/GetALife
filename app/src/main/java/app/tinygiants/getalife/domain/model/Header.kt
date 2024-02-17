@@ -7,5 +7,6 @@ data class Header(
     val id: Long,
     val name: String,
     val sumOfAvailableMoney: Money,
+    val listPosition: Int,
     var isExpanded: Boolean
 )

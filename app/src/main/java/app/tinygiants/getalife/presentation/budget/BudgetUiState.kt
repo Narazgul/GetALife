@@ -24,5 +24,6 @@ sealed class UserClickEvent {
 
     data class AddCategory(val headerId: Long, val categoryName: String): UserClickEvent()
     data class UpdateCategory(val category: Category): UserClickEvent()
+    data class ReplaceEmptyCategory(val category: Category): UserClickEvent()
     data class DeleteCategory(val category: Category): UserClickEvent()
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryRepository {
 
     fun getBudget(): Flow<Result<List<HeaderWithCategoriesEntity>>>
+    suspend fun getCategoriesBy(headerId: Long): List<CategoryEntity>
 
     suspend fun addHeader(headerEntity: HeaderEntity)
     suspend fun updateHeader(headerEntity: HeaderEntity)

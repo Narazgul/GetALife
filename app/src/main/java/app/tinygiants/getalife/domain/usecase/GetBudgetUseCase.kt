@@ -33,17 +33,20 @@ class GetBudgetUseCase @Inject constructor(
         Result.success(
             withContext(defaultDispatcher) {
 
-                headersWithCategories.associate { headerWithCategory ->
+                headersWithCategories
+                    .sortedBy { headerWithCategory -> headerWithCategory.header.listPosition }
+                    .mapIndexed { index, headerWithCategoriesEntity ->
 
-                    val header = mapToHeader(headerWithCategory = headerWithCategory)
-                    val categories = mapToCategories(headerWithCategory = headerWithCategory)
+                        val header = mapToHeader(headerWithCategory = headerWithCategoriesEntity, newListPosition = index)
+                        val categories = mapToCategories(headerWithCategory = headerWithCategoriesEntity)
 
-                    header to categories
-                }
+                        header to categories
+                    }
+                    .toMap()
             }
         )
 
-    private fun mapToHeader(headerWithCategory: HeaderWithCategoriesEntity): Header {
+    private fun mapToHeader(headerWithCategory: HeaderWithCategoriesEntity, newListPosition: Int): Header {
 
         val header = headerWithCategory.header
         val sumOfAvailableMoneyInCategory =
@@ -53,6 +56,7 @@ class GetBudgetUseCase @Inject constructor(
             id = header.id,
             name = header.name,
             sumOfAvailableMoney = Money(value = sumOfAvailableMoneyInCategory),
+            listPosition = newListPosition,
             isExpanded = header.isExpanded
         )
     }
@@ -60,18 +64,22 @@ class GetBudgetUseCase @Inject constructor(
     private fun mapToCategories(headerWithCategory: HeaderWithCategoriesEntity): List<Category> {
         val header = headerWithCategory.header
 
-        return headerWithCategory.categories.map { category ->
-            val progress = (category.availableMoney / category.budgetTarget).toFloat()
+        return headerWithCategory.categories
+            .sortedBy { category -> category.listPosition }
+            .mapIndexed { index, categoryEntity ->
+                val progress = (categoryEntity.availableMoney / categoryEntity.budgetTarget).toFloat()
 
-            Category(
-                id = category.id,
-                headerId = header.id,
-                name = category.name,
-                budgetTarget = Money(value = category.budgetTarget),
-                availableMoney = Money(value = category.availableMoney),
-                progress = progress,
-                optionalText = category.optionalText
-            )
-        }
+                Category(
+                    id = categoryEntity.id,
+                    headerId = header.id,
+                    name = categoryEntity.name,
+                    budgetTarget = Money(value = categoryEntity.budgetTarget),
+                    availableMoney = Money(value = categoryEntity.availableMoney),
+                    progress = progress,
+                    optionalText = categoryEntity.optionalText,
+                    listPosition = index,
+                    isEmptyCategory = categoryEntity.isEmptyCategory
+                )
+            }
     }
 }

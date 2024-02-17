@@ -19,6 +19,7 @@ class UpdateHeaderUseCase @Inject constructor(
             HeaderEntity(
                 id = header.id,
                 name = header.name,
+                listPosition = header.listPosition,
                 isExpanded = header.isExpanded
             )
         }

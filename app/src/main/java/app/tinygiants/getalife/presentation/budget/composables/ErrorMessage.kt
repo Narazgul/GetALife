@@ -2,8 +2,6 @@ package app.tinygiants.getalife.presentation.budget.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,12 +13,13 @@ import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.LightAndDarkPreviews
 
 @Composable
-fun BoxScope.ErrorMessage(errorMessage: ErrorMessage?) {
+fun ErrorMessage(
+    errorMessage: ErrorMessage?,
+    modifier: Modifier = Modifier
+) {
     AnimatedVisibility(
         visible = errorMessage != null,
-        modifier = Modifier
-            .align(Alignment.TopCenter)
-            .background(color = MaterialTheme.colorScheme.onError)
+        modifier = modifier.background(color = MaterialTheme.colorScheme.onError)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -41,13 +40,11 @@ fun BoxScope.ErrorMessage(errorMessage: ErrorMessage?) {
 @Composable
 fun ErrorMessagePreview() {
     GetALifeTheme {
-        Box {
-            ErrorMessage(
-                errorMessage = ErrorMessage(
-                    title = "Zefix",
-                    subtitle = "Ein fürchterlicher Fehler ist aufgetreten."
-                )
+        ErrorMessage(
+            errorMessage = ErrorMessage(
+                title = "Zefix",
+                subtitle = "Ein fürchterlicher Fehler ist aufgetreten.",
             )
-        }
+        )
     }
 }

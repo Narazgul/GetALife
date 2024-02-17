@@ -5,7 +5,9 @@ import app.tinygiants.getalife.data.local.dao.HeaderDao
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.HeaderEntity
 import app.tinygiants.getalife.data.local.entities.HeaderWithCategoriesEntity
+import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.repository.CategoryRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -13,7 +15,8 @@ import javax.inject.Inject
 
 class CategoryRepositoryImpl @Inject constructor(
     private val headerDao: HeaderDao,
-    private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao,
+    @Default val defaultDispatcher: CoroutineDispatcher
 ) : CategoryRepository {
 
     override fun getBudget(): Flow<Result<List<HeaderWithCategoriesEntity>>> =
@@ -22,6 +25,8 @@ class CategoryRepositoryImpl @Inject constructor(
                 .catch { exception -> emit(Result.failure(exception)) }
                 .collect { headersWithCategories -> emit(Result.success(headersWithCategories)) }
         }
+
+    override suspend fun getCategoriesBy(headerId: Long) = headerDao.getCategoriesBy(headerId = headerId)
 
     override suspend fun addHeader(headerEntity: HeaderEntity) {
         headerDao.addHeader(headerEntity = headerEntity)

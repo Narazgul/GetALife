@@ -22,7 +22,9 @@ class UpdateCategoryUseCase @Inject constructor(
                 name = category.name,
                 budgetTarget = category.budgetTarget.value,
                 availableMoney = category.availableMoney.value,
-                optionalText = category.optionalText
+                optionalText = category.optionalText,
+                listPosition = category.listPosition,
+                isEmptyCategory = false
             )
         }
 
