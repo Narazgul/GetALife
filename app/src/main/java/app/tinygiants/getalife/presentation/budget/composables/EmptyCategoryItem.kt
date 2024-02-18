@@ -17,8 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
@@ -57,7 +57,7 @@ fun EmptyCategoryItem(
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun AddCategoryPreview() {
     GetALifeTheme {

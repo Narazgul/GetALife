@@ -210,7 +210,7 @@ fun Category(
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun FullCategoryPreview() {
     GetALifeTheme {
@@ -226,7 +226,7 @@ fun FullCategoryPreview() {
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun SemiFilledCategoryPreview() {
     GetALifeTheme {
@@ -242,7 +242,7 @@ fun SemiFilledCategoryPreview() {
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun EmptyCategoryPreview() {
     GetALifeTheme {

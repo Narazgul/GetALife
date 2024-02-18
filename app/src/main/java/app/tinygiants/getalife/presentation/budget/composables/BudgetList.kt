@@ -18,8 +18,8 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.budget.fakeCategories
+import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 const val ANIMATION_TIME_1_SECOND = 1000
@@ -153,7 +153,7 @@ private fun LazyListScope.items(
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun BudgetListPreview() {
     GetALifeTheme {

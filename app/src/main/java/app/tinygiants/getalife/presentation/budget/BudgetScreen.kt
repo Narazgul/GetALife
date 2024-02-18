@@ -10,6 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.domain.model.Category
@@ -20,7 +22,7 @@ import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
 import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
+import app.tinygiants.getalife.theme.ScreenPreview
 
 @Composable
 fun BudgetScreen() {
@@ -67,56 +69,38 @@ fun BudgetScreen(
     }
 }
 
-@LightAndDarkPreviews
+@ScreenPreview
 @Composable
-fun BudgetScreenPreview(
-) {
+fun BudgetScreenPreview(@PreviewParameter(BudgetScreenPreviewProvider::class) uiState: BudgetUiState) {
     GetALifeTheme {
         Surface {
-            BudgetScreen(
-                BudgetUiState(
-                    groups = fakeCategories(),
-                    isLoading = false,
-                    errorMessage = null
-                )
-            )
+            BudgetScreen(uiState = uiState)
         }
     }
 }
 
-@LightAndDarkPreviews
-@Composable
-fun BudgetScreenLoadingPreview() {
-    GetALifeTheme {
-        Surface {
-            BudgetScreen(
-                BudgetUiState(
-                    groups = emptyMap(),
-                    isLoading = true,
-                    errorMessage = null
+class BudgetScreenPreviewProvider: PreviewParameterProvider<BudgetUiState> {
+    override val values: Sequence<BudgetUiState>
+        get() = sequenceOf(
+            BudgetUiState(
+                groups = fakeCategories(),
+                isLoading = false,
+                errorMessage = null
+            ),
+            BudgetUiState(
+                groups = emptyMap(),
+                isLoading = true,
+                errorMessage = null
+            ),
+            BudgetUiState(
+                groups = emptyMap(),
+                isLoading = false,
+                errorMessage = ErrorMessage(
+                    title = "Zefix",
+                    subtitle = "Ein fürchterlicher Fehler ist aufgetreten."
                 )
             )
-        }
-    }
-}
-
-@LightAndDarkPreviews
-@Composable
-fun BudgetScreenErrorPreview() {
-    GetALifeTheme {
-        Surface {
-            BudgetScreen(
-                BudgetUiState(
-                    groups = emptyMap(),
-                    isLoading = true,
-                    errorMessage = ErrorMessage(
-                        title = "Zefix",
-                        subtitle = "Ein fürchterlicher Fehler ist aufgetreten."
-                    )
-                )
-            )
-        }
-    }
+        )
 }
 
 fun fakeCategories() = mapOf(

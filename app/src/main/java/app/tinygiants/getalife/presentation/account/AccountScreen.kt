@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
+import app.tinygiants.getalife.theme.ScreenPreview
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
@@ -40,7 +40,7 @@ fun AccountScreen(
     }
 }
 
-@LightAndDarkPreviews
+@ScreenPreview
 @Composable
 fun AccountScreenPreview() {
     GetALifeTheme {

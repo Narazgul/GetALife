@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
+import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
@@ -64,7 +64,7 @@ fun AddHeaderItem(
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun AddHeaderItemPreview() {
     GetALifeTheme {

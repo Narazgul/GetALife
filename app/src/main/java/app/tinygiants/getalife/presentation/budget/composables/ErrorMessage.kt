@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import app.tinygiants.getalife.presentation.budget.ErrorMessage
+import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.LightAndDarkPreviews
 
 @Composable
 fun ErrorMessage(
@@ -36,7 +36,7 @@ fun ErrorMessage(
     }
 }
 
-@LightAndDarkPreviews
+@ComponentPreview
 @Composable
 fun ErrorMessagePreview() {
     GetALifeTheme {
