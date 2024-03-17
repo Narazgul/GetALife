@@ -1,7 +1,11 @@
 package app.tinygiants.getalife.di
 
 import android.content.Context
+import app.tinygiants.getalife.BuildConfig
+import app.tinygiants.getalife.data.gemini_ai.GoogleGeminiAi
 import app.tinygiants.getalife.data.local.AppDatabase
+import app.tinygiants.getalife.domain.repository.AiRepository
+import com.google.ai.client.generativeai.GenerativeModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
@@ -26,6 +30,12 @@ object AppModule {
 
     @Provides
     fun provideCategoryDao(@ApplicationContext appContext: Context) = AppDatabase.getDatabase(appContext).categoryDao()
+
+    @Provides
+    fun provideGeminiProGenerativeModel() = GenerativeModel(modelName = "gemini-pro", apiKey = BuildConfig.GEMINI_API_KEY)
+
+    @Provides
+    fun provideAiRepository(generativeModel: GenerativeModel): AiRepository = GoogleGeminiAi(generativeModel = generativeModel)
 
     // endregion
 

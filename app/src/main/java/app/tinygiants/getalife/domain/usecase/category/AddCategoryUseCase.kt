@@ -2,8 +2,8 @@ package app.tinygiants.getalife.domain.usecase.category
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
-import app.tinygiants.getalife.di.Io
 import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -11,15 +11,13 @@ import kotlin.random.Random
 
 class AddCategoryUseCase @Inject constructor(
     private val repository: CategoryRepository,
-    @Io private val ioDispatcher: CoroutineDispatcher,
+    private val addEmoji: AddEmojiToCategoryNameUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(headerId: Long, categoryName: String, isEmptyCategory: Boolean = false) {
 
-        val categories = withContext(ioDispatcher) {
-            repository.getCategoriesBy(headerId = headerId)
-        }
+        val categories = repository.getCategoriesBy(headerId = headerId)
 
         val categoryEntity = withContext(defaultDispatcher) {
 
@@ -39,5 +37,7 @@ class AddCategoryUseCase @Inject constructor(
         }
 
         repository.addCategory(categoryEntity = categoryEntity)
+
+        addEmoji(categoryEntity = categoryEntity)
     }
 }

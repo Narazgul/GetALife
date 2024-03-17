@@ -1,10 +1,20 @@
 package app.tinygiants.getalife.presentation.budget.composables
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -99,7 +109,7 @@ private fun LazyListScope.items(
     ) { category ->
         val onCreateCategoryClicked = { categoryName: String ->
             val updateCategory = category.copy(name = categoryName)
-            onUserClickEvent(UserClickEvent.ReplaceEmptyCategory(updateCategory))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = updateCategory))
         }
         val onUpdateNameClicked = { updatedCategoryName: String ->
             val updatedCategory = category.copy(name = updatedCategoryName)
@@ -126,9 +136,7 @@ private fun LazyListScope.items(
             )
         ) {
             if (category.isEmptyCategory) {
-                EmptyCategoryItem(
-                    onReplaceEmptyClicked = onCreateCategoryClicked
-                )
+                EmptyCategoryItem(onReplaceEmptyClicked = onCreateCategoryClicked)
             } else
                 Column {
                     Category(
@@ -142,12 +150,13 @@ private fun LazyListScope.items(
                         onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
                         onDeleteCategoryClicked = onDeleteCategoryClicked
                     )
-                    if (category != lastCategoryItem) Spacer(
-                        modifier = Modifier
-                            .height(spacing.tiny)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f))
-                    )
+                    if (category != lastCategoryItem)
+                        Spacer(
+                            modifier = Modifier
+                                .height(spacing.tiny)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f))
+                        )
                 }
         }
     }

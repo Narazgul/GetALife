@@ -11,7 +11,12 @@ import app.tinygiants.getalife.domain.usecase.category.UpdateCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.header.AddHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.header.DeleteHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.header.UpdateHeaderUseCase
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.*
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddHeader
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteHeader
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateHeader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -69,9 +74,7 @@ class BudgetViewModel @Inject constructor(
                 is UpdateHeader   -> updateHeader(header = clickEvent.header)
                 is DeleteHeader   -> deleteHeader(header = clickEvent.header)
 
-                is ReplaceEmptyCategory -> updateCategory(clickEvent.category)
-
-                is AddCategory    -> addCategory(headerId = clickEvent.headerId, categoryName = clickEvent.categoryName)
+                is AddCategory    -> addCategory(headerId = clickEvent.headerId,categoryName = clickEvent.categoryName)
                 is UpdateCategory -> updateCategory(category = clickEvent.category)
                 is DeleteCategory -> deleteCategory(category = clickEvent.category)
             }

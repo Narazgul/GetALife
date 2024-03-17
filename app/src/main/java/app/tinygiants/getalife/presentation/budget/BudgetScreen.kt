@@ -79,26 +79,13 @@ fun BudgetScreenPreview(@PreviewParameter(BudgetScreenPreviewProvider::class) ui
     }
 }
 
-class BudgetScreenPreviewProvider: PreviewParameterProvider<BudgetUiState> {
+class BudgetScreenPreviewProvider : PreviewParameterProvider<BudgetUiState> {
     override val values: Sequence<BudgetUiState>
         get() = sequenceOf(
             BudgetUiState(
                 groups = fakeCategories(),
                 isLoading = false,
                 errorMessage = null
-            ),
-            BudgetUiState(
-                groups = emptyMap(),
-                isLoading = true,
-                errorMessage = null
-            ),
-            BudgetUiState(
-                groups = emptyMap(),
-                isLoading = false,
-                errorMessage = ErrorMessage(
-                    title = "Zefix",
-                    subtitle = "Ein fürchterlicher Fehler ist aufgetreten."
-                )
             )
         )
 }
@@ -125,35 +112,68 @@ fun fakeCategories() = mapOf(
         Category(
             id = 2,
             headerId = 0,
-            name = "Gym",
-            budgetTarget = Money(value = 29.00),
-            availableMoney = Money(value = 13.00),
-            progress = (13 / 29.00).toFloat(),
-            optionalText = "16.00 € more needed by the 30th",
+            name = "Barmenia",
+            budgetTarget = Money(value = 28.55),
+            availableMoney = Money(value = 28.55),
+            progress = (28.55 / 28.55).toFloat(),
+            optionalText = "",
             listPosition = 1,
             isEmptyCategory = false
         ),
         Category(
             id = 3,
             headerId = 0,
+            name = "Fraenk",
+            budgetTarget = Money(value = 10.00),
+            availableMoney = Money(value = 10.00),
+            progress = (10.00 / 10.00).toFloat(),
+            optionalText = "",
+            listPosition = 2,
+            isEmptyCategory = false
+        ),
+        Category(
+            id = 4,
+            headerId = 0,
+            name = "YouTube Premium",
+            budgetTarget = Money(value = 7.49),
+            availableMoney = Money(value = 7.49),
+            progress = (7.49 / 7.49).toFloat(),
+            optionalText = "",
+            listPosition = 3,
+            isEmptyCategory = false
+        ),
+        Category(
+            id = 5,
+            headerId = 0,
+            name = "Gym",
+            budgetTarget = Money(value = 29.00),
+            availableMoney = Money(value = 13.00),
+            progress = (13 / 29.00).toFloat(),
+            optionalText = "16.00 € more needed by the 30th",
+            listPosition = 4,
+            isEmptyCategory = false
+        ),
+        Category(
+            id = 6,
+            headerId = 0,
             name = "Netflix",
             budgetTarget = Money(value = 9.00),
             availableMoney = Money(value = 2.00),
             progress = (2 / 9.00).toFloat(),
             optionalText = "7.00 € mored needed by the 10th",
-            listPosition = 2,
+            listPosition = 5,
             isEmptyCategory = false
         )
     ),
     Header(
-        id = 4,
+        id = 100,
         name = "Daily Life",
         sumOfAvailableMoney = Money(value = 210.0),
         listPosition = 1,
         isExpanded = true
     ) to listOf(
         Category(
-            id = 5,
+            id = 101,
             headerId = 4,
             name = "Groceries",
             budgetTarget = Money(value = 100.00),
@@ -164,7 +184,7 @@ fun fakeCategories() = mapOf(
             isEmptyCategory = false
         ),
         Category(
-            id = 6,
+            id = 102,
             headerId = 4,
             name = "Transportation",
             budgetTarget = Money(value = 50.00),
@@ -175,7 +195,7 @@ fun fakeCategories() = mapOf(
             isEmptyCategory = false
         ),
         Category(
-            id = 7,
+            id = 103,
             headerId = 4,
             name = "Eating Out",
             budgetTarget = Money(value = 60.00),
@@ -187,14 +207,14 @@ fun fakeCategories() = mapOf(
         )
     ),
     Header(
-        id = 8,
+        id = 200,
         name = "Daily Life",
         sumOfAvailableMoney = Money(value = 0.0),
         listPosition = 2,
         isExpanded = true
     ) to listOf(
         Category(
-            id = 9,
+            id = 201,
             name = "Jetzt Kategorie hinzufügen",
             headerId = 8,
             budgetTarget = Money(value = 60.00),
@@ -206,7 +226,7 @@ fun fakeCategories() = mapOf(
         )
     ),
     Header(
-        id = 10,
+        id = 300,
         name = "Goals",
         sumOfAvailableMoney = Money(value = 0.0),
         listPosition = 3,
