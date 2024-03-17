@@ -2,19 +2,20 @@
 
 kotlinVersion = "1.9.22"
 ksp-version = "1.9.22-1.0.16"
-android-gradle-plugin = "8.2.2"
+android-gradle-plugin = "8.3.0"
+gemini-version = "0.2.2"
 
 googleServicesVersion = "4.4.1"
 
-firebaseBomVersion = "32.7.2"
-firebase-appdistribution-gradle = "4.1.0"
+firebaseBomVersion = "32.7.4"
+firebase-appdistribution-gradle = "4.2.0"
 firebaseCrashlytics = "2.9.9"
 firebase-perf-plugin = "1.4.2"
 
-hiltVersion = "2.50"
-hilt-navigation-compose = "1.1.0"
+hiltVersion = "2.51"
+hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2024.02.00"
+composeBomVersion = "2024.02.02"
 activityCompose = "1.8.2"
 core-ktx = "1.12.0"
 lifecycleRuntimeCompose = "2.7.0"
@@ -23,7 +24,7 @@ roomVersion = "2.6.1"
 
 junit = "1.1.5"
 jUnit4Version = "4.13.2"
-uiTestJunit4 = "1.6.1"
+uiTestJunit4 = "1.6.3"
 junit5Version = "5.10.2"
 assertk = "0.28.0"
 
@@ -36,6 +37,7 @@ firebase-appdistribution-gradle = { module = "com.google.firebase:firebase-appdi
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlytics" }
 firebase-perf-plugin = { module = "com.google.firebase:perf-plugin", version.ref = "firebase-perf-plugin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
+gemini-ai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "gemini-version" }
 
 # Core
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
@@ -43,6 +45,7 @@ lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-com
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }

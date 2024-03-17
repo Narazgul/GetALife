@@ -25,6 +25,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+
+        buildConfigField(type = "String", name = "GEMINI_API_KEY", value = System.getenv("GEMINI_API_KEY"))
     }
 
     signingConfigs {
@@ -89,6 +91,9 @@ kotlin {
 
 dependencies {
     implementation(libs.bundles.core)
+
+    // Gemini AI
+    implementation(libs.gemini.ai)
 
     // Jetpack Compose
     implementation(platform(libs.compose.bom))
