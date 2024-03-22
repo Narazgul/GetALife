@@ -1,8 +1,7 @@
 package app.tinygiants.getalife.domain.usecase
 
-import app.tinygiants.getalife.data.CategoryRepositoryImpl
+import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
 import app.tinygiants.getalife.data.local.dao.HeaderDao
-import app.tinygiants.getalife.domain.repository.CategoryRepository
 import org.junit.jupiter.api.BeforeEach
 
 class GetBudgetUseCaseTest {

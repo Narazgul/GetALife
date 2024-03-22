@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.data
+package app.tinygiants.getalife.data.repository
 
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.dao.HeaderDao

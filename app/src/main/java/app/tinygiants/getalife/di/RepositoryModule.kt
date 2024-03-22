@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.di
 
-import app.tinygiants.getalife.data.CategoryRepositoryImpl
+import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import dagger.Binds
 import dagger.Module
