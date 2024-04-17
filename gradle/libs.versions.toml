@@ -2,20 +2,20 @@
 
 kotlinVersion = "1.9.22"
 ksp-version = "1.9.22-1.0.16"
-android-gradle-plugin = "8.3.1"
-gemini-version = "0.2.2"
+android-gradle-plugin = "8.3.2"
+gemini-version = "0.3.0"
 
 googleServicesVersion = "4.4.1"
 
-firebaseBomVersion = "32.7.4"
+firebaseBomVersion = "32.8.1"
 firebase-appdistribution-gradle = "4.2.0"
 firebaseCrashlytics = "2.9.9"
 firebase-perf-plugin = "1.4.2"
 
-hiltVersion = "2.51"
+hiltVersion = "2.51.1"
 hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2024.02.02"
+composeBomVersion = "2024.04.00"
 activityCompose = "1.8.2"
 core-ktx = "1.12.0"
 lifecycleRuntimeCompose = "2.7.0"
@@ -24,7 +24,7 @@ roomVersion = "2.6.1"
 
 junit = "1.1.5"
 jUnit4Version = "4.13.2"
-uiTestJunit4 = "1.6.3"
+uiTestJunit4 = "1.6.5"
 junit5Version = "5.10.2"
 assertk = "0.28.0"
 
