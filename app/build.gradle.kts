@@ -54,6 +54,11 @@ android {
             firebaseAppDistribution {
                 artifactType = "APK"
             }
+
+            @Suppress("UnstableApiUsage")
+            vcsInfo {
+                include = true
+            }
         }
         release {
             isMinifyEnabled = true
