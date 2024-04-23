@@ -27,6 +27,7 @@ class AddCategoryUseCase @Inject constructor(
             CategoryEntity(
                 id = Random.nextLong(),
                 headerId = headerId,
+                emoji = "",
                 name = categoryName,
                 budgetTarget = 0.00,
                 availableMoney = 0.00,

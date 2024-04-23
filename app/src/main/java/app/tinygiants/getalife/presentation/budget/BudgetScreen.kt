@@ -101,6 +101,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 1,
             headerId = 0,
+            emoji = "🏠",
             name = "Rent",
             budgetTarget = Money(value = 1000.00),
             availableMoney = Money(value = 1000.00),
@@ -112,6 +113,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 2,
             headerId = 0,
+            emoji = "🏥",
             name = "Barmenia",
             budgetTarget = Money(value = 28.55),
             availableMoney = Money(value = 28.55),
@@ -123,6 +125,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 3,
             headerId = 0,
+            emoji = "📱",
             name = "Fraenk",
             budgetTarget = Money(value = 10.00),
             availableMoney = Money(value = 10.00),
@@ -134,6 +137,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 4,
             headerId = 0,
+            emoji = "▶️",
             name = "YouTube Premium",
             budgetTarget = Money(value = 7.49),
             availableMoney = Money(value = 7.49),
@@ -145,6 +149,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 5,
             headerId = 0,
+            emoji = "🏋",
             name = "Gym",
             budgetTarget = Money(value = 29.00),
             availableMoney = Money(value = 13.00),
@@ -156,6 +161,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 6,
             headerId = 0,
+            emoji = "🍿",
             name = "Netflix",
             budgetTarget = Money(value = 9.00),
             availableMoney = Money(value = 2.00),
@@ -175,6 +181,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 101,
             headerId = 4,
+            emoji = "🛒",
             name = "Groceries",
             budgetTarget = Money(value = 100.00),
             availableMoney = Money(value = 27.00),
@@ -186,6 +193,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 102,
             headerId = 4,
+            emoji = "🚌",
             name = "Transportation",
             budgetTarget = Money(value = 50.00),
             availableMoney = Money(value = 0.00),
@@ -197,6 +205,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 103,
             headerId = 4,
+            emoji = "🍽",
             name = "Eating Out",
             budgetTarget = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
@@ -215,6 +224,7 @@ fun fakeCategories() = mapOf(
     ) to listOf(
         Category(
             id = 201,
+            emoji = "",
             name = "Jetzt Kategorie hinzufügen",
             headerId = 8,
             budgetTarget = Money(value = 60.00),

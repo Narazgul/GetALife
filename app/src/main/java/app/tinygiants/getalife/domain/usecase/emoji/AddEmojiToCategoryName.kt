@@ -20,8 +20,7 @@ class AddEmojiToCategoryNameUseCase @Inject constructor(
             val emojis = successfulResult.text
             if (emojis.isNullOrBlank()) return@onSuccess
 
-            val categoryNameWithEmojis = "$emojis ${categoryEntity.name}"
-            repository.updateCategory(categoryEntity.copy(name = categoryNameWithEmojis))
+            repository.updateCategory(categoryEntity.copy(emoji = emojis))
         }
     }
 }

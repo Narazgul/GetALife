@@ -72,6 +72,7 @@ class GetBudgetUseCase @Inject constructor(
                 Category(
                     id = categoryEntity.id,
                     headerId = header.id,
+                    emoji = categoryEntity.emoji,
                     name = categoryEntity.name,
                     budgetTarget = Money(value = categoryEntity.budgetTarget),
                     availableMoney = Money(value = categoryEntity.availableMoney),

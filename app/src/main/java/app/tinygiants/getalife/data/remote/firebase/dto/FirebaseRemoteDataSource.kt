@@ -1,8 +1,5 @@
-package app.tinygiants.getalife.data.remote
+package app.tinygiants.getalife.data.remote.firebase.dto
 
-import app.tinygiants.getalife.data.remote.dto.BudgetDto
-import app.tinygiants.getalife.data.remote.dto.CategoryDto
-import app.tinygiants.getalife.data.remote.dto.GroupDto
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import com.google.firebase.Firebase

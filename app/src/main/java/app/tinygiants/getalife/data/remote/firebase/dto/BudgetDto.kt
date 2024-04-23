@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.data.remote.dto
+package app.tinygiants.getalife.data.remote.firebase.dto
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp

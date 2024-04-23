@@ -3,6 +3,7 @@ package app.tinygiants.getalife.presentation.budget.composables
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,13 +23,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,29 +41,35 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.emoji2.emojipicker.EmojiPickerView
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
 import app.tinygiants.getalife.theme.warning
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Category(
+    emoji: String = "",
     name: String = "",
     budgetTarget: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Float = 0f,
     optionalText: String? = null,
+    onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money) -> Unit = { },
     onUpdateAvailableMoneyClicked: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
 
+    var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     var categoryNameUserInput by rememberSaveable { mutableStateOf(name) }
     var budget by remember { mutableStateOf(budgetTarget) }
@@ -85,6 +96,11 @@ fun Category(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(
+                text = emoji,
+                modifier = Modifier.clickable(onClick = { showEmojiPicker = true })
+            )
+            Spacer(modifier = Modifier.size(spacing.small))
             Text(
                 text = name,
                 style = MaterialTheme.typography.titleSmall,
@@ -234,14 +250,47 @@ fun Category(
             Spacer(modifier = Modifier.height(spacing.extraLarge))
         }
     }
+
+    if (showEmojiPicker) {
+        val sheetSate = rememberModalBottomSheetState()
+        val scope = rememberCoroutineScope()
+        fun hideModalBottomSheetIfFullyExpanded() {
+            if (sheetSate.currentValue == SheetValue.Expanded) {
+                scope.launch { sheetSate.hide() }.invokeOnCompletion {
+                    if (!sheetSate.isVisible) showBottomSheet = false
+                }
+            }
+        }
+
+        ModalBottomSheet(
+            onDismissRequest = { showEmojiPicker = false },
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            sheetState = sheetSate
+        ) {
+            AndroidView(
+                modifier = Modifier.fillMaxWidth(),
+                factory = { context ->
+                    EmojiPickerView(context).apply {
+                        setOnEmojiPickedListener { emojiViewItem ->
+                            onUpdateEmojiClicked(emojiViewItem.emoji)
+                            hideModalBottomSheetIfFullyExpanded()
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
 
-@ComponentPreview
+
+
+@PreviewLightDark
 @Composable
 fun FullCategoryPreview() {
     GetALifeTheme {
         Surface {
             Category(
+                emoji = "🏠",
                 name = "Rent",
                 budgetTarget = Money(940.00),
                 availableMoney = Money(940.00),
@@ -252,12 +301,13 @@ fun FullCategoryPreview() {
     }
 }
 
-@ComponentPreview
+@PreviewLightDark
 @Composable
 fun SemiFilledCategoryPreview() {
     GetALifeTheme {
         Surface {
             Category(
+                emoji = "🏠",
                 name = "Rent",
                 budgetTarget = Money(940.00),
                 availableMoney = Money(470.00),
@@ -268,12 +318,13 @@ fun SemiFilledCategoryPreview() {
     }
 }
 
-@ComponentPreview
+@PreviewLightDark
 @Composable
 fun EmptyCategoryPreview() {
     GetALifeTheme {
         Surface {
             Category(
+                emoji = "🏠",
                 name = "Rent",
                 budgetTarget = Money(940.00),
                 availableMoney = Money(0.0),

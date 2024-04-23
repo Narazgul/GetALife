@@ -19,6 +19,7 @@ class DeleteCategoryUseCase @Inject constructor(
             CategoryEntity(
                 id = category.id,
                 headerId = category.headerId,
+                emoji = category.emoji,
                 name = category.name,
                 budgetTarget = category.budgetTarget.value,
                 availableMoney = category.availableMoney.value,

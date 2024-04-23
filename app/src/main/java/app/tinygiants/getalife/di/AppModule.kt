@@ -2,7 +2,7 @@ package app.tinygiants.getalife.di
 
 import android.content.Context
 import app.tinygiants.getalife.BuildConfig
-import app.tinygiants.getalife.data.gemini_ai.GoogleGeminiAi
+import app.tinygiants.getalife.data.remote.gemini_ai.GoogleGeminiAi
 import app.tinygiants.getalife.data.local.AppDatabase
 import app.tinygiants.getalife.domain.repository.AiRepository
 import com.google.ai.client.generativeai.GenerativeModel

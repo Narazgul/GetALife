@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 data class Category(
     val id: Long,
     val headerId: Long,
+    val emoji: String,
     val name: String,
     val budgetTarget: Money,
     val availableMoney: Money,

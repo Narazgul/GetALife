@@ -107,21 +107,17 @@ private fun LazyListScope.items(
         items = categories,
         key = { category -> category.id }
     ) { category ->
-        val onCreateCategoryClicked = { categoryName: String ->
-            val updateCategory = category.copy(name = categoryName)
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = updateCategory))
+        val onUpdateEmojiClicked = { emoji: String ->
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(emoji = emoji)))
         }
-        val onUpdateNameClicked = { updatedCategoryName: String ->
-            val updatedCategory = category.copy(name = updatedCategoryName)
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = updatedCategory))
+        val onUpdateName = { categoryName: String ->
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(name = categoryName)))
         }
         val onUpdateBudgetTargetClicked = { newBudgetTarget: Money ->
-            val updateCategory = category.copy(budgetTarget = newBudgetTarget)
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = updateCategory))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetTarget = newBudgetTarget)))
         }
         val onUpdateAvailableMoneyClicked = { newAvailableMoney: Money ->
-            val updatedCategory = category.copy(availableMoney = newAvailableMoney)
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = updatedCategory))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(availableMoney = newAvailableMoney)))
         }
         val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category)) }
 
@@ -136,16 +132,18 @@ private fun LazyListScope.items(
             )
         ) {
             if (category.isEmptyCategory) {
-                EmptyCategoryItem(onReplaceEmptyClicked = onCreateCategoryClicked)
+                EmptyCategoryItem(onReplaceEmptyClicked = onUpdateName)
             } else
                 Column {
                     Category(
+                        emoji = category.emoji,
                         name = category.name,
                         budgetTarget = category.budgetTarget,
                         availableMoney = category.availableMoney,
                         progress = category.progress,
                         optionalText = category.optionalText,
-                        onUpdateCategoryClicked = onUpdateNameClicked,
+                        onUpdateEmojiClicked = onUpdateEmojiClicked,
+                        onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
                         onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
                         onDeleteCategoryClicked = onDeleteCategoryClicked

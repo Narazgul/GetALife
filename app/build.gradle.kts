@@ -103,6 +103,7 @@ dependencies {
     // Jetpack Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.emoji2.emojipicker)
     debugImplementation(libs.bundles.compose.debug)
 
     // Firebase

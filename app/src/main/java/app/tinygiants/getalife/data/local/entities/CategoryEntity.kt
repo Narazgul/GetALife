@@ -8,6 +8,7 @@ data class CategoryEntity(
     @PrimaryKey
     val id: Long,
     val headerId: Long,
+    val emoji: String,
     val name: String,
     val budgetTarget: Double,
     val availableMoney: Double,

@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.data.gemini_ai
+package app.tinygiants.getalife.data.remote.gemini_ai
 
 import app.tinygiants.getalife.domain.repository.AiRepository
 import com.google.ai.client.generativeai.GenerativeModel
