@@ -27,6 +27,7 @@ android {
         vectorDrawables { useSupportLibrary = true }
 
         buildConfigField(type = "String", name = "GEMINI_API_KEY", value = System.getenv("GEMINI_API_KEY"))
+        buildConfigField(type = "String", name = "CHATGPT_API_KEY", value = System.getenv("CHATGPT_API_KEY"))
     }
 
     signingConfigs {
@@ -80,7 +81,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
 
     packaging {
@@ -97,8 +98,9 @@ kotlin {
 dependencies {
     implementation(libs.bundles.core)
 
-    // Gemini AI
+    // AI
     implementation(libs.gemini.ai)
+    implementation(libs.chatgpt.ai)
 
     // Jetpack Compose
     implementation(platform(libs.compose.bom))

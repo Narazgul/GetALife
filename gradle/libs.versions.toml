@@ -1,9 +1,11 @@
 [versions]
 
-kotlinVersion = "1.9.22"
-ksp-version = "1.9.22-1.0.16"
+kotlinVersion = "1.9.23"
+ksp-version = "1.9.23-1.0.20"
 android-gradle-plugin = "8.4.0"
-gemini-version = "0.4.0"
+
+gemini-version = "0.5.0"
+chatgpt-version = "3.7.2"
 
 googleServicesVersion = "4.4.1"
 
@@ -19,7 +21,7 @@ composeBomVersion = "2024.05.00"
 activityCompose = "1.9.0"
 core-ktx = "1.13.1"
 lifecycleRuntimeCompose = "2.7.0"
-navigationCompose = "2.7.7"
+navigationCompose = "2.8.0-alpha08"
 roomVersion = "2.6.1"
 
 emoji2Emojipicker = "1.4.0"
@@ -39,6 +41,7 @@ firebase-appdistribution-gradle = { module = "com.google.firebase:firebase-appdi
 firebase-perf-plugin = { module = "com.google.firebase:perf-plugin", version.ref = "firebase-perf-plugin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 gemini-ai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "gemini-version" }
+chatgpt-ai = { module = "com.aallam.openai:openai-client", version.ref = "chatgpt-version"}
 
 # Core
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
