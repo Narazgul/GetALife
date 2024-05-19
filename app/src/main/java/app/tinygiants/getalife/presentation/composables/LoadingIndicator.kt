@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.budget.composables
+package app.tinygiants.getalife.presentation.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.padding
@@ -7,7 +7,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.tinygiants.getalife.presentation.budget.ErrorMessage
+import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.theme.spacing
 
 @Composable

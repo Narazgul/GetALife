@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.budget.composables
+package app.tinygiants.getalife.presentation.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -6,11 +6,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
+
+@Immutable
+data class ErrorMessage(
+    val title: String?,
+    val subtitle: String?
+)
 
 @Composable
 fun ErrorMessage(

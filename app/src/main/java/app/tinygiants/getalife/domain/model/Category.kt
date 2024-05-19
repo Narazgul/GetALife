@@ -9,9 +9,11 @@ data class Category(
     val emoji: String,
     val name: String,
     val budgetTarget: Money,
+    val budgetPurpose: BudgetPurpose,
+    val assignedMoney: Money,
     val availableMoney: Money,
     val progress: Float,
     val optionalText: String,
     val listPosition: Int,
-    val isEmptyCategory: Boolean
+    val isInitialCategory: Boolean
 )

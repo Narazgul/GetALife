@@ -1,0 +1,189 @@
+package app.tinygiants.getalife.presentation.composables
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.AccountType
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.model.TransactionPartner
+import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.spacing
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransactionDialog(
+    transaction: Transaction?,
+    categories: List<Category> = emptyList(),
+    onDismissRequest: () -> Unit = { },
+    onConfirmClicked: (amount: Money?, direction: TransactionDirection?, description: String?, transactionPartner: String?, category: Category?) -> Unit
+) {
+    var showCategoryDropdown by rememberSaveable { mutableStateOf(false) }
+
+    var amountMoney by remember { mutableStateOf(transaction?.amount) }
+    var amountUserInputText by rememberSaveable { mutableStateOf(amountMoney?.value ?: "") }
+    var descriptionUserInput by rememberSaveable { mutableStateOf(transaction?.description) }
+    var transactionPartnerUserInput by rememberSaveable { mutableStateOf(transaction?.transactionPartner?.name) }
+    var directionUserInput by rememberSaveable { mutableStateOf(transaction?.direction) }
+    var categoryUserInput by remember { mutableStateOf(transaction?.category) }
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+                .padding(spacing.large),
+            shape = RoundedCornerShape(spacing.large),
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Transaction Dialog")
+                Spacer(modifier = Modifier.height(spacing.large))
+                MultiChoiceSegmentedButtonRow {
+                    SegmentedButton(
+                        checked = directionUserInput == TransactionDirection.Inflow,
+                        onCheckedChange = { isChecked ->
+                            directionUserInput = if (isChecked) TransactionDirection.Inflow
+                            else TransactionDirection.Unknown
+                        },
+                        shape = RoundedCornerShape(topStart = spacing.large, bottomStart = spacing.large),
+                    ) {
+                        Text(text = "Inflow")
+                    }
+                    SegmentedButton(
+                        checked = directionUserInput == TransactionDirection.Outflow,
+                        onCheckedChange = { isChecked ->
+                            directionUserInput = if (isChecked) TransactionDirection.Outflow
+                            else TransactionDirection.Unknown
+                        },
+                        shape = RoundedCornerShape(topEnd = spacing.large, bottomEnd = spacing.large),
+                    ) {
+                        Text(text = "Outflow")
+                    }
+                }
+                Spacer(modifier = Modifier.height(spacing.large))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = categoryUserInput?.name ?: "Kategorie wählen",
+                        modifier = Modifier
+                            .clickable { showCategoryDropdown = true }
+                            .padding(spacing.large)
+                    )
+                    DropdownMenu(
+                        expanded = showCategoryDropdown,
+                        onDismissRequest = { showCategoryDropdown = false },
+                        modifier = Modifier
+                            .width(200.dp)
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(text = category.name) },
+                                onClick = {
+                                    categoryUserInput = category
+                                    showCategoryDropdown = false
+                                }
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(spacing.large))
+                TextField(
+                    value = amountUserInputText.toString(),
+                    onValueChange = { userInput ->
+                        amountUserInputText = userInput
+                        amountMoney = Money(userInput.toDoubleOrNull() ?: amountMoney?.value ?: 0.00)
+                    },
+                    label = { Text("Betrag") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(spacing.large))
+                TextField(
+                    value = descriptionUserInput ?: "",
+                    onValueChange = { userInput -> descriptionUserInput = userInput },
+                    label = { Text("Beschreibung") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(spacing.large))
+                TextField(
+                    value = transactionPartnerUserInput ?: "",
+                    onValueChange = { userInput -> transactionPartnerUserInput = userInput },
+                    label = { Text("Transaktionspartner") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(spacing.large))
+                Button(onClick = {
+                    onConfirmClicked(
+                        amountMoney,
+                        directionUserInput,
+                        descriptionUserInput,
+                        transactionPartnerUserInput,
+                        categoryUserInput
+                    )
+                    onDismissRequest()
+                }) {
+                    Text(text = "Confirm")
+                }
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun TransactionDialogPreview() {
+    GetALifeTheme {
+        Surface {
+            TransactionDialog(
+                transaction = Transaction(
+                    id = 1L,
+                    amount = Money(value = 0.00),
+                    account = Account(1L, "", Money(0.00), AccountType.Unknown, 0),
+                    category = null,
+                    transactionPartner = TransactionPartner(1L, "Bäckerei"),
+                    direction = TransactionDirection.Unknown,
+                    description = "",
+                ),
+                categories = emptyList(),
+                onConfirmClicked = { _, _, _, _, _ -> }
+            )
+        }
+    }
+}

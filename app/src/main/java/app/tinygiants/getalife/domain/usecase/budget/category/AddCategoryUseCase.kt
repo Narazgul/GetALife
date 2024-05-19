@@ -1,8 +1,9 @@
-package app.tinygiants.getalife.domain.usecase.category
+package app.tinygiants.getalife.domain.usecase.budget.category
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
-import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.model.BudgetPurpose
+import app.tinygiants.getalife.domain.repository.BudgetRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -10,14 +11,14 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 class AddCategoryUseCase @Inject constructor(
-    private val repository: CategoryRepository,
+    private val repository: BudgetRepository,
     private val addEmoji: AddEmojiToCategoryNameUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(headerId: Long, categoryName: String, isEmptyCategory: Boolean = false) {
+    suspend operator fun invoke(headerId: Long, categoryName: String, isInitialCategory: Boolean = false) {
 
-        val categories = repository.getCategoriesBy(headerId = headerId)
+        val categories = repository.getCategoriesOfHeader(headerId = headerId)
 
         val categoryEntity = withContext(defaultDispatcher) {
 
@@ -30,15 +31,17 @@ class AddCategoryUseCase @Inject constructor(
                 emoji = "",
                 name = categoryName,
                 budgetTarget = 0.00,
+                budgetPurpose = BudgetPurpose.Unknown,
+                assignedMoney = 0.00,
                 availableMoney = 0.00,
                 optionalText = "",
                 listPosition = endOfListPosition,
-                isEmptyCategory = isEmptyCategory
+                isInitialCategory = isInitialCategory
             )
         }
 
         repository.addCategory(categoryEntity = categoryEntity)
 
-        addEmoji(categoryEntity = categoryEntity)
+        if (!isInitialCategory) addEmoji(categoryEntity = categoryEntity)
     }
 }

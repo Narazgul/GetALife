@@ -2,24 +2,128 @@ package app.tinygiants.getalife.presentation.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
+import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
+import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
+import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
+import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
+import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountViewModel @Inject constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow(AccountUiState(isLoading = true))
+class AccountViewModel @Inject constructor(
+    private val getAccounts: GetAccountsUseCase,
+    private val addAccount: AddAccountUseCase,
+    private val updateAccount: UpdateAccountUseCase,
+    private val deleteAccount: DeleteAccountUseCase,
+    private val addTransaction: AddTransactionUseCase,
+    private val getCategories: GetCategoriesUseCase
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        AccountUiState(
+            accounts = emptyList(),
+            categories = emptyList(),
+            isLoading = true,
+            errorMessage = null
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
+    // region Init
+
     init {
+        loadAccounts()
+    }
+
+    private fun loadAccounts() {
         viewModelScope.launch {
-            _uiState.value = AccountUiState(
-                title = "Account Screen",
-                subtitle = "not yet implemented",
-                isLoading = false
+            launch {
+                getAccounts()
+                    .catch { throwable -> displayErrorState(throwable) }
+                    .collect { result ->
+                        result.onSuccess { accounts -> displayAccounts(accounts) }
+                        result.onFailure { throwable -> displayErrorState(throwable) }
+                    }
+            }
+            launch {
+                getCategories()
+                    .catch { throwable -> displayErrorState(throwable) }
+                    .collect { result ->
+                        result.onSuccess { categories -> addCategoriesToUiState(categories = categories) }
+                        result.onFailure { throwable -> displayErrorState(throwable) }
+                    }
+            }
+        }
+    }
+
+    // endregion
+
+    // region User interaction
+
+    fun onUserClickEvent(clickEvent: UserClickEvent) {
+        viewModelScope.launch {
+            when (clickEvent) {
+
+                is UserClickEvent.AddAccount -> addAccount(
+                    name = clickEvent.name,
+                    balance = clickEvent.balance,
+                    type = clickEvent.type
+                )
+
+                is UserClickEvent.UpdateAccount -> updateAccount(account = clickEvent.account)
+                is UserClickEvent.DeleteAccount -> deleteAccount(account = clickEvent.account)
+
+                is UserClickEvent.AddTransaction -> addTransaction(
+                    amount = clickEvent.amount,
+                    direction = clickEvent.direction,
+                    account = clickEvent.account,
+                    category = clickEvent.category
+                )
+            }
+        }
+    }
+
+    // endregion
+
+    // region Private Helper functions
+
+    private fun displayAccounts(accounts: List<Account>) {
+        _uiState.update { state ->
+            state.copy(
+                accounts = accounts,
+                isLoading = false,
+                errorMessage = null
             )
         }
     }
+
+    private fun addCategoriesToUiState(categories: List<Category>) {
+        _uiState.update { state -> state.copy(categories = categories) }
+    }
+
+    private fun displayErrorState(exception: Throwable?) {
+        _uiState.update {
+            AccountUiState(
+                accounts = emptyList(),
+                categories = emptyList(),
+                isLoading = false,
+                errorMessage = ErrorMessage(
+                    title = "Zefix",
+                    subtitle = exception?.message ?: "Ein fürchterlicher Fehler ist aufgetreten."
+                )
+            )
+        }
+    }
+
+    // endregion
 }

@@ -1,7 +1,11 @@
 package app.tinygiants.getalife.presentation.budget
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -14,13 +18,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.composables.AddHeaderItem
-import app.tinygiants.getalife.presentation.budget.composables.BudgetsList
-import app.tinygiants.getalife.presentation.budget.composables.ErrorMessage
-import app.tinygiants.getalife.presentation.budget.composables.LoadingIndicator
+import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
+import app.tinygiants.getalife.presentation.budget.composables.BudgetList
+import app.tinygiants.getalife.presentation.composables.ErrorMessage
+import app.tinygiants.getalife.presentation.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.ScreenPreview
 
@@ -47,12 +53,22 @@ fun BudgetScreen(
             .fillMaxSize()
             .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
     ) {
-        BudgetsList(
-            groups = uiState.groups,
-            isLoading = uiState.isLoading,
-            errorMessage = uiState.errorMessage,
-            onUserClickEvent = onUserClickEvent,
-        )
+        Column(modifier = Modifier.align(Alignment.TopCenter)) {
+
+            AnimatedVisibility(
+                visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
+
+            BudgetList(
+                groups = uiState.groups,
+                isLoading = uiState.isLoading,
+                errorMessage = uiState.errorMessage,
+                onUserClickEvent = onUserClickEvent
+            )
+        }
         LoadingIndicator(
             isLoading = uiState.isLoading,
             errorMessage = uiState.errorMessage,
@@ -83,6 +99,7 @@ class BudgetScreenPreviewProvider : PreviewParameterProvider<BudgetUiState> {
     override val values: Sequence<BudgetUiState>
         get() = sequenceOf(
             BudgetUiState(
+                assignableMoney = Money(value = 100.00),
                 groups = fakeCategories(),
                 isLoading = false,
                 errorMessage = null
@@ -104,11 +121,13 @@ fun fakeCategories() = mapOf(
             emoji = "🏠",
             name = "Rent",
             budgetTarget = Money(value = 1000.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 1000.00),
             availableMoney = Money(value = 1000.00),
             progress = (1000.00 / 1000.00).toFloat(),
             optionalText = "",
             listPosition = 0,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 2,
@@ -116,11 +135,13 @@ fun fakeCategories() = mapOf(
             emoji = "🏥",
             name = "Barmenia",
             budgetTarget = Money(value = 28.55),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 28.55),
             availableMoney = Money(value = 28.55),
             progress = (28.55 / 28.55).toFloat(),
             optionalText = "",
             listPosition = 1,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 3,
@@ -128,11 +149,13 @@ fun fakeCategories() = mapOf(
             emoji = "📱",
             name = "Fraenk",
             budgetTarget = Money(value = 10.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 10.00),
             availableMoney = Money(value = 10.00),
             progress = (10.00 / 10.00).toFloat(),
             optionalText = "",
             listPosition = 2,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 4,
@@ -140,11 +163,13 @@ fun fakeCategories() = mapOf(
             emoji = "▶️",
             name = "YouTube Premium",
             budgetTarget = Money(value = 7.49),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 7.49),
             availableMoney = Money(value = 7.49),
             progress = (7.49 / 7.49).toFloat(),
             optionalText = "",
             listPosition = 3,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 5,
@@ -152,11 +177,13 @@ fun fakeCategories() = mapOf(
             emoji = "🏋",
             name = "Gym",
             budgetTarget = Money(value = 29.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 13.00),
             availableMoney = Money(value = 13.00),
             progress = (13 / 29.00).toFloat(),
             optionalText = "16.00 € more needed by the 30th",
             listPosition = 4,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 6,
@@ -164,11 +191,13 @@ fun fakeCategories() = mapOf(
             emoji = "🍿",
             name = "Netflix",
             budgetTarget = Money(value = 9.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 2.00),
             availableMoney = Money(value = 2.00),
             progress = (2 / 9.00).toFloat(),
             optionalText = "7.00 € mored needed by the 10th",
             listPosition = 5,
-            isEmptyCategory = false
+            isInitialCategory = false
         )
     ),
     Header(
@@ -184,11 +213,13 @@ fun fakeCategories() = mapOf(
             emoji = "🛒",
             name = "Groceries",
             budgetTarget = Money(value = 100.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 27.00),
             availableMoney = Money(value = 27.00),
             progress = (27.00 / 100.00).toFloat(),
             optionalText = "73.00 € more needed by the 30th",
             listPosition = 0,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 102,
@@ -196,11 +227,13 @@ fun fakeCategories() = mapOf(
             emoji = "🚌",
             name = "Transportation",
             budgetTarget = Money(value = 50.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 0.00),
             availableMoney = Money(value = 0.00),
             progress = (0 / 50.00).toFloat(),
             optionalText = "50.00 € more needed by the 30th",
             listPosition = 1,
-            isEmptyCategory = false
+            isInitialCategory = false
         ),
         Category(
             id = 103,
@@ -208,11 +241,13 @@ fun fakeCategories() = mapOf(
             emoji = "🍽",
             name = "Eating Out",
             budgetTarget = Money(value = 60.00),
+            budgetPurpose = BudgetPurpose.Spending,
+            assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = (60 / 60.00).toFloat(),
             optionalText = "",
             listPosition = 2,
-            isEmptyCategory = false
+            isInitialCategory = false
         )
     ),
     Header(
@@ -228,11 +263,13 @@ fun fakeCategories() = mapOf(
             name = "Jetzt Kategorie hinzufügen",
             headerId = 8,
             budgetTarget = Money(value = 60.00),
+            budgetPurpose = BudgetPurpose.Unknown,
+            assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = 0f,
             optionalText = "",
             listPosition = 0,
-            isEmptyCategory = true
+            isInitialCategory = true
         )
     ),
     Header(

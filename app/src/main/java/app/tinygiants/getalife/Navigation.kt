@@ -16,7 +16,11 @@ fun GetALifeNavHost(
     startDestination: String = NestedNavGraph.BudgetNavGraph.route,
     modifier: Modifier
 ) {
-    NavHost(navController = navController, startDestination = startDestination, modifier = modifier) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
         budgetGraph()
         accountGraph()
     }
@@ -30,7 +34,7 @@ sealed class NestedNavGraph(val route: String) {
 fun NavGraphBuilder.budgetGraph() {
     navigation(
         startDestination = Screens.Budget.route,
-        route = NestedNavGraph.BudgetNavGraph.route
+        route = NestedNavGraph.BudgetNavGraph.route,
     ) {
         composable(Screens.Budget.route) { BudgetScreen() }
     }

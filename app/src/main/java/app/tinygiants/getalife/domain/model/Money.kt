@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
+import kotlin.math.abs
 
 @Immutable
 data class Money(
@@ -11,9 +12,9 @@ data class Money(
     val maximumDigits: Int = 2,
     val locale: Locale = Locale.getDefault()
 ) {
-    val currencyCode: String = getCurrencyCode()
     val currencySymbol: String = getCurrencySymbol()
     val formattedMoney: String = value.toCurrencyFormattedString()
+    val formattedPositiveMoney: String = abs(value).toCurrencyFormattedString()
 
     private fun Double.toCurrencyFormattedString(): String {
         val numberFormat = NumberFormat.getCurrencyInstance()
@@ -22,6 +23,7 @@ data class Money(
         return numberFormat.format(this)
     }
 
-    private fun getCurrencyCode(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).currencyCode
+
+
     private fun getCurrencySymbol(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).symbol
 }

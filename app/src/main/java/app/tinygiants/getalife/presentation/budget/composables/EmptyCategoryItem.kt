@@ -23,7 +23,7 @@ import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun EmptyCategoryItem(
-    onReplaceEmptyClicked: (String) -> Unit = { },
+    onUpdateNameClicked: (String) -> Unit = { },
 ) {
     val context = LocalContext.current
     var categoryName by rememberSaveable { mutableStateOf("") }
@@ -48,7 +48,7 @@ fun EmptyCategoryItem(
                     Toast.makeText(context, "kein Name eingegeben", Toast.LENGTH_SHORT).show()
                     return@Button
                 }
-                onReplaceEmptyClicked(categoryName)
+                onUpdateNameClicked(categoryName)
             },
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {

@@ -4,19 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
-import app.tinygiants.getalife.domain.usecase.GetBudgetUseCase
-import app.tinygiants.getalife.domain.usecase.category.AddCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.category.DeleteCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.category.UpdateCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.header.AddHeaderUseCase
-import app.tinygiants.getalife.domain.usecase.header.DeleteHeaderUseCase
-import app.tinygiants.getalife.domain.usecase.header.UpdateHeaderUseCase
+import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.usecase.account.GetAssignableMoneySumUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.category.AddCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.budget.category.DeleteCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.budget.category.UpdateCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.budget.header.AddHeaderUseCase
+import app.tinygiants.getalife.domain.usecase.budget.header.DeleteHeaderUseCase
+import app.tinygiants.getalife.domain.usecase.budget.header.UpdateHeaderUseCase
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddHeader
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteHeader
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateHeader
+import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     private val getBudget: GetBudgetUseCase,
+    private val getAssignableMoney: GetAssignableMoneySumUseCase,
     private val addHeader: AddHeaderUseCase,
     private val updateHeader: UpdateHeaderUseCase,
     private val deleteHeader: DeleteHeaderUseCase,
@@ -38,6 +42,7 @@ class BudgetViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         BudgetUiState(
+            assignableMoney = null,
             groups = emptyMap(),
             isLoading = true,
             errorMessage = null
@@ -48,17 +53,30 @@ class BudgetViewModel @Inject constructor(
     // region Init
 
     init {
-        loadCategories()
+        loadBudget()
     }
 
-    private fun loadCategories() {
+    private fun loadBudget() {
         viewModelScope.launch {
-            getBudget()
-                .catch { throwable -> displayErrorState(throwable) }
-                .collect { result ->
-                    result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
-                    result.onFailure { throwable -> displayErrorState(throwable) }
-                }
+
+            launch {
+                getBudget()
+                    .catch { throwable -> displayErrorState(throwable) }
+                    .collect { result ->
+                        result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
+                        result.onFailure { throwable -> displayErrorState(throwable) }
+                    }
+            }
+
+            launch {
+                getAssignableMoney()
+                    .catch { displayAssignableMoneyErrorState() }
+                    .collect { result ->
+                        result.onSuccess { assignableMoney -> displayAssignableMoney(assignableMoney) }
+                        result.onFailure { displayAssignableMoneyErrorState() }
+                    }
+            }
+
         }
     }
 
@@ -70,11 +88,11 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch {
             when (clickEvent) {
 
-                is AddHeader      -> addHeader(headerName = clickEvent.name)
-                is UpdateHeader   -> updateHeader(header = clickEvent.header)
-                is DeleteHeader   -> deleteHeader(header = clickEvent.header)
+                is AddHeader -> addHeader(headerName = clickEvent.name)
+                is UpdateHeader -> updateHeader(header = clickEvent.header)
+                is DeleteHeader -> deleteHeader(header = clickEvent.header)
 
-                is AddCategory    -> addCategory(headerId = clickEvent.headerId,categoryName = clickEvent.categoryName)
+                is AddCategory -> addCategory(headerId = clickEvent.headerId, categoryName = clickEvent.categoryName)
                 is UpdateCategory -> updateCategory(category = clickEvent.category)
                 is DeleteCategory -> deleteCategory(category = clickEvent.category)
             }
@@ -86,23 +104,39 @@ class BudgetViewModel @Inject constructor(
     // region Private Helper functions
 
     private fun displayBudgetList(groups: Map<Header, List<Category>>) {
-        _uiState.update {
-            BudgetUiState(
+        _uiState.update { budgetUiState ->
+            budgetUiState.copy(
                 groups = groups,
-                isLoading = false,
-                errorMessage = null
+                isLoading = false
             )
         }
     }
 
+    private fun displayAssignableMoney(assignableMoney: Money) {
+        _uiState.update { budgetUiState ->
+            budgetUiState.copy(assignableMoney = assignableMoney)
+        }
+    }
+
     private fun displayErrorState(exception: Throwable?) {
-        _uiState.update {
-            BudgetUiState(
-                groups = emptyMap(),
+        _uiState.update { budgetUiState ->
+            budgetUiState.copy(
                 isLoading = false,
                 errorMessage = ErrorMessage(
                     title = "Zefix",
                     subtitle = exception?.message ?: "Ein fürchterlicher Fehler ist aufgetreten."
+                )
+            )
+        }
+    }
+
+    private fun displayAssignableMoneyErrorState() {
+        _uiState.update { budgetUiState ->
+            budgetUiState.copy(
+                assignableMoney = null,
+                errorMessage = ErrorMessage(
+                    title = "Zefix",
+                    subtitle = "zu verteilendes Geld konnte nicht geladen werden."
                 )
             )
         }

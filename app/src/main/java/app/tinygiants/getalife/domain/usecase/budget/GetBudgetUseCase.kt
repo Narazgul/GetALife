@@ -1,11 +1,11 @@
-package app.tinygiants.getalife.domain.usecase
+package app.tinygiants.getalife.domain.usecase.budget
 
 import app.tinygiants.getalife.data.local.entities.HeaderWithCategoriesEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.BudgetRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -14,13 +14,13 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetBudgetUseCase @Inject constructor(
-    private val repository: CategoryRepository,
+    private val repository: BudgetRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
     operator fun invoke(): Flow<Result<Map<Header, List<Category>>>> {
         return flow {
-            repository.getBudget()
+            repository.getBudgetFlow()
                 .catch { throwable -> emit(Result.failure(throwable)) }
                 .collect { result ->
                     result.onSuccess { list -> emit(mapToGroups(list)) }
@@ -67,6 +67,7 @@ class GetBudgetUseCase @Inject constructor(
         return headerWithCategory.categories
             .sortedBy { category -> category.listPosition }
             .mapIndexed { index, categoryEntity ->
+
                 val progress = (categoryEntity.availableMoney / categoryEntity.budgetTarget).toFloat()
 
                 Category(
@@ -75,11 +76,13 @@ class GetBudgetUseCase @Inject constructor(
                     emoji = categoryEntity.emoji,
                     name = categoryEntity.name,
                     budgetTarget = Money(value = categoryEntity.budgetTarget),
+                    budgetPurpose = categoryEntity.budgetPurpose,
+                    assignedMoney = Money(value = categoryEntity.assignedMoney),
                     availableMoney = Money(value = categoryEntity.availableMoney),
                     progress = progress,
                     optionalText = categoryEntity.optionalText,
                     listPosition = index,
-                    isEmptyCategory = categoryEntity.isEmptyCategory
+                    isInitialCategory = categoryEntity.isInitialCategory
                 )
             }
     }

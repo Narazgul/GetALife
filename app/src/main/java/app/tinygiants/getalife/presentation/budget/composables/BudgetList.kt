@@ -22,12 +22,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.budget.ErrorMessage
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.budget.fakeCategories
+import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -36,17 +37,20 @@ const val ANIMATION_TIME_1_SECOND = 1000
 const val ANIMATION_TIME_300_MILLISECONDS = 300
 
 @Composable
-fun BudgetsList(
+fun BudgetList(
     groups: Map<Header, List<Category>>,
     isLoading: Boolean,
     errorMessage: ErrorMessage?,
-    onUserClickEvent: (UserClickEvent) -> Unit
+    onUserClickEvent: (UserClickEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
         visible = !isLoading && errorMessage == null,
         enter = slideInVertically(),
-        exit = slideOutVertically()
+        exit = slideOutVertically(),
+        modifier = modifier
     ) {
+
         LazyColumn(contentPadding = PaddingValues(spacing.extraSmall)) {
             groups.forEach { (header, items) ->
 
@@ -116,8 +120,11 @@ private fun LazyListScope.items(
         val onUpdateBudgetTargetClicked = { newBudgetTarget: Money ->
             onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetTarget = newBudgetTarget)))
         }
-        val onUpdateAvailableMoneyClicked = { newAvailableMoney: Money ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(availableMoney = newAvailableMoney)))
+        val onUpdateBudgetPurposeClicked = { newBudgetPurpose: BudgetPurpose ->
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetPurpose = newBudgetPurpose)))
+        }
+        val onUpdateAssignedMoneyClicked = { newAssignedMoney: Money ->
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(assignedMoney = newAssignedMoney)))
         }
         val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category)) }
 
@@ -131,21 +138,24 @@ private fun LazyListScope.items(
                 bottom = if (category == lastCategoryItem) spacing.tiny else spacing.halfDp
             )
         ) {
-            if (category.isEmptyCategory) {
-                EmptyCategoryItem(onReplaceEmptyClicked = onUpdateName)
+            if (category.isInitialCategory) {
+                EmptyCategoryItem(onUpdateNameClicked = onUpdateName)
             } else
                 Column {
                     Category(
                         emoji = category.emoji,
-                        name = category.name,
+                        categoryName = category.name,
                         budgetTarget = category.budgetTarget,
+                        budgetPurpose = category.budgetPurpose,
+                        assignedMoney = category.assignedMoney,
                         availableMoney = category.availableMoney,
                         progress = category.progress,
                         optionalText = category.optionalText,
                         onUpdateEmojiClicked = onUpdateEmojiClicked,
                         onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
-                        onUpdateAvailableMoneyClicked = onUpdateAvailableMoneyClicked,
+                        onUpdateBudgetPurposeClicked = onUpdateBudgetPurposeClicked,
+                        onUpdateAssignedMoneyClicked = onUpdateAssignedMoneyClicked,
                         onDeleteCategoryClicked = onDeleteCategoryClicked
                     )
                     if (category != lastCategoryItem)
@@ -165,7 +175,7 @@ private fun LazyListScope.items(
 fun BudgetListPreview() {
     GetALifeTheme {
         Surface {
-            BudgetsList(
+            BudgetList(
                 groups = fakeCategories(),
                 isLoading = false,
                 errorMessage = null,

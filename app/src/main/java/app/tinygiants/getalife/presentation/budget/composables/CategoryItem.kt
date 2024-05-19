@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -23,6 +23,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,8 +44,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
+import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
@@ -53,42 +57,47 @@ import app.tinygiants.getalife.theme.success
 import app.tinygiants.getalife.theme.warning
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun Category(
     emoji: String = "",
-    name: String = "",
+    categoryName: String = "",
     budgetTarget: Money = Money(value = 0.0),
+    budgetPurpose: BudgetPurpose = BudgetPurpose.Unknown,
+    assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Float = 0f,
     optionalText: String? = null,
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money) -> Unit = { },
-    onUpdateAvailableMoneyClicked: (Money) -> Unit = { },
+    onUpdateBudgetPurposeClicked: (BudgetPurpose) -> Unit = { },
+    onUpdateAssignedMoneyClicked: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
-
-    var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var categoryNameUserInput by rememberSaveable { mutableStateOf(name) }
-    var budget by remember { mutableStateOf(budgetTarget) }
-    var money by remember { mutableStateOf(availableMoney) }
-    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budget.value.toString()) }
-    var availableMoneyUserInput by rememberSaveable { mutableStateOf(money.value.toString()) }
+    //TODO implement TransactionSheet
+    var showTransactionSheet by rememberSaveable { mutableStateOf(false) }
+    var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
+
+    var budgetTargetMoney by remember { mutableStateOf(budgetTarget) }
+    var assignedMoneyToCategory by remember { mutableStateOf(assignedMoney) }
+
+    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.value.toString()) }
+    var assignedMoneyUserInput by rememberSaveable { mutableStateOf(assignedMoneyToCategory.value.toString()) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { },
-                onLongClick = { showBottomSheet = true }
+                onClick = { showBottomSheet = true },
+                onLongClick = { showTransactionSheet = true }
             )
             .padding(
                 horizontal = spacing.large,
-                vertical = spacing.default
+                vertical = spacing.small
             )
     ) {
         Row(
@@ -98,11 +107,14 @@ fun Category(
         ) {
             Text(
                 text = emoji,
-                modifier = Modifier.clickable(onClick = { showEmojiPicker = true })
+                maxLines = 1,
+                modifier = Modifier
+                    .clickable(onClick = { showEmojiPicker = true })
+                    .widthIn(max = 20.dp)
             )
             Spacer(modifier = Modifier.size(spacing.small))
             Text(
-                text = name,
+                text = categoryName,
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f)
             )
@@ -111,6 +123,12 @@ fun Category(
                 availableMoney.value < budgetTarget.value -> onWarning
                 else -> onSuccess
             }
+            Spacer(modifier = Modifier.size(spacing.small))
+            Text(
+                text = "Assigned: ${assignedMoneyToCategory.formattedMoney}",
+                style = MaterialTheme.typography.titleSmall,
+            )
+            Spacer(modifier = Modifier.size(spacing.large))
             Box(
                 modifier = Modifier
                     .background(
@@ -174,22 +192,38 @@ fun Category(
             Column(
                 modifier = Modifier.padding(horizontal = spacing.large)
             ) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    MultiChoiceSegmentedButtonRow {
+                        SegmentedButton(
+                            checked = budgetPurpose == BudgetPurpose.Spending,
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) onUpdateBudgetPurposeClicked(BudgetPurpose.Spending)
+                                else onUpdateBudgetPurposeClicked(BudgetPurpose.Unknown)
+                            },
+                            shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp),
+                        ) {
+                            Text(text = "Ausgeben")
+                        }
+                        SegmentedButton(
+                            checked = budgetPurpose == BudgetPurpose.Saving,
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) onUpdateBudgetPurposeClicked(BudgetPurpose.Saving)
+                                else onUpdateBudgetPurposeClicked(BudgetPurpose.Unknown)
+                            },
+                            shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
+                        ) {
+                            Text(text = "Sparen")
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(spacing.default))
                 Row {
                     TextField(
-                        value = categoryNameUserInput,
-                        onValueChange = { userInput -> categoryNameUserInput = userInput },
+                        value = categoryName,
+                        onValueChange = { userInput -> onUpdateCategoryClicked(userInput) },
                         label = { Text("Kategorie umbenennen") },
                         modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.width(spacing.default))
-                    Button(
-                        onClick = {
-                            if (categoryNameUserInput.isNotBlank()) {
-                                onUpdateCategoryClicked(categoryNameUserInput)
-                                categoryNameUserInput = ""
-                            }
-                        }
-                    ) { Text(text = "Speichern") }
                 }
                 Spacer(modifier = Modifier.height(spacing.default))
                 Row {
@@ -197,39 +231,39 @@ fun Category(
                         value = budgetTargetUserInput,
                         onValueChange = { userInput ->
                             budgetTargetUserInput = userInput
-                            budget = Money(userInput.toDoubleOrNull() ?: budget.value)
+                            budgetTargetMoney = Money(userInput.toDoubleOrNull() ?: budgetTargetMoney.value)
+                            onUpdateBudgetTargetClicked(budgetTargetMoney)
                         },
-                        prefix = { Text(availableMoney.currencySymbol) },
+                        prefix = { Text(budgetTargetMoney.currencySymbol) },
                         label = { Text("Budget Ziel ändern") },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .weight(1f)
                             .onFocusChanged { focusState ->
-                                budgetTargetUserInput = if (focusState.hasFocus) "" else budget.value.toString()
+                                budgetTargetUserInput =
+                                    if (focusState.hasFocus) "" else budgetTargetMoney.value.toString()
                             }
                     )
-                    Spacer(modifier = Modifier.width(spacing.default))
-                    Button(onClick = { onUpdateBudgetTargetClicked(Money(value = budget.value)) }) { Text(text = "Speichern") }
                 }
                 Spacer(modifier = Modifier.height(spacing.default))
                 Row {
                     TextField(
-                        value = availableMoneyUserInput,
+                        value = assignedMoneyUserInput,
                         onValueChange = { userInput ->
-                            availableMoneyUserInput = userInput
-                            money = Money(userInput.toDoubleOrNull() ?: money.value)
+                            assignedMoneyUserInput = userInput
+                            assignedMoneyToCategory = Money(userInput.toDoubleOrNull() ?: 0.00)
+                            onUpdateAssignedMoneyClicked(assignedMoneyToCategory)
                         },
-                        prefix = { Text(availableMoney.currencySymbol) },
-                        label = { Text("Verfügbares Geld ändern") },
+                        prefix = { Text(assignedMoney.currencySymbol) },
+                        label = { Text("Geld zuweisen") },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .weight(1f)
                             .onFocusChanged { focusState ->
-                                availableMoneyUserInput = if (focusState.hasFocus) "" else money.value.toString()
+                                assignedMoneyUserInput =
+                                    if (focusState.hasFocus) "" else assignedMoney.value.toString()
                             }
                     )
-                    Spacer(modifier = Modifier.width(spacing.default))
-                    Button(onClick = { onUpdateAvailableMoneyClicked(Money(value = money.value)) }) { Text(text = "Speichern") }
                 }
                 Spacer(modifier = Modifier.height(spacing.default))
                 Row(
@@ -241,7 +275,7 @@ fun Category(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text(
-                            text = "$name löschen",
+                            text = "$categoryName löschen",
                             color = MaterialTheme.colorScheme.onError
                         )
                     }
@@ -256,9 +290,7 @@ fun Category(
         val scope = rememberCoroutineScope()
         fun hideModalBottomSheetIfFullyExpanded() {
             if (sheetSate.currentValue == SheetValue.Expanded) {
-                scope.launch { sheetSate.hide() }.invokeOnCompletion {
-                    if (!sheetSate.isVisible) showBottomSheet = false
-                }
+                scope.launch { sheetSate.hide() }.invokeOnCompletion { showBottomSheet = false }
             }
         }
 
@@ -283,7 +315,6 @@ fun Category(
 }
 
 
-
 @PreviewLightDark
 @Composable
 fun FullCategoryPreview() {
@@ -291,8 +322,9 @@ fun FullCategoryPreview() {
         Surface {
             Category(
                 emoji = "🏠",
-                name = "Rent",
+                categoryName = "Rent",
                 budgetTarget = Money(940.00),
+                assignedMoney = Money(940.00),
                 availableMoney = Money(940.00),
                 progress = 1f,
                 optionalText = optionalExampleText(0.00)
@@ -308,8 +340,9 @@ fun SemiFilledCategoryPreview() {
         Surface {
             Category(
                 emoji = "🏠",
-                name = "Rent",
+                categoryName = "Rent",
                 budgetTarget = Money(940.00),
+                assignedMoney = Money(470.00),
                 availableMoney = Money(470.00),
                 progress = (470.00 / 940.00).toFloat(),
                 optionalText = optionalExampleText(gap = 940.00 - 470.00)
@@ -325,8 +358,9 @@ fun EmptyCategoryPreview() {
         Surface {
             Category(
                 emoji = "🏠",
-                name = "Rent",
+                categoryName = "Rent",
                 budgetTarget = Money(940.00),
+                assignedMoney = Money(0.0),
                 availableMoney = Money(0.0),
                 progress = (0.0 / 940.00).toFloat(),
                 optionalText = optionalExampleText(gap = 940.00 - 0.00)

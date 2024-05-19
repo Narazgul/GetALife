@@ -3,19 +3,24 @@ package app.tinygiants.getalife.data.repository
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.HeaderEntity
 import app.tinygiants.getalife.data.local.entities.HeaderWithCategoriesEntity
-import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.model.BudgetPurpose
+import app.tinygiants.getalife.domain.repository.BudgetRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class CategoryRepositoryFake : CategoryRepository {
+class BudgetRepositoryFake : BudgetRepository {
 
     private val headersWithCategoriesEntity = mutableListOf<HeaderWithCategoriesEntity>()
 
-    override fun getBudget(): Flow<Result<List<HeaderWithCategoriesEntity>>> = flow {
+    override fun getBudgetFlow(): Flow<Result<List<HeaderWithCategoriesEntity>>> = flow {
         headersWithCategoriesEntity
     }
 
-    override suspend fun getCategoriesBy(headerId: Long): List<CategoryEntity> {
+    override fun getCategoriesFlow(): Flow<Result<List<CategoryEntity>>> {
+        return flow { emit(Result.success(headersWithCategoriesEntity.flatMap { it.categories })) }
+    }
+
+    override suspend fun getCategoriesOfHeader(headerId: Long): List<CategoryEntity> {
         val categories = mutableListOf<CategoryEntity>()
 
         headersWithCategoriesEntity.forEach { headerWithCategories ->
@@ -43,6 +48,22 @@ class CategoryRepositoryFake : CategoryRepository {
     override suspend fun deleteHeader(headerEntity: HeaderEntity) {
         headersWithCategoriesEntity.removeAll { it.header.id == headerEntity.id }
     }
+
+    override suspend fun getCategory(categoryId: Long) = headersWithCategoriesEntity
+            .flatMap { headersWithCategories -> headersWithCategories.categories }
+            .find { category -> category.id == categoryId } ?: CategoryEntity(
+                id = 1L,
+                headerId = 1L,
+                emoji = "",
+                name = "",
+                budgetPurpose = BudgetPurpose.Unknown,
+                budgetTarget = 0.00,
+                assignedMoney = 0.00,
+                availableMoney = 0.00,
+                optionalText = "",
+                listPosition = 0,
+                isInitialCategory = false
+            )
 
     override suspend fun addCategory(categoryEntity: CategoryEntity) {
         val headerWithCategories = headersWithCategoriesEntity.find { it.header.id == categoryEntity.headerId }
