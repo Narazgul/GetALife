@@ -16,14 +16,16 @@ data class Money(
     val formattedMoney: String = value.toCurrencyFormattedString()
     val formattedPositiveMoney: String = abs(value).toCurrencyFormattedString()
 
+    operator fun compareTo(other: Money) = value.compareTo(other.value)
+    operator fun plus(other: Money) = Money(value = this.value + other.value)
+    operator fun minus(other: Money) = Money(value = this.value - other.value)
+
+    private fun getCurrencySymbol(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).symbol
+
     private fun Double.toCurrencyFormattedString(): String {
         val numberFormat = NumberFormat.getCurrencyInstance()
         numberFormat.maximumFractionDigits = maximumDigits
         numberFormat.currency = Currency.getInstance(locale)
         return numberFormat.format(this)
     }
-
-
-
-    private fun getCurrencySymbol(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).symbol
 }

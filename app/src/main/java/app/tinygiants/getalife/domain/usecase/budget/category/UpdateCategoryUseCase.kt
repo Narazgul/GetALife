@@ -8,7 +8,6 @@ import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCas
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.abs
 
 class UpdateCategoryUseCase @Inject constructor(
     private val repository: BudgetRepository,
@@ -18,16 +17,6 @@ class UpdateCategoryUseCase @Inject constructor(
 
     suspend operator fun invoke(category: Category) = withContext(defaultDispatcher) {
 
-        val categoryBeforeUpdate = repository
-            .getCategoriesOfHeader(category.headerId)
-            .find { categoryEntity -> categoryEntity.id == category.id }
-
-        val updatedAvailableMoney = calculateAvailableMoney(
-            assignedMoneyBeforeUpdate = categoryBeforeUpdate?.assignedMoney,
-            assignedMoneyValue = category.assignedMoney.value,
-            availableMoney = category.availableMoney.value
-        )
-
         val categoryEntity = CategoryEntity(
             id = category.id,
             headerId = category.headerId,
@@ -36,7 +25,7 @@ class UpdateCategoryUseCase @Inject constructor(
             budgetTarget = category.budgetTarget.value,
             budgetPurpose = category.budgetPurpose,
             assignedMoney = category.assignedMoney.value,
-            availableMoney = updatedAvailableMoney,
+            availableMoney = category.availableMoney.value,
             optionalText = category.optionalText,
             listPosition = category.listPosition,
             isInitialCategory = false
@@ -44,22 +33,6 @@ class UpdateCategoryUseCase @Inject constructor(
 
         repository.updateCategory(categoryEntity)
 
-        if (category.isInitialCategory) { addEmoji(categoryEntity) }
-    }
-
-    private fun calculateAvailableMoney(
-        assignedMoneyBeforeUpdate: Double?,
-        assignedMoneyValue: Double,
-        availableMoney: Double
-    ): Double {
-        if (assignedMoneyBeforeUpdate == null) return assignedMoneyValue
-
-        val assignedMoneyDifference = abs(assignedMoneyValue - assignedMoneyBeforeUpdate)
-
-        return when {
-            assignedMoneyBeforeUpdate < assignedMoneyValue -> availableMoney + assignedMoneyDifference
-            assignedMoneyBeforeUpdate > assignedMoneyValue -> availableMoney - assignedMoneyDifference
-            else -> availableMoney
-        }
+        if (category.isInitialCategory) addEmoji(categoryEntity)
     }
 }

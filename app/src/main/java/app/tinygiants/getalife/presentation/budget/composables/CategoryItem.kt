@@ -261,7 +261,7 @@ fun Category(
                             .weight(1f)
                             .onFocusChanged { focusState ->
                                 assignedMoneyUserInput =
-                                    if (focusState.hasFocus) "" else assignedMoney.value.toString()
+                                    if (focusState.hasFocus) "" else assignedMoneyUserInput
                             }
                     )
                 }
