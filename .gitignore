@@ -94,3 +94,6 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# kotlin compiler sessions
+.kotlin/sessions
