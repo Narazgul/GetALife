@@ -47,6 +47,10 @@ captures/
 .idea/libraries
 .idea/sonarlint
 .idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetSelector.xml
+.idea/other.xml
+.idea/studiobot.xml
+
 
 # Android Studio 3 in .gitignore file.
 
