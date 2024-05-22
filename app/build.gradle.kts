@@ -10,6 +10,7 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("com.google.dagger.hilt.android")
     id("de.mannodermaus.android-junit5") version "1.10.0.0"
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -81,7 +82,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     packaging {
