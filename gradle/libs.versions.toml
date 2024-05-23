@@ -3,6 +3,7 @@
 kotlinVersion = "2.0.0"
 ksp-version = "2.0.0-1.0.21"
 android-gradle-plugin = "8.4.1"
+splashscreenVersion = "1.0.1"
 
 gemini-version = "0.6.0"
 chatgpt-version = "3.7.2"
@@ -49,6 +50,7 @@ lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-com
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreenVersion" }
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -94,7 +96,7 @@ assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assert
 ####################################################################################################
 
 [bundles]
-core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose", "navigation-compose"]
+core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose", "navigation-compose", "splashscreen"]
 hilt = ["hilt-android", "hilt-navigation-compose"]
 room = ["room-ktx", "room-runtime"]
 compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
