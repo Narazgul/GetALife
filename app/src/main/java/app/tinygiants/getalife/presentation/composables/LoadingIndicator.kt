@@ -7,7 +7,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.theme.spacing
 
 @Composable

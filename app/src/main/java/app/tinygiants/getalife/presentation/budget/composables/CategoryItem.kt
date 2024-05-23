@@ -83,10 +83,11 @@ fun Category(
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
 
     var budgetTargetMoney by remember { mutableStateOf(budgetTarget) }
-    var assignedMoneyToCategory by remember { mutableStateOf(assignedMoney) }
+    var assignedMoneyInCategory by remember { mutableStateOf(assignedMoney) }
 
+    var categoryNameUserInput by rememberSaveable { mutableStateOf(categoryName) }
     var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.value.toString()) }
-    var assignedMoneyUserInput by rememberSaveable { mutableStateOf(assignedMoneyToCategory.value.toString()) }
+    var assignedMoneyUserInput by rememberSaveable { mutableStateOf(assignedMoneyInCategory.value.toString()) }
 
     Column(
         modifier = Modifier
@@ -125,7 +126,7 @@ fun Category(
             }
             Spacer(modifier = Modifier.size(spacing.small))
             Text(
-                text = "Assigned: ${assignedMoneyToCategory.formattedMoney}",
+                text = "Assigned: ${assignedMoney.formattedMoney}",
                 style = MaterialTheme.typography.titleSmall,
             )
             Spacer(modifier = Modifier.size(spacing.large))
@@ -219,8 +220,10 @@ fun Category(
                 Spacer(modifier = Modifier.height(spacing.default))
                 Row {
                     TextField(
-                        value = categoryName,
-                        onValueChange = { userInput -> onUpdateCategoryClicked(userInput) },
+                        value = categoryNameUserInput,
+                        onValueChange = { userInput ->
+                            categoryNameUserInput = userInput
+                            onUpdateCategoryClicked(userInput) },
                         label = { Text("Kategorie umbenennen") },
                         modifier = Modifier.weight(1f)
                     )
@@ -230,8 +233,8 @@ fun Category(
                     TextField(
                         value = budgetTargetUserInput,
                         onValueChange = { userInput ->
-                            budgetTargetUserInput = userInput
-                            budgetTargetMoney = Money(userInput.toDoubleOrNull() ?: budgetTargetMoney.value)
+                            budgetTargetUserInput = userInput.replace(oldChar = ',', newChar = '.')
+                            budgetTargetMoney = Money(budgetTargetUserInput.toDoubleOrNull() ?: return@TextField)
                             onUpdateBudgetTargetClicked(budgetTargetMoney)
                         },
                         prefix = { Text(budgetTargetMoney.currencySymbol) },
@@ -241,7 +244,7 @@ fun Category(
                             .weight(1f)
                             .onFocusChanged { focusState ->
                                 budgetTargetUserInput =
-                                    if (focusState.hasFocus) "" else budgetTargetMoney.value.toString()
+                                    if (focusState.hasFocus) "" else budgetTarget.value.toString()
                             }
                     )
                 }
@@ -250,9 +253,9 @@ fun Category(
                     TextField(
                         value = assignedMoneyUserInput,
                         onValueChange = { userInput ->
-                            assignedMoneyUserInput = userInput
-                            assignedMoneyToCategory = Money(userInput.toDoubleOrNull() ?: 0.00)
-                            onUpdateAssignedMoneyClicked(assignedMoneyToCategory)
+                            assignedMoneyUserInput = userInput.replace(oldChar = ',', newChar = '.')
+                            assignedMoneyInCategory = Money(assignedMoneyUserInput.toDoubleOrNull() ?: return@TextField)
+                            onUpdateAssignedMoneyClicked(assignedMoneyInCategory)
                         },
                         prefix = { Text(assignedMoney.currencySymbol) },
                         label = { Text("Geld zuweisen") },
@@ -261,7 +264,7 @@ fun Category(
                             .weight(1f)
                             .onFocusChanged { focusState ->
                                 assignedMoneyUserInput =
-                                    if (focusState.hasFocus) "" else assignedMoneyUserInput
+                                    if (focusState.isFocused) "" else assignedMoney.value.toString()
                             }
                     )
                 }

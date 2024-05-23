@@ -1,12 +1,15 @@
 package app.tinygiants.getalife.presentation.budget
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +32,7 @@ import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.ScreenPreview
+import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun BudgetScreen() {
@@ -57,9 +61,9 @@ fun BudgetScreen(
 
             AnimatedVisibility(
                 visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                enter = fadeIn(tween(1500)),
+                exit = fadeOut(tween(2500)),
+                modifier = Modifier.fillMaxWidth().padding(spacing.default)
             ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
 
             BudgetList(

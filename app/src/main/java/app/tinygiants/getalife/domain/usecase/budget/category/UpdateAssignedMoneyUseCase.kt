@@ -15,13 +15,14 @@ class UpdateAssignedMoneyUseCase @Inject constructor(
     suspend operator fun invoke(category: Category, newAssignedMoney: Money) =
         withContext(defaultDispatcher) {
 
-            val oldAssignedMoney = category.assignedMoney
-            val deltaAssignedMoney = when {
-                oldAssignedMoney == newAssignedMoney -> newAssignedMoney
-                else -> newAssignedMoney - oldAssignedMoney
+            val previousAssignedMoney = category.assignedMoney
+            val assignedMoneyDifference = when {
+                previousAssignedMoney == newAssignedMoney -> Money(value = 0.00)
+                else -> newAssignedMoney - previousAssignedMoney
             }
-            val newAvailableMoney = category.availableMoney + deltaAssignedMoney
-            val updatedCategory = category.copy(assignedMoney = newAssignedMoney, availableMoney = newAvailableMoney)
+
+            val updatedAvailableMoney = category.availableMoney + assignedMoneyDifference
+            val updatedCategory = category.copy(assignedMoney = newAssignedMoney, availableMoney = updatedAvailableMoney)
 
             updateCategory(category = updatedCategory)
         }

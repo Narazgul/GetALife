@@ -2,30 +2,26 @@ package app.tinygiants.getalife.presentation.budget.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
 
 @Composable
-fun ColumnScope.AssignableMoney(assignableMoney: Money) {
+fun AssignableMoney(assignableMoney: Money) {
     val background = when {
         assignableMoney.value > 0.0 -> success
         assignableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
@@ -50,8 +46,6 @@ fun ColumnScope.AssignableMoney(assignableMoney: Money) {
         color = textColor,
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .width(300.dp)
             .background(
                 color = background,
                 shape = RoundedCornerShape(size = spacing.medium)

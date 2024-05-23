@@ -22,12 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -48,9 +49,11 @@ fun AccountDialog(
 
     var showAccountTypeDropdown by rememberSaveable { mutableStateOf(false) }
 
+    var balanceInAccount by remember { mutableStateOf(balance) }
+
     var accountNameInput by rememberSaveable { mutableStateOf(accountName ?: "") }
-    var balanceInput by rememberSaveable { mutableDoubleStateOf(balance?.value ?: 0.00) }
-    var accountTypeInput by rememberSaveable { mutableStateOf(type ?: AccountType.Unknown) }
+    var balanceUserInput by rememberSaveable { mutableStateOf(balanceInAccount?.value.toString()) }
+    var accountTypeInput by rememberSaveable { mutableStateOf(type) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -79,12 +82,18 @@ fun AccountDialog(
                         .padding(horizontal = spacing.large, vertical = spacing.medium)
                 )
                 OutlinedTextField(
-                    value = balanceInput.toString(),
-                    onValueChange = { newValue -> balanceInput = newValue.toDoubleOrNull() ?: 0.00 },
+                    value = balanceUserInput,
+                    onValueChange = { newValue ->
+                        balanceUserInput = newValue.replace(oldChar = ',', newChar = '.')
+                        balanceInAccount = Money(value = balanceUserInput.toDoubleOrNull() ?: return@OutlinedTextField)
+                    },
                     label = { Text("Balance") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = spacing.large, vertical = spacing.medium)
+                        .onFocusChanged {  focusState ->
+                            balanceUserInput = if (focusState.isFocused) "" else balance?.value.toString()
+                        }
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -92,7 +101,7 @@ fun AccountDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = accountTypeInput.name,
+                        text = accountTypeInput?.name ?: "Account-Art wählen" ,
                         modifier = Modifier
                             .clickable { showAccountTypeDropdown = true }
                             .padding(spacing.large)
@@ -104,6 +113,7 @@ fun AccountDialog(
                             .width(200.dp)
                     ) {
                         AccountType.entries.forEach { type ->
+
                             DropdownMenuItem(
                                 text = { Text(text = type.name) },
                                 onClick = {
@@ -144,8 +154,8 @@ fun AccountDialog(
                         onClick = {
                             onConfirmClicked(
                                 accountNameInput,
-                                Money(value = balanceInput),
-                                accountTypeInput
+                                balanceInAccount ?: Money(value = 0.00),
+                                accountTypeInput ?: AccountType.Unknown
                             )
                             onDismissRequest()
                         },
