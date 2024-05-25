@@ -1,3 +1,31 @@
 <resources>
-
+    <string name="distribute_available_money">Distribute available money to categories: %1$s</string>
+    <string name="everything_distributed">Everything is distributed 👍🏼</string>
+    <string name="more_distributed_than_available">You\'ve distributed more than you own. Remove %1$s from categories</string>
+    <string name="error_title">An error occurred</string>
+    <string name="error_subtitle">It\'s terrible. Safe yourself</string>
+    <string name="enter_groupname">Enter group name</string>
+    <string name="no_name_entered">No name entered</string>
+    <string name="save">Save</string>
+    <string name="add_new_category">Add new category</string>
+    <string name="change_title">Change title</string>
+    <string name="delete_group">Delete %1$s-group</string>
+    <string name="spent">Spent</string>
+    <string name="saving">Saving</string>
+    <string name="rename_category">Rename category</string>
+    <string name="change_budget_target">Change budget target</string>
+    <string name="distribute_money">Allocate money</string>
+    <string name="delete_argument">Delete %1$s</string>
+    <string name="add_account">Add account</string>
+    <string name="edit_account">Edit account</string>
+    <string name="account_name">Account name</string>
+    <string name="balance">Balance</string>
+    <string name="chose_account_type">Chose account typ</string>
+    <string name="chose_category">Chose category</string>
+    <string name="amount">Amount</string>
+    <string name="description">Description</string>
+    <string name="add_transaction">Add transaction</string>
+    <string name="transaction_partner">Transaction partner</string>
+    <string name="budget">Budget</string>
+    <string name="account">Account</string>
 </resources>

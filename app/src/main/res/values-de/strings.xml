@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="distribute_available_money">Verfügbares Geld auf Kategorien verteilen: %1$s</string>
+    <string name="everything_distributed">Alles verteilt 👍🏼</string>
+    <string name="more_distributed_than_available">Zu hast mehr Geld verteilt als du hast. Entferne %1$s aus den Kategorien</string>
+    <string name="error_title">Zefix</string>
+    <string name="error_subtitle">Ein fürchterlicher Fehler ist aufgetreten.</string>
+    <string name="enter_groupname">Gruppenname eingeben</string>
+    <string name="no_name_entered">kein Name eingegeben</string>
+    <string name="save">Save</string>
+    <string name="add_new_category">Neue Kategorie hinzufügen</string>
+    <string name="change_title">Titel ändern</string>
+    <string name="delete_group">%1$s-Gruppe löschen</string>
+    <string name="spent">Ausgeben</string>
+    <string name="saving">Sparen</string>
+    <string name="rename_category">Kategorie umbenennen</string>
+    <string name="change_budget_target">Budget Ziel ändern</string>
+    <string name="distribute_money">Geld zuweisen</string>
+    <string name="delete_argument">%1$s löschen</string>
+    <string name="add_account">Account hinzufügen</string>
+    <string name="edit_account">Account bearbeiten</string>
+    <string name="account_name">Account Name</string>
+    <string name="balance">Balance</string>
+    <string name="chose_account_type">Account-Art wählen</string>
+    <string name="chose_category">Kategorie wählen</string>
+    <string name="amount">Betrag</string>
+    <string name="description">Beschreibung</string>
+    <string name="add_transaction">Transaktion hinzufügen</string>
+    <string name="transaction_partner">Transaktionspartner</string>
+    <string name="budget">Budget</string>
+    <string name="account">Account</string>
+</resources>
