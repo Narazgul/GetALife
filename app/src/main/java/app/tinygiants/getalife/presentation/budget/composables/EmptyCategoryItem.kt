@@ -17,6 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -38,14 +40,14 @@ fun EmptyCategoryItem(
         OutlinedTextField(
             value = categoryName,
             onValueChange = { textInput -> categoryName = textInput },
-            label = { Text("Jetzt Kategorie hinzufügen") },
+            label = { Text(stringResource(id = R.string.add_new_category)) },
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(spacing.default))
         Button(
             onClick = {
                 if (categoryName.isBlank()) {
-                    Toast.makeText(context, "kein Name eingegeben", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.no_name_entered, Toast.LENGTH_SHORT).show()
                     return@Button
                 }
                 onUpdateNameClicked(categoryName)

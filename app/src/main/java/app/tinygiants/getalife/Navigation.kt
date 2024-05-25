@@ -1,5 +1,6 @@
 package app.tinygiants.getalife
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
@@ -49,7 +50,8 @@ fun NavGraphBuilder.accountGraph() {
     }
 }
 
-sealed class Screens(val label: String, val iconId: Int, val route: String) {
-    data object Budget : Screens(label = "Budget", iconId = R.drawable.ic_dashboard, route = "budget")
-    data object Account : Screens(label = "Account", iconId = R.drawable.ic_account, route = "account")
+sealed class Screens(@StringRes val label: Int, val iconId: Int, val route: String) {
+    data object Budget : Screens(label = R.string.budget, iconId = R.drawable.ic_dashboard, route = "budget")
+    data object Transaction : Screens(label = R.string.budget, iconId = R.drawable.ic_add, route = "transaction")
+    data object Account : Screens(label = R.string.account, iconId = R.drawable.ic_account, route = "account")
 }

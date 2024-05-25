@@ -9,13 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import app.tinygiants.getalife.R
+import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Immutable
 data class ErrorMessage(
-    val title: String?,
-    val subtitle: String?
+    val title: UiText?,
+    val subtitle: UiText?
 )
 
 @Composable
@@ -29,12 +31,12 @@ fun ErrorMessage(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = errorMessage?.title ?: "",
+                text = errorMessage?.title?.asString() ?: "",
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = errorMessage?.subtitle ?: "",
+                text = errorMessage?.subtitle?.asString() ?: "",
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -48,8 +50,8 @@ fun ErrorMessagePreview() {
     GetALifeTheme {
         ErrorMessage(
             errorMessage = ErrorMessage(
-                title = "Zefix",
-                subtitle = "Ein fürchterlicher Fehler ist aufgetreten.",
+                title = UiText.StringResource(R.string.error_title),
+                subtitle = UiText.StringResource(R.string.error_subtitle)
             )
         )
     }

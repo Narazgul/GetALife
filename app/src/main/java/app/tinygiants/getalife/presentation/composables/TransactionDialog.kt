@@ -28,9 +28,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
@@ -102,7 +104,7 @@ fun TransactionDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = categoryUserInput?.name ?: "Kategorie wählen",
+                        text = categoryUserInput?.name ?: stringResource(R.string.chose_category),
                         modifier = Modifier
                             .clickable { showCategoryDropdown = true }
                             .padding(spacing.large)
@@ -131,21 +133,21 @@ fun TransactionDialog(
                         amountUserInputText = userInput
                         amountMoney = Money(userInput.toDoubleOrNull() ?: amountMoney?.value ?: 0.00)
                     },
-                    label = { Text("Betrag") },
+                    label = { Text(stringResource(R.string.amount)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(spacing.large))
                 TextField(
                     value = descriptionUserInput ?: "",
                     onValueChange = { userInput -> descriptionUserInput = userInput },
-                    label = { Text("Beschreibung") },
+                    label = { Text(stringResource(R.string.description)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(spacing.large))
                 TextField(
                     value = transactionPartnerUserInput ?: "",
                     onValueChange = { userInput -> transactionPartnerUserInput = userInput },
-                    label = { Text("Transaktionspartner") },
+                    label = { Text(stringResource(R.string.transaction_partner)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(spacing.large))
@@ -159,7 +161,7 @@ fun TransactionDialog(
                     )
                     onDismissRequest()
                 }) {
-                    Text(text = "Confirm")
+                    Text(text = stringResource(id = R.string.save))
                 }
             }
         }

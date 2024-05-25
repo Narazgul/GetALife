@@ -29,9 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -69,14 +71,14 @@ fun AccountDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = if (accountName == null) "Account hinzufügen" else "Account bearbeiten",
+                    text = if (accountName == null) stringResource(id = R.string.add_account) else stringResource(R.string.edit_account),
                     modifier = Modifier.padding(spacing.large),
                     style = MaterialTheme.typography.titleMedium
                 )
                 OutlinedTextField(
                     value = accountNameInput,
                     onValueChange = { accountNameInput = it },
-                    label = { Text("Account Name") },
+                    label = { Text(stringResource(R.string.account_name)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = spacing.large, vertical = spacing.medium)
@@ -87,11 +89,11 @@ fun AccountDialog(
                         balanceUserInput = newValue.replace(oldChar = ',', newChar = '.')
                         balanceInAccount = Money(value = balanceUserInput.toDoubleOrNull() ?: return@OutlinedTextField)
                     },
-                    label = { Text("Balance") },
+                    label = { Text(stringResource(R.string.balance)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = spacing.large, vertical = spacing.medium)
-                        .onFocusChanged {  focusState ->
+                        .onFocusChanged { focusState ->
                             balanceUserInput = if (focusState.isFocused) "" else balance?.value.toString()
                         }
                 )
@@ -101,7 +103,7 @@ fun AccountDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = accountTypeInput?.name ?: "Account-Art wählen" ,
+                        text = accountTypeInput?.name ?: stringResource(R.string.chose_account_type) ,
                         modifier = Modifier
                             .clickable { showAccountTypeDropdown = true }
                             .padding(spacing.large)
@@ -134,7 +136,7 @@ fun AccountDialog(
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text(
-                                text = "$accountName löschen",
+                                text = stringResource(id = R.string.delete_argument, accountName ?: ""),
                                 color = MaterialTheme.colorScheme.onError
                             )
                         }

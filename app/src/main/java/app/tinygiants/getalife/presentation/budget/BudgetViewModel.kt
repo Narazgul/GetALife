@@ -2,6 +2,7 @@ package app.tinygiants.getalife.presentation.budget
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
@@ -14,6 +15,7 @@ import app.tinygiants.getalife.domain.usecase.budget.category.UpdateCategoryUseC
 import app.tinygiants.getalife.domain.usecase.budget.header.AddHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.budget.header.DeleteHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.budget.header.UpdateHeaderUseCase
+import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddHeader
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
@@ -96,7 +98,11 @@ class BudgetViewModel @Inject constructor(
                 is DeleteHeader -> deleteHeader(header = clickEvent.header)
 
                 is AddCategory -> addCategory(headerId = clickEvent.headerId, categoryName = clickEvent.categoryName)
-                is UpdateAssignedMoney -> updateAssignedMoney(category = clickEvent.category, newAssignedMoney = clickEvent.newAssignedMoney)
+                is UpdateAssignedMoney -> updateAssignedMoney(
+                    category = clickEvent.category,
+                    newAssignedMoney = clickEvent.newAssignedMoney
+                )
+
                 is UpdateCategory -> updateCategory(category = clickEvent.category)
                 is DeleteCategory -> deleteCategory(category = clickEvent.category)
             }
@@ -127,8 +133,9 @@ class BudgetViewModel @Inject constructor(
             budgetUiState.copy(
                 isLoading = false,
                 errorMessage = ErrorMessage(
-                    title = "Zefix",
-                    subtitle = exception?.message ?: "Ein fürchterlicher Fehler ist aufgetreten."
+                    title = UiText.StringResource(resId = R.string.error_title),
+                    subtitle = if (exception?.message != null) UiText.DynamicString(value = exception.message!!)
+                    else UiText.StringResource(R.string.error_subtitle)
                 )
             )
         }
@@ -139,8 +146,8 @@ class BudgetViewModel @Inject constructor(
             budgetUiState.copy(
                 assignableMoney = null,
                 errorMessage = ErrorMessage(
-                    title = "Zefix",
-                    subtitle = "zu verteilendes Geld konnte nicht geladen werden."
+                    title = UiText.StringResource(resId = R.string.error_title),
+                    subtitle = UiText.StringResource(R.string.error_subtitle)
                 )
             )
         }

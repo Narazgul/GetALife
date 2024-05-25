@@ -16,32 +16,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.MultiChoiceSegmentedButtonRow
-import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -81,13 +72,6 @@ fun Category(
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
-
-    var budgetTargetMoney by remember { mutableStateOf(budgetTarget) }
-    var assignedMoneyInCategory by remember { mutableStateOf(assignedMoney) }
-
-    var categoryNameUserInput by rememberSaveable { mutableStateOf(categoryName) }
-    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.value.toString()) }
-    var assignedMoneyUserInput by rememberSaveable { mutableStateOf(assignedMoneyInCategory.value.toString()) }
 
     Column(
         modifier = Modifier
@@ -185,108 +169,18 @@ fun Category(
         }
     }
 
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = spacing.large)
-            ) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    MultiChoiceSegmentedButtonRow {
-                        SegmentedButton(
-                            checked = budgetPurpose == BudgetPurpose.Spending,
-                            onCheckedChange = { isChecked ->
-                                if (isChecked) onUpdateBudgetPurposeClicked(BudgetPurpose.Spending)
-                                else onUpdateBudgetPurposeClicked(BudgetPurpose.Unknown)
-                            },
-                            shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp),
-                        ) {
-                            Text(text = "Ausgeben")
-                        }
-                        SegmentedButton(
-                            checked = budgetPurpose == BudgetPurpose.Saving,
-                            onCheckedChange = { isChecked ->
-                                if (isChecked) onUpdateBudgetPurposeClicked(BudgetPurpose.Saving)
-                                else onUpdateBudgetPurposeClicked(BudgetPurpose.Unknown)
-                            },
-                            shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
-                        ) {
-                            Text(text = "Sparen")
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(spacing.default))
-                Row {
-                    TextField(
-                        value = categoryNameUserInput,
-                        onValueChange = { userInput ->
-                            categoryNameUserInput = userInput
-                            onUpdateCategoryClicked(userInput) },
-                        label = { Text("Kategorie umbenennen") },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Spacer(modifier = Modifier.height(spacing.default))
-                Row {
-                    TextField(
-                        value = budgetTargetUserInput,
-                        onValueChange = { userInput ->
-                            budgetTargetUserInput = userInput.replace(oldChar = ',', newChar = '.')
-                            budgetTargetMoney = Money(budgetTargetUserInput.toDoubleOrNull() ?: return@TextField)
-                            onUpdateBudgetTargetClicked(budgetTargetMoney)
-                        },
-                        prefix = { Text(budgetTargetMoney.currencySymbol) },
-                        label = { Text("Budget Ziel ändern") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .weight(1f)
-                            .onFocusChanged { focusState ->
-                                budgetTargetUserInput =
-                                    if (focusState.hasFocus) "" else budgetTarget.value.toString()
-                            }
-                    )
-                }
-                Spacer(modifier = Modifier.height(spacing.default))
-                Row {
-                    TextField(
-                        value = assignedMoneyUserInput,
-                        onValueChange = { userInput ->
-                            assignedMoneyUserInput = userInput.replace(oldChar = ',', newChar = '.')
-                            assignedMoneyInCategory = Money(assignedMoneyUserInput.toDoubleOrNull() ?: return@TextField)
-                            onUpdateAssignedMoneyClicked(assignedMoneyInCategory)
-                        },
-                        prefix = { Text(assignedMoney.currencySymbol) },
-                        label = { Text("Geld zuweisen") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .weight(1f)
-                            .onFocusChanged { focusState ->
-                                assignedMoneyUserInput =
-                                    if (focusState.isFocused) "" else assignedMoney.value.toString()
-                            }
-                    )
-                }
-                Spacer(modifier = Modifier.height(spacing.default))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = { onDeleteCategoryClicked() },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text(
-                            text = "$categoryName löschen",
-                            color = MaterialTheme.colorScheme.onError
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(spacing.extraLarge))
-        }
-    }
+    if (showBottomSheet) BudgetBottomSheet(
+        categoryName = categoryName,
+        budgetTarget = budgetTarget,
+        assignedMoney = assignedMoney,
+        budgetPurpose = budgetPurpose,
+        onUpdateCategoryName = onUpdateCategoryClicked,
+        onBudgetTargetChanged = { money -> onUpdateBudgetTargetClicked(money) },
+        onAssignedMoneyChanged = { money -> onUpdateAssignedMoneyClicked(money) },
+        onUpdateBudgetPurposeClicked = onUpdateBudgetPurposeClicked,
+        onDeleteCategoryClicked = onDeleteCategoryClicked,
+        onDismissRequest = { showBottomSheet = false },
+    )
 
     if (showEmojiPicker) {
         val sheetSate = rememberModalBottomSheetState()

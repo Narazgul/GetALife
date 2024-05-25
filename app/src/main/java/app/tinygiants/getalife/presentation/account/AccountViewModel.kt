@@ -2,6 +2,7 @@ package app.tinygiants.getalife.presentation.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
@@ -10,6 +11,7 @@ import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
 import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
+import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,8 +120,9 @@ class AccountViewModel @Inject constructor(
                 categories = emptyList(),
                 isLoading = false,
                 errorMessage = ErrorMessage(
-                    title = "Zefix",
-                    subtitle = exception?.message ?: "Ein fürchterlicher Fehler ist aufgetreten."
+                    title = UiText.StringResource(R.string.error_title),
+                    subtitle = if (exception?.message != null) UiText.DynamicString(exception.message ?: "")
+                        else UiText.StringResource(R.string.error_subtitle)
                 )
             )
         }

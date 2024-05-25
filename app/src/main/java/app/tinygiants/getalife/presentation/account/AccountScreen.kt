@@ -16,9 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
@@ -72,7 +74,7 @@ fun AccountScreen(
             onClick = { showAddAccountDialog = true },
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-            Text(text = "Account hinzufügen")
+            Text(text = stringResource(R.string.add_account))
         }
         AnimatedVisibility(
             visible = showAddAccountDialog,

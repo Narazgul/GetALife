@@ -18,7 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -42,14 +44,14 @@ fun AddHeaderItem(
         OutlinedTextField(
             value = headerName,
             onValueChange = { newName -> onNameChanged(newName) },
-            label = { Text("Gruppenname eingeben") },
+            label = { Text(stringResource(R.string.enter_groupname)) },
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(spacing.default))
         Button(
             onClick = {
                 if (headerName.isBlank()) {
-                    Toast.makeText(context, "kein Name eingegeben", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.no_name_entered), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
 
@@ -59,7 +61,7 @@ fun AddHeaderItem(
             },
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {
-            Text(text = "Save")
+            Text(text = stringResource(R.string.save))
         }
     }
 }

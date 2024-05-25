@@ -37,7 +37,8 @@ class GetBudgetUseCase @Inject constructor(
                     .sortedBy { headerWithCategory -> headerWithCategory.header.listPosition }
                     .mapIndexed { index, headerWithCategoriesEntity ->
 
-                        val header = mapToHeader(headerWithCategory = headerWithCategoriesEntity, newListPosition = index)
+                        val header =
+                            mapToHeader(headerWithCategory = headerWithCategoriesEntity, newListPosition = index)
                         val categories = mapToCategories(headerWithCategory = headerWithCategoriesEntity)
 
                         header to categories
@@ -68,7 +69,11 @@ class GetBudgetUseCase @Inject constructor(
             .sortedBy { category -> category.listPosition }
             .mapIndexed { index, categoryEntity ->
 
-                val progress = (categoryEntity.availableMoney / categoryEntity.budgetTarget).toFloat()
+                val progress = when {
+                    categoryEntity.budgetTarget == 0.00 && categoryEntity.assignedMoney == 0.00 -> 0f
+                    categoryEntity.budgetTarget == 0.00 -> 1f
+                    else -> (categoryEntity.availableMoney / categoryEntity.budgetTarget).toFloat()
+                }
 
                 Category(
                     id = categoryEntity.id,

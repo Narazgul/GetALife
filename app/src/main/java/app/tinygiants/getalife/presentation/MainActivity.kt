@@ -1,8 +1,11 @@
 package app.tinygiants.getalife.presentation
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -16,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -28,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -37,13 +42,16 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    Scaffold(
-                        bottomBar = { BottomNavigation(navController = navController) }
-                    ) { innerPadding ->
-                        GetALifeNavHost(
-                            navController = navController,
-                            modifier = Modifier.padding(innerPadding)
-                        )
+                    Box {
+                        Scaffold(
+                            bottomBar = { BottomNavigation(navController = navController) }
+                        ) { innerPadding ->
+                            GetALifeNavHost(
+                                navController = navController,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                        //CustomFabAdd()
                     }
                 }
             }
@@ -59,14 +67,15 @@ fun BottomNavigation(navController: NavHostController) {
         bottomNavigationItems.forEach { screen ->
             NavigationBarItem(
                 icon = {
-                    Icon(
-                        painter = painterResource(id = screen.iconId),
-                        contentDescription = "${screen.label} Icon"
-                    )
+                    if (screen !is Screens.Transaction)
+                        Icon(
+                            painter = painterResource(id = screen.iconId),
+                            contentDescription = "${screen.label} Icon"
+                        )
                 },
                 label = {
                     Text(
-                        text = screen.label,
+                        text = if (screen != Screens.Transaction) stringResource(id = screen.label) else "",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 },
@@ -87,5 +96,6 @@ fun BottomNavigation(navController: NavHostController) {
 
 val bottomNavigationItems = listOf(
     Screens.Budget,
+    //Screens.Transaction,
     Screens.Account
 )

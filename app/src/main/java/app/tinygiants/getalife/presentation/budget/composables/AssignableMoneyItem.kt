@@ -11,10 +11,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -33,9 +35,12 @@ fun AssignableMoney(assignableMoney: Money) {
         else -> MaterialTheme.colorScheme.onError
     }
     val text = when {
-        assignableMoney.value > 0.0 -> "Verteil mich: ${assignableMoney.formattedMoney}"
-        assignableMoney.value == 0.0 -> "Alles verteilt"
-        else -> "Zu hast mehr Geld verteilt als du hast. Entferne ${assignableMoney.formattedPositiveMoney} aus den Kategorien"
+        assignableMoney.value > 0.0 -> stringResource(
+            R.string.distribute_available_money,
+            assignableMoney.formattedMoney
+        )
+        assignableMoney.value == 0.0 -> stringResource(R.string.everything_distributed)
+        else -> stringResource(R.string.more_distributed_than_available, assignableMoney.formattedPositiveMoney)
     }
 
     Spacer(modifier = Modifier.height(spacing.small))
