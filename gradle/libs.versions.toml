@@ -5,12 +5,12 @@ ksp-version = "2.0.0-1.0.21"
 android-gradle-plugin = "8.4.1"
 splashscreenVersion = "1.0.1"
 
-gemini-version = "0.6.0"
+gemini-version = "0.7.0"
 chatgpt-version = "3.7.2"
 
-googleServicesVersion = "4.4.1"
+googleServicesVersion = "4.4.2"
 
-firebaseBomVersion = "33.0.0"
+firebaseBomVersion = "33.1.0"
 firebase-appdistribution-gradle = "5.0.0"
 firebaseCrashlytics = "3.0.1"
 firebase-perf-plugin = "1.4.2"
@@ -21,8 +21,8 @@ hilt-navigation-compose = "1.2.0"
 composeBomVersion = "2024.05.00"
 activityCompose = "1.9.0"
 core-ktx = "1.13.1"
-lifecycleRuntimeCompose = "2.8.0"
-navigationCompose = "2.8.0-beta01"
+lifecycleRuntimeCompose = "2.8.1"
+navigationCompose = "2.8.0-beta02"
 roomVersion = "2.6.1"
 
 emoji2Emojipicker = "1.4.0"
@@ -36,6 +36,7 @@ assertk = "0.28.1"
 ####################################################################################################
 
 [libraries]
+
 # Top-level `build.gradle.kts` file
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesVersion" }
 firebase-appdistribution-gradle = { module = "com.google.firebase:firebase-appdistribution-gradle", version.ref = "firebase-appdistribution-gradle" }
@@ -96,6 +97,7 @@ assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assert
 ####################################################################################################
 
 [bundles]
+
 core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose", "navigation-compose", "splashscreen"]
 hilt = ["hilt-android", "hilt-navigation-compose"]
 room = ["room-ktx", "room-runtime"]
@@ -108,6 +110,7 @@ testing = ["junit4", "junit5-api", "junit5-params", "assertk"]
 ####################################################################################################
 
 [plugins]
+
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
