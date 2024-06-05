@@ -187,7 +187,7 @@ fun Category(
         val scope = rememberCoroutineScope()
         fun hideModalBottomSheetIfFullyExpanded() {
             if (sheetSate.currentValue == SheetValue.Expanded) {
-                scope.launch { sheetSate.hide() }.invokeOnCompletion { showBottomSheet = false }
+                scope.launch { sheetSate.hide() }.invokeOnCompletion { showEmojiPicker = false }
             }
         }
 

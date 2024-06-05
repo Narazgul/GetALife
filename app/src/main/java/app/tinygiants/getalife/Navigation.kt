@@ -52,6 +52,6 @@ fun NavGraphBuilder.accountGraph() {
 
 sealed class Screens(@StringRes val label: Int, val iconId: Int, val route: String) {
     data object Budget : Screens(label = R.string.budget, iconId = R.drawable.ic_dashboard, route = "budget")
-    data object Transaction : Screens(label = R.string.budget, iconId = R.drawable.ic_add, route = "transaction")
     data object Account : Screens(label = R.string.account, iconId = R.drawable.ic_account, route = "account")
+    data object Transaction : Screens(label = R.string.transaction, iconId = R.drawable.ic_list, route = "transaction")
 }

@@ -1,9 +1,5 @@
 package app.tinygiants.getalife.presentation.account
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -26,8 +22,6 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.account.composables.AccountDialog
 import app.tinygiants.getalife.presentation.account.composables.AccountsList
-import app.tinygiants.getalife.presentation.budget.composables.ANIMATION_TIME_1_SECOND
-import app.tinygiants.getalife.presentation.budget.composables.ANIMATION_TIME_300_MILLISECONDS
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -49,7 +43,7 @@ fun AccountScreen(
     onUserClickEvent: (UserClickEvent) -> Unit = { }
 ) {
 
-    var showAddAccountDialog by remember { mutableStateOf(false) }
+    var isAccountDialogVisible by remember { mutableStateOf(false) }
 
     val onAddAccountClicked = { accountName: String, balance: Money, type: AccountType ->
         onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = balance, type = type))
@@ -71,21 +65,16 @@ fun AccountScreen(
             modifier = Modifier.align(Alignment.TopCenter)
         )
         TextButton(
-            onClick = { showAddAccountDialog = true },
+            onClick = { isAccountDialogVisible = true },
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             Text(text = stringResource(R.string.add_account))
         }
-        AnimatedVisibility(
-            visible = showAddAccountDialog,
-            enter = fadeIn(animationSpec = tween(ANIMATION_TIME_1_SECOND)),
-            exit = fadeOut(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS))
-        ) {
-            AccountDialog(
-                onConfirmClicked = onAddAccountClicked,
-                onDismissRequest = { showAddAccountDialog = false }
-            )
-        }
+
+        if (isAccountDialogVisible) AccountDialog(
+            onConfirmClicked = onAddAccountClicked,
+            onDismissRequest = { isAccountDialogVisible = false }
+        )
     }
 }
 

@@ -28,4 +28,5 @@
     <string name="transaction_partner">Transaction partner</string>
     <string name="budget">Budget</string>
     <string name="account">Account</string>
+    <string name="transaction">Transaction</string>
 </resources>

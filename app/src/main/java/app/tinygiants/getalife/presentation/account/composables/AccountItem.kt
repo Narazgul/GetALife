@@ -1,9 +1,5 @@
 package app.tinygiants.getalife.presentation.account.composables
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
@@ -26,8 +22,7 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.presentation.budget.composables.ANIMATION_TIME_300_MILLISECONDS
-import app.tinygiants.getalife.presentation.composables.TransactionDialog
+import app.tinygiants.getalife.presentation.transaction.composables.TransactionDialog
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.md_theme_dark_outline
 import app.tinygiants.getalife.theme.spacing
@@ -45,15 +40,15 @@ fun AccountItem(
     onDeleteAccountClicked: () -> Unit = { },
     onTransaction: (amount: Money?, direction: TransactionDirection?, description: String?, transactionPartner: String?, category: Category?) -> Unit
 ) {
-    var showUpdateAccountDialog by rememberSaveable { mutableStateOf(false) }
-    var showTransactionDialog by rememberSaveable { mutableStateOf(false) }
+    var isAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var isTransactionDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { showUpdateAccountDialog = true },
-                onLongClick = { showTransactionDialog = true }
+                onClick = { isAccountDialogVisible = true },
+                onLongClick = { isTransactionDialogVisible = true }
             )
             .padding(spacing.default),
         verticalAlignment = Alignment.CenterVertically
@@ -75,34 +70,21 @@ fun AccountItem(
         )
     }
 
-    AnimatedVisibility(
-        visible = showUpdateAccountDialog,
-        enter = fadeIn(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
-        exit = fadeOut(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS))
-    ) {
-        AccountDialog(
-            accountName = name,
-            balance = balance,
-            type = type,
-            onConfirmClicked = onUpdateAccountClicked,
-            onDeleteAccountClicked = onDeleteAccountClicked,
-            onDismissRequest = { showUpdateAccountDialog = false }
-        )
-    }
+    if (isAccountDialogVisible) AccountDialog(
+        accountName = name,
+        balance = balance,
+        type = type,
+        onConfirmClicked = onUpdateAccountClicked,
+        onDeleteAccountClicked = onDeleteAccountClicked,
+        onDismissRequest = { isAccountDialogVisible = false }
+    )
 
-    AnimatedVisibility(
-        visible = showTransactionDialog,
-        enter = fadeIn(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
-        exit = fadeOut(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS))
-    ) {
-        TransactionDialog(
-            transaction = null,
-            categories = categories,
-            onConfirmClicked = onTransaction,
-            onDismissRequest = { showTransactionDialog = false }
-        )
-    }
-
+    if (isTransactionDialogVisible) TransactionDialog(
+        transaction = null,
+        categories = categories,
+        onConfirmClicked = onTransaction,
+        onDismissRequest = { isTransactionDialogVisible = false }
+    )
 }
 
 @PreviewLightDark

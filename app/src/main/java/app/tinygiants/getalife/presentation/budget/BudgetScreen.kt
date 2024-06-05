@@ -63,7 +63,9 @@ fun BudgetScreen(
                 visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
                 enter = fadeIn(tween(1500)),
                 exit = fadeOut(tween(2500)),
-                modifier = Modifier.fillMaxWidth().padding(spacing.default)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(spacing.default)
             ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
 
             BudgetList(

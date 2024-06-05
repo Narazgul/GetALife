@@ -118,6 +118,7 @@ fun AnimatedFab(
         modifier = modifier
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+
             if (icon != null) Icon(
                 imageVector = icon,
                 contentDescription = null,

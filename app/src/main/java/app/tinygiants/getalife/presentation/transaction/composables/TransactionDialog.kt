@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.composables
+package app.tinygiants.getalife.presentation.transaction.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

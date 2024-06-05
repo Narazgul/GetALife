@@ -51,7 +51,6 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
-                        //CustomFabAdd()
                     }
                 }
             }
@@ -67,21 +66,18 @@ fun BottomNavigation(navController: NavHostController) {
         bottomNavigationItems.forEach { screen ->
             NavigationBarItem(
                 icon = {
-                    if (screen !is Screens.Transaction)
-                        Icon(
-                            painter = painterResource(id = screen.iconId),
-                            contentDescription = "${screen.label} Icon"
-                        )
+                    Icon(
+                        painter = painterResource(id = screen.iconId),
+                        contentDescription = "${screen.label} Icon"
+                    )
                 },
                 label = {
                     Text(
-                        text = if (screen != Screens.Transaction) stringResource(id = screen.label) else "",
+                        text = stringResource(id = screen.label),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 },
-                selected = currentDestination?.hierarchy?.any { navDestination ->
-                    navDestination.route == screen.route
-                } == true,
+                selected = currentDestination?.hierarchy?.any { navDestination -> navDestination.route == screen.route } == true,
                 onClick = {
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -96,6 +92,5 @@ fun BottomNavigation(navController: NavHostController) {
 
 val bottomNavigationItems = listOf(
     Screens.Budget,
-    //Screens.Transaction,
     Screens.Account
 )
