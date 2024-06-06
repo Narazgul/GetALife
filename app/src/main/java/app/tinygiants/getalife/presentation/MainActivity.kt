@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     Box {
                         Scaffold(
+
                             bottomBar = { BottomNavigation(navController = navController) }
                         ) { innerPadding ->
                             GetALifeNavHost(

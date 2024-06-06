@@ -53,9 +53,7 @@ android {
             manifestPlaceholders["appName"] = "Get A Life Debug"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"debug\"")
 
-            firebaseAppDistribution {
-                artifactType = "APK"
-            }
+            firebaseAppDistribution { artifactType = "APK" }
 
             @Suppress("UnstableApiUsage")
             vcsInfo {
@@ -70,9 +68,7 @@ android {
             manifestPlaceholders["appName"] = "Get A Life"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"release\"")
 
-            firebaseAppDistribution {
-                artifactType = "AAB"
-            }
+            firebaseAppDistribution { artifactType = "AAB" }
         }
     }
 
