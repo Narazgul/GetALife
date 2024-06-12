@@ -24,7 +24,9 @@ fun TransactionScreen(
     onUserClickEvent: (UserClickEvent) -> Unit = { }
 ) {
 
-    TransactionsList(title = uiState.title)
+    TransactionsList(
+        title = uiState.title,
+        transactions = uiState.transactions)
 }
 
 @ScreenPreview

@@ -13,6 +13,9 @@ import java.sql.Timestamp
 @Dao
 interface TransactionDao {
 
+    @Query("SELECT * FROM transactions")
+    fun getAllTransactionsFlow(): Flow<List<TransactionEntity>>
+
     @Transaction
     @Query("SELECT * FROM transactions WHERE id == :accountId")
     fun getAccountTransactionsFlow(accountId: Long): Flow<List<TransactionEntity>>

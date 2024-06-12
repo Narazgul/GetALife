@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.data.repository
 
 import androidx.room.withTransaction
-import app.tinygiants.getalife.data.local.AppDatabase
+import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.local.dao.AccountsDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
@@ -9,14 +9,24 @@ import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class TransactionRepositoryImpl @Inject constructor(
-    private val db: AppDatabase,
+    private val db: GetALifeDatabase,
     private val transactionDao: TransactionDao,
     private val accountDao: AccountsDao,
     private val categoryDao: CategoryDao
 ) : TransactionRepository {
+
+    override fun getTransactions(): Flow<Result<List<TransactionEntity>>> =
+        flow {
+            transactionDao.getAllTransactionsFlow()
+                .catch { exception -> emit(Result.failure(exception)) }
+                .collect { transactions -> emit(Result.success(transactions)) }
+        }
 
     override suspend fun addTransaction(transaction: TransactionEntity, account: AccountEntity, category: CategoryEntity?) {
         db.withTransaction {

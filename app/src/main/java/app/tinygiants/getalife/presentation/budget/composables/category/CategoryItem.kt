@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.budget.composables
+package app.tinygiants.getalife.presentation.budget.composables.category
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -40,6 +40,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.presentation.budget.composables.BudgetBottomSheet
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
@@ -67,8 +68,6 @@ fun Category(
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-    //TODO implement TransactionSheet
-    var showTransactionSheet by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
@@ -78,7 +77,7 @@ fun Category(
             .fillMaxWidth()
             .combinedClickable(
                 onClick = { showBottomSheet = true },
-                onLongClick = { showTransactionSheet = true }
+                onLongClick = { }
             )
             .padding(
                 horizontal = spacing.large,

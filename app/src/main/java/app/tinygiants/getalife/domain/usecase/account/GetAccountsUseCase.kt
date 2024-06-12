@@ -17,7 +17,7 @@ class GetAccountsUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    operator fun invoke(): Flow<Result<List<Account>>> {
+    suspend operator fun invoke(): Flow<Result<List<Account>>> {
         return flow {
             repository.getAccountsFlow()
                 .catch { throwable -> emit(Result.failure(throwable)) }

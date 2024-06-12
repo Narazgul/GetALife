@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     Box {
                         Scaffold(
-
                             bottomBar = { BottomNavigation(navController = navController) }
                         ) { innerPadding ->
                             GetALifeNavHost(
@@ -93,5 +92,6 @@ fun BottomNavigation(navController: NavHostController) {
 
 val bottomNavigationItems = listOf(
     Screens.Budget,
-    Screens.Account
+    Screens.Account,
+    Screens.Transaction
 )

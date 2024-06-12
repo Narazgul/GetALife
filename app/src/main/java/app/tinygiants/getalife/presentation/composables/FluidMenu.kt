@@ -69,7 +69,9 @@ fun FluidMenu(modifier: Modifier = Modifier) {
         null
     }
 
-    Box(modifier = modifier.height(450.dp).width(200.dp)) {
+    Box(modifier = modifier
+        .height(450.dp)
+        .width(200.dp)) {
         AnimatedFabGroup(renderEffect = renderEffect?.asComposeRenderEffect())
         AnimatedFabGroup()
     }

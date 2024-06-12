@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.tinygiants.getalife.presentation.account.AccountScreen
 import app.tinygiants.getalife.presentation.budget.BudgetScreen
+import app.tinygiants.getalife.presentation.transaction.TransactionScreen
 
 @Composable
 fun GetALifeNavHost(
@@ -24,18 +25,20 @@ fun GetALifeNavHost(
     ) {
         budgetGraph()
         accountGraph()
+        transactionGraph()
     }
 }
 
 sealed class NestedNavGraph(val route: String) {
     data object BudgetNavGraph : NestedNavGraph("budgetNavGraph")
     data object AccountNavGraph : NestedNavGraph("accountNavGraph")
+    data object TransactionNavGraph : NestedNavGraph("transactionNavGraph")
 }
 
 fun NavGraphBuilder.budgetGraph() {
     navigation(
         startDestination = Screens.Budget.route,
-        route = NestedNavGraph.BudgetNavGraph.route,
+        route = NestedNavGraph.BudgetNavGraph.route
     ) {
         composable(Screens.Budget.route) { BudgetScreen() }
     }
@@ -47,6 +50,15 @@ fun NavGraphBuilder.accountGraph() {
         route = NestedNavGraph.AccountNavGraph.route
     ) {
         composable(Screens.Account.route) { AccountScreen() }
+    }
+}
+
+fun NavGraphBuilder.transactionGraph() {
+    navigation(
+        startDestination = Screens.Transaction.route,
+        route = NestedNavGraph.TransactionNavGraph.route
+    ) {
+        composable(Screens.Transaction.route) { TransactionScreen() }
     }
 }
 

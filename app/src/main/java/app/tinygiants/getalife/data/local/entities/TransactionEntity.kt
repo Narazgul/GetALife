@@ -12,6 +12,8 @@ data class TransactionEntity(
     val accountId: Long,
     val categoryId: Long?,
     val amount: Double,
+    val transactionPartner: String,
     val transactionType: TransactionDirection,
+    val description: String,
     val timestamp: Timestamp
 )

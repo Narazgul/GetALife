@@ -32,7 +32,7 @@ import java.sql.Timestamp
     exportSchema = false
 )
 @TypeConverters(Converters::class)
-abstract class AppDatabase : RoomDatabase() {
+abstract class GetALifeDatabase : RoomDatabase() {
 
     abstract fun budgetDao(): BudgetDao
     abstract fun headerDao(): HeaderDao
@@ -42,13 +42,13 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var INSTANCE: GetALifeDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase {
+        fun getDatabase(context: Context): GetALifeDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    AppDatabase::class.java,
+                    GetALifeDatabase::class.java,
                     "budget_database"
                 ).build()
                 INSTANCE = instance
@@ -58,6 +58,7 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
+// region TypConverters
 
 private const val UNKNOWN = 0
 private const val SPENT = 1
@@ -115,4 +116,5 @@ class Converters {
     @TypeConverter
     fun toTimestamp(value: Long) = Timestamp(value)
 
+    // endregion
 }

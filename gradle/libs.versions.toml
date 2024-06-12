@@ -2,10 +2,10 @@
 
 kotlinVersion = "2.0.0"
 ksp-version = "2.0.0-1.0.21"
-android-gradle-plugin = "8.4.1"
+android-gradle-plugin = "8.4.2"
 splashscreenVersion = "1.0.1"
 
-gemini-version = "0.7.0"
+gemini-version = "0.8.0"
 chatgpt-version = "3.7.2"
 
 googleServicesVersion = "4.4.2"

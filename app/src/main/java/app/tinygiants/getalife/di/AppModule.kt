@@ -2,7 +2,7 @@ package app.tinygiants.getalife.di
 
 import android.content.Context
 import app.tinygiants.getalife.BuildConfig
-import app.tinygiants.getalife.data.local.AppDatabase
+import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.GoogleGeminiAi
 import app.tinygiants.getalife.domain.repository.AiRepository
@@ -28,19 +28,19 @@ object AppModule {
     fun provideFirebaseFirestore() = Firebase.firestore
 
     @Provides
-    fun provideDatabase(@ApplicationContext appContext: Context) = AppDatabase.getDatabase(appContext)
+    fun provideDatabase(@ApplicationContext appContext: Context) = GetALifeDatabase.getDatabase(appContext)
 
     @Provides
-    fun provideHeaderDao(database: AppDatabase) = database.headerDao()
+    fun provideHeaderDao(database: GetALifeDatabase) = database.headerDao()
 
     @Provides
-    fun provideCategoryDao(database: AppDatabase) = database.categoryDao()
+    fun provideCategoryDao(database: GetALifeDatabase) = database.categoryDao()
 
     @Provides
-    fun provideAccountDao(database: AppDatabase) = database.accountsDao()
+    fun provideAccountDao(database: GetALifeDatabase) = database.accountsDao()
 
     @Provides
-    fun provideTransactionDao(database: AppDatabase) = database.transactionDao()
+    fun provideTransactionDao(database: GetALifeDatabase) = database.transactionDao()
 
     // endregion
 

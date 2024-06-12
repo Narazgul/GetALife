@@ -89,6 +89,8 @@ class AccountViewModel @Inject constructor(
                     amount = clickEvent.amount,
                     direction = clickEvent.direction,
                     account = clickEvent.account,
+                    transactionPartner = clickEvent.transactionPartner,
+                    description = clickEvent.description,
                     category = clickEvent.category
                 )
             }

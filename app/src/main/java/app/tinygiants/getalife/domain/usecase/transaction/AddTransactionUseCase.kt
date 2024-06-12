@@ -20,7 +20,14 @@ class AddTransactionUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(amount: Money?, direction: TransactionDirection?, account: Account?, category: Category?) {
+    suspend operator fun invoke(
+        amount: Money?,
+        direction: TransactionDirection?,
+        transactionPartner: String?,
+        description: String?,
+        account: Account?,
+        category: Category?
+    ) {
 
         withContext(defaultDispatcher) {
 
@@ -39,6 +46,8 @@ class AddTransactionUseCase @Inject constructor(
                 categoryId = category?.id,
                 amount = amount.value,
                 transactionType = direction,
+                transactionPartner = transactionPartner ?: "",
+                description = description ?: "",
                 timestamp = Timestamp(System.currentTimeMillis())
             )
             val accountEntity = AccountEntity(

@@ -1,8 +1,5 @@
 package app.tinygiants.getalife.domain.model
 
-import androidx.compose.runtime.Immutable
-
-@Immutable
 data class Category(
     val id: Long,
     val headerId: Long,

@@ -28,4 +28,6 @@ data class Money(
         numberFormat.currency = Currency.getInstance(locale)
         return numberFormat.format(this)
     }
+
+    override fun toString() = formattedMoney
 }

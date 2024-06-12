@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,7 +22,8 @@ import app.tinygiants.getalife.theme.GetALifeTheme
 @Composable
 fun TransactionsList(
     title: String,
-    items: List<Transaction> = emptyList()
+    transactions: List<Transaction> = emptyList(),
+    onTransactionClicked: () -> Unit = { }
 ) {
     Surface(
         modifier = Modifier.background(Color.White),
@@ -43,8 +45,13 @@ fun TransactionsList(
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
-                items(3) {
-                    TransactionItem(text = it.toString())
+                items(items =  transactions, key = { transaction -> transaction.id }) { transaction ->
+                    TransactionItem(
+                        description = transaction.description,
+                        category = transaction.category?.name ?: "Ready to assign",
+                        amount = transaction.amount,
+                        direction = transaction.direction
+                    )
                 }
             }
         }

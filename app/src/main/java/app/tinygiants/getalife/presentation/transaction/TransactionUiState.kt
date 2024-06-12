@@ -1,6 +1,11 @@
 package app.tinygiants.getalife.presentation.transaction
 
-import androidx.compose.runtime.Immutable
+import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.presentation.composables.ErrorMessage
 
-@Immutable
-data class TransactionUiState(val title: String)
+data class TransactionUiState(
+    val title: String,
+    val transactions: List<Transaction>,
+    val isLoading: Boolean,
+    val errorMessage: ErrorMessage?
+)

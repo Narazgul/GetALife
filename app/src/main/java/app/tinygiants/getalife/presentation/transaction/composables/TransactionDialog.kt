@@ -39,7 +39,6 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.domain.model.TransactionPartner
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
@@ -56,7 +55,7 @@ fun TransactionDialog(
     var amountMoney by remember { mutableStateOf(transaction?.amount) }
     var amountUserInputText by rememberSaveable { mutableStateOf(amountMoney?.value ?: "") }
     var descriptionUserInput by rememberSaveable { mutableStateOf(transaction?.description) }
-    var transactionPartnerUserInput by rememberSaveable { mutableStateOf(transaction?.transactionPartner?.name) }
+    var transactionPartnerUserInput by rememberSaveable { mutableStateOf(transaction?.transactionPartner) }
     var directionUserInput by rememberSaveable { mutableStateOf(transaction?.direction) }
     var categoryUserInput by remember { mutableStateOf(transaction?.category) }
 
@@ -179,7 +178,7 @@ private fun TransactionDialogPreview() {
                     amount = Money(value = 0.00),
                     account = Account(1L, "", Money(0.00), AccountType.Unknown, 0),
                     category = null,
-                    transactionPartner = TransactionPartner(1L, "Bäckerei"),
+                    transactionPartner = "Bäckerei",
                     direction = TransactionDirection.Unknown,
                     description = "",
                 ),
