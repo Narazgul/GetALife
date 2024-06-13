@@ -28,6 +28,7 @@ import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.budget.composables.category.Category
+import app.tinygiants.getalife.presentation.budget.composables.category.EmptyCategoryItem
 import app.tinygiants.getalife.presentation.budget.fakeCategories
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.theme.ComponentPreview

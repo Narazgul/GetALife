@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.budget.composables
+package app.tinygiants.getalife.presentation.budget.composables.category
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Row
