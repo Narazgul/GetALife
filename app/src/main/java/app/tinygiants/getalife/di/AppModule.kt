@@ -47,7 +47,7 @@ object AppModule {
     // region AI
 
     @Provides
-    fun provideGeminiProGenerativeModel() = GenerativeModel(modelName = "gemini-pro", apiKey = BuildConfig.GEMINI_API_KEY)
+    fun provideGeminiProGenerativeModel() = GenerativeModel(modelName = "gemini-1.5-flash", apiKey = BuildConfig.GEMINI_API_KEY)
 
     @Gemini
     @Provides
