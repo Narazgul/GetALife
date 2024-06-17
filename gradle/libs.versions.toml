@@ -1,7 +1,7 @@
 [versions]
 
 kotlinVersion = "2.0.0"
-ksp-version = "2.0.0-1.0.21"
+ksp-version = "2.0.0-1.0.22"
 android-gradle-plugin = "8.5.0"
 splashscreenVersion = "1.0.1"
 
