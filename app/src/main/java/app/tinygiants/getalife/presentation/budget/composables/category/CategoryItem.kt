@@ -40,7 +40,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.budget.composables.BudgetBottomSheet
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
@@ -67,7 +66,8 @@ fun Category(
     onUpdateAssignedMoneyClicked: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showAssignMoneyBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showGeneralEditBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
@@ -76,8 +76,14 @@ fun Category(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { showBottomSheet = true },
-                onLongClick = { }
+                onClick = {
+                    showAssignMoneyBottomSheet = true
+                    showGeneralEditBottomSheet = false
+                },
+                onLongClick = {
+                    showGeneralEditBottomSheet = true
+                    showAssignMoneyBottomSheet = false
+                }
             )
             .padding(
                 horizontal = spacing.large,
@@ -168,17 +174,21 @@ fun Category(
         }
     }
 
-    if (showBottomSheet) BudgetBottomSheet(
+    if (showGeneralEditBottomSheet) EditGeneralCategoryBottomSheet(
         categoryName = categoryName,
         budgetTarget = budgetTarget,
-        assignedMoney = assignedMoney,
         budgetPurpose = budgetPurpose,
         onUpdateCategoryName = onUpdateCategoryClicked,
         onBudgetTargetChanged = { money -> onUpdateBudgetTargetClicked(money) },
-        onAssignedMoneyChanged = { money -> onUpdateAssignedMoneyClicked(money) },
         onUpdateBudgetPurposeClicked = onUpdateBudgetPurposeClicked,
         onDeleteCategoryClicked = onDeleteCategoryClicked,
-        onDismissRequest = { showBottomSheet = false },
+        onDismissRequest = { showGeneralEditBottomSheet = false },
+    )
+
+    if (showAssignMoneyBottomSheet) AssignableMoneyBottomSheet(
+        assignedMoney = assignedMoney,
+        onAssignedMoneyChanged = { money -> onUpdateAssignedMoneyClicked(money) },
+        onDismissRequest = { showAssignMoneyBottomSheet = false }
     )
 
     if (showEmojiPicker) {

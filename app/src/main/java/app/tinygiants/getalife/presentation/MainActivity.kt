@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -42,15 +41,14 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    Box {
-                        Scaffold(
-                            bottomBar = { BottomNavigation(navController = navController) }
-                        ) { innerPadding ->
-                            GetALifeNavHost(
-                                navController = navController,
-                                modifier = Modifier.padding(innerPadding)
-                            )
-                        }
+
+                    Scaffold(
+                        bottomBar = { BottomNavigation(navController = navController) }
+                    ) { innerPadding ->
+                        GetALifeNavHost(
+                            navController = navController,
+                            modifier = Modifier.padding(innerPadding)
+                        )
                     }
                 }
             }

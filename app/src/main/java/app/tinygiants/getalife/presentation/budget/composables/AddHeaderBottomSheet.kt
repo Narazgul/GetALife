@@ -3,9 +3,13 @@ package app.tinygiants.getalife.presentation.budget.composables
 import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,10 +29,11 @@ import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddHeaderItem(
+fun AddHeaderBottomSheet(
     onUserClickEvent: (UserClickEvent) -> Unit,
-    modifier: Modifier = Modifier
+    onDismissRequest: () -> Unit = { },
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -38,31 +43,37 @@ fun AddHeaderItem(
     val onNameChanged = { newName: String -> headerName = newName }
     val onAddHeaderClicked = { onUserClickEvent(UserClickEvent.AddHeader(name = headerName)) }
 
-    Row(
-        modifier = modifier.padding(spacing.medium)
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
-        OutlinedTextField(
-            value = headerName,
-            onValueChange = { newName -> onNameChanged(newName) },
-            label = { Text(stringResource(R.string.enter_groupname)) },
-            modifier = Modifier.weight(1f)
-        )
-        Spacer(modifier = Modifier.width(spacing.default))
-        Button(
-            onClick = {
-                if (headerName.isBlank()) {
-                    Toast.makeText(context, context.getString(R.string.no_name_entered), Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
-                onAddHeaderClicked()
-                onNameChanged("")
-                focusManager.clearFocus()
-            },
-            modifier = Modifier.align(Alignment.CenterVertically)
+        Row(
+            modifier = Modifier.padding(spacing.medium)
         ) {
-            Text(text = stringResource(R.string.save))
+            OutlinedTextField(
+                value = headerName,
+                onValueChange = { newName -> onNameChanged(newName) },
+                label = { Text(stringResource(R.string.enter_groupname)) },
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(spacing.default))
+            Button(
+                onClick = {
+                    if (headerName.isBlank()) {
+                        Toast.makeText(context, context.getString(R.string.no_name_entered), Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    onAddHeaderClicked()
+                    onNameChanged("")
+                    focusManager.clearFocus()
+                },
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
         }
+        Spacer(modifier = Modifier.height(spacing.extraLarge))
     }
 }
 
@@ -71,7 +82,7 @@ fun AddHeaderItem(
 fun AddHeaderItemPreview() {
     GetALifeTheme {
         Surface {
-            AddHeaderItem( onUserClickEvent = { } )
+            AddHeaderBottomSheet( onUserClickEvent = { } )
         }
     }
 }

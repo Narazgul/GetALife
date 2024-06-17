@@ -10,9 +10,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -25,7 +33,7 @@ import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.budget.composables.AddHeaderItem
+import app.tinygiants.getalife.presentation.budget.composables.AddHeaderBottomSheet
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
@@ -52,41 +60,56 @@ fun BudgetScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
-    ) {
-        Column(modifier = Modifier.align(Alignment.TopCenter)) {
+    var showAddHeaderBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-            AnimatedVisibility(
-                visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
-                enter = fadeIn(tween(1500)),
-                exit = fadeOut(tween(2500)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(spacing.default)
-            ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(
+            onClick = { showAddHeaderBottomSheet = true },
+        ) {
+            Icon(Icons.Filled.Add, "Floating action button.")
+        }
+    }) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
+        ) {
+            Column(modifier = Modifier.align(Alignment.TopCenter)) {
 
-            BudgetList(
-                groups = uiState.groups,
+                AnimatedVisibility(
+                    visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
+                    enter = fadeIn(tween(1500)),
+                    exit = fadeOut(tween(2500)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(spacing.default)
+                ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
+
+                BudgetList(
+                    groups = uiState.groups,
+                    isLoading = uiState.isLoading,
+                    errorMessage = uiState.errorMessage,
+                    onUserClickEvent = onUserClickEvent
+                )
+            }
+            LoadingIndicator(
                 isLoading = uiState.isLoading,
                 errorMessage = uiState.errorMessage,
-                onUserClickEvent = onUserClickEvent
+                modifier = Modifier.align(Alignment.TopCenter)
             )
+            ErrorMessage(
+                errorMessage = uiState.errorMessage,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+
         }
-        LoadingIndicator(
-            isLoading = uiState.isLoading,
-            errorMessage = uiState.errorMessage,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-        ErrorMessage(
-            errorMessage = uiState.errorMessage,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-        AddHeaderItem(
-            onUserClickEvent = onUserClickEvent,
-            modifier = Modifier.align(Alignment.BottomCenter)
+    }
+
+    if (showAddHeaderBottomSheet) {
+        AddHeaderBottomSheet(
+            onDismissRequest = { showAddHeaderBottomSheet = false },
+            onUserClickEvent = onUserClickEvent
         )
     }
 }
