@@ -17,6 +17,7 @@
     <string name="change_budget_target">เปลี่ยนเป้าหมายงบประมาณ</string>
     <string name="distribute_money">จัดสรรเงิน</string>
     <string name="delete_argument">%1$s ลบ</string>
+    <string name="add_group">เพิ่มกลุ่ม</string>
     <string name="add_account">เพิ่มบัญชี</string>
     <string name="edit_account">แก้ไขบัญชี</string>
     <string name="account_name">ชื่อบัญชี</string>

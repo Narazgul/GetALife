@@ -17,6 +17,7 @@
     <string name="change_budget_target">Budget Ziel ändern</string>
     <string name="distribute_money">Geld zuweisen</string>
     <string name="delete_argument">%1$s löschen</string>
+    <string name="add_group">Gruppe hinzufügen</string>
     <string name="add_account">Account hinzufügen</string>
     <string name="edit_account">Account bearbeiten</string>
     <string name="account_name">Account Name</string>
