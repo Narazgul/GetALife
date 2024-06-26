@@ -2,6 +2,7 @@ package app.tinygiants.getalife.presentation.budget.composables
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -35,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.ComponentPreview
@@ -44,7 +44,7 @@ import app.tinygiants.getalife.theme.spacing
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryHeader(
+fun Header(
     name: String = "",
     sumOfAvailableMoney: Money = Money(value = 0.00),
     isExpanded: Boolean = false,
@@ -75,17 +75,20 @@ fun CategoryHeader(
     ) {
         Icon(
             imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = Modifier.size(24.dp)
+            contentDescription = null
         )
         Text(
             text = name,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.padding(start = spacing.default)
         )
         Spacer(modifier = Modifier.weight(1f))
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+            modifier = Modifier.clickable { showBottomSheet = true }
+        )
+        Spacer(modifier = Modifier.width(spacing.large))
         val alignment = if (isExpanded) Alignment.CenterHorizontally else Alignment.End
         Column(horizontalAlignment = alignment) {
             Text(text = "Available", color = MaterialTheme.colorScheme.onPrimaryContainer)
@@ -104,7 +107,7 @@ fun CategoryHeader(
                     TextField(
                         value = categoryNameUserInput,
                         onValueChange = { userInput -> categoryNameUserInput = userInput },
-                        label = { Text(stringResource(R.string.add_new_category)) },
+                        label = { Text(stringResource(R.string.add_category)) },
                         modifier = Modifier
                             .weight(1f)
                             .background(color = MaterialTheme.colorScheme.background)
@@ -165,7 +168,7 @@ fun CategoryHeader(
 fun CategoryHeaderPreview() {
     GetALifeTheme {
         Surface {
-            CategoryHeader(
+            Header(
                 name = "Quality of Life",
                 sumOfAvailableMoney = Money(value = 12345.67)
             )
@@ -178,7 +181,7 @@ fun CategoryHeaderPreview() {
 fun CategoryHeaderExpandedPreview() {
     GetALifeTheme {
         Surface {
-            CategoryHeader(
+            Header(
                 name = "Quality of Life",
                 sumOfAvailableMoney = Money(value = 100.00),
                 isExpanded = true

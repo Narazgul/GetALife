@@ -17,7 +17,7 @@ import app.tinygiants.getalife.domain.usecase.budget.header.DeleteHeaderUseCase
 import app.tinygiants.getalife.domain.usecase.budget.header.UpdateHeaderUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddHeader
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddGroup
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteHeader
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateAssignedMoney
@@ -78,8 +78,7 @@ class BudgetViewModel @Inject constructor(
                     .catch { displayAssignableMoneyErrorState() }
                     .collect { result ->
                         result.onSuccess { assignableMoney -> displayAssignableMoney(assignableMoney) }
-                        result.onFailure { displayAssignableMoneyErrorState() }
-                    }
+                        result.onFailure { displayAssignableMoneyErrorState() } }
             }
 
         }
@@ -93,7 +92,7 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch {
             when (clickEvent) {
 
-                is AddHeader -> addHeader(headerName = clickEvent.name)
+                is AddGroup -> addHeader(headerName = clickEvent.name)
                 is UpdateHeader -> updateHeader(header = clickEvent.header)
                 is DeleteHeader -> deleteHeader(header = clickEvent.header)
 

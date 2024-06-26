@@ -1,10 +1,13 @@
 package app.tinygiants.getalife.presentation.transaction
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
+import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Transaction
-import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsUseCase
+import app.tinygiants.getalife.domain.usecase.account.GetAccountUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsForAccountUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,12 +20,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
-    private val getTransactions: GetTransactionsUseCase
+    private val getTransactionsForAccount: GetTransactionsForAccountUseCase,
+    private val getAccount: GetAccountUseCase,
+    savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(
         TransactionUiState(
-            title = "TransactionScreen",
+            title = "",
             transactions = emptyList(),
             isLoading = true,
             errorMessage = null
@@ -33,26 +38,40 @@ class TransactionViewModel @Inject constructor(
     // region Init
 
     init {
-        loadTransactions()
+        val accountId: Long? = savedStateHandle["accountId"]
+        accountId?.let { loadTransactions(accountId) }
     }
 
-    private fun loadTransactions() {
+    private fun loadTransactions(accountId: Long) {
         viewModelScope.launch {
 
             launch {
-                getTransactions()
+                getTransactionsForAccount(accountId = accountId)
                     .catch { throwable -> displayErrorState(throwable) }
                     .collect { result ->
                         result.onSuccess { transactions -> displayTransactions(transactions) }
                         result.onFailure { throwable -> displayErrorState(throwable) }
                     }
             }
+
+            launch {
+                val account = getAccount(accountId = accountId)
+                displayAccountName(account)
+            }
         }
     }
 
     // endregion
 
+    // region User interaction
+
+    // TODO: Add updating transaction 
+
+    // endregion
+
     // region Private Helper functions
+
+    private fun displayAccountName(account: Account) = _uiState.update { uiState -> uiState.copy(title = account.name) }
 
     private fun displayTransactions(transactions: List<Transaction>) {
         _uiState.update { transactionUiState ->

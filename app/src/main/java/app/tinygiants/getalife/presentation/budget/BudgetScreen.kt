@@ -12,10 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,15 +26,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Header
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.budget.composables.AddHeaderBottomSheet
+import app.tinygiants.getalife.presentation.budget.composables.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
@@ -60,13 +63,20 @@ fun BudgetScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    var showAddHeaderBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var isAddGroupFabVisible by rememberSaveable { mutableStateOf(true) }
+    var isAddGroupBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(floatingActionButton = {
-        FloatingActionButton(
-            onClick = { showAddHeaderBottomSheet = true },
+        AnimatedVisibility(
+            visible = isAddGroupFabVisible,
+            enter = fadeIn(tween(500)),
+            exit = fadeOut(tween(500))
         ) {
-            Icon(Icons.Filled.Add, "Floating action button.")
+            ExtendedFloatingActionButton(
+                onClick = { isAddGroupBottomSheetVisible = true },
+                icon = { Icon(Icons.Filled.Add, "Add Group FloatingActionButton") },
+                text = { Text(text = stringResource(id = R.string.add_group)) }
+            )
         }
     }) { innerPadding ->
         Box(
@@ -80,7 +90,7 @@ fun BudgetScreen(
                 AnimatedVisibility(
                     visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
                     enter = fadeIn(tween(1500)),
-                    exit = fadeOut(tween(2500)),
+                    exit = fadeOut(tween(3000)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(spacing.default)
@@ -90,6 +100,7 @@ fun BudgetScreen(
                     groups = uiState.groups,
                     isLoading = uiState.isLoading,
                     errorMessage = uiState.errorMessage,
+                    onUserScrolling = { isUserScrollingDown -> isAddGroupFabVisible = isUserScrollingDown },
                     onUserClickEvent = onUserClickEvent
                 )
             }
@@ -106,9 +117,9 @@ fun BudgetScreen(
         }
     }
 
-    if (showAddHeaderBottomSheet) {
-        AddHeaderBottomSheet(
-            onDismissRequest = { showAddHeaderBottomSheet = false },
+    if (isAddGroupBottomSheetVisible) {
+        AddGroupBottomSheet(
+            onDismissRequest = { isAddGroupBottomSheetVisible = false },
             onUserClickEvent = onUserClickEvent
         )
     }

@@ -10,7 +10,6 @@ import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
 import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
-import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,11 +23,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val getAccounts: GetAccountsUseCase,
+    private val getCategories: GetCategoriesUseCase,
     private val addAccount: AddAccountUseCase,
     private val updateAccount: UpdateAccountUseCase,
-    private val deleteAccount: DeleteAccountUseCase,
-    private val addTransaction: AddTransactionUseCase,
-    private val getCategories: GetCategoriesUseCase
+    private val deleteAccount: DeleteAccountUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -61,7 +59,7 @@ class AccountViewModel @Inject constructor(
                 getCategories()
                     .catch { throwable -> displayErrorState(throwable) }
                     .collect { result ->
-                        result.onSuccess { categories -> addCategoriesToUiState(categories = categories) }
+                        result.onSuccess { categories -> displayCategories(categories) }
                         result.onFailure { throwable -> displayErrorState(throwable) }
                     }
             }
@@ -84,15 +82,6 @@ class AccountViewModel @Inject constructor(
 
                 is UserClickEvent.UpdateAccount -> updateAccount(account = clickEvent.account)
                 is UserClickEvent.DeleteAccount -> deleteAccount(account = clickEvent.account)
-
-                is UserClickEvent.AddTransaction -> addTransaction(
-                    amount = clickEvent.amount,
-                    direction = clickEvent.direction,
-                    account = clickEvent.account,
-                    transactionPartner = clickEvent.transactionPartner,
-                    description = clickEvent.description,
-                    category = clickEvent.category
-                )
             }
         }
     }
@@ -111,8 +100,10 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    private fun addCategoriesToUiState(categories: List<Category>) {
-        _uiState.update { state -> state.copy(categories = categories) }
+    private fun displayCategories(categories: List<Category>) {
+        _uiState.update { state ->
+            state.copy(categories = categories)
+        }
     }
 
     private fun displayErrorState(exception: Throwable?) {

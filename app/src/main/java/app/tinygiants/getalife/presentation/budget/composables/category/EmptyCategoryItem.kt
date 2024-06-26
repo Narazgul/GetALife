@@ -40,7 +40,7 @@ fun EmptyCategoryItem(
         OutlinedTextField(
             value = categoryName,
             onValueChange = { textInput -> categoryName = textInput },
-            label = { Text(stringResource(id = R.string.add_new_category)) },
+            label = { Text(stringResource(id = R.string.add_category)) },
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(spacing.default))

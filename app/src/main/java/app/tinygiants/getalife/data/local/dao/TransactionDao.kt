@@ -17,27 +17,27 @@ interface TransactionDao {
     fun getAllTransactionsFlow(): Flow<List<TransactionEntity>>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE id == :accountId")
+    @Query("SELECT * FROM transactions WHERE accountId == :accountId")
     fun getAccountTransactionsFlow(accountId: Long): Flow<List<TransactionEntity>>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE id == :categoryId")
+    @Query("SELECT * FROM transactions WHERE categoryId == :categoryId")
     fun getCategoryTransactionsFlow(categoryId: Long): Flow<List<TransactionEntity>>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE id == :accountId")
+    @Query("SELECT * FROM transactions WHERE accountId == :accountId")
     suspend fun getAccountTransactions(accountId: Long): List<TransactionEntity>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE id == :accountId AND timestamp >= :startTime AND timestamp <= :endTime")
+    @Query("SELECT * FROM transactions WHERE accountId == :accountId AND timestamp >= :startTime AND timestamp <= :endTime")
     suspend fun getAccountTransactions(accountId: Long, startTime: Timestamp, endTime: Timestamp): List<TransactionEntity>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE id == :categoryId")
+    @Query("SELECT * FROM transactions WHERE categoryId == :categoryId")
     suspend fun getCategoryTransactions(categoryId: Long): List<TransactionEntity>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE id == :categoryId  AND timestamp >= :startTime AND timestamp <= :endTime")
+    @Query("SELECT * FROM transactions WHERE categoryId == :categoryId  AND timestamp >= :startTime AND timestamp <= :endTime")
     suspend fun getCategoryTransactions(categoryId: Long, startTime: Timestamp, endTime: Timestamp): List<TransactionEntity>
 
     @Query("SELECT * FROM transactions WHERE id == :transactionId")

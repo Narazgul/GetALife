@@ -46,7 +46,7 @@ fun TransactionItem(
         Text(
             text = amount.toString(),
             style = MaterialTheme.typography.bodyLarge,
-            color = if (direction == TransactionDirection.Inflow) success else MaterialTheme.colorScheme.primary
+            color = if (direction == TransactionDirection.Inflow) success else MaterialTheme.colorScheme.error
         )
     }
 }

@@ -4,11 +4,11 @@ import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
-import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.account.GetAccountUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.sql.Timestamp
@@ -17,35 +17,32 @@ import kotlin.random.Random
 
 class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
+    private val getAccount: GetAccountUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(
-        amount: Money?,
-        direction: TransactionDirection?,
+        amount: Money,
+        direction: TransactionDirection,
+        accountId: Long,
+        category: Category,
         transactionPartner: String?,
         description: String?,
-        account: Account?,
-        category: Category?
     ) {
+        val account = getAccount(accountId)
 
         withContext(defaultDispatcher) {
 
-            if (amount == null) return@withContext
-            if (direction == null) return@withContext
-            if (direction == TransactionDirection.Outflow && category == null) return@withContext
-            if (account == null) return@withContext
-
             val newBalance =
-                if (direction == TransactionDirection.Inflow) account.balance.value + amount.value
-                else account.balance.value - amount.value
+                if (direction == TransactionDirection.Inflow) account.balance + amount
+                else account.balance - amount
 
             val transactionEntity = TransactionEntity(
                 id = Random.nextLong(),
                 accountId = account.id,
-                categoryId = category?.id,
+                categoryId = category.id,
                 amount = amount.value,
-                transactionType = direction,
+                transactionDirection = direction,
                 transactionPartner = transactionPartner ?: "",
                 description = description ?: "",
                 timestamp = Timestamp(System.currentTimeMillis())
@@ -53,11 +50,11 @@ class AddTransactionUseCase @Inject constructor(
             val accountEntity = AccountEntity(
                 id = account.id,
                 name = account.name,
-                balance = newBalance,
+                balance = newBalance.value,
                 type = account.type,
                 listPosition = account.listPosition
             )
-            val categoryEntity = if (direction == TransactionDirection.Outflow && category != null) {
+            val categoryEntity = if (direction == TransactionDirection.Outflow) {
 
                 val newAvailableAmount = category.assignedMoney.value - amount.value
 

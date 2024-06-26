@@ -21,11 +21,12 @@ class TransactionRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao
 ) : TransactionRepository {
 
-    override fun getTransactions(): Flow<Result<List<TransactionEntity>>> =
+    override fun getTransactions(accountId: Long): Flow<Result<List<TransactionEntity>>> =
         flow {
-            transactionDao.getAllTransactionsFlow()
+            transactionDao.getAccountTransactionsFlow(accountId = accountId)
                 .catch { exception -> emit(Result.failure(exception)) }
-                .collect { transactions -> emit(Result.success(transactions)) }
+                .collect { transactions ->
+                    emit(Result.success(transactions))}
         }
 
     override suspend fun addTransaction(transaction: TransactionEntity, account: AccountEntity, category: CategoryEntity?) {

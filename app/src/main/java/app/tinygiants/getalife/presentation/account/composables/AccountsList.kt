@@ -4,24 +4,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
-import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.account.UserClickEvent
+import app.tinygiants.getalife.presentation.composables.isScrollingDown
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun AccountsList(
     accounts: List<Account>,
-    categories: List<Category>,
+    onNavigateToTransactionScreen: (accountId: Long) -> Unit,
+    onUserScrolling: (Boolean) -> Unit,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
+    val listState = rememberLazyListState()
 
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxWidth()
             .padding(
@@ -34,23 +37,7 @@ fun AccountsList(
             key = { account -> account.id }
         ) { account ->
 
-            val onAddTransactionClicked = { amount: Money?,
-                                            direction: TransactionDirection?,
-                                            description: String?,
-                                            transactionPartner: String?,
-                                            category: Category?
-                ->
-                onUserClickEvent(
-                    UserClickEvent.AddTransaction(
-                        amount = amount,
-                        account = account,
-                        direction = direction,
-                        description = description,
-                        transactionPartner = transactionPartner,
-                        category = category
-                    )
-                )
-            }
+            val onAccountClicked = { onNavigateToTransactionScreen(account.id) }
             val onUpdateAccountTypeClicked = { accountName: String, balance: Money, type: AccountType ->
                 val updatedAccount = account.copy(name = accountName, balance = balance, type = type)
                 onUserClickEvent(UserClickEvent.UpdateAccount(account = updatedAccount))
@@ -61,11 +48,12 @@ fun AccountsList(
                 name = account.name,
                 balance = account.balance,
                 type = account.type,
-                categories = categories,
+                onNavigateToAccountDetails = onAccountClicked,
                 onUpdateAccountClicked = onUpdateAccountTypeClicked,
-                onDeleteAccountClicked = onDeleteAccountClicked,
-                onTransaction = onAddTransactionClicked
+                onDeleteAccountClicked = onDeleteAccountClicked
             )
         }
     }
+
+    onUserScrolling(listState.isScrollingDown())
 }

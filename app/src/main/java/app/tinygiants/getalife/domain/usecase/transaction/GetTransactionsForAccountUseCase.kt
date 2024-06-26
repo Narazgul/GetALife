@@ -15,16 +15,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetTransactionsUseCase @Inject constructor(
+class GetTransactionsForAccountUseCase @Inject constructor(
     private val transactions: TransactionRepository,
     private val accounts: GetAccountsUseCase,
     private val categories: GetCategoriesUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(): Flow<Result<List<Transaction>>> {
+    suspend operator fun invoke(accountId: Long): Flow<Result<List<Transaction>>> {
         return combine(
-            flow = transactions.getTransactions(),
+            flow = transactions.getTransactions(accountId = accountId),
             flow2 = accounts(),
             flow3 = categories()
         ) { transactionsResult, accountsResult, categoriesResult ->
@@ -36,15 +36,19 @@ class GetTransactionsUseCase @Inject constructor(
             if (accounts.isNullOrEmpty()) Result.failure<Throwable>(Throwable("Account is null or empty"))
             if (categories.isNullOrEmpty()) Result.failure<Throwable>(Throwable("Category is null or empty"))
 
+            val sortedByTimestampTransactions = sortTransactionsByTimestamp(transactions)
+
             Result.success(
                 mapToTransactions(
-                    transactions = transactions!!,
+                    transactions = sortedByTimestampTransactions!!,
                     accounts = accounts!!,
                     categories = categories!!
                 )
             )
         }
     }
+
+    private fun sortTransactionsByTimestamp(transactions: List<TransactionEntity>?) = transactions?.sortedBy { it.timestamp }
 
     private suspend fun mapToTransactions(
         transactions: List<TransactionEntity>,
@@ -65,8 +69,9 @@ class GetTransactionsUseCase @Inject constructor(
                     account = account,
                     category = category,
                     transactionPartner = transactionEntity.transactionPartner,
-                    direction = transactionEntity.transactionType,
-                    description = transactionEntity.description
+                    direction = transactionEntity.transactionDirection,
+                    description = transactionEntity.description,
+                    timestamp = transactionEntity.timestamp
                 )
             }
         }

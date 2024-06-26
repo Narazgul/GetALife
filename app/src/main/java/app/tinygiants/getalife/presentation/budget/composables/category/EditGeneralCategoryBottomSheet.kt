@@ -77,7 +77,7 @@ fun EditGeneralCategoryBottomSheet(
                         },
                         shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
                     ) {
-                        Text(text = stringResource(R.string.saving))
+                        Text(text = stringResource(R.string.savings))
                     }
                 }
             }

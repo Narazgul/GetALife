@@ -19,10 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import app.tinygiants.getalife.domain.model.AccountType
-import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.presentation.transaction.composables.TransactionDialog
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.md_theme_dark_outline
 import app.tinygiants.getalife.theme.spacing
@@ -35,20 +32,18 @@ fun AccountItem(
     name: String = "",
     balance: Money = Money(value = 0.00),
     type: AccountType = AccountType.Unknown,
-    categories: List<Category> = emptyList(),
+    onNavigateToAccountDetails: () -> Unit = { },
     onUpdateAccountClicked: (accountName: String, balance: Money, type: AccountType) -> Unit = { _, _, _ -> },
-    onDeleteAccountClicked: () -> Unit = { },
-    onTransaction: (amount: Money?, direction: TransactionDirection?, description: String?, transactionPartner: String?, category: Category?) -> Unit
+    onDeleteAccountClicked: () -> Unit = { }
 ) {
     var isAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
-    var isTransactionDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { isAccountDialogVisible = true },
-                onLongClick = { isTransactionDialogVisible = true }
+                onClick = { onNavigateToAccountDetails() },
+                onLongClick = { isAccountDialogVisible = true }
             )
             .padding(spacing.default),
         verticalAlignment = Alignment.CenterVertically
@@ -70,20 +65,13 @@ fun AccountItem(
         )
     }
 
-    if (isAccountDialogVisible) AccountDialog(
+    if (isAccountDialogVisible) AccountBottomSheet(
         accountName = name,
         balance = balance,
         type = type,
         onConfirmClicked = onUpdateAccountClicked,
         onDeleteAccountClicked = onDeleteAccountClicked,
         onDismissRequest = { isAccountDialogVisible = false }
-    )
-
-    if (isTransactionDialogVisible) TransactionDialog(
-        transaction = null,
-        categories = categories,
-        onConfirmClicked = onTransaction,
-        onDismissRequest = { isTransactionDialogVisible = false }
     )
 }
 
@@ -94,8 +82,7 @@ fun AccountItemPreview(@PreviewParameter(AccountItemPreviewProvider::class) mone
         Surface {
             AccountItem(
                 name = "Girokonto",
-                balance = money,
-                onTransaction = { _, _, _, _, _ -> }
+                balance = money
             )
         }
     }

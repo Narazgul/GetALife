@@ -90,6 +90,6 @@ fun BottomNavigation(navController: NavHostController) {
 
 val bottomNavigationItems = listOf(
     Screens.Budget,
-    Screens.Account,
-    Screens.Transaction
+    Screens.AddTransaction,
+    Screens.Account
 )

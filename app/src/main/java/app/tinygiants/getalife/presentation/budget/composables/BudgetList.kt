@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import app.tinygiants.getalife.presentation.budget.composables.category.Category
 import app.tinygiants.getalife.presentation.budget.composables.category.EmptyCategoryItem
 import app.tinygiants.getalife.presentation.budget.fakeCategories
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
+import app.tinygiants.getalife.presentation.composables.isScrollingDown
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -44,6 +46,7 @@ fun BudgetList(
     isLoading: Boolean,
     errorMessage: ErrorMessage?,
     onUserClickEvent: (UserClickEvent) -> Unit,
+    onUserScrolling: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
@@ -52,8 +55,12 @@ fun BudgetList(
         exit = slideOutVertically(),
         modifier = modifier
     ) {
+        val listState = rememberLazyListState()
 
-        LazyColumn(contentPadding = PaddingValues(spacing.extraSmall)) {
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(spacing.extraSmall)
+        ) {
             groups.forEach { (header, items) ->
 
                 stickyHeader(
@@ -68,6 +75,8 @@ fun BudgetList(
                 )
             }
         }
+
+        onUserScrolling(listState.isScrollingDown())
     }
 }
 
@@ -76,7 +85,8 @@ private fun LazyListScope.stickyHeader(
     header: Header,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
-    val onHeaderClicked = { onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(isExpanded = !header.isExpanded))) }
+    val onHeaderClicked =
+        { onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(isExpanded = !header.isExpanded))) }
 
     val onUpdateHeaderNameClicked =
         { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(name = updatedCategoryName))) }
@@ -84,10 +94,17 @@ private fun LazyListScope.stickyHeader(
     val onDeleteHeaderClicked = { onUserClickEvent(UserClickEvent.DeleteHeader(header = header)) }
 
     val onAddCategoryClicked =
-        { categoryName: String -> onUserClickEvent(UserClickEvent.AddCategory(headerId = header.id, categoryName = categoryName)) }
+        { categoryName: String ->
+            onUserClickEvent(
+                UserClickEvent.AddCategory(
+                    headerId = header.id,
+                    categoryName = categoryName
+                )
+            )
+        }
 
     stickyHeader(key = header.id) {
-        CategoryHeader(
+        Header(
             name = header.name,
             sumOfAvailableMoney = header.sumOfAvailableMoney,
             isExpanded = header.isExpanded,
@@ -126,7 +143,12 @@ private fun LazyListScope.items(
             onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetPurpose = newBudgetPurpose)))
         }
         val onUpdateAssignedMoneyClicked = { newAssignedMoney: Money ->
-            onUserClickEvent(UserClickEvent.UpdateAssignedMoney(category = category, newAssignedMoney = newAssignedMoney))
+            onUserClickEvent(
+                UserClickEvent.UpdateAssignedMoney(
+                    category = category,
+                    newAssignedMoney = newAssignedMoney
+                )
+            )
         }
         val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category)) }
 
@@ -181,6 +203,7 @@ fun BudgetListPreview() {
                 groups = fakeCategories(),
                 isLoading = false,
                 errorMessage = null,
+                onUserScrolling = { },
                 onUserClickEvent = { }
             )
         }

@@ -1,14 +1,24 @@
 package app.tinygiants.getalife.presentation.account
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,19 +30,20 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.account.composables.AccountDialog
+import app.tinygiants.getalife.presentation.account.composables.AccountBottomSheet
 import app.tinygiants.getalife.presentation.account.composables.AccountsList
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Composable
-fun AccountScreen() {
+fun AccountScreen(onNavigateToTransactionScreen: (accountId: Long) -> Unit) {
     val viewModel: AccountViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AccountScreen(
         uiState = uiState,
+        onNavigateToTransactionScreen = onNavigateToTransactionScreen,
         onUserClickEvent = viewModel::onUserClickEvent
     )
 }
@@ -40,40 +51,55 @@ fun AccountScreen() {
 @Composable
 fun AccountScreen(
     uiState: AccountUiState,
+    onNavigateToTransactionScreen: (accountId: Long) -> Unit = { },
     onUserClickEvent: (UserClickEvent) -> Unit = { }
 ) {
 
-    var isAccountDialogVisible by remember { mutableStateOf(false) }
+    var areFabButtonsVisible by rememberSaveable { mutableStateOf(true) }
+    var isAccountDialogModalSheetVisible by remember { mutableStateOf(false) }
 
     val onAddAccountClicked = { accountName: String, balance: Money, type: AccountType ->
         onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = balance, type = type))
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        AccountsList(
-            accounts = uiState.accounts,
-            categories = uiState.categories,
-            onUserClickEvent = onUserClickEvent
-        )
-        LoadingIndicator(
-            isLoading = uiState.isLoading,
-            errorMessage = uiState.errorMessage,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-        ErrorMessage(
-            errorMessage = uiState.errorMessage,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-        TextButton(
-            onClick = { isAccountDialogVisible = true },
-            modifier = Modifier.align(Alignment.BottomCenter)
+    Scaffold(floatingActionButton = {
+        AnimatedVisibility(
+            visible = areFabButtonsVisible,
+            enter = fadeIn(tween(500)),
+            exit = fadeOut(tween(500))
         ) {
-            Text(text = stringResource(R.string.add_account))
+            ExtendedFloatingActionButton(
+                onClick = { isAccountDialogModalSheetVisible = true },
+                icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
+                text = { Text(text = stringResource(id = R.string.add_account)) }
+            )
+        }
+    }) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            AccountsList(
+                accounts = uiState.accounts,
+                onNavigateToTransactionScreen = onNavigateToTransactionScreen,
+                onUserScrolling = { isUserScrollingDown -> areFabButtonsVisible = isUserScrollingDown },
+                onUserClickEvent = onUserClickEvent
+            )
+            LoadingIndicator(
+                isLoading = uiState.isLoading,
+                errorMessage = uiState.errorMessage,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+            ErrorMessage(
+                errorMessage = uiState.errorMessage,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
 
-        if (isAccountDialogVisible) AccountDialog(
+        if (isAccountDialogModalSheetVisible) AccountBottomSheet(
             onConfirmClicked = onAddAccountClicked,
-            onDismissRequest = { isAccountDialogVisible = false }
+            onDismissRequest = { isAccountDialogModalSheetVisible = false }
         )
     }
 }
