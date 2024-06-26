@@ -10,9 +10,9 @@ chatgpt-version = "3.7.2"
 
 googleServicesVersion = "4.4.2"
 
-firebaseBomVersion = "33.1.0"
+firebaseBomVersion = "33.1.1"
 firebase-appdistribution-gradle = "5.0.0"
-firebaseCrashlytics = "3.0.1"
+firebaseCrashlytics = "3.0.2"
 firebase-perf-plugin = "1.4.2"
 
 hiltVersion = "2.51.1"
@@ -27,7 +27,7 @@ roomVersion = "2.6.1"
 
 emoji2Emojipicker = "1.4.0"
 
-junit = "1.1.5"
+junit = "1.2.0"
 jUnit4Version = "4.13.2"
 uiTestJunit4 = "1.6.8"
 junit5Version = "5.10.2"
