@@ -13,13 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.presentation.transaction.UserClickEvent
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Composable
 fun TransactionsList(
     modifier: Modifier = Modifier,
-    transactions: List<Transaction> = emptyList()
+    transactions: List<Transaction> = emptyList(),
+    accounts: List<Account> = emptyList(),
+    categories: List<Category> = emptyList(),
+    onUserClickEvent: (UserClickEvent) -> Unit = {}
 ) {
     Surface(
         modifier = modifier.background(Color.White),
@@ -35,11 +41,20 @@ fun TransactionsList(
                 modifier = Modifier.weight(1f)
             ) {
                 items(items = transactions, key = { transaction -> transaction.id }) { transaction ->
+
+                    val onUpdateTransactionClicked = { updatedTransaction: Transaction ->
+                        onUserClickEvent(UserClickEvent.UpdateTransaction(transaction = updatedTransaction))
+                    }
+                    val onDeleteTransactionClicked = {
+                        onUserClickEvent(UserClickEvent.DeleteTransaction(transaction = transaction))
+                    }
+
                     TransactionItem(
-                        description = transaction.description,
-                        category = transaction.category?.name ?: "Ready to assign",
-                        amount = transaction.amount,
-                        direction = transaction.direction
+                        transaction = transaction,
+                        accounts = accounts,
+                        categories = categories,
+                        onUpdateTransactionClicked = onUpdateTransactionClicked,
+                        onDeleteTransactionClicked = onDeleteTransactionClicked
                     )
                 }
             }

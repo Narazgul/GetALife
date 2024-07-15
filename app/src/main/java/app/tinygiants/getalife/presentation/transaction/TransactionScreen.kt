@@ -26,6 +26,7 @@ fun TransactionScreen(onNavigateUp: () -> Unit) {
 
     TransactionScreen(
         uiState = uiState,
+        onUserClickEvent = viewModel::onUserClickEvent,
         onNavigateUp = onNavigateUp
     )
 }
@@ -34,6 +35,7 @@ fun TransactionScreen(onNavigateUp: () -> Unit) {
 @Composable
 fun TransactionScreen(
     uiState: TransactionUiState,
+    onUserClickEvent: (UserClickEvent) -> Unit,
     onNavigateUp: () -> Unit
 ) {
 
@@ -52,7 +54,10 @@ fun TransactionScreen(
 
         TransactionsList(
             modifier = Modifier.padding(innerPadding),
-            transactions = uiState.transactions
+            transactions = uiState.transactions,
+            accounts = uiState.accounts,
+            categories = uiState.categories,
+            onUserClickEvent = onUserClickEvent
         )
     }
 }
@@ -62,7 +67,18 @@ fun TransactionScreen(
 private fun TransactionScreenPreview() {
     GetALifeTheme {
         Surface {
-            TransactionScreen(onNavigateUp = {})
+            TransactionScreen(
+                uiState = TransactionUiState(
+                    title = "Girokonto",
+                    transactions = emptyList(),
+                    accounts = emptyList(),
+                    categories = emptyList(),
+                    isLoading = false,
+                    errorMessage = null
+                ),
+                onUserClickEvent = {},
+                onNavigateUp = {}
+            )
         }
     }
 }

@@ -209,3 +209,19 @@ fun BudgetListPreview() {
         }
     }
 }
+
+@ComponentPreview
+@Composable
+fun BudgetListEmptyGroupsPreview() {
+    GetALifeTheme {
+        Surface {
+            BudgetList(
+                groups = emptyMap(),
+                isLoading = false,
+                errorMessage = null,
+                onUserScrolling = { },
+                onUserClickEvent = { }
+            )
+        }
+    }
+}

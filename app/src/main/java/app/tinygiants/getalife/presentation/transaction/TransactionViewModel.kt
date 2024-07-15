@@ -5,9 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.usecase.account.GetAccountUseCase
+import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
+import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.DeleteTransactionUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsForAccountUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.UpdateTransactionUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,14 +26,20 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
     private val getTransactionsForAccount: GetTransactionsForAccountUseCase,
+    private val updateTransaction: UpdateTransactionUseCase,
+    private val deleteTransaction: DeleteTransactionUseCase,
     private val getAccount: GetAccountUseCase,
+    private val getAccounts: GetAccountsUseCase,
+    private val getCategories: GetCategoriesUseCase,
     savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         TransactionUiState(
             title = "",
             transactions = emptyList(),
+            accounts = emptyList(),
+            categories = emptyList(),
             isLoading = true,
             errorMessage = null
         )
@@ -55,9 +66,28 @@ class TransactionViewModel @Inject constructor(
             }
 
             launch {
-                val account = getAccount(accountId = accountId)
-                displayAccountName(account)
+                getAccounts()
+                    .catch { throwable -> displayErrorState(throwable) }
+                    .collect { result ->
+                        result.onSuccess { accounts -> listAvailableAccounts(accounts = accounts) }
+                        result.onFailure { throwable -> displayErrorState(throwable) }
+                    }
             }
+
+            launch {
+                val currentTransactionAccount = getAccount(accountId = accountId)
+                displayAccountName(currentTransactionAccount)
+            }
+
+            launch {
+                getCategories()
+                    .catch { throwable -> displayErrorState(throwable) }
+                    .collect { result ->
+                        result.onSuccess { categories -> listAvailableCategories(categories = categories) }
+                        result.onFailure { throwable -> displayErrorState(throwable) }
+                    }
+            }
+
         }
     }
 
@@ -65,7 +95,14 @@ class TransactionViewModel @Inject constructor(
 
     // region User interaction
 
-    // TODO: Add updating transaction 
+    fun onUserClickEvent(clickEvent: UserClickEvent) {
+        viewModelScope.launch {
+            when (clickEvent) {
+                is UserClickEvent.UpdateTransaction -> updateTransaction(transaction = clickEvent.transaction)
+                is UserClickEvent.DeleteTransaction -> deleteTransaction(transaction = clickEvent.transaction)
+            }
+        }
+    }
 
     // endregion
 
@@ -74,14 +111,20 @@ class TransactionViewModel @Inject constructor(
     private fun displayAccountName(account: Account) = _uiState.update { uiState -> uiState.copy(title = account.name) }
 
     private fun displayTransactions(transactions: List<Transaction>) {
-        _uiState.update { transactionUiState ->
-            transactionUiState.copy(
+        _uiState.update { uiState ->
+            uiState.copy(
                 transactions = transactions,
                 isLoading = false,
                 errorMessage = null
             )
         }
     }
+
+    private fun listAvailableAccounts(accounts: List<Account>) =
+        _uiState.update { uiState -> uiState.copy(accounts = accounts) }
+
+    private fun listAvailableCategories(categories: List<Category>) =
+        _uiState.update { uiState -> uiState.copy(categories = categories) }
 
     private fun displayErrorState(exception: Throwable?) {
         _uiState.update { transactionUiState ->
