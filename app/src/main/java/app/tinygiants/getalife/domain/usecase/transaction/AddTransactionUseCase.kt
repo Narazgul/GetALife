@@ -24,12 +24,13 @@ class AddTransactionUseCase @Inject constructor(
     suspend operator fun invoke(
         amount: Money,
         direction: TransactionDirection,
-        accountId: Long,
-        category: Category,
+        accountId: Long?,
+        category: Category?,
         transactionPartner: String?,
         description: String?,
     ) {
-        val account = getAccount(accountId)
+        if (category == null) return
+        val account = if (accountId != null) getAccount(accountId) else return
 
         withContext(defaultDispatcher) {
 

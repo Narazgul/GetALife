@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.transaction.add_transaction
+package app.tinygiants.getalife.presentation.transaction
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -65,8 +65,8 @@ class AddTransactionViewModel @Inject constructor(
     fun onSaveTransactionClicked(
         amount: Money,
         direction: TransactionDirection,
-        accountId: Long,
-        category: Category,
+        accountId: Long?,
+        category: Category?,
         transactionPartner: String?,
         description: String?
     ) {

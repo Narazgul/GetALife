@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class UpdateTransactionUseCase @Inject constructor(
+class DeleteTransactionUseCase @Inject constructor(
     private val repository: TransactionRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
@@ -55,12 +55,11 @@ class UpdateTransactionUseCase @Inject constructor(
                 )
             }
 
-            repository.updateTransaction(
+            repository.deleteTransaction(
                 transaction = transactionEntity,
                 account = accountEntity,
                 category = categoryEntity
             )
-
         }
     }
 }
