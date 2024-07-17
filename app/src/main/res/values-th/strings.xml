@@ -32,4 +32,6 @@
     <string name="budget">งบประมาณ</string>
     <string name="account">บัญชี</string>
     <string name="transaction">ธุรกรรม</string>
+    <string name="inflow">การบริโภค</string>
+    <string name="outflow">เอาท์พุท</string>
 </resources>

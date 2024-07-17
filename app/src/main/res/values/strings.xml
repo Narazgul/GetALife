@@ -31,4 +31,6 @@
     <string name="budget">Budget</string>
     <string name="account">Account</string>
     <string name="transaction">Transaction</string>
+    <string name="inflow">Inflow</string>
+    <string name="outflow">Outflow</string>
 </resources>

@@ -89,7 +89,7 @@ fun AddTransactionItem(
                 },
                 shape = RoundedCornerShape(topStart = spacing.large, bottomStart = spacing.large),
             ) {
-                Text(text = "Inflow")
+                Text(text = stringResource(R.string.inflow))
             }
             SegmentedButton(
                 checked = directionUserInput == TransactionDirection.Outflow,
@@ -99,7 +99,7 @@ fun AddTransactionItem(
                 },
                 shape = RoundedCornerShape(topEnd = spacing.large, bottomEnd = spacing.large),
             ) {
-                Text(text = "Outflow")
+                Text(text = stringResource(R.string.outflow))
             }
         }
         Spacer(modifier = Modifier.height(spacing.small))
