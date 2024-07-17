@@ -16,7 +16,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -24,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,7 +38,6 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
-import kotlinx.coroutines.launch
 
 typealias Description = String
 typealias TransactionPartner = String
@@ -60,9 +57,6 @@ fun AddTransactionItem(
     ) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     var showCategoryDropdown by rememberSaveable { mutableStateOf(false) }
     var showAccountDropdown by rememberSaveable { mutableStateOf(false) }
@@ -202,8 +196,6 @@ fun AddTransactionItem(
                     descriptionUserInput,
                     transactionPartnerUserInput,
                 )
-
-                scope.launch { snackbarHostState.showSnackbar("Transaktion gespeichert.") }
             },
             enabled = accountUserInput != null && categoryUserInput != null
         ) {

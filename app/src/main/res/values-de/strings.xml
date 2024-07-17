@@ -34,4 +34,5 @@
     <string name="transaction">Transaktion</string>
     <string name="inflow">Einnahme</string>
     <string name="outflow">Ausgabe</string>
+    <string name="transaction_saved">Transaction saved</string>
 </resources>
