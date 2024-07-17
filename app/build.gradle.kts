@@ -21,8 +21,8 @@ android {
         applicationId = "app.tinygiants.getalife"
         minSdk = 28
         targetSdk = 34
-        versionCode = 5
-        versionName = "Hatching 0.0.5"
+        versionCode = 6
+        versionName = "Hatching 0.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
