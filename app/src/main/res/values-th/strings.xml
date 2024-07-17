@@ -34,5 +34,5 @@
     <string name="transaction">ธุรกรรม</string>
     <string name="inflow">การบริโภค</string>
     <string name="outflow">เอาท์พุท</string>
-    <string name="transaction_saved">Transaction saved</string>
+    <string name="transaction_saved">บันทึกธุรกรรมแล้ว</string>
 </resources>
