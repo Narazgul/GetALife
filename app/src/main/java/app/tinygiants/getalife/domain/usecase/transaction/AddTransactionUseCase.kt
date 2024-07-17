@@ -29,7 +29,6 @@ class AddTransactionUseCase @Inject constructor(
         transactionPartner: String?,
         description: String?,
     ) {
-        if (category == null) return
         val account = if (accountId != null) getAccount(accountId) else return
 
         withContext(defaultDispatcher) {
@@ -41,7 +40,7 @@ class AddTransactionUseCase @Inject constructor(
             val transactionEntity = TransactionEntity(
                 id = Random.nextLong(),
                 accountId = account.id,
-                categoryId = category.id,
+                categoryId = category?.id,
                 amount = amount.value,
                 transactionDirection = direction,
                 transactionPartner = transactionPartner ?: "",
@@ -55,24 +54,33 @@ class AddTransactionUseCase @Inject constructor(
                 type = account.type,
                 listPosition = account.listPosition
             )
-            val categoryEntity = if (direction == TransactionDirection.Outflow) {
 
-                val newAvailableAmount = category.assignedMoney.value - amount.value
+            val transactions = category?.let { category ->
+                transactionRepository.getTransactionsByCategory(categoryId = category.id)
+            }
 
-                CategoryEntity(
-                    id = category.id,
-                    headerId = category.headerId,
-                    emoji = category.emoji,
-                    name = category.name,
-                    budgetTarget = category.budgetTarget.value,
-                    budgetPurpose = category.budgetPurpose,
-                    assignedMoney = category.assignedMoney.value,
-                    availableMoney = newAvailableAmount,
-                    optionalText = category.optionalText,
-                    listPosition = category.listPosition,
-                    isInitialCategory = category.isInitialCategory
-                )
-            } else null
+            val categoryEntity = when {
+                transactions == null -> null
+                direction == TransactionDirection.Inflow -> null
+                else -> {
+                    val amountValues = transactions.sumOf { it.amount }
+                    val newAvailableAmount = category.assignedMoney.value - (amountValues + amount.value)
+
+                    CategoryEntity(
+                        id = category.id,
+                        headerId = category.headerId,
+                        emoji = category.emoji,
+                        name = category.name,
+                        budgetTarget = category.budgetTarget.value,
+                        budgetPurpose = category.budgetPurpose,
+                        assignedMoney = category.assignedMoney.value,
+                        availableMoney = newAvailableAmount,
+                        optionalText = category.optionalText,
+                        listPosition = category.listPosition,
+                        isInitialCategory = category.isInitialCategory
+                    )
+                }
+            }
 
             transactionRepository.addTransaction(
                 transaction = transactionEntity,

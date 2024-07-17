@@ -24,7 +24,7 @@ class GetTransactionsForAccountUseCase @Inject constructor(
 
     suspend operator fun invoke(accountId: Long): Flow<Result<List<Transaction>>> {
         return combine(
-            flow = transactions.getTransactions(accountId = accountId),
+            flow = transactions.getTransactionsByAccountFlow(accountId = accountId),
             flow2 = accounts(),
             flow3 = categories()
         ) { transactionsResult, accountsResult, categoriesResult ->

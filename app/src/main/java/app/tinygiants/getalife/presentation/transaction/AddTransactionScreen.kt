@@ -74,7 +74,7 @@ fun AddTransaction(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val transactionSavedString = stringResource(id = R.string.transaction)
+    val transactionSavedString = stringResource(id = R.string.transaction_saved)
     val showTransactionAddedSnackbar = {
         scope.launch { snackbarHostState.showSnackbar(transactionSavedString) }
     }

@@ -16,20 +16,26 @@ import javax.inject.Inject
 
 class TransactionRepositoryImpl @Inject constructor(
     private val db: GetALifeDatabase,
-    private val transactionDao: TransactionDao,
     private val accountDao: AccountsDao,
-    private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao,
+    private val transactionDao: TransactionDao
 ) : TransactionRepository {
 
-    override fun getTransactions(accountId: Long): Flow<Result<List<TransactionEntity>>> =
+    override fun getTransactionsByAccountFlow(accountId: Long): Flow<Result<List<TransactionEntity>>> =
         flow {
             transactionDao.getAccountTransactionsFlow(accountId = accountId)
                 .catch { exception -> emit(Result.failure(exception)) }
-                .collect { transactions ->
-                    emit(Result.success(transactions))}
+                .collect { transactions -> emit(Result.success(transactions)) }
         }
 
-    override suspend fun addTransaction(transaction: TransactionEntity, account: AccountEntity, category: CategoryEntity?) {
+    override suspend fun getTransactionsByCategory(categoryId: Long): List<TransactionEntity> =
+        transactionDao.getCategoryTransactions(categoryId = categoryId)
+
+    override suspend fun addTransaction(
+        transaction: TransactionEntity,
+        account: AccountEntity,
+        category: CategoryEntity?
+    ) {
         db.withTransaction {
             transactionDao.addTransaction(transaction = transaction)
             accountDao.updateAccount(accountEntity = account)
@@ -37,7 +43,11 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateTransaction(transaction: TransactionEntity, account: AccountEntity, category: CategoryEntity?) {
+    override suspend fun updateTransaction(
+        transaction: TransactionEntity,
+        account: AccountEntity,
+        category: CategoryEntity?
+    ) {
         db.withTransaction {
             transactionDao.updateTransaction(transaction = transaction)
             accountDao.updateAccount(accountEntity = account)
@@ -45,7 +55,11 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteTransaction(transaction: TransactionEntity, account: AccountEntity, category: CategoryEntity?) {
+    override suspend fun deleteTransaction(
+        transaction: TransactionEntity,
+        account: AccountEntity,
+        category: CategoryEntity?
+    ) {
         db.withTransaction {
             transactionDao.deleteTransaction(transaction = transaction)
             accountDao.updateAccount(accountEntity = account)
