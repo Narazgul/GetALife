@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.transaction.composables
 
-import android.graphics.Color
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -19,15 +18,15 @@ import androidx.compose.ui.node.ModifierNodeElement
 import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.Language
 
-private data object YellowBackgroundElement : ModifierNodeElement<YellowBackgroundNode>() {
+private data class AnimatedBackgroundElement(val color: Int) : ModifierNodeElement<AnimatedBackgroundNode>() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun create() = YellowBackgroundNode()
-    override fun update(node: YellowBackgroundNode) {
+    override fun create() = AnimatedBackgroundNode(color)
+    override fun update(node: AnimatedBackgroundNode) {
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private class YellowBackgroundNode : DrawModifierNode, Modifier.Node() {
+private class AnimatedBackgroundNode(color: Int) : DrawModifierNode, Modifier.Node() {
 
     private val shader = RuntimeShader(SHADER)
     private val shaderBrush = ShaderBrush(shader)
@@ -36,7 +35,7 @@ private class YellowBackgroundNode : DrawModifierNode, Modifier.Node() {
     init {
         shader.setColorUniform(
             "color",
-            Color.valueOf(Yellow.red, Yellow.green, Yellow.blue, Yellow.alpha),
+            color
         )
     }
 
@@ -58,9 +57,9 @@ private class YellowBackgroundNode : DrawModifierNode, Modifier.Node() {
     }
 }
 
-fun Modifier.yellowBackground(): Modifier =
+fun Modifier.waveAnimationBackground(color: Int): Modifier =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this.then(YellowBackgroundElement)
+        this.then(AnimatedBackgroundElement(color))
     } else {
         drawWithCache {
 
@@ -83,7 +82,7 @@ val SHADER = """
 
     float4 main(in float2 fragCoord) {
         // Config values
-        const float speedMultiplier = 1.5;
+        const float speedMultiplier = 0.5;
         const float waveDensity = 1.0;
         const float loops = 8.0;
         const float energy = 0.6;
