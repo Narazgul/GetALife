@@ -69,9 +69,9 @@ fun Header(
             )
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(size = spacing.small)
+                shape = RoundedCornerShape(size = spacing.s)
             )
-            .padding(horizontal = spacing.large),
+            .padding(horizontal = spacing.l),
     ) {
         Icon(
             imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
@@ -88,7 +88,7 @@ fun Header(
             contentDescription = null,
             modifier = Modifier.clickable { showBottomSheet = true }
         )
-        Spacer(modifier = Modifier.width(spacing.large))
+        Spacer(modifier = Modifier.width(spacing.l))
         val alignment = if (isExpanded) Alignment.CenterHorizontally else Alignment.End
         Column(horizontalAlignment = alignment) {
             Text(text = "Available", color = MaterialTheme.colorScheme.onPrimaryContainer)
@@ -101,7 +101,7 @@ fun Header(
     if (showBottomSheet) {
         ModalBottomSheet(onDismissRequest = { showBottomSheet = false }) {
             Column(
-                modifier = Modifier.padding(horizontal = spacing.large)
+                modifier = Modifier.padding(horizontal = spacing.l)
             ) {
                 Row {
                     TextField(
@@ -158,7 +158,7 @@ fun Header(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(spacing.extraLarge))
+            Spacer(modifier = Modifier.height(spacing.xl))
         }
     }
 }

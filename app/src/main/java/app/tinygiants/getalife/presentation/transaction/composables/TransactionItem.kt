@@ -52,7 +52,7 @@ fun TransactionItem(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(spacing.small))
+            Spacer(modifier = Modifier.height(spacing.s))
             Text(
                 text = transaction.category?.name ?: "Ready to assign",
                 style = MaterialTheme.typography.bodySmall,

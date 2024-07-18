@@ -56,14 +56,14 @@ fun AssignableMoneyBottomSheet(
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = spacing.large)
+                .padding(horizontal = spacing.l)
                 .onFocusChanged { focusState ->
                     assignedMoneyUserInput =
                         if (focusState.isFocused) "" else assignedMoney.value.toString()
                 }
         )
 
-        Spacer(modifier = Modifier.height(spacing.extraLarge))
+        Spacer(modifier = Modifier.height(spacing.xl))
     }
 }
 

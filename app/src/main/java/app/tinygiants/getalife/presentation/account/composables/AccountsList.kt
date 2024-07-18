@@ -28,8 +28,8 @@ fun AccountsList(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = spacing.large,
-                vertical = spacing.small
+                horizontal = spacing.l,
+                vertical = spacing.s
             )
     ) {
         items(

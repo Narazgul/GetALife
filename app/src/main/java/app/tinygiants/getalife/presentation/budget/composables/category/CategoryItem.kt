@@ -86,8 +86,8 @@ fun Category(
                 }
             )
             .padding(
-                horizontal = spacing.large,
-                vertical = spacing.small
+                horizontal = spacing.l,
+                vertical = spacing.s
             )
     ) {
         Row(
@@ -102,7 +102,7 @@ fun Category(
                     .clickable(onClick = { showEmojiPicker = true })
                     .widthIn(max = 20.dp)
             )
-            Spacer(modifier = Modifier.size(spacing.small))
+            Spacer(modifier = Modifier.size(spacing.s))
             Text(
                 text = categoryName,
                 style = MaterialTheme.typography.titleSmall,
@@ -113,21 +113,21 @@ fun Category(
                 availableMoney.value < budgetTarget.value -> onWarning
                 else -> onSuccess
             }
-            Spacer(modifier = Modifier.size(spacing.small))
+            Spacer(modifier = Modifier.size(spacing.s))
             Text(
                 text = "Assigned: ${assignedMoney.formattedMoney}",
                 style = MaterialTheme.typography.titleSmall,
             )
-            Spacer(modifier = Modifier.size(spacing.large))
+            Spacer(modifier = Modifier.size(spacing.l))
             Box(
                 modifier = Modifier
                     .background(
                         color = budgetTargetBackground,
-                        shape = RoundedCornerShape(spacing.large)
+                        shape = RoundedCornerShape(spacing.l)
                     )
                     .padding(
                         horizontal = spacing.default,
-                        vertical = spacing.extraSmall
+                        vertical = spacing.xs
                     )
             ) {
                 val formattedBudgetTarget = availableMoney.formattedMoney
@@ -147,7 +147,7 @@ fun Category(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(spacing.small)
+                .height(spacing.s)
         ) {
             val progressBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             val progressColor = when {

@@ -20,7 +20,7 @@ fun LoadingIndicator(
         modifier = modifier.padding(top = spacing.default)
     ) {
         CircularProgressIndicator(
-            strokeWidth = spacing.extraSmall,
+            strokeWidth = spacing.xs,
             modifier = Modifier.size(20.dp)
         )
     }

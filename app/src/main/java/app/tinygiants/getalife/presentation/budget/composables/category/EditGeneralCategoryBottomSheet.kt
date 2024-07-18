@@ -56,7 +56,7 @@ fun EditGeneralCategoryBottomSheet(
         onDismissRequest = onDismissRequest,
         containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
-        Column(modifier = Modifier.padding(horizontal = spacing.large)) {
+        Column(modifier = Modifier.padding(horizontal = spacing.l)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 MultiChoiceSegmentedButtonRow {
                     SegmentedButton(
@@ -129,6 +129,6 @@ fun EditGeneralCategoryBottomSheet(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(spacing.extraLarge))
+        Spacer(modifier = Modifier.height(spacing.xl))
     }
 }

@@ -61,7 +61,7 @@ fun AccountBottomSheet(
         ) {
             Text(
                 text = if (accountName == null) stringResource(id = R.string.add_account) else stringResource(R.string.edit_account),
-                modifier = Modifier.padding(spacing.large),
+                modifier = Modifier.padding(spacing.l),
                 style = MaterialTheme.typography.titleMedium
             )
             OutlinedTextField(
@@ -70,7 +70,7 @@ fun AccountBottomSheet(
                 label = { Text(stringResource(R.string.account_name)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = spacing.large, vertical = spacing.medium)
+                    .padding(horizontal = spacing.l, vertical = spacing.m)
             )
             OutlinedTextField(
                 value = balanceUserInput,
@@ -81,7 +81,7 @@ fun AccountBottomSheet(
                 label = { Text(stringResource(R.string.balance)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = spacing.large, vertical = spacing.medium)
+                    .padding(horizontal = spacing.l, vertical = spacing.m)
                     .onFocusChanged { focusState ->
                         balanceUserInput = if (focusState.isFocused) "" else balance?.value.toString()
                     }
@@ -95,7 +95,7 @@ fun AccountBottomSheet(
                     text = accountTypeInput?.name ?: stringResource(R.string.chose_account_type),
                     modifier = Modifier
                         .clickable { showAccountTypeDropdown = true }
-                        .padding(spacing.large)
+                        .padding(spacing.l)
                 )
                 DropdownMenu(
                     expanded = showAccountTypeDropdown,

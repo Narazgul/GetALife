@@ -59,7 +59,7 @@ fun BudgetList(
 
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(spacing.extraSmall)
+            contentPadding = PaddingValues(spacing.xs)
         ) {
             groups.forEach { (header, items) ->
 
@@ -113,7 +113,7 @@ private fun LazyListScope.stickyHeader(
             onDeleteHeaderClicked = onDeleteHeaderClicked,
             onAddCategoryClicked = onAddCategoryClicked
         )
-        Spacer(modifier = Modifier.height(spacing.tiny))
+        Spacer(modifier = Modifier.height(spacing.xxs))
     }
 }
 
@@ -158,8 +158,8 @@ private fun LazyListScope.items(
                     expandVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             modifier = Modifier.padding(
-                top = if (category == firstCategoryItem) spacing.tiny else spacing.halfDp,
-                bottom = if (category == lastCategoryItem) spacing.tiny else spacing.halfDp
+                top = if (category == firstCategoryItem) spacing.xxs else spacing.halfDp,
+                bottom = if (category == lastCategoryItem) spacing.xxs else spacing.halfDp
             )
         ) {
             if (category.isInitialCategory) {
@@ -185,7 +185,7 @@ private fun LazyListScope.items(
                     if (category != lastCategoryItem)
                         Spacer(
                             modifier = Modifier
-                                .height(spacing.tiny)
+                                .height(spacing.xxs)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f))
                         )

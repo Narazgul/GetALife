@@ -81,7 +81,7 @@ fun AddTransactionItem(
                     directionUserInput = if (isChecked) TransactionDirection.Inflow
                     else TransactionDirection.Unknown
                 },
-                shape = RoundedCornerShape(topStart = spacing.large, bottomStart = spacing.large),
+                shape = RoundedCornerShape(topStart = spacing.l, bottomStart = spacing.l),
             ) {
                 Text(text = stringResource(R.string.inflow))
             }
@@ -91,12 +91,12 @@ fun AddTransactionItem(
                     directionUserInput = if (isChecked) TransactionDirection.Outflow
                     else TransactionDirection.Unknown
                 },
-                shape = RoundedCornerShape(topEnd = spacing.large, bottomEnd = spacing.large),
+                shape = RoundedCornerShape(topEnd = spacing.l, bottomEnd = spacing.l),
             ) {
                 Text(text = stringResource(R.string.outflow))
             }
         }
-        Spacer(modifier = Modifier.height(spacing.small))
+        Spacer(modifier = Modifier.height(spacing.s))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -106,7 +106,7 @@ fun AddTransactionItem(
                 text = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
                 modifier = Modifier
                     .clickable { showCategoryDropdown = true }
-                    .padding(spacing.small)
+                    .padding(spacing.s)
             )
             DropdownMenu(
                 expanded = showCategoryDropdown,
@@ -135,7 +135,7 @@ fun AddTransactionItem(
                 text = accountUserInput?.name ?: stringResource(id = R.string.choose_account),
                 modifier = Modifier
                     .clickable { showAccountDropdown = true }
-                    .padding(spacing.small)
+                    .padding(spacing.s)
             )
             DropdownMenu(
                 expanded = showAccountDropdown,
@@ -154,7 +154,7 @@ fun AddTransactionItem(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(spacing.large))
+        Spacer(modifier = Modifier.height(spacing.l))
         TextField(
             value = amountUserInputText,
             onValueChange = { userInput ->
@@ -171,21 +171,21 @@ fun AddTransactionItem(
                     else amountMoney.value.toString()
                 }
         )
-        Spacer(modifier = Modifier.height(spacing.large))
+        Spacer(modifier = Modifier.height(spacing.l))
         TextField(
             value = descriptionUserInput,
             onValueChange = { userInput -> descriptionUserInput = userInput },
             label = { Text(stringResource(R.string.description)) },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(spacing.large))
+        Spacer(modifier = Modifier.height(spacing.l))
         TextField(
             value = transactionPartnerUserInput,
             onValueChange = { userInput -> transactionPartnerUserInput = userInput },
             label = { Text(stringResource(R.string.transaction_partner)) },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(spacing.extraLarge))
+        Spacer(modifier = Modifier.height(spacing.xl))
         Button(
             onClick = {
                 onAddTransactionClicked(

@@ -43,7 +43,7 @@ fun AssignableMoney(assignableMoney: Money) {
         else -> stringResource(R.string.more_distributed_than_available, assignableMoney.formattedPositiveMoney)
     }
 
-    Spacer(modifier = Modifier.height(spacing.small))
+    Spacer(modifier = Modifier.height(spacing.s))
 
     Text(
         text = text,
@@ -53,12 +53,12 @@ fun AssignableMoney(assignableMoney: Money) {
         modifier = Modifier
             .background(
                 color = background,
-                shape = RoundedCornerShape(size = spacing.medium)
+                shape = RoundedCornerShape(size = spacing.m)
             )
-            .padding(spacing.large)
+            .padding(spacing.l)
     )
 
-    Spacer(modifier = Modifier.height(spacing.small))
+    Spacer(modifier = Modifier.height(spacing.s))
 }
 
 @PreviewLightDark

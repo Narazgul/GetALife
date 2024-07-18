@@ -44,7 +44,7 @@ fun AddGroupBottomSheet(
         containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
         Row(
-            modifier = Modifier.padding(spacing.medium)
+            modifier = Modifier.padding(spacing.m)
         ) {
             OutlinedTextField(
                 value = groupName,
@@ -67,7 +67,7 @@ fun AddGroupBottomSheet(
                 Text(text = stringResource(R.string.save))
             }
         }
-        Spacer(modifier = Modifier.height(spacing.extraLarge))
+        Spacer(modifier = Modifier.height(spacing.xl))
     }
 }
 

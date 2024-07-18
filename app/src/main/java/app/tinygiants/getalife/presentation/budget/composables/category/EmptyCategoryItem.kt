@@ -32,9 +32,9 @@ fun EmptyCategoryItem(
 
     Row(
         modifier = Modifier.padding(
-            start = spacing.large,
-            end = spacing.large,
-            bottom = spacing.medium
+            start = spacing.l,
+            end = spacing.l,
+            bottom = spacing.m
         )
     ) {
         OutlinedTextField(
