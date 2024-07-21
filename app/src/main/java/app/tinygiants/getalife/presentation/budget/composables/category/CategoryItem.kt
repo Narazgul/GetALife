@@ -32,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -58,6 +59,7 @@ fun Category(
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Float = 0f,
+    spentProgress: Float = 0f,
     optionalText: String? = null,
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
@@ -71,6 +73,7 @@ fun Category(
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
+    val animatedSpentProgress by animateFloatAsState(targetValue = spentProgress, label = "animatedSpentProgress")
 
     Column(
         modifier = Modifier
@@ -155,11 +158,24 @@ fun Category(
                 availableMoney.value < budgetTarget.value -> warning
                 else -> success
             }
+            val spentProgressColor = when {
+                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.onPrimary
+                availableMoney.value < budgetTarget.value -> onWarning
+                else -> onSuccess
+            }
+
             LinearProgressIndicator(
                 progress = { animatedProgress },
                 modifier = Modifier.fillMaxWidth(),
                 color = progressColor,
                 trackColor = progressBackground,
+                strokeCap = StrokeCap.Round,
+            )
+            LinearProgressIndicator(
+                progress = { animatedSpentProgress },
+                modifier = Modifier.fillMaxWidth(),
+                color = spentProgressColor,
+                trackColor = Color.Transparent,
                 strokeCap = StrokeCap.Round,
             )
         }
@@ -233,6 +249,7 @@ fun FullCategoryPreview() {
                 assignedMoney = Money(940.00),
                 availableMoney = Money(940.00),
                 progress = 1f,
+                spentProgress = 0.2f,
                 optionalText = optionalExampleText(0.00)
             )
         }
@@ -251,6 +268,7 @@ fun SemiFilledCategoryPreview() {
                 assignedMoney = Money(470.00),
                 availableMoney = Money(470.00),
                 progress = (470.00 / 940.00).toFloat(),
+                spentProgress = 0.2f,
                 optionalText = optionalExampleText(gap = 940.00 - 470.00)
             )
         }
@@ -269,6 +287,7 @@ fun EmptyCategoryPreview() {
                 assignedMoney = Money(0.0),
                 availableMoney = Money(0.0),
                 progress = (0.0 / 940.00).toFloat(),
+                spentProgress = 0f,
                 optionalText = optionalExampleText(gap = 940.00 - 0.00)
             )
         }

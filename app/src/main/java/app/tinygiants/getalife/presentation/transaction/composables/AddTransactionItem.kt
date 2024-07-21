@@ -194,13 +194,13 @@ fun AddTransactionItem(
                 onAddTransactionClicked(
                     amountMoney,
                     accountUserInput,
-                    categoryUserInput!!,
+                    categoryUserInput,
                     directionUserInput,
                     descriptionUserInput,
                     transactionPartnerUserInput,
                 )
             },
-            enabled = accountUserInput != null && categoryUserInput != null
+            enabled = accountUserInput != null && (categoryUserInput != null || directionUserInput == TransactionDirection.Inflow)
         ) {
             Text(text = stringResource(id = R.string.save))
         }
