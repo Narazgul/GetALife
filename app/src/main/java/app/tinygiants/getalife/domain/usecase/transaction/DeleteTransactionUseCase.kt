@@ -30,11 +30,12 @@ class DeleteTransactionUseCase @Inject constructor(
                 description = transaction.description,
                 timestamp = transaction.timestamp
             )
+            val newBalance = transaction.account.balance.value + transaction.amount.value
             val accountEntity = transaction.account.run {
                 AccountEntity(
                     id = id,
                     name = name,
-                    balance = balance.value,
+                    balance = newBalance,
                     type = type,
                     listPosition = listPosition
                 )
