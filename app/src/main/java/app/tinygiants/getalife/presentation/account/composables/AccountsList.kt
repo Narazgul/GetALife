@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
-import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.account.UserClickEvent
 import app.tinygiants.getalife.presentation.composables.isScrollingDown
 import app.tinygiants.getalife.theme.spacing
@@ -38,8 +37,8 @@ fun AccountsList(
         ) { account ->
 
             val onAccountClicked = { onNavigateToTransactionScreen(account.id) }
-            val onUpdateAccountTypeClicked = { accountName: String, balance: Money, type: AccountType ->
-                val updatedAccount = account.copy(name = accountName, balance = balance, type = type)
+            val onUpdateAccountTypeClicked = { accountName: String, type: AccountType ->
+                val updatedAccount = account.copy(name = accountName, type = type)
                 onUserClickEvent(UserClickEvent.UpdateAccount(account = updatedAccount))
             }
             val onDeleteAccountClicked = { onUserClickEvent(UserClickEvent.DeleteAccount(account = account)) }

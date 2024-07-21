@@ -32,8 +32,8 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.account.composables.AccountBottomSheet
 import app.tinygiants.getalife.presentation.account.composables.AccountsList
+import app.tinygiants.getalife.presentation.account.composables.AddAccountBottomSheet
 import app.tinygiants.getalife.presentation.composables.ErrorMessage
 import app.tinygiants.getalife.presentation.composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -58,10 +58,10 @@ fun AccountScreen(
 ) {
 
     var areFabButtonsVisible by rememberSaveable { mutableStateOf(true) }
-    var isAccountDialogModalSheetVisible by remember { mutableStateOf(false) }
+    var isAddAccountBottomSheetVisible by remember { mutableStateOf(false) }
 
-    val onAddAccountClicked = { accountName: String, balance: Money, type: AccountType ->
-        onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = balance, type = type))
+    val onAddAccountClicked = { accountName: String, startingCredit: Money, type: AccountType ->
+        onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = startingCredit, type = type))
     }
 
     Scaffold(floatingActionButton = {
@@ -71,7 +71,7 @@ fun AccountScreen(
             exit = fadeOut(tween(500))
         ) {
             ExtendedFloatingActionButton(
-                onClick = { isAccountDialogModalSheetVisible = true },
+                onClick = { isAddAccountBottomSheetVisible = true },
                 icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
                 text = { Text(text = stringResource(id = R.string.add_account)) }
             )
@@ -107,9 +107,9 @@ fun AccountScreen(
             )
         }
 
-        if (isAccountDialogModalSheetVisible) AccountBottomSheet(
+        if (isAddAccountBottomSheetVisible) AddAccountBottomSheet(
             onConfirmClicked = onAddAccountClicked,
-            onDismissRequest = { isAccountDialogModalSheetVisible = false }
+            onDismissRequest = { isAddAccountBottomSheetVisible = false }
         )
     }
 }

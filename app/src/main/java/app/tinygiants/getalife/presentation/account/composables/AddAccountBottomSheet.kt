@@ -4,18 +4,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,32 +27,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountBottomSheet(
-    accountName: String? = null,
-    balance: Money? = null,
-    type: AccountType? = null,
+fun AddAccountBottomSheet(
     onConfirmClicked: (accountName: String, balance: Money, type: AccountType) -> Unit,
-    onDeleteAccountClicked: (() -> Unit)? = null,
     onDismissRequest: () -> Unit = { }
 ) {
-
     var showAccountTypeDropdown by rememberSaveable { mutableStateOf(false) }
 
-    var balanceInAccount by remember { mutableStateOf(balance) }
+    var startingCredit by remember { mutableStateOf(Money(value = 0.00)) }
 
-    var accountNameInput by rememberSaveable { mutableStateOf(accountName ?: "") }
-    var balanceUserInput by rememberSaveable { mutableStateOf(balanceInAccount?.value.toString()) }
-    var accountTypeInput by rememberSaveable { mutableStateOf(type) }
+    var accountNameInput by rememberSaveable { mutableStateOf("") }
+    var startingCreditUserInput by rememberSaveable { mutableStateOf(startingCredit.formattedMoney) }
+    var accountTypeInput by rememberSaveable { mutableStateOf(AccountType.Unknown) }
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
@@ -60,7 +53,7 @@ fun AccountBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = if (accountName == null) stringResource(id = R.string.add_account) else stringResource(R.string.edit_account),
+                text = stringResource(id = R.string.add_account),
                 modifier = Modifier.padding(spacing.l),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -73,17 +66,17 @@ fun AccountBottomSheet(
                     .padding(horizontal = spacing.l, vertical = spacing.m)
             )
             OutlinedTextField(
-                value = balanceUserInput,
+                value = startingCreditUserInput,
                 onValueChange = { newValue ->
-                    balanceUserInput = newValue.replace(oldChar = ',', newChar = '.')
-                    balanceInAccount = Money(value = balanceUserInput.toDoubleOrNull() ?: return@OutlinedTextField)
+                    startingCreditUserInput = newValue.replace(oldChar = ',', newChar = '.')
+                    startingCredit = Money(value = startingCreditUserInput.toDoubleOrNull() ?: return@OutlinedTextField)
                 },
                 label = { Text(stringResource(R.string.balance)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = spacing.l, vertical = spacing.m)
                     .onFocusChanged { focusState ->
-                        balanceUserInput = if (focusState.isFocused) "" else balance?.value.toString()
+                        startingCreditUserInput = if (focusState.isFocused) "" else startingCredit.formattedMoney
                     }
             )
             Row(
@@ -92,7 +85,7 @@ fun AccountBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = accountTypeInput?.name ?: stringResource(R.string.chose_account_type),
+                    text = if (accountTypeInput == AccountType.Unknown) stringResource(R.string.chose_account_type) else accountTypeInput.name,
                     modifier = Modifier
                         .clickable { showAccountTypeDropdown = true }
                         .padding(spacing.l)
@@ -105,28 +98,14 @@ fun AccountBottomSheet(
                 ) {
                     AccountType.entries.forEach { type ->
 
+                        if (type == AccountType.Unknown) return@forEach
+
                         DropdownMenuItem(
                             text = { Text(text = type.name) },
                             onClick = {
                                 accountTypeInput = type
                                 showAccountTypeDropdown = false
                             }
-                        )
-                    }
-                }
-            }
-            if (onDeleteAccountClicked != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = { onDeleteAccountClicked() },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.delete_argument, accountName ?: ""),
-                            color = MaterialTheme.colorScheme.onError
                         )
                     }
                 }
@@ -139,26 +118,18 @@ fun AccountBottomSheet(
                     onClick = {
                         onConfirmClicked(
                             accountNameInput,
-                            balanceInAccount ?: Money(value = 0.00),
-                            accountTypeInput ?: AccountType.Unknown
+                            startingCredit,
+                            accountTypeInput
                         )
                         onDismissRequest()
                     },
+                    enabled = accountNameInput.isNotBlank() && accountTypeInput != AccountType.Unknown,
                     modifier = Modifier.padding(spacing.default),
                 ) {
                     Text(text = stringResource(id = R.string.save))
                 }
             }
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun AccountDialogPreview() {
-    GetALifeTheme {
-        Surface {
-            AccountBottomSheet(onConfirmClicked = { _, _, _ -> })
+            Spacer(modifier = Modifier.height(spacing.xl))
         }
     }
 }

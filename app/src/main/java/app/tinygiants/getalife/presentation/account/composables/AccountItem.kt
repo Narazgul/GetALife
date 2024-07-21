@@ -33,7 +33,7 @@ fun AccountItem(
     balance: Money = Money(value = 0.00),
     type: AccountType = AccountType.Unknown,
     onNavigateToAccountDetails: () -> Unit = { },
-    onUpdateAccountClicked: (accountName: String, balance: Money, type: AccountType) -> Unit = { _, _, _ -> },
+    onUpdateAccountClicked: (accountName: String, type: AccountType) -> Unit = { _, _ -> },
     onDeleteAccountClicked: () -> Unit = { }
 ) {
     var isAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
@@ -65,9 +65,8 @@ fun AccountItem(
         )
     }
 
-    if (isAccountDialogVisible) AccountBottomSheet(
+    if (isAccountDialogVisible) EditAccountBottomSheet(
         accountName = name,
-        balance = balance,
         type = type,
         onConfirmClicked = onUpdateAccountClicked,
         onDeleteAccountClicked = onDeleteAccountClicked,
