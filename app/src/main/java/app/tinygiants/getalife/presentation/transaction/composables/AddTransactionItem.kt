@@ -171,7 +171,7 @@ fun AddTransactionItem(
                 .fillMaxWidth()
                 .onFocusChanged {
                     amountUserInputText = if (it.isFocused.not()) amountMoney.formattedMoney
-                    else amountMoney.value.toString()
+                    else ""
                 }
         )
         Spacer(modifier = Modifier.height(spacing.l))
