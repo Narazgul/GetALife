@@ -172,10 +172,7 @@ fun EditTransaction(
                 label = { Text(stringResource(R.string.amount)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged {
-                        amountUserInputText = if (it.isFocused.not()) amountMoney.formattedMoney
-                        else amountMoney.value.toString()
-                    }
+                    .onFocusChanged { amountUserInputText = if (it.isFocused.not()) amountMoney.formattedMoney else "" }
             )
             Spacer(modifier = Modifier.height(spacing.l))
             TextField(

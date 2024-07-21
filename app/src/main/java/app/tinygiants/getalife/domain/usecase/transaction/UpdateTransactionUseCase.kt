@@ -5,6 +5,7 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -30,11 +31,17 @@ class UpdateTransactionUseCase @Inject constructor(
                 description = transaction.description,
                 timestamp = transaction.timestamp
             )
+
+            val account = transaction.account
+            val newBalance =
+                if (transaction.direction == TransactionDirection.Inflow) account.balance + transaction.amount
+                else account.balance - transaction.amount
+
             val accountEntity = transaction.account.run {
                 AccountEntity(
                     id = id,
                     name = name,
-                    balance = balance.value,
+                    balance = newBalance.value,
                     type = type,
                     listPosition = listPosition
                 )

@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.presentation.transaction.composables
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -97,35 +98,37 @@ fun AddTransactionItem(
             }
         }
         Spacer(modifier = Modifier.height(spacing.s))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
-                modifier = Modifier
-                    .clickable { showCategoryDropdown = true }
-                    .padding(spacing.s)
-            )
-            DropdownMenu(
-                expanded = showCategoryDropdown,
-                onDismissRequest = { showCategoryDropdown = false },
-                modifier = Modifier
-                    .width(200.dp)
+        AnimatedVisibility(visible = directionUserInput != TransactionDirection.Inflow) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                categories.forEach { category ->
-                    DropdownMenuItem(
-                        text = { Text(text = category.name) },
-                        onClick = {
-                            categoryUserInput = category
-                            showCategoryDropdown = false
-                        }
-                    )
+                Text(
+                    text = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
+                    modifier = Modifier
+                        .clickable { showCategoryDropdown = true }
+                        .padding(spacing.s)
+                )
+                DropdownMenu(
+                    expanded = showCategoryDropdown,
+                    onDismissRequest = { showCategoryDropdown = false },
+                    modifier = Modifier
+                        .width(200.dp)
+                ) {
+                    categories.forEach { category ->
+                        DropdownMenuItem(
+                            text = { Text(text = category.name) },
+                            onClick = {
+                                categoryUserInput = category
+                                showCategoryDropdown = false
+                            }
+                        )
+                    }
                 }
             }
+            Spacer(modifier = Modifier.height(spacing.default))
         }
-        Spacer(modifier = Modifier.height(spacing.default))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
