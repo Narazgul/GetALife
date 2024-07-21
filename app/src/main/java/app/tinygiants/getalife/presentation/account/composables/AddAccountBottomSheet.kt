@@ -41,10 +41,10 @@ fun AddAccountBottomSheet(
 ) {
     var showAccountTypeDropdown by rememberSaveable { mutableStateOf(false) }
 
-    var startingCredit by remember { mutableStateOf(Money(value = 0.00)) }
+    var startingBalance by remember { mutableStateOf(Money(value = 0.00)) }
 
     var accountNameInput by rememberSaveable { mutableStateOf("") }
-    var startingCreditUserInput by rememberSaveable { mutableStateOf(startingCredit.formattedMoney) }
+    var startingBalanceUserInput by rememberSaveable { mutableStateOf(startingBalance.formattedMoney) }
     var accountTypeInput by rememberSaveable { mutableStateOf(AccountType.Unknown) }
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
@@ -66,17 +66,17 @@ fun AddAccountBottomSheet(
                     .padding(horizontal = spacing.l, vertical = spacing.m)
             )
             OutlinedTextField(
-                value = startingCreditUserInput,
+                value = startingBalanceUserInput,
                 onValueChange = { newValue ->
-                    startingCreditUserInput = newValue.replace(oldChar = ',', newChar = '.')
-                    startingCredit = Money(value = startingCreditUserInput.toDoubleOrNull() ?: return@OutlinedTextField)
+                    startingBalanceUserInput = newValue.replace(oldChar = ',', newChar = '.')
+                    startingBalance = Money(value = startingBalanceUserInput.toDoubleOrNull() ?: return@OutlinedTextField)
                 },
                 label = { Text(stringResource(R.string.balance)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = spacing.l, vertical = spacing.m)
                     .onFocusChanged { focusState ->
-                        startingCreditUserInput = if (focusState.isFocused) "" else startingCredit.formattedMoney
+                        startingBalanceUserInput = if (focusState.isFocused) "" else startingBalance.formattedMoney
                     }
             )
             Row(
@@ -118,7 +118,7 @@ fun AddAccountBottomSheet(
                     onClick = {
                         onConfirmClicked(
                             accountNameInput,
-                            startingCredit,
+                            startingBalance,
                             accountTypeInput
                         )
                         onDismissRequest()

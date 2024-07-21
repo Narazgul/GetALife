@@ -60,8 +60,8 @@ fun AccountScreen(
     var areFabButtonsVisible by rememberSaveable { mutableStateOf(true) }
     var isAddAccountBottomSheetVisible by remember { mutableStateOf(false) }
 
-    val onAddAccountClicked = { accountName: String, startingCredit: Money, type: AccountType ->
-        onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = startingCredit, type = type))
+    val onAddAccountClicked = { accountName: String, startingBalance: Money, type: AccountType ->
+        onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = startingBalance, type = type))
     }
 
     Scaffold(floatingActionButton = {
