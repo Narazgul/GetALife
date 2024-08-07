@@ -50,7 +50,7 @@ fun AddTransactionItem(
     accounts: List<Account>,
     onAddTransactionClicked: (
         amount: Money,
-        account: Account?,
+        account: Account,
         category: Category?,
         direction: TransactionDirection,
         description: Description,
@@ -193,7 +193,7 @@ fun AddTransactionItem(
             onClick = {
                 onAddTransactionClicked(
                     amountMoney,
-                    accountUserInput,
+                    accountUserInput!!,
                     categoryUserInput,
                     directionUserInput,
                     descriptionUserInput,

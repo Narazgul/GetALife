@@ -1,7 +1,5 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
-import app.tinygiants.getalife.data.local.entities.AccountEntity
-import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Transaction
@@ -30,37 +28,8 @@ class DeleteTransactionUseCase @Inject constructor(
                 description = transaction.description,
                 timestamp = transaction.timestamp
             )
-            val newBalance = transaction.account.balance.value + transaction.amount.value
-            val accountEntity = transaction.account.run {
-                AccountEntity(
-                    id = id,
-                    name = name,
-                    balance = newBalance,
-                    type = type,
-                    listPosition = listPosition
-                )
-            }
-            val categoryEntity = transaction.category?.run {
-                CategoryEntity(
-                    id = id,
-                    headerId = headerId,
-                    emoji = emoji,
-                    name = name,
-                    budgetTarget = budgetTarget.value,
-                    budgetPurpose = budgetPurpose,
-                    assignedMoney = assignedMoney.value,
-                    availableMoney = availableMoney.value,
-                    optionalText = optionalText,
-                    listPosition = listPosition,
-                    isInitialCategory = isInitialCategory
-                )
-            }
 
-            repository.deleteTransaction(
-                transaction = transactionEntity,
-                account = accountEntity,
-                category = categoryEntity
-            )
+            repository.deleteTransaction(transaction = transactionEntity)
         }
     }
 }

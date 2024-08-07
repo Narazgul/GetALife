@@ -11,7 +11,7 @@ data class CategoryEntity(
     val headerId: Long,
     val emoji: String,
     val name: String,
-    val budgetTarget: Double,
+    val budgetTarget: Double?,
     val budgetPurpose: BudgetPurpose,
     val assignedMoney: Double,
     val availableMoney: Double,

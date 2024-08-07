@@ -22,7 +22,7 @@ class UpdateCategoryUseCase @Inject constructor(
             headerId = category.headerId,
             emoji = category.emoji,
             name = category.name,
-            budgetTarget = category.budgetTarget.value,
+            budgetTarget = category.budgetTarget?.value,
             budgetPurpose = category.budgetPurpose,
             assignedMoney = category.assignedMoney.value,
             availableMoney = category.availableMoney.value,

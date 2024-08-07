@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -26,22 +27,28 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.ScreenPreview
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
 import app.tinygiants.getalife.theme.spacing
@@ -54,16 +61,18 @@ import kotlinx.coroutines.launch
 fun Category(
     emoji: String = "",
     categoryName: String = "",
-    budgetTarget: Money = Money(value = 0.0),
+    budgetTarget: Money? = Money(value = 0.0),
     budgetPurpose: BudgetPurpose = BudgetPurpose.Unknown,
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Float = 0f,
     spentProgress: Float = 0f,
+    overspentProgress: Float = 0f,
+    budgetTargetProgress: Float? = null,
     optionalText: String? = null,
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
-    onUpdateBudgetTargetClicked: (Money) -> Unit = { },
+    onUpdateBudgetTargetClicked: (Money?) -> Unit = { },
     onUpdateBudgetPurposeClicked: (BudgetPurpose) -> Unit = { },
     onUpdateAssignedMoneyClicked: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
@@ -74,6 +83,8 @@ fun Category(
 
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
     val animatedSpentProgress by animateFloatAsState(targetValue = spentProgress, label = "animatedSpentProgress")
+    val animatedOverspentProgress by animateFloatAsState(targetValue = overspentProgress, label = "overspentProgress")
+    var progressBarWidth by remember { mutableFloatStateOf(0f) }
 
     Column(
         modifier = Modifier
@@ -105,23 +116,30 @@ fun Category(
                     .clickable(onClick = { showEmojiPicker = true })
                     .widthIn(max = 20.dp)
             )
+
             Spacer(modifier = Modifier.size(spacing.s))
+
             Text(
                 text = categoryName,
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f)
             )
             val budgetTargetBackground = when {
+                availableMoney.value < 0.0 -> MaterialTheme.colorScheme.error
                 availableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-                availableMoney.value < budgetTarget.value -> onWarning
+                assignedMoney.value < (availableMoney.value) -> onWarning
                 else -> onSuccess
             }
+
             Spacer(modifier = Modifier.size(spacing.s))
+
             Text(
                 text = "Assigned: ${assignedMoney.formattedMoney}",
                 style = MaterialTheme.typography.titleSmall,
             )
+
             Spacer(modifier = Modifier.size(spacing.l))
+
             Box(
                 modifier = Modifier
                     .background(
@@ -146,40 +164,72 @@ fun Category(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(spacing.default))
+
+        Spacer(modifier = Modifier.height(spacing.xs))
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(spacing.s)
+                .height(spacing.l)
         ) {
             val progressBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             val progressColor = when {
                 availableMoney.value == 0.0 -> MaterialTheme.colorScheme.primary
-                availableMoney.value < budgetTarget.value -> warning
+                assignedMoney.value < availableMoney.value -> warning
                 else -> success
             }
             val spentProgressColor = when {
-                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.onPrimary
-                availableMoney.value < budgetTarget.value -> onWarning
+                availableMoney.value < 0.0 -> onSuccess
+                availableMoney.value == 0.0 && (assignedMoney.value == budgetTarget?.value)-> onSuccess
+                assignedMoney.value < (availableMoney.value) -> onWarning
                 else -> onSuccess
             }
 
             LinearProgressIndicator(
                 progress = { animatedProgress },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
                 color = progressColor,
                 trackColor = progressBackground,
                 strokeCap = StrokeCap.Round,
             )
             LinearProgressIndicator(
                 progress = { animatedSpentProgress },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
                 color = spentProgressColor,
                 trackColor = Color.Transparent,
                 strokeCap = StrokeCap.Round,
             )
+            LinearProgressIndicator(
+                progress = { animatedOverspentProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                    .rotate(180f)
+                    .onGloballyPositioned { coordinates -> progressBarWidth = coordinates.size.width.toFloat() },
+                color = MaterialTheme.colorScheme.error,
+                trackColor = Color.Transparent,
+                strokeCap = StrokeCap.Round
+            )
+
+            if (budgetTargetProgress != null)
+                Text(
+                    text = "🏁",
+                    modifier = Modifier.offset {
+                        IntOffset(
+                            x = (budgetTargetProgress * progressBarWidth).toInt() - 8.dp.value.toInt(),
+                            y = -32
+                        )
+                    }
+                )
+
         }
+
         Spacer(modifier = Modifier.height(spacing.default))
+
         if (!optionalText.isNullOrBlank()) {
             Text(
                 text = optionalText,
@@ -190,7 +240,7 @@ fun Category(
         }
     }
 
-    if (showGeneralEditBottomSheet) EditGeneralCategoryBottomSheet(
+    if (showGeneralEditBottomSheet) EditCategoryBottomSheet(
         categoryName = categoryName,
         budgetTarget = budgetTarget,
         budgetPurpose = budgetPurpose,
@@ -275,7 +325,7 @@ fun SemiFilledCategoryPreview() {
     }
 }
 
-@PreviewLightDark
+@ScreenPreview
 @Composable
 fun EmptyCategoryPreview() {
     GetALifeTheme {

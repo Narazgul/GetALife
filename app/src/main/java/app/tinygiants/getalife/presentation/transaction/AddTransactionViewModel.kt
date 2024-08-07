@@ -65,7 +65,7 @@ class AddTransactionViewModel @Inject constructor(
     fun onSaveTransactionClicked(
         amount: Money,
         direction: TransactionDirection,
-        accountId: Long?,
+        accountId: Long,
         category: Category?,
         transactionPartner: String?,
         description: String?

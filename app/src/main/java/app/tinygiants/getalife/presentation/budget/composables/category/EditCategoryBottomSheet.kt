@@ -36,12 +36,12 @@ import app.tinygiants.getalife.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditGeneralCategoryBottomSheet(
+fun EditCategoryBottomSheet(
     categoryName: String,
-    budgetTarget: Money,
+    budgetTarget: Money?,
     budgetPurpose: BudgetPurpose,
     onUpdateCategoryName: (String) -> Unit = { },
-    onBudgetTargetChanged: (Money) -> Unit = { },
+    onBudgetTargetChanged: (Money?) -> Unit = { },
     onUpdateBudgetPurposeClicked: (BudgetPurpose) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { },
     onDismissRequest: () -> Unit = { }
@@ -50,7 +50,7 @@ fun EditGeneralCategoryBottomSheet(
     var categoryNameUserInput by rememberSaveable { mutableStateOf(categoryName) }
 
     var budgetTargetMoney by remember { mutableStateOf(budgetTarget) }
-    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.value.toString()) }
+    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney?.value?.toString() ?: "") }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -103,13 +103,13 @@ fun EditGeneralCategoryBottomSheet(
                             Money(value = budgetTargetUserInput.toDoubleOrNull() ?: return@TextField)
                         onBudgetTargetChanged(budgetTargetMoney)
                     },
-                    prefix = { Text(budgetTarget.currencySymbol) },
+                    prefix = { Text(budgetTarget?.currencySymbol ?: "") },
                     label = { Text(stringResource(R.string.change_budget_target)) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .weight(1f)
                         .onFocusChanged { focusState ->
-                            budgetTargetUserInput = if (focusState.hasFocus) "" else budgetTarget.value.toString()
+                            budgetTargetUserInput = if (focusState.hasFocus) "" else budgetTarget?.value.toString()
                         }
                 )
             }

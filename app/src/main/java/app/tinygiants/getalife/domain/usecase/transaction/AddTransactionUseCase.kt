@@ -1,14 +1,11 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
-import app.tinygiants.getalife.data.local.entities.AccountEntity
-import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.TransactionRepository
-import app.tinygiants.getalife.domain.usecase.account.GetAccountUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.sql.Timestamp
@@ -17,29 +14,22 @@ import kotlin.random.Random
 
 class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val getAccount: GetAccountUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(
         amount: Money,
         direction: TransactionDirection,
-        accountId: Long?,
+        accountId: Long,
         category: Category?,
         transactionPartner: String?,
         description: String?,
     ) {
-        val account = if (accountId != null) getAccount(accountId) else return
-
         withContext(defaultDispatcher) {
-
-            val newBalance =
-                if (direction == TransactionDirection.Inflow) account.balance + amount
-                else account.balance - amount
 
             val transactionEntity = TransactionEntity(
                 id = Random.nextLong(),
-                accountId = account.id,
+                accountId = accountId,
                 categoryId = category?.id,
                 amount = amount.value,
                 transactionDirection = direction,
@@ -47,46 +37,8 @@ class AddTransactionUseCase @Inject constructor(
                 description = description ?: "",
                 timestamp = Timestamp(System.currentTimeMillis())
             )
-            val accountEntity = AccountEntity(
-                id = account.id,
-                name = account.name,
-                balance = newBalance.value,
-                type = account.type,
-                listPosition = account.listPosition
-            )
 
-            val transactions = category?.let { category ->
-                transactionRepository.getTransactionsByCategory(categoryId = category.id)
-            }
-
-            val categoryEntity = when {
-                transactions == null -> null
-                direction == TransactionDirection.Inflow -> null
-                else -> {
-                    val amountValues = transactions.sumOf { it.amount }
-                    val newAvailableAmount = category.assignedMoney.value - (amountValues + amount.value)
-
-                    CategoryEntity(
-                        id = category.id,
-                        headerId = category.headerId,
-                        emoji = category.emoji,
-                        name = category.name,
-                        budgetTarget = category.budgetTarget.value,
-                        budgetPurpose = category.budgetPurpose,
-                        assignedMoney = category.assignedMoney.value,
-                        availableMoney = newAvailableAmount,
-                        optionalText = category.optionalText,
-                        listPosition = category.listPosition,
-                        isInitialCategory = category.isInitialCategory
-                    )
-                }
-            }
-
-            transactionRepository.addTransaction(
-                transaction = transactionEntity,
-                account = accountEntity,
-                category = categoryEntity
-            )
+            transactionRepository.addTransaction(transaction = transactionEntity)
         }
     }
 }

@@ -30,7 +30,7 @@ class AddCategoryUseCase @Inject constructor(
                 headerId = headerId,
                 emoji = "",
                 name = categoryName,
-                budgetTarget = 0.00,
+                budgetTarget = null,
                 budgetPurpose = BudgetPurpose.Unknown,
                 assignedMoney = 0.00,
                 availableMoney = 0.00,

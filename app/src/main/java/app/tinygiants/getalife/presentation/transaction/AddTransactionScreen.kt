@@ -42,7 +42,7 @@ fun AddTransaction() {
 
     val onAddTransactionClicked =
         { amount: Money,
-          account: Account?,
+          account: Account,
           category: Category?,
           direction: TransactionDirection,
           description: Description?,
@@ -51,7 +51,7 @@ fun AddTransaction() {
             viewModel.onSaveTransactionClicked(
                 amount = amount,
                 direction = direction,
-                accountId = account?.id,
+                accountId = account.id,
                 description = description,
                 transactionPartner = transactionPartner,
                 category = category
@@ -69,7 +69,7 @@ fun AddTransaction() {
 fun AddTransaction(
     categories: List<Category>,
     accounts: List<Account>,
-    onAddTransactionClicked: (amount: Money, account: Account?, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner) -> Unit
+    onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }

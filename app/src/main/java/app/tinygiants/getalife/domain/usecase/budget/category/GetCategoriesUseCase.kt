@@ -32,18 +32,22 @@ class GetCategoriesUseCase @Inject constructor(
         withContext(defaultDispatcher) {
             categoryEntities.map { categoryEntity ->
 
-                val progress = (categoryEntity.availableMoney / categoryEntity.budgetTarget).toFloat()
+                val budgetTarget = categoryEntity.budgetTarget ?: 0.00
+                val progress = (categoryEntity.availableMoney / budgetTarget).toFloat()
 
                 Category(
                     id = categoryEntity.id,
                     headerId = categoryEntity.headerId,
                     emoji = categoryEntity.emoji,
                     name = categoryEntity.name,
-                    budgetTarget = Money(value = categoryEntity.budgetTarget),
+                    budgetTarget = Money(value = categoryEntity.budgetTarget ?: 0.00),
                     budgetPurpose = categoryEntity.budgetPurpose,
                     assignedMoney = Money(value = categoryEntity.assignedMoney),
                     availableMoney = Money(value = categoryEntity.availableMoney),
                     progress = progress,
+                    spentProgress = 0f,
+                    overspentProgress = 0f,
+                    budgetTargetProgress = null,
                     optionalText = categoryEntity.optionalText,
                     listPosition = categoryEntity.listPosition,
                     isInitialCategory = categoryEntity.isInitialCategory

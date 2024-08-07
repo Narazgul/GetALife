@@ -21,7 +21,6 @@ class AddAccountUseCase @Inject constructor(
     suspend operator fun invoke(name: String, balance: Money, type: AccountType) {
 
         val accounts = repository.getAccounts()
-
         val accountId = Random.nextLong()
 
         val accountEntity = withContext(defaultDispatcher) {

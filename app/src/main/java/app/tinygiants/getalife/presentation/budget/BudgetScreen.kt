@@ -175,6 +175,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 1000.00),
             availableMoney = Money(value = 1000.00),
             progress = (1000.00 / 1000.00).toFloat(),
+            spentProgress = 0.2f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0.8f,
             optionalText = "",
             listPosition = 0,
             isInitialCategory = false
@@ -189,6 +192,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 28.55),
             availableMoney = Money(value = 28.55),
             progress = (28.55 / 28.55).toFloat(),
+            spentProgress = 0.2f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 1,
             isInitialCategory = false
@@ -203,6 +209,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 10.00),
             availableMoney = Money(value = 10.00),
             progress = (10.00 / 10.00).toFloat(),
+            spentProgress = 0f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 2,
             isInitialCategory = false
@@ -217,6 +226,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 7.49),
             availableMoney = Money(value = 7.49),
             progress = (7.49 / 7.49).toFloat(),
+            spentProgress = 1f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 3,
             isInitialCategory = false
@@ -231,6 +243,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 13.00),
             availableMoney = Money(value = 13.00),
             progress = (13 / 29.00).toFloat(),
+            spentProgress = 0.1f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "16.00 € more needed by the 30th",
             listPosition = 4,
             isInitialCategory = false
@@ -245,6 +260,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 2.00),
             availableMoney = Money(value = 2.00),
             progress = (2 / 9.00).toFloat(),
+            spentProgress = 0f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "7.00 € mored needed by the 10th",
             listPosition = 5,
             isInitialCategory = false
@@ -267,6 +285,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 27.00),
             availableMoney = Money(value = 27.00),
             progress = (27.00 / 100.00).toFloat(),
+            spentProgress = 0f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "73.00 € more needed by the 30th",
             listPosition = 0,
             isInitialCategory = false
@@ -281,6 +302,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 0.00),
             availableMoney = Money(value = 0.00),
             progress = (0 / 50.00).toFloat(),
+            spentProgress = 0f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "50.00 € more needed by the 30th",
             listPosition = 1,
             isInitialCategory = false
@@ -295,6 +319,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = (60 / 60.00).toFloat(),
+            spentProgress = 0.9f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 2,
             isInitialCategory = false
@@ -317,6 +344,9 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = 0f,
+            spentProgress = 0f,
+            overspentProgress = 0f,
+            budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 0,
             isInitialCategory = true
