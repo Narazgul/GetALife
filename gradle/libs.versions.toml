@@ -1,8 +1,8 @@
 [versions]
 
-kotlinVersion = "2.0.0"
-ksp-version = "2.0.0-1.0.22"
-android-gradle-plugin = "8.5.1"
+kotlinVersion = "2.0.10"
+ksp-version = "2.0.10-1.0.24"
+android-gradle-plugin = "8.5.2"
 splashscreenVersion = "1.0.1"
 
 gemini-version = "0.9.0"
@@ -19,10 +19,10 @@ hiltVersion = "2.51.1"
 hilt-navigation-compose = "1.2.0"
 
 composeBomVersion = "2024.06.00"
-activityCompose = "1.9.0"
+activityCompose = "1.9.1"
 core-ktx = "1.13.1"
-lifecycleRuntimeCompose = "2.8.3"
-navigationCompose = "2.8.0-beta05"
+lifecycleRuntimeCompose = "2.8.4"
+navigationCompose = "2.8.0-beta06"
 roomVersion = "2.6.1"
 
 emoji2Emojipicker = "1.4.0"
