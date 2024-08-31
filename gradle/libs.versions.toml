@@ -2,7 +2,7 @@
 
 kotlinVersion = "2.0.10"
 ksp-version = "2.0.10-1.0.24"
-android-gradle-plugin = "8.5.2"
+android-gradle-plugin = "8.6.0"
 splashscreenVersion = "1.0.1"
 
 gemini-version = "0.9.0"
@@ -10,7 +10,7 @@ chatgpt-version = "3.7.2"
 
 googleServicesVersion = "4.4.2"
 
-firebaseBomVersion = "33.1.2"
+firebaseBomVersion = "33.2.0"
 firebase-appdistribution-gradle = "5.0.0"
 firebaseCrashlytics = "3.0.2"
 firebase-perf-plugin = "1.4.2"
@@ -18,11 +18,11 @@ firebase-perf-plugin = "1.4.2"
 hiltVersion = "2.51.1"
 hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2024.06.00"
+composeBomVersion = "2024.08.00"
 activityCompose = "1.9.1"
 core-ktx = "1.13.1"
 lifecycleRuntimeCompose = "2.8.4"
-navigationCompose = "2.8.0-beta06"
+navigationCompose = "2.8.0-rc01"
 roomVersion = "2.6.1"
 
 emoji2Emojipicker = "1.4.0"
