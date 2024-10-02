@@ -3,7 +3,7 @@ package app.tinygiants.getalife.data.local.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import java.sql.Timestamp
+import kotlinx.datetime.Instant
 
 @Entity(tableName = "transactions")
 data class TransactionEntity(
@@ -15,5 +15,5 @@ data class TransactionEntity(
     val transactionPartner: String,
     val transactionDirection: TransactionDirection,
     val description: String,
-    val timestamp: Timestamp
+    val timestamp: Instant
 )

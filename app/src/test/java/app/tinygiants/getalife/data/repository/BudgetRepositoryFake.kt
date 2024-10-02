@@ -20,7 +20,7 @@ class BudgetRepositoryFake : BudgetRepository {
         return flow { emit(Result.success(headersWithCategoriesEntity.flatMap { it.categories })) }
     }
 
-    override suspend fun getCategoriesOfHeader(headerId: Long): List<CategoryEntity> {
+    override suspend fun getCategoriesByHeader(headerId: Long): List<CategoryEntity> {
         val categories = mutableListOf<CategoryEntity>()
 
         headersWithCategoriesEntity.forEach { headerWithCategories ->

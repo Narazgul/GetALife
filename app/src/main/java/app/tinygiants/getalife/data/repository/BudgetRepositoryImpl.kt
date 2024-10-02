@@ -27,7 +27,7 @@ class BudgetRepositoryImpl @Inject constructor(
             .catch { exception -> emit(Result.failure(exception)) }
             .collect { categoryEntities -> emit(Result.success(categoryEntities)) }
     }
-    override suspend fun getCategoriesOfHeader(headerId: Long) = headerDao.getCategoriesByHeader(headerId = headerId)
+    override suspend fun getCategoriesByHeader(headerId: Long) = headerDao.getCategoriesByHeader(headerId = headerId)
 
     override suspend fun addHeader(headerEntity: HeaderEntity) { headerDao.addHeader(headerEntity = headerEntity) }
     override suspend fun updateHeader(headerEntity: HeaderEntity) { headerDao.updateHeader(headerEntity = headerEntity) }

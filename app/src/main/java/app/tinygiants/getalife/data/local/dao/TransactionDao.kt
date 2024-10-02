@@ -8,7 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import kotlinx.coroutines.flow.Flow
-import java.sql.Timestamp
+import kotlinx.datetime.Instant
 
 @Dao
 interface TransactionDao {
@@ -30,7 +30,7 @@ interface TransactionDao {
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE accountId == :accountId AND timestamp >= :startTime AND timestamp <= :endTime")
-    suspend fun getAccountTransactions(accountId: Long, startTime: Timestamp, endTime: Timestamp): List<TransactionEntity>
+    suspend fun getAccountTransactions(accountId: Long, startTime: Instant, endTime: Instant): List<TransactionEntity>
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId == :categoryId")
@@ -38,7 +38,7 @@ interface TransactionDao {
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId == :categoryId  AND timestamp >= :startTime AND timestamp <= :endTime")
-    suspend fun getCategoryTransactions(categoryId: Long, startTime: Timestamp, endTime: Timestamp): List<TransactionEntity>
+    suspend fun getCategoryTransactions(categoryId: Long, startTime: Instant, endTime: Instant): List<TransactionEntity>
 
     @Query("SELECT * FROM transactions WHERE id == :transactionId")
     suspend fun getTransaction(transactionId: Long): TransactionEntity

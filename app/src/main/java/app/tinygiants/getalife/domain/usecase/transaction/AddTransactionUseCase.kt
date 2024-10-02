@@ -8,7 +8,7 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.sql.Timestamp
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -35,7 +35,7 @@ class AddTransactionUseCase @Inject constructor(
                 transactionDirection = direction,
                 transactionPartner = transactionPartner ?: "",
                 description = description ?: "",
-                timestamp = Timestamp(System.currentTimeMillis())
+                timestamp = Clock.System.now()
             )
 
             transactionRepository.addTransaction(transaction = transactionEntity)

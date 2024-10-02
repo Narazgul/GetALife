@@ -42,7 +42,7 @@ import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
-import java.sql.Timestamp
+import kotlinx.datetime.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -222,7 +222,7 @@ private fun TransactionDialogPreview() {
                     transactionPartner = "Landlord",
                     direction = TransactionDirection.Unknown,
                     description = "Rent for Mai",
-                    timestamp = Timestamp(System.currentTimeMillis())
+                    timestamp = Clock.System.now()
                 ),
                 accounts = emptyList(),
                 categories = emptyList()

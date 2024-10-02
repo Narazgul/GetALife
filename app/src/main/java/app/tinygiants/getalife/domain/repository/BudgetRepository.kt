@@ -9,7 +9,7 @@ interface BudgetRepository {
 
     fun getBudgetFlow(): Flow<Result<List<HeaderWithCategoriesEntity>>>
     fun getCategoriesFlow(): Flow<Result<List<CategoryEntity>>>
-    suspend fun getCategoriesOfHeader(headerId: Long): List<CategoryEntity>
+    suspend fun getCategoriesByHeader(headerId: Long): List<CategoryEntity>
 
     suspend fun addHeader(headerEntity: HeaderEntity)
     suspend fun updateHeader(headerEntity: HeaderEntity)

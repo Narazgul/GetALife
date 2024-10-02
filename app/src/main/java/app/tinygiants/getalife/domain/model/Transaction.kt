@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.domain.model
 
-import java.sql.Timestamp
+import kotlinx.datetime.Instant
 
 data class Transaction(
     val id: Long,
@@ -10,5 +10,5 @@ data class Transaction(
     val transactionPartner: String,
     val direction: TransactionDirection,
     val description: String,
-    val timestamp: Timestamp
+    val timestamp: Instant
 )

@@ -27,7 +27,7 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
-import java.sql.Timestamp
+import kotlinx.datetime.Clock
 
 @Composable
 fun TransactionItem(
@@ -91,7 +91,7 @@ private fun TransactionItemPreview() {
                     transactionPartner = "Wimmer",
                     direction = TransactionDirection.Outflow,
                     description = "Bäckerei",
-                    timestamp = Timestamp(1L),
+                    timestamp = Clock.System.now()
                 ),
                 accounts = emptyList(),
                 categories = emptyList()

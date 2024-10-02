@@ -18,7 +18,7 @@ class AddCategoryUseCase @Inject constructor(
 
     suspend operator fun invoke(headerId: Long, categoryName: String, isInitialCategory: Boolean = false) {
 
-        val categories = repository.getCategoriesOfHeader(headerId = headerId)
+        val categories = repository.getCategoriesByHeader(headerId = headerId)
 
         val categoryEntity = withContext(defaultDispatcher) {
 

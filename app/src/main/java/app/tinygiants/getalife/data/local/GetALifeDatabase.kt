@@ -18,7 +18,7 @@ import app.tinygiants.getalife.data.local.entities.HeaderEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.BudgetPurpose
-import java.sql.Timestamp
+import kotlinx.datetime.Instant
 
 @Database(
     entities = [
@@ -111,10 +111,10 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromTimestamp(value: Timestamp) = value.time
+    fun fromInstant(value: Instant) = value.toEpochMilliseconds()
 
     @TypeConverter
-    fun toTimestamp(value: Long) = Timestamp(value)
+    fun toInstant(value: Long) = Instant.fromEpochMilliseconds(value)
 
     // endregion
 }
