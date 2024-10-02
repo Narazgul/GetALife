@@ -2,15 +2,16 @@
 
 kotlinVersion = "2.0.10"
 ksp-version = "2.0.10-1.0.24"
-android-gradle-plugin = "8.6.0"
+android-gradle-plugin = "8.7.0"
 splashscreenVersion = "1.0.1"
+datetime = "0.6.1"
 
 gemini-version = "0.9.0"
 chatgpt-version = "3.7.2"
 
 googleServicesVersion = "4.4.2"
 
-firebaseBomVersion = "33.2.0"
+firebaseBomVersion = "33.4.0"
 firebase-appdistribution-gradle = "5.0.0"
 firebaseCrashlytics = "3.0.2"
 firebase-perf-plugin = "1.4.2"
@@ -18,19 +19,21 @@ firebase-perf-plugin = "1.4.2"
 hiltVersion = "2.51.1"
 hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2024.08.00"
-activityCompose = "1.9.1"
+composeBomVersion = "2024.09.02"
+activityCompose = "1.9.2"
 core-ktx = "1.13.1"
-lifecycleRuntimeCompose = "2.8.4"
-navigationCompose = "2.8.0-rc01"
+lifecycleRuntimeCompose = "2.8.6"
+navigationCompose = "2.8.1"
 roomVersion = "2.6.1"
 
-emoji2Emojipicker = "1.4.0"
+emoji2Emojipicker = "1.5.0"
 
 junit = "1.2.1"
 jUnit4Version = "4.13.2"
-uiTestJunit4 = "1.6.8"
+uiTestJunit4 = "1.7.2"
 junit5Version = "5.10.2"
+coroutineTest = "1.8.1"
+flowTest = "1.1.0"
 assertk = "0.28.1"
 
 ####################################################################################################
@@ -52,6 +55,7 @@ activity-compose = { module = "androidx.activity:activity-compose", version.ref 
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreenVersion" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime"}
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -92,20 +96,22 @@ junit4-ui = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTe
 junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5Version" }
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5Version" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5Version" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutineTest" }
+flow-test = { module = "app.cash.turbine:turbine", version.ref = "flowTest"}
 assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 
 ####################################################################################################
 
 [bundles]
 
-core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose", "navigation-compose", "splashscreen"]
+core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose", "navigation-compose", "splashscreen", "kotlinx-datetime"]
 hilt = ["hilt-android", "hilt-navigation-compose"]
 room = ["room-ktx", "room-runtime"]
 compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
 compose-debug = ["debug-compose-ui-tooling", "debug-compose-ui-tooling-preview", "debug-compose-ui-test-manifest"]
 firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "firebase-auth", "firebase-firestore", "firebase-remote-config"]
 junit4 = ["junit4-androidx", "junit4-ui"]
-testing = ["junit4", "junit5-api", "junit5-params", "assertk"]
+testing = ["junit4", "junit5-api", "junit5-params", "coroutines-test", "flow-test", "assertk"]
 
 ####################################################################################################
 
