@@ -19,24 +19,24 @@ firebase-perf-plugin = "1.4.2"
 hiltVersion = "2.51.1"
 hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2024.09.02"
+composeBomVersion = "2024.09.03"
 activityCompose = "1.9.2"
 core-ktx = "1.13.1"
 lifecycleRuntimeCompose = "2.8.6"
-navigationCompose = "2.8.1"
+navigationCompose = "2.8.2"
 roomVersion = "2.6.1"
 
 emoji2Emojipicker = "1.5.0"
 
 junit = "1.2.1"
 jUnit4Version = "4.13.2"
-uiTestJunit4 = "1.7.2"
+uiTestJunit4 = "1.7.3"
 junit5Version = "5.10.2"
 coroutineTest = "1.8.1"
 flowTest = "1.1.0"
 assertk = "0.28.1"
 
-####################################################################################################
+########################################################################################################################
 
 [libraries]
 
@@ -100,7 +100,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 flow-test = { module = "app.cash.turbine:turbine", version.ref = "flowTest"}
 assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 
-####################################################################################################
+########################################################################################################################
 
 [bundles]
 
@@ -113,7 +113,7 @@ firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "fire
 junit4 = ["junit4-androidx", "junit4-ui"]
 testing = ["junit4", "junit5-api", "junit5-params", "coroutines-test", "flow-test", "assertk"]
 
-####################################################################################################
+########################################################################################################################
 
 [plugins]
 
