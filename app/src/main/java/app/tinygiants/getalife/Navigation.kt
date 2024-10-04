@@ -12,8 +12,8 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import app.tinygiants.getalife.presentation.account.AccountScreen
 import app.tinygiants.getalife.presentation.budget.BudgetScreen
-import app.tinygiants.getalife.presentation.transaction.TransactionScreen
 import app.tinygiants.getalife.presentation.transaction.AddTransaction
+import app.tinygiants.getalife.presentation.transaction.TransactionScreen
 
 @Composable
 fun GetALifeNavHost(

@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -68,22 +69,23 @@ fun BudgetScreen(
     var isAddGroupFabVisible by rememberSaveable { mutableStateOf(true) }
     var isAddGroupBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(floatingActionButton = {
-        AnimatedVisibility(
-            visible = isAddGroupFabVisible,
-            enter = fadeIn(tween(500)),
-            exit = fadeOut(tween(500))
-        ) {
-            ExtendedFloatingActionButton(
-                onClick = { isAddGroupBottomSheetVisible = true },
-                icon = { Icon(Icons.Filled.Add, "Add Group FloatingActionButton") },
-                text = { Text(text = stringResource(id = R.string.add_group)) }
-            )
-        }
-    }) { innerPadding ->
+    Scaffold(
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = isAddGroupFabVisible,
+                enter = fadeIn(tween(500)),
+                exit = fadeOut(tween(500))
+            ) {
+                ExtendedFloatingActionButton(
+                    onClick = { isAddGroupBottomSheetVisible = true },
+                    icon = { Icon(Icons.Filled.Add, "Add Group FloatingActionButton") },
+                    text = { Text(text = stringResource(id = R.string.add_group)) }
+                )
+            }
+        }) { innerPadding ->
         Box(
             modifier = Modifier
-                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
                 .fillMaxSize()
                 .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) {

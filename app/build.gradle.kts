@@ -15,12 +15,12 @@ plugins {
 
 android {
     namespace = "app.tinygiants.getalife"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "app.tinygiants.getalife"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 6
         versionName = "Hatching 0.0.6"
 
