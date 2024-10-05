@@ -1,7 +1,7 @@
 [versions]
 
-kotlinVersion = "2.0.10"
-ksp-version = "2.0.10-1.0.24"
+kotlinVersion = "2.0.20"
+ksp-version = "2.0.20-1.0.24"
 android-gradle-plugin = "8.7.0"
 splashscreenVersion = "1.0.1"
 datetime = "0.6.1"
@@ -31,7 +31,8 @@ emoji2Emojipicker = "1.5.0"
 junit = "1.2.1"
 jUnit4Version = "4.13.2"
 uiTestJunit4 = "1.7.3"
-junit5Version = "5.10.2"
+mannOderMausJunit5 = "1.11.2.0"
+junit5Version = "5.11.1"
 coroutineTest = "1.8.1"
 flowTest = "1.1.0"
 assertk = "0.28.1"
@@ -124,3 +125,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics"}
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-version" }
+junit5-plugin = { id = "de.mannodermaus.android-junit5", version.ref = "mannOderMausJunit5" }
