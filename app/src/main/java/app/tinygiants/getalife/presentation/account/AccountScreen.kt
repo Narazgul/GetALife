@@ -6,8 +6,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -64,53 +69,59 @@ fun AccountScreen(
         onUserClickEvent(UserClickEvent.AddAccount(name = accountName, balance = startingBalance, type = type))
     }
 
-    Scaffold(floatingActionButton = {
-        AnimatedVisibility(
-            visible = areFabButtonsVisible,
-            enter = fadeIn(tween(500)),
-            exit = fadeOut(tween(500))
-        ) {
-            ExtendedFloatingActionButton(
-                onClick = { isAddAccountBottomSheetVisible = true },
-                icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
-                text = { Text(text = stringResource(id = R.string.add_account)) }
-            )
-        }
-    }) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
-        ) {
-            if (uiState.accounts.isEmpty() && !uiState.isLoading)
-                Image(
-                    painter = painterResource(id = R.drawable.bg_cactus),
-                    contentDescription = "No groups available",
-                    modifier = Modifier.fillMaxSize(),
-                    alignment = Alignment.BottomCenter
+    Column {
+        Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+
+        Scaffold(floatingActionButton = {
+            AnimatedVisibility(
+                visible = areFabButtonsVisible,
+                enter = fadeIn(tween(500)),
+                exit = fadeOut(tween(500))
+            ) {
+                ExtendedFloatingActionButton(
+                    onClick = { isAddAccountBottomSheetVisible = true },
+                    icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
+                    text = { Text(text = stringResource(id = R.string.add_account)) }
                 )
+            }
+        }) { innerPadding ->
+            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
 
-            AccountsList(
-                accounts = uiState.accounts,
-                onNavigateToTransactionScreen = onNavigateToTransactionScreen,
-                onUserScrolling = { isUserScrollingDown -> areFabButtonsVisible = isUserScrollingDown },
-                onUserClickEvent = onUserClickEvent
-            )
-            LoadingIndicator(
-                isLoading = uiState.isLoading,
-                errorMessage = uiState.errorMessage,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-            ErrorMessage(
-                errorMessage = uiState.errorMessage,
-                modifier = Modifier.align(Alignment.TopCenter)
+            Box(
+                modifier = Modifier
+                    .consumeWindowInsets(innerPadding)
+                    .fillMaxSize()
+            ) {
+                if (uiState.accounts.isEmpty() && !uiState.isLoading)
+                    Image(
+                        painter = painterResource(id = R.drawable.bg_cactus),
+                        contentDescription = "No groups available",
+                        modifier = Modifier.fillMaxSize(),
+                        alignment = Alignment.BottomCenter
+                    )
+
+                AccountsList(
+                    accounts = uiState.accounts,
+                    onNavigateToTransactionScreen = onNavigateToTransactionScreen,
+                    onUserScrolling = { isUserScrollingDown -> areFabButtonsVisible = isUserScrollingDown },
+                    onUserClickEvent = onUserClickEvent
+                )
+                LoadingIndicator(
+                    isLoading = uiState.isLoading,
+                    errorMessage = uiState.errorMessage,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+                ErrorMessage(
+                    errorMessage = uiState.errorMessage,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
+
+            if (isAddAccountBottomSheetVisible) AddAccountBottomSheet(
+                onConfirmClicked = onAddAccountClicked,
+                onDismissRequest = { isAddAccountBottomSheetVisible = false }
             )
         }
-
-        if (isAddAccountBottomSheetVisible) AddAccountBottomSheet(
-            onConfirmClicked = onAddAccountClicked,
-            onDismissRequest = { isAddAccountBottomSheetVisible = false }
-        )
     }
 }
 

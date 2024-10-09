@@ -8,10 +8,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -69,63 +73,67 @@ fun BudgetScreen(
     var isAddGroupFabVisible by rememberSaveable { mutableStateOf(true) }
     var isAddGroupBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = isAddGroupFabVisible,
-                enter = fadeIn(tween(500)),
-                exit = fadeOut(tween(500))
-            ) {
-                ExtendedFloatingActionButton(
-                    onClick = { isAddGroupBottomSheetVisible = true },
-                    icon = { Icon(Icons.Filled.Add, "Add Group FloatingActionButton") },
-                    text = { Text(text = stringResource(id = R.string.add_group)) }
-                )
-            }
-        }) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
-                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
-        ) {
-            Column(modifier = Modifier.align(Alignment.TopCenter)) {
+    Column {
+        Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
 
-                if (uiState.groups.isEmpty() && !uiState.isLoading)
-                    Image(
-                        painter = painterResource(id = R.drawable.bg_city),
-                        contentDescription = "No groups available",
-                        modifier = Modifier.fillMaxSize(),
-                        alignment = Alignment.BottomCenter
-                    )
-
+        Scaffold(
+            floatingActionButton = {
                 AnimatedVisibility(
-                    visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
-                    enter = fadeIn(tween(1500)),
-                    exit = fadeOut(tween(3000)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(spacing.default)
-                ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
+                    visible = isAddGroupFabVisible,
+                    enter = fadeIn(tween(500)),
+                    exit = fadeOut(tween(500))
+                ) {
+                    ExtendedFloatingActionButton(
+                        onClick = { isAddGroupBottomSheetVisible = true },
+                        icon = { Icon(Icons.Filled.Add, "Add Group FloatingActionButton") },
+                        text = { Text(text = stringResource(id = R.string.add_group)) }
+                    )
+                }
+            }) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .consumeWindowInsets(innerPadding)
+                    .fillMaxSize()
+                    .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
+            ) {
+                Column(modifier = Modifier.align(Alignment.TopCenter)) {
 
-                BudgetList(
-                    groups = uiState.groups,
+                    if (uiState.groups.isEmpty() && !uiState.isLoading)
+                        Image(
+                            painter = painterResource(id = R.drawable.bg_city),
+                            contentDescription = "No groups available",
+                            modifier = Modifier.fillMaxSize(),
+                            alignment = Alignment.BottomCenter
+                        )
+
+                    AnimatedVisibility(
+                        visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
+                        enter = fadeIn(tween(1500)),
+                        exit = fadeOut(tween(3000)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(spacing.default)
+                    ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
+
+                    BudgetList(
+                        groups = uiState.groups,
+                        isLoading = uiState.isLoading,
+                        errorMessage = uiState.errorMessage,
+                        onUserScrolling = { isUserScrollingDown -> isAddGroupFabVisible = isUserScrollingDown },
+                        onUserClickEvent = onUserClickEvent
+                    )
+                }
+                LoadingIndicator(
                     isLoading = uiState.isLoading,
                     errorMessage = uiState.errorMessage,
-                    onUserScrolling = { isUserScrollingDown -> isAddGroupFabVisible = isUserScrollingDown },
-                    onUserClickEvent = onUserClickEvent
+                    modifier = Modifier.align(Alignment.TopCenter)
                 )
-            }
-            LoadingIndicator(
-                isLoading = uiState.isLoading,
-                errorMessage = uiState.errorMessage,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-            ErrorMessage(
-                errorMessage = uiState.errorMessage,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+                ErrorMessage(
+                    errorMessage = uiState.errorMessage,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
 
+            }
         }
     }
 
