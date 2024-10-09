@@ -21,8 +21,8 @@ android {
         applicationId = "app.tinygiants.getalife"
         minSdk = 28
         targetSdk = 35
-        versionCode = 6
-        versionName = "Hatching 0.0.6"
+        versionCode = 7
+        versionName = "Hatching 0.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -56,9 +56,7 @@ android {
             firebaseAppDistribution { artifactType = "APK" }
 
             @Suppress("UnstableApiUsage")
-            vcsInfo {
-                include = true
-            }
+            vcsInfo { include = true }
         }
         release {
             isMinifyEnabled = true
