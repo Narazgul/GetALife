@@ -14,7 +14,7 @@ import app.tinygiants.getalife.domain.usecase.transaction.DeleteTransactionUseCa
 import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsForAccountUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.UpdateTransactionUseCase
 import app.tinygiants.getalife.presentation.UiText
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

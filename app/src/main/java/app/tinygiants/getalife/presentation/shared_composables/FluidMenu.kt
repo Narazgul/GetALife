@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.composables
+package app.tinygiants.getalife.presentation.shared_composables
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter

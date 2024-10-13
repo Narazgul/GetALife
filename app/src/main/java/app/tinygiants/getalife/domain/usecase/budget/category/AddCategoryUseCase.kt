@@ -3,7 +3,7 @@ package app.tinygiants.getalife.domain.usecase.budget.category
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.BudgetPurpose
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -11,14 +11,14 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 class AddCategoryUseCase @Inject constructor(
-    private val repository: BudgetRepository,
+    private val repository: CategoryRepository,
     private val addEmoji: AddEmojiToCategoryNameUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(headerId: Long, categoryName: String, isInitialCategory: Boolean = false) {
+    suspend operator fun invoke(groupId: Long, categoryName: String, isInitialCategory: Boolean = false) {
 
-        val categories = repository.getCategoriesByHeader(headerId = headerId)
+        val categories = repository.getCategoriesInGroup(groupId = groupId)
 
         val categoryEntity = withContext(defaultDispatcher) {
 
@@ -27,7 +27,7 @@ class AddCategoryUseCase @Inject constructor(
 
             CategoryEntity(
                 id = Random.nextLong(),
-                headerId = headerId,
+                groupId = groupId,
                 emoji = "",
                 name = categoryName,
                 budgetTarget = null,

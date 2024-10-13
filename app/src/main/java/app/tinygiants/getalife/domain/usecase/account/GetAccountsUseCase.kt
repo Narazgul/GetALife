@@ -1,44 +1,44 @@
 package app.tinygiants.getalife.domain.usecase.account
 
-import app.tinygiants.getalife.data.local.entities.AccountWithTransactionsEntity
+import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
+import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetAccountsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
+    private val transactionRepository: TransactionRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(): Flow<Result<List<Account>>> {
-        return flow {
-            accountRepository.getAccountsWithTransactionsFlow()
-                .catch { throwable -> emit(Result.failure(throwable)) }
-                .collect { result ->
-                    result.onSuccess { accountsWithTransactions -> emit(getAccounts(accountsWithTransactions)) }
-                    result.onFailure { throwable -> emit(Result.failure(throwable)) }
-                }
-        }
+    operator fun invoke(): Flow<Result<List<Account>>> = flow {
+        val accountsFlow = accountRepository.getAccountsFlow()
+        val transactionsFlow = transactionRepository.getTransactions()
+        accountsFlow.combine(transactionsFlow) { accounts, transactions -> getAccounts(accounts, transactions) }
+            .catch { throwable -> emit(Result.failure(throwable)) }
+            .collect { accounts -> emit(accounts) }
     }
 
-    private suspend fun getAccounts(accountsWithTransactions: List<AccountWithTransactionsEntity>): Result<List<Account>> {
+    private suspend fun getAccounts(accounts: List<AccountEntity>, transactions: List<TransactionEntity>): Result<List<Account>> {
         return Result.success(
             withContext(defaultDispatcher) {
-                accountsWithTransactions
-                    .sortedBy { it.account.listPosition }
-                    .mapIndexed { index, accountWithTransaction ->
+                accounts
+                    .sortedBy { account -> account.listPosition }
+                    .mapIndexed { index, account ->
 
-                        val (account, transactions) = accountWithTransaction
-                        val balance = calculateNetAmount(transactions)
+                        val transactionsForAccount = transactions.filter { transaction -> transaction.accountId == account.id }
+                        val balance = calculateNetAmount(transactionsForAccount)
 
                         Account(
                             id = account.id,

@@ -22,17 +22,16 @@ class GetTransactionsForAccountUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(accountId: Long): Flow<Result<List<Transaction>>> {
+    operator fun invoke(accountId: Long): Flow<Result<List<Transaction>>> {
         return combine(
-            flow = transactions.getTransactionsByAccountFlow(accountId = accountId),
+            flow = transactions.getTransactionsByAccount(accountId = accountId),
             flow2 = accounts(),
             flow3 = categories()
-        ) { transactionsResult, accountsResult, categoriesResult ->
-            val transactions = transactionsResult.getOrNull()
+        ) { transactions, accountsResult, categoriesResult ->
             val accounts = accountsResult.getOrNull()
             val categories = categoriesResult.getOrNull()
 
-            if (transactions.isNullOrEmpty()) Result.failure<Throwable>(Throwable("Transaction is null or empty"))
+            if (transactions.isEmpty()) Result.failure<Throwable>(Throwable("Transaction is empty"))
             if (accounts.isNullOrEmpty()) Result.failure<Throwable>(Throwable("Account is null or empty"))
             if (categories.isNullOrEmpty()) Result.failure<Throwable>(Throwable("Category is null or empty"))
 

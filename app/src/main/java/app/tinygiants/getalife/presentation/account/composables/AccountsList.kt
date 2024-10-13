@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.presentation.account.UserClickEvent
-import app.tinygiants.getalife.presentation.composables.isScrollingDown
+import app.tinygiants.getalife.presentation.shared_composables.isScrollingDown
 import app.tinygiants.getalife.theme.spacing
 
 @Composable

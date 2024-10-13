@@ -1,59 +1,58 @@
 package app.tinygiants.getalife.data.repository
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
-import app.tinygiants.getalife.data.local.entities.HeaderEntity
-import app.tinygiants.getalife.data.local.entities.HeaderWithCategoriesEntity
+import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.domain.model.BudgetPurpose
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class BudgetRepositoryFake : BudgetRepository {
+class CategoryRepositoryFake : CategoryRepository {
 
-    private val headersWithCategoriesEntity = mutableListOf<HeaderWithCategoriesEntity>()
+    private val headersWithCategoriesEntity = mutableListOf<GroupWithCategoriesEntity>()
 
-    override fun getBudgetFlow(): Flow<Result<List<HeaderWithCategoriesEntity>>> = flow {
+    override fun getBudgetFlow(): Flow<Result<List<GroupWithCategoriesEntity>>> = flow {
         headersWithCategoriesEntity
     }
 
-    override fun getCategoriesFlow(): Flow<Result<List<CategoryEntity>>> {
+    override fun getCategories(): Flow<Result<List<CategoryEntity>>> {
         return flow { emit(Result.success(headersWithCategoriesEntity.flatMap { it.categories })) }
     }
 
-    override suspend fun getCategoriesByHeader(headerId: Long): List<CategoryEntity> {
+    override suspend fun getCategoriesInGroup(groupId: Long): List<CategoryEntity> {
         val categories = mutableListOf<CategoryEntity>()
 
         headersWithCategoriesEntity.forEach { headerWithCategories ->
-            if (headerWithCategories.header.id == headerId) categories.addAll(headerWithCategories.categories)
+            if (headerWithCategories.header.id == groupId) categories.addAll(headerWithCategories.categories)
         }
 
         return categories
     }
 
-    override suspend fun addHeader(headerEntity: HeaderEntity) {
-        val entity = HeaderWithCategoriesEntity(header = headerEntity, categories = emptyList())
+    override suspend fun addHeader(groupEntity: GroupEntity) {
+        val entity = GroupWithCategoriesEntity(header = groupEntity, categories = emptyList())
         headersWithCategoriesEntity.add(entity)
     }
 
-    override suspend fun updateHeader(headerEntity: HeaderEntity) {
+    override suspend fun updateHeader(groupEntity: GroupEntity) {
         headersWithCategoriesEntity.forEachIndexed { index, headerWithCategories ->
-            if (headerWithCategories.header.id == headerEntity.id) {
-                val updatedHeaderWithCategories = headerWithCategories.copy(header = headerEntity)
+            if (headerWithCategories.header.id == groupEntity.id) {
+                val updatedHeaderWithCategories = headerWithCategories.copy(header = groupEntity)
                 headersWithCategoriesEntity[index] = updatedHeaderWithCategories
                 return@forEachIndexed
             }
         }
     }
 
-    override suspend fun deleteHeader(headerEntity: HeaderEntity) {
-        headersWithCategoriesEntity.removeAll { it.header.id == headerEntity.id }
+    override suspend fun deleteHeader(groupEntity: GroupEntity) {
+        headersWithCategoriesEntity.removeAll { it.header.id == groupEntity.id }
     }
 
     override suspend fun getCategory(categoryId: Long) = headersWithCategoriesEntity
             .flatMap { headersWithCategories -> headersWithCategories.categories }
             .find { category -> category.id == categoryId } ?: CategoryEntity(
                 id = 1L,
-                headerId = 1L,
+                groupId = 1L,
                 emoji = "",
                 name = "",
                 budgetPurpose = BudgetPurpose.Unknown,
@@ -66,7 +65,7 @@ class BudgetRepositoryFake : BudgetRepository {
             )
 
     override suspend fun addCategory(categoryEntity: CategoryEntity) {
-        val headerWithCategories = headersWithCategoriesEntity.find { it.header.id == categoryEntity.headerId }
+        val headerWithCategories = headersWithCategoriesEntity.find { it.header.id == categoryEntity.groupId }
         if (headerWithCategories != null) {
 
             val updatedCategories = headerWithCategories.categories.toMutableList()

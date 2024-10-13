@@ -1,118 +1,130 @@
 package app.tinygiants.getalife.domain.usecase.budget
 
-import app.tinygiants.getalife.data.local.entities.HeaderWithCategoriesEntity
+import app.tinygiants.getalife.data.local.entities.CategoryEntity
+import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.GroupRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 
 class GetBudgetUseCase @Inject constructor(
-    private val repository: BudgetRepository,
+    private val groupsRepository: GroupRepository,
+    private val categoryRepository: CategoryRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    operator fun invoke(): Flow<Result<Map<Header, List<Category>>>> {
+    operator fun invoke(): Flow<Result<Map<Group, List<Category>>>> {
         return flow {
-            repository.getBudgetFlow()
+            val groupsFlow = groupsRepository.getGroupsFlow()
+            val categoriesFlow = categoryRepository.getCategories()
+
+            groupsFlow.combine(categoriesFlow) { groups, categories ->
+                mapToHeadersWithCategories(
+                    groupEntities = groups,
+                    categoryEntities = categories
+                )
+            }
                 .catch { throwable -> emit(Result.failure(throwable)) }
-                .collect { result ->
-                    result.onSuccess { list -> emit(mapToGroups(list)) }
-                    result.onFailure { throwable -> emit(Result.failure(throwable)) }
-                }
+                .collect { groups -> emit(groups) }
         }
     }
 
-    private suspend fun mapToGroups(headersWithCategories: List<HeaderWithCategoriesEntity>) =
+    private suspend fun mapToHeadersWithCategories(groupEntities: List<GroupEntity>, categoryEntities: List<CategoryEntity>) =
         Result.success(
             withContext(defaultDispatcher) {
 
-                headersWithCategories
-                    .sortedBy { headerWithCategory -> headerWithCategory.header.listPosition }
-                    .mapIndexed { index, headerWithCategoriesEntity ->
+                val groupedCategories = categoryEntities.groupBy { category -> category.groupId }
+                val unsortedGroups = groupEntities.associateWith { groupEntity ->
+                    groupedCategories[groupEntity.id]
+                        ?.sortedBy { it.listPosition }
+                        ?: emptyList()
+                }
+                val sortedGroups = unsortedGroups.toSortedMap(compareBy { groupEntity -> groupEntity.listPosition })
 
-                        val header =
-                            mapToHeader(headerWithCategory = headerWithCategoriesEntity, newListPosition = index)
-                        val categories = mapToCategories(headerWithCategory = headerWithCategoriesEntity)
+                sortedGroups.map { grouped ->
 
-                        header to categories
-                    }
-                    .toMap()
+                    val header = mapToHeader(group = grouped.key, categories = grouped.value)
+                    val categories = mapToCategories(categories = grouped.value)
+
+                    header to categories
+                }.toMap()
             }
         )
 
-    private fun mapToHeader(headerWithCategory: HeaderWithCategoriesEntity, newListPosition: Int): Header {
+    private fun mapToHeader(group: GroupEntity, categories: List<CategoryEntity>): Group {
 
-        val header = headerWithCategory.header
-        val sumOfAvailableMoneyInCategory =
-            headerWithCategory.categories.sumOf { category -> category.availableMoney }
+        val sumOfAvailableMoneyInCategory = categories.sumOf { category -> category.availableMoney }
 
-        return Header(
-            id = header.id,
-            name = header.name,
+        return Group(
+            id = group.id,
+            name = group.name,
             sumOfAvailableMoney = Money(value = sumOfAvailableMoneyInCategory),
-            listPosition = newListPosition,
-            isExpanded = header.isExpanded
+            listPosition = group.listPosition,
+            isExpanded = group.isExpanded
         )
     }
 
-    private fun mapToCategories(headerWithCategory: HeaderWithCategoriesEntity): List<Category> {
-        val header = headerWithCategory.header
+    private fun mapToCategories(categories: List<CategoryEntity>): List<Category> {
+        return categories.mapIndexed { index, categoryEntity ->
 
-        return headerWithCategory.categories
-            .sortedBy { category -> category.listPosition }
-            .mapIndexed { index, categoryEntity ->
+            val progress = getProgress(
+                budgetPurpose = categoryEntity.budgetPurpose,
+                budgetTarget = categoryEntity.budgetTarget,
+                assignedMoney = categoryEntity.assignedMoney,
+                availableMoney = categoryEntity.availableMoney
+            )
+            val spentProgress = getSpentProgress(
+                budgetPurpose = categoryEntity.budgetPurpose,
+                availableMoney = categoryEntity.availableMoney,
+                assignedMoney = categoryEntity.assignedMoney
+            )
+            val overspentProgress = getOverspentProgress(
+                availableMoney = categoryEntity.availableMoney,
+                assignedMoney = categoryEntity.assignedMoney
+            )
+            val budgetTargetProgress = getBudgetTargetProgress(
+                budgetTarget = categoryEntity.budgetTarget,
+                availableMoney = categoryEntity.availableMoney,
+                assignedMoney = categoryEntity.assignedMoney
+            )
 
-                val progress = getProgress(
-                    budgetPurpose = categoryEntity.budgetPurpose,
-                    budgetTarget = categoryEntity.budgetTarget,
-                    assignedMoney = categoryEntity.assignedMoney,
-                    availableMoney = categoryEntity.availableMoney
-                )
-                val spentProgress = getSpentProgress(
-                    budgetPurpose = categoryEntity.budgetPurpose,
-                    availableMoney = categoryEntity.availableMoney,
-                    assignedMoney = categoryEntity.assignedMoney
-                )
-                val overspentProgress = getOverspentProgress(
-                    availableMoney = categoryEntity.availableMoney,
-                    assignedMoney = categoryEntity.assignedMoney
-                )
-                val budgetTargetProgress = getBudgetTargetProgress(
-                    budgetTarget = categoryEntity.budgetTarget,
-                    availableMoney = categoryEntity.availableMoney,
-                    assignedMoney = categoryEntity.assignedMoney
-                )
-
-                Category(
-                    id = categoryEntity.id,
-                    headerId = header.id,
-                    emoji = categoryEntity.emoji,
-                    name = categoryEntity.name,
-                    budgetTarget = if (categoryEntity.budgetTarget != null) Money(value = categoryEntity.budgetTarget) else null,
-                    budgetPurpose = categoryEntity.budgetPurpose,
-                    assignedMoney = Money(value = categoryEntity.assignedMoney),
-                    availableMoney = Money(value = categoryEntity.availableMoney),
-                    progress = progress,
-                    spentProgress = spentProgress,
-                    overspentProgress = overspentProgress,
-                    budgetTargetProgress = budgetTargetProgress,
-                    optionalText = categoryEntity.optionalText,
-                    listPosition = index,
-                    isInitialCategory = categoryEntity.isInitialCategory
-                )
-            }
+            Category(
+                id = categoryEntity.id,
+                groupId = categoryEntity.groupId,
+                emoji = categoryEntity.emoji,
+                name = categoryEntity.name,
+                budgetTarget = Money(value = categoryEntity.budgetTarget ?: 0.0),
+                budgetPurpose = categoryEntity.budgetPurpose,
+                assignedMoney = Money(value = categoryEntity.assignedMoney),
+                availableMoney = Money(value = categoryEntity.availableMoney),
+                progress = progress,
+                spentProgress = spentProgress,
+                overspentProgress = overspentProgress,
+                budgetTargetProgress = budgetTargetProgress,
+                optionalText = categoryEntity.optionalText,
+                listPosition = index,
+                isInitialCategory = categoryEntity.isInitialCategory
+            )
+        }
     }
 
-    private fun getProgress(budgetPurpose: BudgetPurpose, budgetTarget: Double?, assignedMoney: Double, availableMoney: Double): Float {
+    private fun getProgress(
+        budgetPurpose: BudgetPurpose,
+        budgetTarget: Double?,
+        assignedMoney: Double,
+        availableMoney: Double
+    ): Float {
 
         fun calculateSpendingProgress() =
             when {

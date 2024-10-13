@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.data.remote.firebase.dto
 
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.domain.model.Group
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
@@ -50,7 +50,7 @@ class FirebaseRemoteDataSource @Inject constructor() {
         reference.update(firestoreBudgetName, name)
     }
 
-    fun addCategoryGroup(budgetList: Map<Header, List<Category>>) {
+    fun addCategoryGroup(budgetList: Map<Group, List<Category>>) {
         var headerPosition = 0
 
         val categoryGroup = budgetList.map { (header, items) ->
@@ -80,7 +80,7 @@ class FirebaseRemoteDataSource @Inject constructor() {
         reference.update("$firestoreCategories.$headerId.$firestoreName", name)
     }
 
-    fun addCategory(budgetList: Map<Header, List<Category>>) {
+    fun addCategory(budgetList: Map<Group, List<Category>>) {
         var headerPosition = 0
 
         val categoryGroup = budgetList.map { (header, items) ->

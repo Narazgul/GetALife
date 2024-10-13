@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "headers")
-data class HeaderEntity(
+data class GroupEntity(
     @PrimaryKey
     val id: Long,
     val budgetId: Long = 0,

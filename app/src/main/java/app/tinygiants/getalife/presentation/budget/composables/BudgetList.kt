@@ -25,14 +25,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.budget.composables.category.Category
 import app.tinygiants.getalife.presentation.budget.composables.category.EmptyCategoryItem
 import app.tinygiants.getalife.presentation.budget.fakeCategories
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
-import app.tinygiants.getalife.presentation.composables.isScrollingDown
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.isScrollingDown
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -42,7 +42,7 @@ const val ANIMATION_TIME_300_MILLISECONDS = 300
 
 @Composable
 fun BudgetList(
-    groups: Map<Header, List<Category>>,
+    groups: Map<Group, List<Category>>,
     isLoading: Boolean,
     errorMessage: ErrorMessage?,
     onUserClickEvent: (UserClickEvent) -> Unit,
@@ -64,12 +64,12 @@ fun BudgetList(
             groups.forEach { (header, items) ->
 
                 stickyHeader(
-                    header = header,
+                    group = header,
                     onUserClickEvent = onUserClickEvent
                 )
 
                 items(
-                    header = header,
+                    group = header,
                     categories = items,
                     onUserClickEvent = onUserClickEvent
                 )
@@ -82,32 +82,32 @@ fun BudgetList(
 
 @OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.stickyHeader(
-    header: Header,
+    group: Group,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
     val onHeaderClicked =
-        { onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(isExpanded = !header.isExpanded))) }
+        { onUserClickEvent(UserClickEvent.UpdateHeader(group = group.copy(isExpanded = !group.isExpanded))) }
 
     val onUpdateHeaderNameClicked =
-        { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateHeader(header = header.copy(name = updatedCategoryName))) }
+        { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateHeader(group = group.copy(name = updatedCategoryName))) }
 
-    val onDeleteHeaderClicked = { onUserClickEvent(UserClickEvent.DeleteHeader(header = header)) }
+    val onDeleteHeaderClicked = { onUserClickEvent(UserClickEvent.DeleteHeader(group = group)) }
 
     val onAddCategoryClicked =
         { categoryName: String ->
             onUserClickEvent(
                 UserClickEvent.AddCategory(
-                    headerId = header.id,
+                    groupId = group.id,
                     categoryName = categoryName
                 )
             )
         }
 
-    stickyHeader(key = header.id) {
+    stickyHeader(key = group.id) {
         Header(
-            name = header.name,
-            sumOfAvailableMoney = header.sumOfAvailableMoney,
-            isExpanded = header.isExpanded,
+            name = group.name,
+            sumOfAvailableMoney = group.sumOfAvailableMoney,
+            isExpanded = group.isExpanded,
             onHeaderClicked = onHeaderClicked,
             onUpdateHeaderNameClicked = onUpdateHeaderNameClicked,
             onDeleteHeaderClicked = onDeleteHeaderClicked,
@@ -118,7 +118,7 @@ private fun LazyListScope.stickyHeader(
 }
 
 private fun LazyListScope.items(
-    header: Header,
+    group: Group,
     categories: List<Category>,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
@@ -153,7 +153,7 @@ private fun LazyListScope.items(
         val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category)) }
 
         AnimatedVisibility(
-            visible = header.isExpanded,
+            visible = group.isExpanded,
             enter = fadeIn(animationSpec = tween(ANIMATION_TIME_1_SECOND)) +
                     expandVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),

@@ -4,14 +4,14 @@ import android.util.Log
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Gemini
 import app.tinygiants.getalife.domain.repository.AiRepository
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import javax.inject.Inject
 
 class AddEmojiToCategoryNameUseCase @Inject constructor(
     @Gemini private val aiRepository: AiRepository,
-    private val repository: BudgetRepository) {
+    private val repository: CategoryRepository) {
 
     suspend operator fun invoke(categoryEntity: CategoryEntity) {
 

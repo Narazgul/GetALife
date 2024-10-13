@@ -14,7 +14,7 @@ import kotlinx.datetime.Instant
 interface TransactionDao {
 
     @Query("SELECT * FROM transactions")
-    fun getAllTransactionsFlow(): Flow<List<TransactionEntity>>
+    fun getAllTransactions(): Flow<List<TransactionEntity>>
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE accountId == :accountId")
@@ -23,14 +23,6 @@ interface TransactionDao {
     @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId == :categoryId")
     fun getCategoryTransactionsFlow(categoryId: Long): Flow<List<TransactionEntity>>
-
-    @Transaction
-    @Query("SELECT * FROM transactions WHERE accountId == :accountId")
-    suspend fun getAccountTransactions(accountId: Long): List<TransactionEntity>
-
-    @Transaction
-    @Query("SELECT * FROM transactions WHERE accountId == :accountId AND timestamp >= :startTime AND timestamp <= :endTime")
-    suspend fun getAccountTransactions(accountId: Long, startTime: Instant, endTime: Instant): List<TransactionEntity>
 
     @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId == :categoryId")

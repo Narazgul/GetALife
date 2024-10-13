@@ -7,14 +7,13 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import app.tinygiants.getalife.data.local.dao.AccountsDao
-import app.tinygiants.getalife.data.local.dao.BudgetDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
-import app.tinygiants.getalife.data.local.dao.HeaderDao
+import app.tinygiants.getalife.data.local.dao.GroupDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
-import app.tinygiants.getalife.data.local.entities.HeaderEntity
+import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.BudgetPurpose
@@ -23,7 +22,7 @@ import kotlinx.datetime.Instant
 @Database(
     entities = [
         BudgetEntity::class,
-        HeaderEntity::class,
+        GroupEntity::class,
         CategoryEntity::class,
         AccountEntity::class,
         TransactionEntity::class
@@ -34,8 +33,7 @@ import kotlinx.datetime.Instant
 @TypeConverters(Converters::class)
 abstract class GetALifeDatabase : RoomDatabase() {
 
-    abstract fun budgetDao(): BudgetDao
-    abstract fun headerDao(): HeaderDao
+    abstract fun headerDao(): GroupDao
     abstract fun categoryDao(): CategoryDao
     abstract fun accountsDao(): AccountsDao
     abstract fun transactionDao(): TransactionDao

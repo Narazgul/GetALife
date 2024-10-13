@@ -41,13 +41,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.composables.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
-import app.tinygiants.getalife.presentation.composables.LoadingIndicator
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.ScreenPreview
 import app.tinygiants.getalife.theme.spacing
@@ -168,7 +168,7 @@ class BudgetScreenPreviewProvider : PreviewParameterProvider<BudgetUiState> {
 }
 
 fun fakeCategories() = mapOf(
-    Header(
+    Group(
         id = 0,
         name = "Fixed Costs",
         sumOfAvailableMoney = Money(value = 1015.00),
@@ -177,7 +177,7 @@ fun fakeCategories() = mapOf(
     ) to listOf(
         Category(
             id = 1,
-            headerId = 0,
+            groupId = 0,
             emoji = "🏠",
             name = "Rent",
             budgetTarget = Money(value = 1000.00),
@@ -194,7 +194,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 2,
-            headerId = 0,
+            groupId = 0,
             emoji = "🏥",
             name = "Barmenia",
             budgetTarget = Money(value = 28.55),
@@ -211,7 +211,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 3,
-            headerId = 0,
+            groupId = 0,
             emoji = "📱",
             name = "Fraenk",
             budgetTarget = Money(value = 10.00),
@@ -228,7 +228,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 4,
-            headerId = 0,
+            groupId = 0,
             emoji = "▶️",
             name = "YouTube Premium",
             budgetTarget = Money(value = 7.49),
@@ -245,7 +245,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 5,
-            headerId = 0,
+            groupId = 0,
             emoji = "🏋",
             name = "Gym",
             budgetTarget = Money(value = 29.00),
@@ -262,7 +262,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 6,
-            headerId = 0,
+            groupId = 0,
             emoji = "🍿",
             name = "Netflix",
             budgetTarget = Money(value = 9.00),
@@ -278,7 +278,7 @@ fun fakeCategories() = mapOf(
             isInitialCategory = false
         )
     ),
-    Header(
+    Group(
         id = 100,
         name = "Daily Life",
         sumOfAvailableMoney = Money(value = 210.0),
@@ -287,7 +287,7 @@ fun fakeCategories() = mapOf(
     ) to listOf(
         Category(
             id = 101,
-            headerId = 4,
+            groupId = 4,
             emoji = "🛒",
             name = "Groceries",
             budgetTarget = Money(value = 100.00),
@@ -304,7 +304,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 102,
-            headerId = 4,
+            groupId = 4,
             emoji = "🚌",
             name = "Transportation",
             budgetTarget = Money(value = 50.00),
@@ -321,7 +321,7 @@ fun fakeCategories() = mapOf(
         ),
         Category(
             id = 103,
-            headerId = 4,
+            groupId = 4,
             emoji = "🍽",
             name = "Eating Out",
             budgetTarget = Money(value = 60.00),
@@ -337,7 +337,7 @@ fun fakeCategories() = mapOf(
             isInitialCategory = false
         )
     ),
-    Header(
+    Group(
         id = 200,
         name = "Daily Life",
         sumOfAvailableMoney = Money(value = 0.0),
@@ -348,7 +348,7 @@ fun fakeCategories() = mapOf(
             id = 201,
             emoji = "",
             name = "Jetzt Kategorie hinzufügen",
-            headerId = 8,
+            groupId = 8,
             budgetTarget = Money(value = 60.00),
             budgetPurpose = BudgetPurpose.Unknown,
             assignedMoney = Money(value = 60.00),
@@ -362,7 +362,7 @@ fun fakeCategories() = mapOf(
             isInitialCategory = true
         )
     ),
-    Header(
+    Group(
         id = 300,
         name = "Goals",
         sumOfAvailableMoney = Money(value = 0.0),

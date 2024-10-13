@@ -1,7 +1,6 @@
 package app.tinygiants.getalife.data.local.dao
 
 import app.tinygiants.getalife.data.local.entities.AccountEntity
-import app.tinygiants.getalife.data.local.entities.AccountWithTransactionsEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.TransactionDirection
@@ -37,7 +36,7 @@ class AccountsDaoFake : AccountsDao {
         )
     }
 
-    override fun getAccountsFlow(): Flow<List<AccountEntity>> = flow { emit(accounts) }
+    override fun getAccounts(): Flow<List<AccountEntity>> = flow { emit(accounts) }
 
     override suspend fun getAccounts(): List<AccountEntity> = accounts
 

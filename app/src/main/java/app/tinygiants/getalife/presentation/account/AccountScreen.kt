@@ -39,8 +39,8 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.account.composables.AccountsList
 import app.tinygiants.getalife.presentation.account.composables.AddAccountBottomSheet
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
-import app.tinygiants.getalife.presentation.composables.LoadingIndicator
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Composable

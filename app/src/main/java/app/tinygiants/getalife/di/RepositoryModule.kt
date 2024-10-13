@@ -1,10 +1,12 @@
 package app.tinygiants.getalife.di
 
 import app.tinygiants.getalife.data.repository.AccountsRepositoryImpl
-import app.tinygiants.getalife.data.repository.BudgetRepositoryImpl
+import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
+import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
 import app.tinygiants.getalife.domain.repository.AccountRepository
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import dagger.Binds
 import dagger.Module
@@ -16,7 +18,10 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryModule {
 
     @Binds
-    abstract fun provideBudgetRepository(budgetRepositoryImpl: BudgetRepositoryImpl): BudgetRepository
+    abstract fun provideGroupRepository(groupRepositoryImpl: GroupRepositoryImpl): GroupRepository
+
+    @Binds
+    abstract fun provideCategoryRepository(categoryRepositoryImpl: CategoryRepositoryImpl): CategoryRepository
 
     @Binds
     abstract fun provideAccountRepository(accountsRepositoryImpl: AccountsRepositoryImpl): AccountRepository

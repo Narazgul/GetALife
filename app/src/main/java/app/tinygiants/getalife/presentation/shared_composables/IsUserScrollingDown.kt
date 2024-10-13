@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.composables
+package app.tinygiants.getalife.presentation.shared_composables
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -10,8 +10,10 @@ import androidx.compose.runtime.setValue
 
 @Composable
 fun LazyListState.isScrollingDown(): Boolean {
+
     var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
     var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
+
     return remember(this) {
         derivedStateOf {
             if (previousIndex != firstVisibleItemIndex) {

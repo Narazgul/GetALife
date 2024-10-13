@@ -8,7 +8,7 @@ import app.tinygiants.getalife.domain.model.BudgetPurpose
 data class CategoryEntity(
     @PrimaryKey
     val id: Long,
-    val headerId: Long,
+    val groupId: Long,
     val emoji: String,
     val name: String,
     val budgetTarget: Double?,

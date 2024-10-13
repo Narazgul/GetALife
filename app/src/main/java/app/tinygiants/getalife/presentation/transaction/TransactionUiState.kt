@@ -3,7 +3,7 @@ package app.tinygiants.getalife.presentation.transaction
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Transaction
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 
 data class TransactionUiState(
     val title: String,

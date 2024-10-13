@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.composables
+package app.tinygiants.getalife.presentation.shared_composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.padding

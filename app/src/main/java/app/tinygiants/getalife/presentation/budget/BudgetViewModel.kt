@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Header
+import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.usecase.account.GetAssignableMoneySumUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetBudgetUseCase
@@ -12,9 +12,9 @@ import app.tinygiants.getalife.domain.usecase.budget.category.AddCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.category.DeleteCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.category.UpdateAssignedMoneyUseCase
 import app.tinygiants.getalife.domain.usecase.budget.category.UpdateCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.budget.header.AddHeaderUseCase
-import app.tinygiants.getalife.domain.usecase.budget.header.DeleteHeaderUseCase
-import app.tinygiants.getalife.domain.usecase.budget.header.UpdateHeaderUseCase
+import app.tinygiants.getalife.domain.usecase.budget.group.AddGroupUseCase
+import app.tinygiants.getalife.domain.usecase.budget.group.DeleteHeaderUseCase
+import app.tinygiants.getalife.domain.usecase.budget.group.UpdateGroupUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddGroup
@@ -23,7 +23,7 @@ import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteHeader
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateAssignedMoney
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateHeader
-import app.tinygiants.getalife.presentation.composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,9 +36,9 @@ import javax.inject.Inject
 class BudgetViewModel @Inject constructor(
     private val getBudget: GetBudgetUseCase,
     private val getAssignableMoney: GetAssignableMoneySumUseCase,
-    private val addHeader: AddHeaderUseCase,
-    private val updateHeader: UpdateHeaderUseCase,
-    private val deleteHeader: DeleteHeaderUseCase,
+    private val addGroup: AddGroupUseCase,
+    private val updateGroup: UpdateGroupUseCase,
+    private val deleteGroup: DeleteHeaderUseCase,
     private val addCategory: AddCategoryUseCase,
     private val updateAssignedMoney: UpdateAssignedMoneyUseCase,
     private val updateCategory: UpdateCategoryUseCase,
@@ -92,11 +92,11 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch {
             when (clickEvent) {
 
-                is AddGroup -> addHeader(headerName = clickEvent.name)
-                is UpdateHeader -> updateHeader(header = clickEvent.header)
-                is DeleteHeader -> deleteHeader(header = clickEvent.header)
+                is AddGroup -> addGroup(groupName = clickEvent.name)
+                is UpdateHeader -> updateGroup(group = clickEvent.group)
+                is DeleteHeader -> deleteGroup(group = clickEvent.group)
 
-                is AddCategory -> addCategory(headerId = clickEvent.headerId, categoryName = clickEvent.categoryName)
+                is AddCategory -> addCategory(groupId = clickEvent.groupId, categoryName = clickEvent.categoryName)
                 is UpdateAssignedMoney -> updateAssignedMoney(
                     category = clickEvent.category,
                     newAssignedMoney = clickEvent.newAssignedMoney
@@ -112,7 +112,7 @@ class BudgetViewModel @Inject constructor(
 
     // region Private Helper functions
 
-    private fun displayBudgetList(groups: Map<Header, List<Category>>) {
+    private fun displayBudgetList(groups: Map<Group, List<Category>>) {
         _uiState.update { budgetUiState ->
             budgetUiState.copy(
                 groups = groups,

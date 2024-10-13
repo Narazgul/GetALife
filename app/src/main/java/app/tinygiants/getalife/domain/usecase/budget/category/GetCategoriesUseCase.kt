@@ -4,7 +4,7 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -13,18 +13,15 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetCategoriesUseCase @Inject constructor(
-    private val repository: BudgetRepository,
+    private val repository: CategoryRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(): Flow<Result<List<Category>>> {
+    operator fun invoke(): Flow<Result<List<Category>>> {
         return flow {
-            repository.getCategoriesFlow()
+            repository.getCategories()
                 .catch { throwable -> emit(Result.failure(throwable)) }
-                .collect { result ->
-                    result.onFailure { throwable -> emit(Result.failure(throwable)) }
-                    result.onSuccess { categoryEntities -> emit(Result.success(mapToCategory(categoryEntities = categoryEntities))) }
-                }
+                .collect { categoryEntities -> emit(Result.success(mapToCategory(categoryEntities = categoryEntities))) }
         }
     }
 
@@ -37,7 +34,7 @@ class GetCategoriesUseCase @Inject constructor(
 
                 Category(
                     id = categoryEntity.id,
-                    headerId = categoryEntity.headerId,
+                    groupId = categoryEntity.groupId,
                     emoji = categoryEntity.emoji,
                     name = categoryEntity.name,
                     budgetTarget = Money(value = categoryEntity.budgetTarget ?: 0.00),
