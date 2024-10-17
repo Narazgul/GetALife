@@ -15,7 +15,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
 
 @Module
@@ -61,35 +60,7 @@ object AppModule {
     fun provideChatGPT(openAi: OpenAI): AiRepository = ChatGptAi(openAi = openAi)
 
     // endregion
-
-    // region Dispatchers
-
-    @Main
-    @Provides
-    fun provideMainDispatcher() = Dispatchers.Main
-
-    @Io
-    @Provides
-    fun provideIoDispatcher() = Dispatchers.IO
-
-    @Default
-    @Provides
-    fun provideDefaultDispatcher() = Dispatchers.Default
-
-    // endregion
 }
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class Main
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class Io
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class Default
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

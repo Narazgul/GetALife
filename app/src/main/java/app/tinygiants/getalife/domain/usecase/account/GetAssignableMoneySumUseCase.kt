@@ -20,7 +20,7 @@ class GetAssignableMoneySumUseCase @Inject constructor(
 
     operator fun invoke(): Flow<Result<Money>> {
         return combine(
-            flow = categoryRepository.getCategories(),
+            flow = categoryRepository.getCategoriesFlow(),
             flow2 = getAccounts()
         ) { categories, accountsResult ->
 

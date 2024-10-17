@@ -6,12 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import app.tinygiants.getalife.data.local.dao.AccountsDao
+import app.tinygiants.getalife.data.local.dao.AccountDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.dao.GroupDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.local.entities.AccountEntity
-import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
@@ -21,7 +20,6 @@ import kotlinx.datetime.Instant
 
 @Database(
     entities = [
-        BudgetEntity::class,
         GroupEntity::class,
         CategoryEntity::class,
         AccountEntity::class,
@@ -35,7 +33,7 @@ abstract class GetALifeDatabase : RoomDatabase() {
 
     abstract fun headerDao(): GroupDao
     abstract fun categoryDao(): CategoryDao
-    abstract fun accountsDao(): AccountsDao
+    abstract fun accountsDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
 
     companion object {

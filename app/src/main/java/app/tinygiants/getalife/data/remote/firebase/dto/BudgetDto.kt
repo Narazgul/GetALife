@@ -27,38 +27,3 @@ data class CategoryDto(
     @ServerTimestamp val createdAt: Timestamp? = null,
     @ServerTimestamp val updatedAt: Timestamp? = null
 )
-
-//fun BudgetDto?.toBudgetListElement(): Result<List<Group>> {
-//    return try {
-//        val budgetDto = this ?: return Result.success(emptyList())
-//
-//        val sortedCategoryGroups = budgetDto.categories
-//            ?.toList()
-//            ?.sortedBy { it.second.position ?: Int.MIN_VALUE }
-//            ?.toMap()
-//
-//        val budgetList = mutableListOf<Group>()
-//
-//        sortedCategoryGroups?.forEach { (_, groupDto) ->
-//
-//            val header = groupDto.toHeader()
-//            val items = groupDto.items?.values
-//                ?.toList()
-//                ?.sortedBy { categoryDto -> categoryDto.position }
-//                ?.map { categoryDto ->  categoryDto.toCategory() }
-//                .orEmpty()
-//
-//            val group = Group(
-//                id = 0,
-//                header = header,
-//                items = items,
-//            )
-//
-//            budgetList.add(element = group)
-//        }
-//
-//        Result.success(budgetList)
-//    } catch (exception: Exception) {
-//        Result.failure(exception)
-//    }
-//}

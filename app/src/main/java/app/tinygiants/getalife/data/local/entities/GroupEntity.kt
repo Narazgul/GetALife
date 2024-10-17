@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 data class GroupEntity(
     @PrimaryKey
     val id: Long,
-    val budgetId: Long = 0,
     val name: String,
     val listPosition: Int,
     val isExpanded: Boolean

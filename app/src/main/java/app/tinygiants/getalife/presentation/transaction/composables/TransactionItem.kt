@@ -37,7 +37,7 @@ fun TransactionItem(
     onUpdateTransactionClicked: (transaction: Transaction) -> Unit = {},
     onDeleteTransactionClicked: () -> Unit = {}
 
-    ) {
+) {
     var isUpdateTransactionBottomSheetVisible by remember { mutableStateOf(false) }
 
     Row(
@@ -86,7 +86,7 @@ private fun TransactionItemPreview() {
                 transaction = Transaction(
                     id = 0,
                     amount = Money(value = -3.20),
-                    account = Account(-1, "", Money(0.00), AccountType.Unknown, 0),
+                    account = Account(-1, "", Money(0.00), AccountType.Unknown, 0, Clock.System.now(), Clock.System.now()),
                     category = null,
                     transactionPartner = "Wimmer",
                     direction = TransactionDirection.Outflow,

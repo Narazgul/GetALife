@@ -19,7 +19,7 @@ class GetCategoriesUseCase @Inject constructor(
 
     operator fun invoke(): Flow<Result<List<Category>>> {
         return flow {
-            repository.getCategories()
+            repository.getCategoriesFlow()
                 .catch { throwable -> emit(Result.failure(throwable)) }
                 .collect { categoryEntities -> emit(Result.success(mapToCategory(categoryEntities = categoryEntities))) }
         }

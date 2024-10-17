@@ -27,7 +27,7 @@ class GetBudgetUseCase @Inject constructor(
     operator fun invoke(): Flow<Result<Map<Group, List<Category>>>> {
         return flow {
             val groupsFlow = groupsRepository.getGroupsFlow()
-            val categoriesFlow = categoryRepository.getCategories()
+            val categoriesFlow = categoryRepository.getCategoriesFlow()
 
             groupsFlow.combine(categoriesFlow) { groups, categories ->
                 mapToHeadersWithCategories(

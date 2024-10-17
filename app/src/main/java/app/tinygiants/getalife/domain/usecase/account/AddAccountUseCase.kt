@@ -9,6 +9,7 @@ import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -33,7 +34,9 @@ class AddAccountUseCase @Inject constructor(
                 name = name,
                 balance = 0.0,
                 type = type,
-                listPosition = endOfListPosition
+                listPosition = endOfListPosition,
+                updatedAt = Clock.System.now(),
+                createdAt = Clock.System.now()
             )
         }
 

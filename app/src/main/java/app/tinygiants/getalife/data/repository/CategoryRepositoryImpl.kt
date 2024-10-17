@@ -8,8 +8,8 @@ import javax.inject.Inject
 
 class CategoryRepositoryImpl @Inject constructor(private val categoryDao: CategoryDao) : CategoryRepository {
 
-    override fun getCategories(): Flow<List<CategoryEntity>> = categoryDao.getCategories()
-    override suspend fun getCategoriesInGroup(groupId: Long) = categoryDao.getCategoryInGroup(groupId = groupId)
+    override fun getCategoriesFlow(): Flow<List<CategoryEntity>> = categoryDao.getCategoriesFlow()
+    override suspend fun getCategoriesInGroup(groupId: Long) = categoryDao.getCategoriesInGroup(groupId = groupId)
     override suspend fun addCategory(categoryEntity: CategoryEntity) { categoryDao.addCategory(categoryEntity = categoryEntity) }
     override suspend fun updateCategory(categoryEntity: CategoryEntity) { categoryDao.updateCategory(categoryEntity) }
     override suspend fun deleteCategory(categoryEntity: CategoryEntity) { categoryDao.deleteCategory(categoryEntity) }

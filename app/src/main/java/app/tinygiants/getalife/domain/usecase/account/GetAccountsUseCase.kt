@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class GetAccountsUseCase @Inject constructor(
@@ -45,7 +46,9 @@ class GetAccountsUseCase @Inject constructor(
                             name = account.name,
                             balance = Money(balance),
                             type = account.type,
-                            listPosition = index
+                            listPosition = index,
+                            updatedAt = Clock.System.now(),
+                            createdAt = Clock.System.now()
                         )
                     }
             }

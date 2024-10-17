@@ -12,7 +12,7 @@ class ChatGptAi @Inject constructor(private val openAi: OpenAI) : AiRepository {
 
     override suspend fun generateEmojiBy(tag: String): Result<String?> {
 
-        val prompt = "$tag one Emoji Unicode. Answer in one row and without whitespaces. Unicode only!"
+        val prompt = "Return one Emoji for this tag: $tag"
         val chatCompletionRequest = ChatCompletionRequest(
             model = ModelId("gpt-3.5-turbo-0125"),
             messages = listOf(

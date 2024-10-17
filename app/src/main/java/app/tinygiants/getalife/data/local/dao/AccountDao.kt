@@ -10,7 +10,7 @@ import app.tinygiants.getalife.data.local.entities.AccountEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface AccountsDao {
+interface AccountDao {
 
     @Transaction
     @Query("SELECT * FROM accounts")

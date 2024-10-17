@@ -3,6 +3,7 @@ package app.tinygiants.getalife.data.local.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.BudgetPurpose
+import kotlinx.datetime.Instant
 
 @Entity(tableName = "categories")
 data class CategoryEntity(
@@ -17,5 +18,7 @@ data class CategoryEntity(
     val availableMoney: Double,
     val optionalText: String,
     val listPosition: Int,
-    val isInitialCategory: Boolean
+    val isInitialCategory: Boolean,
+    val updatedAt: Instant,
+    val createdAt: Instant
 )

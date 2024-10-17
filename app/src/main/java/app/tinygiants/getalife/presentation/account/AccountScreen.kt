@@ -42,6 +42,7 @@ import app.tinygiants.getalife.presentation.account.composables.AddAccountBottom
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
+import kotlinx.datetime.Clock
 
 @Composable
 fun AccountScreen(onNavigateToTransactionScreen: (accountId: Long) -> Unit) {
@@ -143,19 +144,31 @@ fun AccountScreenPreview() {
 }
 
 fun accounts() = listOf(
-    Account(id = 1L, name = "Cash", balance = Money(value = 0.00), type = AccountType.Cash, listPosition = 0),
+    Account(
+        id = 1L,
+        name = "Cash",
+        balance = Money(value = 0.00),
+        type = AccountType.Cash,
+        listPosition = 0,
+        updatedAt = Clock.System.now(),
+        createdAt = Clock.System.now()
+    ),
     Account(
         id = 2L,
         name = "Girokonto",
         balance = Money(value = -100.00),
         type = AccountType.Checking,
-        listPosition = 1
+        listPosition = 1,
+        updatedAt = Clock.System.now(),
+        createdAt = Clock.System.now()
     ),
     Account(
         id = 3L,
         name = "Tagesgeldkonto",
         balance = Money(value = 100.00),
         type = AccountType.Savings,
-        listPosition = 2
+        listPosition = 2,
+        updatedAt = Clock.System.now(),
+        createdAt = Clock.System.now()
     )
 )

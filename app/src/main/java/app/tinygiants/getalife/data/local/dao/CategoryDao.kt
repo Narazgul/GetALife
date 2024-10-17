@@ -14,10 +14,10 @@ interface CategoryDao {
 
     @Transaction
     @Query("SELECT * FROM categories")
-    fun getCategories(): Flow<List<CategoryEntity>>
+    fun getCategoriesFlow(): Flow<List<CategoryEntity>>
 
     @Query("SELECT * FROM categories WHERE groupId == :groupId")
-    suspend fun getCategoryInGroup(groupId: Long): List<CategoryEntity>
+    suspend fun getCategoriesInGroup(groupId: Long): List<CategoryEntity>
 
     @Insert
     suspend fun addCategory(categoryEntity: CategoryEntity)

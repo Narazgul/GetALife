@@ -8,7 +8,7 @@ class GoogleGeminiAi @Inject constructor(private val generativeModel: Generative
 
     override suspend fun generateEmojiBy(tag: String): Result<String?> {
 
-        val prompt = "$tag one Emoji Unicode. Answer in one row and without whitespaces. Unicode only!"
+        val prompt = "Return one Emoji for this tag: $tag"
         return runCatching {
             generativeModel.generateContent(prompt).text
         }

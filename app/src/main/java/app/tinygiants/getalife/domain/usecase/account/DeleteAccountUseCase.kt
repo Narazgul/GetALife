@@ -13,7 +13,9 @@ class DeleteAccountUseCase @Inject constructor(private val repository: AccountRe
             name = account.name,
             balance = account.balance.value,
             type = account.type,
-            listPosition = account.listPosition
+            listPosition = account.listPosition,
+            updatedAt = account.updatedAt,
+            createdAt = account.createdAt
         )
 
         repository.deleteAccount(accountEntity = accountEntity)

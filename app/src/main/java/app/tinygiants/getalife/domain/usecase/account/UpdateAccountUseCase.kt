@@ -3,6 +3,7 @@ package app.tinygiants.getalife.domain.usecase.account
 import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.repository.AccountRepository
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class UpdateAccountUseCase @Inject constructor(private val repository: AccountRepository){
@@ -13,7 +14,9 @@ class UpdateAccountUseCase @Inject constructor(private val repository: AccountRe
             name = account.name,
             balance = account.balance.value,
             type = account.type,
-            listPosition = account.listPosition
+            listPosition = account.listPosition,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         )
 
         repository.updateAccount(accountEntity = accountEntity)
