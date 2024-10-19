@@ -8,6 +8,7 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import javax.inject.Inject
@@ -21,7 +22,7 @@ class AddAccountUseCase @Inject constructor(
 
     suspend operator fun invoke(name: String, balance: Money, type: AccountType) {
 
-        val accounts = repository.getAccounts()
+        val accounts = repository.getAccountsFlow().first()
         val accountId = Random.nextLong()
 
         val accountEntity = withContext(defaultDispatcher) {

@@ -6,6 +6,7 @@ import app.tinygiants.getalife.di.Io
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.usecase.budget.category.AddCategoryUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.random.Random
@@ -19,7 +20,7 @@ class AddGroupUseCase @Inject constructor(
 
     suspend operator fun invoke(groupName: String) {
 
-        val groups = withContext(ioDispatcher) { repository.getGroups() }
+        val groups = withContext(ioDispatcher) { repository.getGroupsFlow() }.first()
 
         withContext(defaultDispatcher) {
 

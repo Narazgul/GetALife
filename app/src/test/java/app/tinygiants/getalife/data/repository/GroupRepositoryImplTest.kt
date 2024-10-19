@@ -11,7 +11,6 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import kotlinx.coroutines.test.runTest
@@ -58,26 +57,8 @@ class GroupRepositoryImplTest {
     }
 
     @Test
-    fun `Groups list is empty`(): Unit = runTest {
-        val groups = repository.getGroups()
-
-        assertThat(groups).isEmpty()
-        assertThat(groups).isNotNull()
-    }
-
-    @Test
-    fun `Get groups list`(): Unit = runTest {
-        fakeDao.groups.value = groups
-
-        val groups = repository.getGroups()
-
-        assertThat(groups).isNotEmpty()
-        assertThat(groups).hasSize(4)
-    }
-
-    @Test
     fun `Add group to list`(): Unit = runTest {
-        val groups = repository.getGroups()
+        val groups = fakeDao.groups.value
         assertThat(groups).isEmpty()
 
         repository.addGroup(fixedCosts())

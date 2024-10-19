@@ -22,9 +22,6 @@ class TransactionDaoFake : TransactionDao {
             transactions.filter { it.categoryId == categoryId }
         }
 
-    override suspend fun getCategoryTransactions(categoryId: Long): List<TransactionEntity> =
-        transactions.value.filter { it.categoryId == categoryId }
-
     override suspend fun getCategoryTransactions(
         categoryId: Long,
         startTime: Instant,

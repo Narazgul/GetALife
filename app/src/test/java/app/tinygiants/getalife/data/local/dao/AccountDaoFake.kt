@@ -10,8 +10,6 @@ class AccountDaoFake : AccountDao {
 
     override fun getAccountsFlow(): Flow<List<AccountEntity>> = accounts
 
-    override suspend fun getAccounts(): List<AccountEntity> = accounts.value
-
     override suspend fun getAccount(accountId: Long): AccountEntity {
         return accounts.value.firstOrNull { it.id == accountId }
             ?: throw IllegalArgumentException("Account with id $accountId not found")

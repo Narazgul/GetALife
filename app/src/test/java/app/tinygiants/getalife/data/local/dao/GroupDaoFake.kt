@@ -10,8 +10,6 @@ class GroupDaoFake : GroupDao {
 
     override fun getGroupsFlow(): Flow<List<GroupEntity>> = groups
 
-    override fun getGroups(): List<GroupEntity> = groups.value
-
     override suspend fun addGroup(groupEntity: GroupEntity) {
         val updatedGroups = groups.value.toMutableList()
         updatedGroups.add(groupEntity)

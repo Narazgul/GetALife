@@ -11,7 +11,6 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
@@ -57,24 +56,6 @@ class AccountsRepositoryImplTest {
     }
 
     @Test
-    fun `Accounts list is empty`(): Unit = runTest {
-        val accounts = repository.getAccounts()
-
-        assertThat(accounts).isEmpty()
-        assertThat(accounts).isNotNull()
-    }
-
-    @Test
-    fun `Get accounts list`(): Unit = runTest {
-        fakeDao.accounts.value = accounts
-
-        val accounts = repository.getAccounts()
-
-        assertThat(accounts).isNotEmpty()
-        assertThat(accounts).hasSize(7)
-    }
-
-    @Test
     fun `Get account`(): Unit = runTest {
         fakeDao.accounts.value = accounts
 
@@ -86,7 +67,7 @@ class AccountsRepositoryImplTest {
 
     @Test
     fun `Add account to list`(): Unit = runTest {
-        val accounts = repository.getAccounts()
+        val accounts = fakeDao.accounts.value
         assertThat(accounts).isEmpty()
 
         repository.addAccount(cashAccountEntity())

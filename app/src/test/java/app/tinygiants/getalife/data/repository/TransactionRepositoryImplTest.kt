@@ -81,11 +81,12 @@ class TransactionRepositoryImplTest {
     fun `Get Transactions for Category`(): Unit = runTest {
         fakeDao.transactions.value = transactionEntities()
 
-        val transactions = repository.getTransactionsByCategory(categoryId = 1L)
-
-        assertThat(transactions).hasSize(6)
-        assertThat(transactions.first()).isEqualTo(aldiGroceriesJanuary())
-        assertThat(transactions.last()).isEqualTo(lidlGroceriesMarch())
+        repository.getTransactionsByCategory(categoryId = 1L).test {
+            val emission = awaitItem()
+            assertThat(emission).hasSize(6)
+            assertThat(emission.first()).isEqualTo(aldiGroceriesJanuary())
+            assertThat(emission.last()).isEqualTo(lidlGroceriesMarch())
+        }
     }
 
     @Test

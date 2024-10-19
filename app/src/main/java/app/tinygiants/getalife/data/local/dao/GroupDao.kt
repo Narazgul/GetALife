@@ -14,9 +14,6 @@ interface GroupDao {
     @Query("SELECT * FROM headers")
     fun getGroupsFlow(): Flow<List<GroupEntity>>
 
-    @Query("SELECT * FROM headers")
-    fun getGroups(): List<GroupEntity>
-
     @Insert
     suspend fun addGroup(groupEntity: GroupEntity)
 
