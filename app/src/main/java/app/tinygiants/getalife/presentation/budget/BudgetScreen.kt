@@ -51,6 +51,7 @@ import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.ScreenPreview
 import app.tinygiants.getalife.theme.spacing
+import kotlinx.datetime.Clock
 
 @Composable
 fun BudgetScreen() {
@@ -190,7 +191,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0.8f,
             optionalText = "",
             listPosition = 0,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 2,
@@ -207,7 +210,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 1,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 3,
@@ -224,7 +229,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 2,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 4,
@@ -241,7 +248,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 3,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 5,
@@ -258,7 +267,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "16.00 € more needed by the 30th",
             listPosition = 4,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 6,
@@ -275,7 +286,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "7.00 € mored needed by the 10th",
             listPosition = 5,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         )
     ),
     Group(
@@ -300,7 +313,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "73.00 € more needed by the 30th",
             listPosition = 0,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 102,
@@ -317,7 +332,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "50.00 € more needed by the 30th",
             listPosition = 1,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         ),
         Category(
             id = 103,
@@ -334,7 +351,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 2,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         )
     ),
     Group(
@@ -359,7 +378,9 @@ fun fakeCategories() = mapOf(
             budgetTargetProgress = 0f,
             optionalText = "",
             listPosition = 0,
-            isInitialCategory = true
+            isInitialCategory = true,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         )
     ),
     Group(

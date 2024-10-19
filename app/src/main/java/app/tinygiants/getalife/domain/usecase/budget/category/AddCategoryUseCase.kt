@@ -7,6 +7,7 @@ import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -36,7 +37,9 @@ class AddCategoryUseCase @Inject constructor(
                 availableMoney = 0.00,
                 optionalText = "",
                 listPosition = endOfListPosition,
-                isInitialCategory = isInitialCategory
+                isInitialCategory = isInitialCategory,
+                updatedAt = Clock.System.now(),
+                createdAt = Clock.System.now()
             )
         }
 

@@ -27,7 +27,9 @@ class DeleteCategoryUseCase @Inject constructor(
                 availableMoney = category.availableMoney.value,
                 optionalText = category.optionalText,
                 listPosition = category.listPosition,
-                isInitialCategory = category.isInitialCategory
+                isInitialCategory = category.isInitialCategory,
+                updatedAt = category.updatedAt,
+                createdAt = category.createdAt
             )
         }
 

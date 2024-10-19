@@ -47,7 +47,9 @@ class GetCategoriesUseCase @Inject constructor(
                     budgetTargetProgress = null,
                     optionalText = categoryEntity.optionalText,
                     listPosition = categoryEntity.listPosition,
-                    isInitialCategory = categoryEntity.isInitialCategory
+                    isInitialCategory = categoryEntity.isInitialCategory,
+                    updatedAt = categoryEntity.updatedAt,
+                    createdAt = categoryEntity.createdAt
                 )
             }
         }

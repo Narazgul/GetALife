@@ -7,6 +7,7 @@ import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class UpdateCategoryUseCase @Inject constructor(
@@ -28,7 +29,9 @@ class UpdateCategoryUseCase @Inject constructor(
             availableMoney = category.availableMoney.value,
             optionalText = category.optionalText,
             listPosition = category.listPosition,
-            isInitialCategory = false
+            isInitialCategory = false,
+            updatedAt = Clock.System.now(),
+            createdAt = category.createdAt
         )
 
         repository.updateCategory(categoryEntity)
