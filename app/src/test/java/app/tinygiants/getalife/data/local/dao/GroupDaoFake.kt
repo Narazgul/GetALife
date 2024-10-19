@@ -6,30 +6,30 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class GroupDaoFake : GroupDao {
 
-    private val groupsFlow = MutableStateFlow<List<GroupEntity>>(emptyList())
+    val groups = MutableStateFlow<List<GroupEntity>>(emptyList())
 
-    override fun getGroupsFlow(): Flow<List<GroupEntity>> = groupsFlow
+    override fun getGroupsFlow(): Flow<List<GroupEntity>> = groups
 
-    override fun getGroups(): List<GroupEntity> = groupsFlow.value
+    override fun getGroups(): List<GroupEntity> = groups.value
 
     override suspend fun addGroup(groupEntity: GroupEntity) {
-        val updatedGroups = groupsFlow.value.toMutableList()
+        val updatedGroups = groups.value.toMutableList()
         updatedGroups.add(groupEntity)
-        groupsFlow.value = updatedGroups
+        groups.value = updatedGroups
     }
 
     override suspend fun updateGroup(groupEntity: GroupEntity) {
-        val updatedGroups = groupsFlow.value.toMutableList()
+        val updatedGroups = groups.value.toMutableList()
         val index = updatedGroups.indexOfFirst { it.id == groupEntity.id }
         if (index != -1) {
             updatedGroups[index] = groupEntity
-            groupsFlow.value = updatedGroups
+            groups.value = updatedGroups
         }
     }
 
     override suspend fun deleteGroup(groupEntity: GroupEntity) {
-        val updatedGroups = groupsFlow.value.toMutableList()
+        val updatedGroups = groups.value.toMutableList()
         updatedGroups.removeIf { it.id == groupEntity.id }
-        groupsFlow.value = updatedGroups
+        groups.value = updatedGroups
     }
 }
