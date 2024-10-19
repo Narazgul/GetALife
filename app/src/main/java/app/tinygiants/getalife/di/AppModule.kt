@@ -30,7 +30,7 @@ object AppModule {
     fun provideDatabase(@ApplicationContext appContext: Context) = GetALifeDatabase.getDatabase(appContext)
 
     @Provides
-    fun provideHeaderDao(database: GetALifeDatabase) = database.headerDao()
+    fun provideGroupDao(database: GetALifeDatabase) = database.groupDao()
 
     @Provides
     fun provideCategoryDao(database: GetALifeDatabase) = database.categoryDao()

@@ -16,8 +16,8 @@ data class BudgetUiState(
 
 sealed class UserClickEvent {
     data class AddGroup(val name: String) : UserClickEvent()
-    data class UpdateHeader(val group: Group) : UserClickEvent()
-    data class DeleteHeader(val group: Group) : UserClickEvent()
+    data class UpdateGroup(val group: Group) : UserClickEvent()
+    data class DeleteGroup(val group: Group) : UserClickEvent()
 
     data class AddCategory(val groupId: Long, val categoryName: String) : UserClickEvent()
     data class UpdateAssignedMoney(val category: Category, val newAssignedMoney: Money): UserClickEvent()

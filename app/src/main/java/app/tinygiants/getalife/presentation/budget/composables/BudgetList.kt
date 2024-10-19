@@ -61,15 +61,15 @@ fun BudgetList(
             state = listState,
             contentPadding = PaddingValues(spacing.xs)
         ) {
-            groups.forEach { (header, items) ->
+            groups.forEach { (group, items) ->
 
-                stickyHeader(
-                    group = header,
+                stickyGroups(
+                    group = group,
                     onUserClickEvent = onUserClickEvent
                 )
 
-                items(
-                    group = header,
+                categories(
+                    group = group,
                     categories = items,
                     onUserClickEvent = onUserClickEvent
                 )
@@ -81,17 +81,17 @@ fun BudgetList(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private fun LazyListScope.stickyHeader(
+private fun LazyListScope.stickyGroups(
     group: Group,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
-    val onHeaderClicked =
-        { onUserClickEvent(UserClickEvent.UpdateHeader(group = group.copy(isExpanded = !group.isExpanded))) }
+    val onGroupClicked =
+        { onUserClickEvent(UserClickEvent.UpdateGroup(group = group.copy(isExpanded = !group.isExpanded))) }
 
-    val onUpdateHeaderNameClicked =
-        { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateHeader(group = group.copy(name = updatedCategoryName))) }
+    val onUpdateGroupNameClicked =
+        { updatedCategoryName: String -> onUserClickEvent(UserClickEvent.UpdateGroup(group = group.copy(name = updatedCategoryName))) }
 
-    val onDeleteHeaderClicked = { onUserClickEvent(UserClickEvent.DeleteHeader(group = group)) }
+    val onDeleteGroupClicked = { onUserClickEvent(UserClickEvent.DeleteGroup(group = group)) }
 
     val onAddCategoryClicked =
         { categoryName: String ->
@@ -104,20 +104,20 @@ private fun LazyListScope.stickyHeader(
         }
 
     stickyHeader(key = group.id) {
-        Header(
+        Group(
             name = group.name,
             sumOfAvailableMoney = group.sumOfAvailableMoney,
             isExpanded = group.isExpanded,
-            onHeaderClicked = onHeaderClicked,
-            onUpdateHeaderNameClicked = onUpdateHeaderNameClicked,
-            onDeleteHeaderClicked = onDeleteHeaderClicked,
+            onGroupClicked = onGroupClicked,
+            onUpdateGroupNameClicked = onUpdateGroupNameClicked,
+            onDeleteGroupClicked = onDeleteGroupClicked,
             onAddCategoryClicked = onAddCategoryClicked
         )
         Spacer(modifier = Modifier.height(spacing.xxs))
     }
 }
 
-private fun LazyListScope.items(
+private fun LazyListScope.categories(
     group: Group,
     categories: List<Category>,
     onUserClickEvent: (UserClickEvent) -> Unit

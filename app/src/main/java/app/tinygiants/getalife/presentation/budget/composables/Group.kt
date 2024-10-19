@@ -44,19 +44,19 @@ import app.tinygiants.getalife.theme.spacing
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun Header(
+fun Group(
     name: String = "",
     sumOfAvailableMoney: Money = Money(value = 0.00),
     isExpanded: Boolean = false,
-    onHeaderClicked: () -> Unit = { },
-    onUpdateHeaderNameClicked: (String) -> Unit = { },
-    onDeleteHeaderClicked: () -> Unit = { },
+    onGroupClicked: () -> Unit = { },
+    onUpdateGroupNameClicked: (String) -> Unit = { },
+    onDeleteGroupClicked: () -> Unit = { },
     onAddCategoryClicked: (String) -> Unit = { },
 ) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    var headerNameUserInput by rememberSaveable { mutableStateOf(name) }
+    var groupNameUserInput by rememberSaveable { mutableStateOf(name) }
     var categoryNameUserInput by rememberSaveable { mutableStateOf("") }
 
     Row(
@@ -64,7 +64,7 @@ fun Header(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = onHeaderClicked,
+                onClick = onGroupClicked,
                 onLongClick = { showBottomSheet = true }
             )
             .background(
@@ -126,17 +126,17 @@ fun Header(
                 Spacer(modifier = Modifier.height(spacing.default))
                 Row {
                     TextField(
-                        value = headerNameUserInput,
-                        onValueChange = { userInput -> headerNameUserInput = userInput },
+                        value = groupNameUserInput,
+                        onValueChange = { userInput -> groupNameUserInput = userInput },
                         label = { Text(stringResource(R.string.change_title)) },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(spacing.default))
                     Button(
                         onClick = {
-                            if (headerNameUserInput.isNotBlank()) {
-                                onUpdateHeaderNameClicked(headerNameUserInput)
-                                headerNameUserInput = ""
+                            if (groupNameUserInput.isNotBlank()) {
+                                onUpdateGroupNameClicked(groupNameUserInput)
+                                groupNameUserInput = ""
                                 showBottomSheet = false
                             }
                         }
@@ -148,7 +148,7 @@ fun Header(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = onDeleteHeaderClicked,
+                        onClick = onDeleteGroupClicked,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text(
@@ -165,10 +165,10 @@ fun Header(
 
 @ComponentPreview
 @Composable
-fun CategoryHeaderPreview() {
+fun CategoryGroupPreview() {
     GetALifeTheme {
         Surface {
-            Header(
+            Group(
                 name = "Quality of Life",
                 sumOfAvailableMoney = Money(value = 12345.67)
             )
@@ -178,10 +178,10 @@ fun CategoryHeaderPreview() {
 
 @ComponentPreview
 @Composable
-fun CategoryHeaderExpandedPreview() {
+fun CategoryGroupExpandedPreview() {
     GetALifeTheme {
         Surface {
-            Header(
+            Group(
                 name = "Quality of Life",
                 sumOfAvailableMoney = Money(value = 100.00),
                 isExpanded = true

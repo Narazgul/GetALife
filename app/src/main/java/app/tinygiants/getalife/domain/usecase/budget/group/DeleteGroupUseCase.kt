@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class DeleteHeaderUseCase @Inject constructor(
+class DeleteGroupUseCase @Inject constructor(
     private val repository: GroupRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {

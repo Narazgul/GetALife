@@ -30,7 +30,7 @@ class GetBudgetUseCase @Inject constructor(
             val categoriesFlow = categoryRepository.getCategoriesFlow()
 
             groupsFlow.combine(categoriesFlow) { groups, categories ->
-                mapToHeadersWithCategories(
+                mapToGroupsWithCategories(
                     groupEntities = groups,
                     categoryEntities = categories
                 )
@@ -40,7 +40,7 @@ class GetBudgetUseCase @Inject constructor(
         }
     }
 
-    private suspend fun mapToHeadersWithCategories(groupEntities: List<GroupEntity>, categoryEntities: List<CategoryEntity>) =
+    private suspend fun mapToGroupsWithCategories(groupEntities: List<GroupEntity>, categoryEntities: List<CategoryEntity>) =
         Result.success(
             withContext(defaultDispatcher) {
 
@@ -54,15 +54,15 @@ class GetBudgetUseCase @Inject constructor(
 
                 sortedGroups.map { grouped ->
 
-                    val header = mapToHeader(group = grouped.key, categories = grouped.value)
+                    val group = mapToGroup(group = grouped.key, categories = grouped.value)
                     val categories = mapToCategories(categories = grouped.value)
 
-                    header to categories
+                    group to categories
                 }.toMap()
             }
         )
 
-    private fun mapToHeader(group: GroupEntity, categories: List<CategoryEntity>): Group {
+    private fun mapToGroup(group: GroupEntity, categories: List<CategoryEntity>): Group {
 
         val sumOfAvailableMoneyInCategory = categories.sumOf { category -> category.availableMoney }
 

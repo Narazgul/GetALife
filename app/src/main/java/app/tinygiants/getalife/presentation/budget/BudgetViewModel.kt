@@ -13,16 +13,16 @@ import app.tinygiants.getalife.domain.usecase.budget.category.DeleteCategoryUseC
 import app.tinygiants.getalife.domain.usecase.budget.category.UpdateAssignedMoneyUseCase
 import app.tinygiants.getalife.domain.usecase.budget.category.UpdateCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.group.AddGroupUseCase
-import app.tinygiants.getalife.domain.usecase.budget.group.DeleteHeaderUseCase
+import app.tinygiants.getalife.domain.usecase.budget.group.DeleteGroupUseCase
 import app.tinygiants.getalife.domain.usecase.budget.group.UpdateGroupUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddGroup
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteHeader
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteGroup
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateAssignedMoney
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateHeader
+import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateGroup
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +38,7 @@ class BudgetViewModel @Inject constructor(
     private val getAssignableMoney: GetAssignableMoneySumUseCase,
     private val addGroup: AddGroupUseCase,
     private val updateGroup: UpdateGroupUseCase,
-    private val deleteGroup: DeleteHeaderUseCase,
+    private val deleteGroup: DeleteGroupUseCase,
     private val addCategory: AddCategoryUseCase,
     private val updateAssignedMoney: UpdateAssignedMoneyUseCase,
     private val updateCategory: UpdateCategoryUseCase,
@@ -93,8 +93,8 @@ class BudgetViewModel @Inject constructor(
             when (clickEvent) {
 
                 is AddGroup -> addGroup(groupName = clickEvent.name)
-                is UpdateHeader -> updateGroup(group = clickEvent.group)
-                is DeleteHeader -> deleteGroup(group = clickEvent.group)
+                is UpdateGroup -> updateGroup(group = clickEvent.group)
+                is DeleteGroup -> deleteGroup(group = clickEvent.group)
 
                 is AddCategory -> addCategory(groupId = clickEvent.groupId, categoryName = clickEvent.categoryName)
                 is UpdateAssignedMoney -> updateAssignedMoney(

@@ -31,7 +31,7 @@ import kotlinx.datetime.Instant
 @TypeConverters(Converters::class)
 abstract class GetALifeDatabase : RoomDatabase() {
 
-    abstract fun headerDao(): GroupDao
+    abstract fun groupDao(): GroupDao
     abstract fun categoryDao(): CategoryDao
     abstract fun accountsDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
