@@ -1,6 +1,15 @@
 package app.tinygiants.getalife.data.repository
 
+import app.cash.turbine.test
 import app.tinygiants.getalife.data.local.dao.CategoryDaoFake
+import app.tinygiants.getalife.data.local.datagenerator.categoryEntities
+import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,7 +27,78 @@ class CategoryRepositoryImplTest {
 
     @Test
     fun `Test CategoriesFlow`(): Unit = runTest {
+        repository.getCategoriesFlow().test {
+            val initialEmission = awaitItem()
+            assertThat(initialEmission).hasSize(0)
 
+            fakeDao.addCategory(rentCategoryEntity())
+            val emission1 = awaitItem()
+            assertThat(emission1).hasSize(1)
+            assertThat(emission1.first().name).isEqualTo(rentCategoryEntity().name)
+
+            fakeDao.updateCategory(rentCategoryEntity().copy(name = "Mieeete"))
+            val emission2 = awaitItem()
+            assertThat(emission2).hasSize(1)
+            assertThat(emission2.first().name).isEqualTo("Mieeete")
+
+            fakeDao.deleteCategory(rentCategoryEntity())
+            val emission3 = awaitItem()
+            assertThat(emission3).isEmpty()
+
+            fakeDao.categories.value = categoryEntities()
+            val emission4 = awaitItem()
+            assertThat(emission4).hasSize(20)
+        }
+    }
+
+
+    @Test
+    fun `Get Categories in Group`(): Unit = runTest {
+        val emptyList = repository.getCategoriesInGroup(groupId = 0)
+        assertThat(emptyList).isEmpty()
+
+        fakeDao.categories.value = categoryEntities()
+        val categoriesFromCategoryZero = fakeDao.getCategoriesInGroup(groupId = 0)
+
+        assertThat(categoriesFromCategoryZero).isNotNull()
+        assertThat(categoriesFromCategoryZero).hasSize(4)
+        assertThat(categoriesFromCategoryZero.first()).isEqualTo(rentCategoryEntity())
+    }
+
+    @Test
+    fun `Add Category`(): Unit = runTest {
+        repository.addCategory(rentCategoryEntity())
+
+        val categories = fakeDao.categories.value
+
+        assertThat(categories).hasSize(1)
+        assertThat(categories.first()).isEqualTo(rentCategoryEntity())
+    }
+
+    @Test
+    fun `Update Category`(): Unit = runTest {
+        fakeDao.categories.value = categoryEntities()
+
+        val updatedCategory = rentCategoryEntity().copy(name = "UpdatedMiete")
+        repository.updateCategory(categoryEntity = updatedCategory)
+
+        val categoryUnderTest = fakeDao.categories.value.find { it.id == rentCategoryEntity().id }
+        assertThat(categoryUnderTest?.name).isEqualTo("UpdatedMiete")
+    }
+
+    @Test
+    fun `Delete Category`(): Unit = runTest {
+        fakeDao.categories.value = categoryEntities()
+        val categoriesBeforeDeletion = fakeDao.categories.value
+        assertThat(categoriesBeforeDeletion).hasSize(20)
+        assertThat(categoriesBeforeDeletion.find {  it.id == rentCategoryEntity().id }).isEqualTo(rentCategoryEntity())
+
+        repository.deleteCategory(rentCategoryEntity())
+
+        val categories = fakeDao.categories.value
+        assertThat(categories).hasSize(19)
+        assertThat(categories.find { it.id == rentCategoryEntity().id }).isNull()
+        assertThat(categories.first().id).isEqualTo(2L)
     }
 
 }

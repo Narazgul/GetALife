@@ -11,7 +11,7 @@ class CategoryDaoFake: CategoryDao {
     override fun getCategoriesFlow(): Flow<List<CategoryEntity>> = categories
 
     override suspend fun getCategoriesInGroup(groupId: Long): List<CategoryEntity> {
-        return categories.value.filter { it.id == groupId }
+        return categories.value.filter { it.groupId == groupId }
     }
 
     override suspend fun addCategory(categoryEntity: CategoryEntity) {
