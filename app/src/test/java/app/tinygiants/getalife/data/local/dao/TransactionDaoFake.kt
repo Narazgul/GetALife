@@ -8,54 +8,54 @@ import kotlinx.datetime.Instant
 
 class TransactionDaoFake : TransactionDao {
 
-    private val transactionsFlow = MutableStateFlow<List<TransactionEntity>>(emptyList())
+    val transactions = MutableStateFlow<List<TransactionEntity>>(emptyList())
 
-    override fun getAllTransactions(): Flow<List<TransactionEntity>> = transactionsFlow
+    override fun getAllTransactions(): Flow<List<TransactionEntity>> = transactions
 
     override fun getAccountTransactionsFlow(accountId: Long): Flow<List<TransactionEntity>> =
-        transactionsFlow.map { transactions ->
+        transactions.map { transactions ->
             transactions.filter { it.accountId == accountId }
         }
 
     override fun getCategoryTransactionsFlow(categoryId: Long): Flow<List<TransactionEntity>> =
-        transactionsFlow.map { transactions ->
+        transactions.map { transactions ->
             transactions.filter { it.categoryId == categoryId }
         }
 
     override suspend fun getCategoryTransactions(categoryId: Long): List<TransactionEntity> =
-        transactionsFlow.value.filter { it.categoryId == categoryId }
+        transactions.value.filter { it.categoryId == categoryId }
 
     override suspend fun getCategoryTransactions(
         categoryId: Long,
         startTime: Instant,
         endTime: Instant
     ): List<TransactionEntity> {
-        return transactionsFlow.value.filter {
+        return transactions.value.filter {
             it.categoryId == categoryId && it.timestamp >= startTime && it.timestamp <= endTime
         }
     }
 
     override suspend fun getTransaction(transactionId: Long): TransactionEntity =
-        transactionsFlow.value.first { it.id == transactionId }
+        transactions.value.first { it.id == transactionId }
 
     override suspend fun addTransaction(transaction: TransactionEntity) {
-        val updatedTransactions = transactionsFlow.value.toMutableList()
+        val updatedTransactions = transactions.value.toMutableList()
         updatedTransactions.add(transaction)
-        transactionsFlow.value = updatedTransactions
+        transactions.value = updatedTransactions
     }
 
     override suspend fun updateTransaction(transaction: TransactionEntity) {
-        val updatedTransactions = transactionsFlow.value.toMutableList()
+        val updatedTransactions = transactions.value.toMutableList()
         val index = updatedTransactions.indexOfFirst { it.id == transaction.id }
         if (index != -1) {
             updatedTransactions[index] = transaction
-            transactionsFlow.value = updatedTransactions
+            transactions.value = updatedTransactions
         }
     }
 
     override suspend fun deleteTransaction(transaction: TransactionEntity) {
-        val updatedTransactions = transactionsFlow.value.toMutableList()
+        val updatedTransactions = transactions.value.toMutableList()
         updatedTransactions.removeIf { it.id == transaction.id }
-        transactionsFlow.value = updatedTransactions
+        transactions.value = updatedTransactions
     }
 }
