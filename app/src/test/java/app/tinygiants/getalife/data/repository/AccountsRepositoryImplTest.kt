@@ -35,17 +35,17 @@ class AccountsRepositoryImplTest {
             assertThat(initialEmission).isNotNull()
             assertThat(initialEmission).isEmpty()
 
-            repository.addAccount(cashAccountEntity())
+            fakeDao.addAccount(cashAccountEntity())
             val emission1 = awaitItem()
             assertThat(emission1).hasSize(1)
             assertThat(emission1.first().name).isEqualTo(cashAccountEntity().name)
 
             val updatedAccount = cashAccountEntity().copy(name = "Cash")
-            repository.updateAccount(updatedAccount)
+            fakeDao.updateAccount(updatedAccount)
             val emission2 = awaitItem()
             assertThat(emission2.first().name).isEqualTo("Cash")
 
-            repository.deleteAccount(cashAccountEntity())
+            fakeDao.deleteAccount(cashAccountEntity())
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
@@ -131,7 +131,7 @@ class AccountsRepositoryImplTest {
 
         val accountsAfterSecondDeletion = fakeDao.accounts.value
         assertThat(accountsAfterSecondDeletion).hasSize(5)
-        assertThat(accountsAfterFirstDeletion.first().name).isEqualTo(checkingAccountEntity().name)
+        assertThat(accountsAfterSecondDeletion.first().name).isEqualTo(checkingAccountEntity().name)
         assertThat(accountsAfterSecondDeletion[1].name).isEqualTo(creditCardAccountEntity().name)
     }
 }
