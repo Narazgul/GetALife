@@ -7,14 +7,14 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.usecase.account.GetAssignableMoneySumUseCase
-import app.tinygiants.getalife.domain.usecase.budget.GetBudgetUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.AddCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.DeleteCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.UpdateAssignedMoneyUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.UpdateCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.budget.group.AddGroupUseCase
-import app.tinygiants.getalife.domain.usecase.budget.group.DeleteGroupUseCase
-import app.tinygiants.getalife.domain.usecase.budget.group.UpdateGroupUseCase
+import app.tinygiants.getalife.domain.usecase.categories.GetCategoriesInGroupsUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.AddCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.DeleteCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.UpdateAssignedMoneyUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.UpdateCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.categories.group.AddGroupUseCase
+import app.tinygiants.getalife.domain.usecase.categories.group.DeleteGroupUseCase
+import app.tinygiants.getalife.domain.usecase.categories.group.UpdateGroupUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddGroup
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-    private val getBudget: GetBudgetUseCase,
+    private val getBudget: GetCategoriesInGroupsUseCase,
     private val getAssignableMoney: GetAssignableMoneySumUseCase,
     private val addGroup: AddGroupUseCase,
     private val updateGroup: UpdateGroupUseCase,

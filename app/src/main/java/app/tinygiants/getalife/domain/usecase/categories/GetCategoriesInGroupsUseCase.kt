@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.domain.usecase.budget
+package app.tinygiants.getalife.domain.usecase.categories
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 
-class GetBudgetUseCase @Inject constructor(
+class GetCategoriesInGroupsUseCase @Inject constructor(
     private val groupsRepository: GroupRepository,
     private val categoryRepository: CategoryRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher

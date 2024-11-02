@@ -7,7 +7,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

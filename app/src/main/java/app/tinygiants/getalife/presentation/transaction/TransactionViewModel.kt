@@ -9,7 +9,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.usecase.account.GetAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.DeleteTransactionUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsForAccountUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.UpdateTransactionUseCase

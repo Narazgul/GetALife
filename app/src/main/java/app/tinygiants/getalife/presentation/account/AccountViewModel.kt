@@ -9,7 +9,7 @@ import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.domain.usecase.budget.category
+package app.tinygiants.getalife.domain.usecase.categories.category
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default

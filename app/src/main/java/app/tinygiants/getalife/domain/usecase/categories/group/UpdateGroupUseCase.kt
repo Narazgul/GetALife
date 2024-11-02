@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.domain.usecase.budget.group
+package app.tinygiants.getalife.domain.usecase.categories.group
 
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.di.Default

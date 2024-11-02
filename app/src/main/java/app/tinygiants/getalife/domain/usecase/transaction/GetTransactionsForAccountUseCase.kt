@@ -8,7 +8,7 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
-import app.tinygiants.getalife.domain.usecase.budget.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
