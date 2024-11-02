@@ -37,7 +37,7 @@ class GetCategoriesUseCase @Inject constructor(
                     groupId = categoryEntity.groupId,
                     emoji = categoryEntity.emoji,
                     name = categoryEntity.name,
-                    budgetTarget = Money(value = categoryEntity.budgetTarget ?: 0.00),
+                    budgetTarget = Money(value = budgetTarget),
                     budgetPurpose = categoryEntity.budgetPurpose,
                     assignedMoney = Money(value = categoryEntity.assignedMoney),
                     availableMoney = Money(value = categoryEntity.availableMoney),

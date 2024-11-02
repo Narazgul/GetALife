@@ -76,7 +76,8 @@ class TransactionViewModel @Inject constructor(
 
             launch {
                 val currentTransactionAccount = getAccount(accountId = accountId)
-                displayAccountName(currentTransactionAccount)
+                if (currentTransactionAccount != null) displayAccountName(currentTransactionAccount)
+                else displayErrorState(exception = null)
             }
 
             launch {

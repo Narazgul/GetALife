@@ -212,7 +212,8 @@ fun Category(
                     .onGloballyPositioned { coordinates -> progressBarWidth = coordinates.size.width.toFloat() },
                 color = MaterialTheme.colorScheme.error,
                 trackColor = Color.Transparent,
-                strokeCap = StrokeCap.Round
+                strokeCap = StrokeCap.Round,
+                drawStopIndicator = { }
             )
 
             if (budgetTargetProgress != null)

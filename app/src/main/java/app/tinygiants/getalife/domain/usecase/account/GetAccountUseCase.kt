@@ -10,9 +10,9 @@ class GetAccountUseCase @Inject constructor(
     private val repository: AccountRepository
 ) {
 
-    suspend operator fun invoke(accountId: Long): Account {
+    suspend operator fun invoke(accountId: Long): Account? {
         val accountEntity = repository.getAccount(accountId)
-        return accountEntity.run {
+        return accountEntity?.run {
             Account(
                 id = id,
                 name = name,
@@ -22,6 +22,6 @@ class GetAccountUseCase @Inject constructor(
                 updatedAt = Clock.System.now(),
                 createdAt = Clock.System.now()
             )
-        }
+        } ?: return null
     }
 }

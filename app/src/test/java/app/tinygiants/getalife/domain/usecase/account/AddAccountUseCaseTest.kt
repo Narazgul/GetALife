@@ -4,9 +4,7 @@ import app.tinygiants.getalife.MainCoroutineExtension
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
-import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
-import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isBetween
@@ -26,7 +24,6 @@ class AddAccountUseCaseTest {
     private lateinit var addAccount: AddAccountUseCase
     private lateinit var accountRepositoryFake: AccountRepositoryFake
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
-    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
 
     companion object {
         @JvmField
@@ -38,18 +35,10 @@ class AddAccountUseCaseTest {
     fun setUp() {
         accountRepositoryFake = AccountRepositoryFake()
         transactionRepositoryFake = TransactionRepositoryFake()
-        categoryRepositoryFake = CategoryRepositoryFake()
-
-        val addTransaction = AddTransactionUseCase(
-            transactionRepository = transactionRepositoryFake,
-            accountRepository = accountRepositoryFake,
-            categoryRepository = categoryRepositoryFake,
-            mainCoroutineExtension.testDispatcher
-        )
 
         addAccount = AddAccountUseCase(
-            repository = accountRepositoryFake,
-            addTransaction = addTransaction,
+            accountRepository = accountRepositoryFake,
+            transactionRepository = transactionRepositoryFake,
             defaultDispatcher = mainCoroutineExtension.testDispatcher
         )
     }
@@ -57,7 +46,7 @@ class AddAccountUseCaseTest {
     @Test
     fun `Add new account with positive balance and AccountType and has positive starting balance`(): Unit = runTest {
         val testBegin = Clock.System.now()
-        val oneSecondAfterTestBegin = testBegin + 50.milliseconds
+        val shortlyAfterTestBegin = testBegin + 50.milliseconds
         addAccount(name = "Bargeld", balance = Money(value = 1.00), type = AccountType.Cash, startingBalanceName = "Starting balance")
 
         advanceUntilIdle()
@@ -68,8 +57,8 @@ class AddAccountUseCaseTest {
         assertThat(insertedAccount.balance).isEqualTo(1.00)
         assertThat(insertedAccount.type).isEqualTo(AccountType.Cash)
         assertThat(insertedAccount.listPosition).isEqualTo(0)
-        assertThat(insertedAccount.updatedAt).isBetween(start = testBegin, end = oneSecondAfterTestBegin)
-        assertThat(insertedAccount.createdAt).isBetween(start = testBegin, end = oneSecondAfterTestBegin)
+        assertThat(insertedAccount.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+        assertThat(insertedAccount.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
 
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
         assertThat(startingBalanceTransaction.description).isEqualTo("Starting balance")

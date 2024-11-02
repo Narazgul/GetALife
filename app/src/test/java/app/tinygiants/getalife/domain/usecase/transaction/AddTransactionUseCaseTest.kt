@@ -1,0 +1,139 @@
+package app.tinygiants.getalife.domain.usecase.transaction
+
+import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.data.local.datagenerator.accounts
+import app.tinygiants.getalife.data.local.datagenerator.cashAccount
+import app.tinygiants.getalife.data.local.datagenerator.categoryEntities
+import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
+import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isBetween
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
+import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import kotlin.time.Duration.Companion.milliseconds
+
+class AddTransactionUseCaseTest {
+
+    private lateinit var addTransaction: AddTransactionUseCase
+    private lateinit var transactionRepositoryFake: TransactionRepositoryFake
+    private lateinit var accountRepositoryFake: AccountRepositoryFake
+    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+    }
+
+    @BeforeEach
+    fun setUp() {
+        transactionRepositoryFake = TransactionRepositoryFake()
+        accountRepositoryFake = AccountRepositoryFake()
+        categoryRepositoryFake = CategoryRepositoryFake()
+
+        addTransaction = AddTransactionUseCase(
+            transactionRepository = transactionRepositoryFake,
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake,
+            defaultDispatcher = mainCoroutineExtension.testDispatcher
+        )
+    }
+
+    @Test
+    fun `add Account creation Transaction`(): Unit = runTest {
+        accountRepositoryFake.accountsFlow.value = listOf(cashAccount())
+        val testBegin = Clock.System.now()
+        val shortlyAfterTestBegin = testBegin + 50.milliseconds
+        addTransaction(
+            amount = Money(value = 10.71),
+            direction = TransactionDirection.Inflow,
+            accountId = 1L,
+            category = null,
+            transactionPartner = "",
+            description = "Startguthaben"
+        )
+        val transactions = transactionRepositoryFake.transactions.value
+        val transaction = transactions.first()
+
+        assertThat(transactions).hasSize(1)
+        assertThat(transaction.amount).isEqualTo(10.71)
+        assertThat(transaction.transactionDirection).isEqualTo(TransactionDirection.Inflow)
+        assertThat(transaction.categoryId).isNull()
+        assertThat(transaction.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+        assertThat(transaction.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+    }
+
+    @Test
+    fun `add Outflow transaction`(): Unit = runTest {
+        accountRepositoryFake.accountsFlow.value = accounts
+        categoryRepositoryFake.categories.value = categoryEntities
+        val testBegin = Clock.System.now()
+        val shortlyAfterTestBegin = testBegin + 50.milliseconds
+        val category = rentCategoryEntity().run {
+            Category(
+                id = id,
+                groupId = groupId,
+                emoji = emoji,
+                name = name,
+                budgetTarget = Money(budgetTarget!!),
+                budgetPurpose = budgetPurpose,
+                assignedMoney = Money(assignedMoney),
+                availableMoney = Money(availableMoney),
+                optionalText = optionalText,
+                listPosition = listPosition,
+                isInitialCategory = isInitialCategory,
+                updatedAt = updatedAt,
+                createdAt = createdAt,
+                progress = 0f,
+                spentProgress = 0f,
+                overspentProgress = 0f,
+                budgetTargetProgress = 0f
+            )
+        }
+
+        addTransaction(
+            amount = Money(value = 50.81),
+            direction = TransactionDirection.Outflow,
+            accountId = 1L,
+            category = category,
+            transactionPartner = "Landlord",
+            description = "Rent"
+        )
+
+        val transactionsAfterTest = transactionRepositoryFake.transactions.value
+        val transaction = transactionsAfterTest.first()
+
+        assertThat(transactionsAfterTest).hasSize(1)
+        assertThat(transaction.amount).isEqualTo(-50.81)
+        assertThat(transaction.transactionDirection).isEqualTo(TransactionDirection.Outflow)
+        assertThat(transaction.accountId).isEqualTo(1)
+        assertThat(transaction.categoryId).isEqualTo(1)
+        assertThat(transaction.transactionPartner).isEqualTo("Landlord")
+        assertThat(transaction.description).isEqualTo("Rent")
+        assertThat(transaction.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+        assertThat(transaction.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+
+        val accountAfterTransaction = accountRepositoryFake.accountsFlow.value.first()
+        assertThat(accountAfterTransaction.name).isEqualTo("Cash Account")
+        assertThat(accountAfterTransaction.balance).isEqualTo(449.19)
+        assertThat(transaction.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+        assertThat(transaction.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+
+        val categoryAfterTransaction = categoryRepositoryFake.categories.value.first()
+        assertThat(categoryAfterTransaction.name).isEqualTo("Miete")
+        assertThat(categoryAfterTransaction.budgetTarget).isEqualTo(1200.0)
+        assertThat(categoryAfterTransaction.assignedMoney).isEqualTo(1200.0)
+        assertThat(categoryAfterTransaction.availableMoney).isEqualTo(1249.19)
+    }
+}

@@ -30,10 +30,9 @@ class AddTransactionUseCase @Inject constructor(
         accountId: Long,
         category: Category?,
         transactionPartner: String,
-        description: String,
-        isAccountCreation: Boolean = false
+        description: String
     ) {
-        val account = accountRepository.getAccount(accountId)
+        val account = accountRepository.getAccount(accountId) ?: return
         val transformedAmount = transformAmount(direction = direction, amount = amount)
 
         withContext(defaultDispatcher) {
@@ -52,13 +51,12 @@ class AddTransactionUseCase @Inject constructor(
                 account = account,
                 direction = direction,
                 amount = transformedAmount,
-                isAccountCreation = isAccountCreation,
                 updateAccount = accountRepository::updateAccount,
             )
 
             updateCategory(
                 category = category,
-                absoluteAmountValue = transformedAmount,
+                amount = transformedAmount,
                 direction = direction,
                 updateCategory = categoryRepository::updateCategory,
             )
@@ -102,15 +100,11 @@ class AddTransactionUseCase @Inject constructor(
         account: AccountEntity,
         direction: TransactionDirection,
         amount: Double,
-        isAccountCreation: Boolean,
         updateAccount: suspend (AccountEntity) -> Unit
     ) {
         if (direction == TransactionDirection.Unknown) return
-        if (isAccountCreation) return
 
-        val updatedAccountBalance =
-            if (direction == TransactionDirection.Inflow) account.balance + abs(amount)
-            else account.balance - abs(amount)
+        val updatedAccountBalance = account.balance + amount
         val updatedAccount = account.copy(balance = updatedAccountBalance, updatedAt = Clock.System.now())
 
         updateAccount(updatedAccount)
@@ -118,7 +112,7 @@ class AddTransactionUseCase @Inject constructor(
 
     private suspend fun updateCategory(
         category: Category?,
-        absoluteAmountValue: Double,
+        amount: Double,
         direction: TransactionDirection,
         updateCategory: suspend (CategoryEntity) -> Unit
     ) {
@@ -126,9 +120,7 @@ class AddTransactionUseCase @Inject constructor(
         if (category == null) return
         if (direction == TransactionDirection.Unknown) return
 
-        val updatedAvailableMoney =
-            if (direction == TransactionDirection.Inflow) category.availableMoney.value + absoluteAmountValue
-            else category.availableMoney.value - absoluteAmountValue
+        val updatedAvailableMoney = category.availableMoney.value + amount
 
         val updatedCategoryEntity = category.run {
             CategoryEntity(
