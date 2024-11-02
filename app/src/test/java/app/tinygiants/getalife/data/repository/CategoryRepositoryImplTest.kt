@@ -45,7 +45,7 @@ class CategoryRepositoryImplTest {
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
-            fakeDao.categories.value = categoryEntities()
+            fakeDao.categories.value = categoryEntities
             val emission4 = awaitItem()
             assertThat(emission4).hasSize(20)
         }
@@ -57,7 +57,7 @@ class CategoryRepositoryImplTest {
         val emptyList = repository.getCategoriesInGroup(groupId = 0)
         assertThat(emptyList).isEmpty()
 
-        fakeDao.categories.value = categoryEntities()
+        fakeDao.categories.value = categoryEntities
         val categoriesFromCategoryZero = fakeDao.getCategoriesInGroup(groupId = 0)
 
         assertThat(categoriesFromCategoryZero).isNotNull()
@@ -77,7 +77,7 @@ class CategoryRepositoryImplTest {
 
     @Test
     fun `Update Category`(): Unit = runTest {
-        fakeDao.categories.value = categoryEntities()
+        fakeDao.categories.value = categoryEntities
 
         val updatedCategory = rentCategoryEntity().copy(name = "UpdatedMiete")
         repository.updateCategory(categoryEntity = updatedCategory)
@@ -88,7 +88,7 @@ class CategoryRepositoryImplTest {
 
     @Test
     fun `Delete Category`(): Unit = runTest {
-        fakeDao.categories.value = categoryEntities()
+        fakeDao.categories.value = categoryEntities
         val categoriesBeforeDeletion = fakeDao.categories.value
         assertThat(categoriesBeforeDeletion).hasSize(20)
         assertThat(categoriesBeforeDeletion.find {  it.id == rentCategoryEntity().id }).isEqualTo(rentCategoryEntity())

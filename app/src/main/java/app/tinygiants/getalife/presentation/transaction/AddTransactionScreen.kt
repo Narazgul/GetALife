@@ -46,8 +46,8 @@ fun AddTransaction() {
           account: Account,
           category: Category?,
           direction: TransactionDirection,
-          description: Description?,
-          transactionPartner: TransactionPartner? ->
+          description: Description,
+          transactionPartner: TransactionPartner ->
 
             viewModel.onSaveTransactionClicked(
                 amount = amount,

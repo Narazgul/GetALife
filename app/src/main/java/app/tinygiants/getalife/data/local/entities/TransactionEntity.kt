@@ -15,5 +15,6 @@ data class TransactionEntity(
     val transactionPartner: String,
     val transactionDirection: TransactionDirection,
     val description: String,
-    val timestamp: Instant
+    val updatedAt: Instant,
+    val createdAt: Instant
 )

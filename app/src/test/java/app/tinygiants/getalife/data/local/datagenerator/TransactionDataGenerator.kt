@@ -14,37 +14,35 @@ const val ELECTRICITY_BILL: Long = 4L
 const val SUBSCRIPTION: Long = 5L
 const val FITNESS: Long = 6L
 
-fun transactionEntities(): List<TransactionEntity> {
-    return listOf(
+val transactionEntities = listOf(
 
-        // January
-        aldiGroceriesJanuary(),
-        techCorpSalaryJanuary(),
-        landlordRentJanuary(),
-        eonElectricityJanuary(),
-        netflixJanuary(),
-        lidlGroceriesJanuary(),
-        gymMembershipJanuary(),
+    // January
+    aldiGroceriesJanuary(),
+    techCorpSalaryJanuary(),
+    landlordRentJanuary(),
+    eonElectricityJanuary(),
+    netflixJanuary(),
+    lidlGroceriesJanuary(),
+    gymMembershipJanuary(),
 
-        // Februar
-        techCorpSalaryFebruary(),
-        landlordRentFebruary(),
-        eonElectricityFebruary(),
-        tescoGroceriesFebruary(),
-        netflixFebruary(),
-        gymMembershipFebruary(),
-        reweGroceriesFebruary(),
+    // Februar
+    techCorpSalaryFebruary(),
+    landlordRentFebruary(),
+    eonElectricityFebruary(),
+    tescoGroceriesFebruary(),
+    netflixFebruary(),
+    gymMembershipFebruary(),
+    reweGroceriesFebruary(),
 
-        // March
-        techCorpSalaryMarch(),
-        landlordRentMarch(),
-        eonElectricityMarch(),
-        aldiGroceriesMarch(),
-        netflixMarch(),
-        gymMembershipMarch(),
-        lidlGroceriesMarch()
-    )
-}
+    // March
+    techCorpSalaryMarch(),
+    landlordRentMarch(),
+    eonElectricityMarch(),
+    aldiGroceriesMarch(),
+    netflixMarch(),
+    gymMembershipMarch(),
+    lidlGroceriesMarch()
+)
 
 // region January
 
@@ -57,7 +55,8 @@ fun aldiGroceriesJanuary(): TransactionEntity {
         transactionPartner = "Aldi",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
-        timestamp = Instant.parse("2024-01-05T10:30:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-05T10:30:00Z")
     )
 }
 
@@ -70,7 +69,8 @@ fun techCorpSalaryJanuary(): TransactionEntity {
         transactionPartner = "TechCorp Ltd.",
         transactionDirection = TransactionDirection.Inflow,
         description = "Salary",
-        timestamp = Instant.parse("2024-01-01T12:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-01T12:00:00Z")
     )
 }
 
@@ -83,7 +83,8 @@ fun landlordRentJanuary(): TransactionEntity {
         transactionPartner = "Landlord",
         transactionDirection = TransactionDirection.Outflow,
         description = "Rent",
-        timestamp = Instant.parse("2024-01-03T09:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-03T09:00:00Z")
     )
 }
 
@@ -96,7 +97,8 @@ fun eonElectricityJanuary(): TransactionEntity {
         transactionPartner = "E.ON",
         transactionDirection = TransactionDirection.Outflow,
         description = "Electricity bill",
-        timestamp = Instant.parse("2024-01-15T08:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-15T08:00:00Z")
     )
 }
 
@@ -109,7 +111,8 @@ fun netflixJanuary(): TransactionEntity {
         transactionPartner = "Netflix",
         transactionDirection = TransactionDirection.Outflow,
         description = "Netflix subscription",
-        timestamp = Instant.parse("2024-01-05T18:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-05T18:00:00Z")
     )
 }
 
@@ -122,7 +125,8 @@ fun lidlGroceriesJanuary(): TransactionEntity {
         transactionPartner = "Lidl",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
-        timestamp = Instant.parse("2024-01-20T17:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-20T17:00:00Z")
     )
 }
 
@@ -135,7 +139,8 @@ fun gymMembershipJanuary(): TransactionEntity {
         transactionPartner = "Gym Membership",
         transactionDirection = TransactionDirection.Outflow,
         description = "Fitness Studio",
-        timestamp = Instant.parse("2024-01-10T12:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-01-10T12:00:00Z")
     )
 }
 
@@ -152,7 +157,8 @@ fun techCorpSalaryFebruary(): TransactionEntity {
         transactionPartner = "TechCorp Ltd.",
         transactionDirection = TransactionDirection.Inflow,
         description = "Salary",
-        timestamp = Instant.parse("2024-02-01T12:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-01T12:00:00Z")
     )
 }
 
@@ -165,7 +171,8 @@ fun landlordRentFebruary(): TransactionEntity {
         transactionPartner = "Landlord",
         transactionDirection = TransactionDirection.Outflow,
         description = "Rent",
-        timestamp = Instant.parse("2024-02-03T09:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-03T09:00:00Z")
     )
 }
 
@@ -178,7 +185,8 @@ fun eonElectricityFebruary(): TransactionEntity {
         transactionPartner = "E.ON",
         transactionDirection = TransactionDirection.Outflow,
         description = "Electricity bill",
-        timestamp = Instant.parse("2024-02-15T08:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-15T08:00:00Z")
     )
 }
 
@@ -191,7 +199,8 @@ fun tescoGroceriesFebruary(): TransactionEntity {
         transactionPartner = "Tesco",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
-        timestamp = Instant.parse("2024-02-10T11:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-10T11:00:00Z")
     )
 }
 
@@ -204,7 +213,8 @@ fun netflixFebruary(): TransactionEntity {
         transactionPartner = "Netflix",
         transactionDirection = TransactionDirection.Outflow,
         description = "Netflix subscription",
-        timestamp = Instant.parse("2024-02-05T18:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-05T18:00:00Z")
     )
 }
 
@@ -217,7 +227,8 @@ fun gymMembershipFebruary(): TransactionEntity {
         transactionPartner = "Gym Membership",
         transactionDirection = TransactionDirection.Outflow,
         description = "Fitness Studio",
-        timestamp = Instant.parse("2024-02-10T12:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-10T12:00:00Z")
     )
 }
 
@@ -230,7 +241,8 @@ fun reweGroceriesFebruary(): TransactionEntity {
         transactionPartner = "Rewe",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
-        timestamp = Instant.parse("2024-02-20T15:30:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-02-20T15:30:00Z")
     )
 }
 
@@ -247,7 +259,8 @@ fun techCorpSalaryMarch(): TransactionEntity {
         transactionPartner = "TechCorp Ltd.",
         transactionDirection = TransactionDirection.Inflow,
         description = "Salary",
-        timestamp = Instant.parse("2024-03-01T12:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-01T12:00:00Z")
     )
 }
 
@@ -260,7 +273,8 @@ fun landlordRentMarch(): TransactionEntity {
         transactionPartner = "Landlord",
         transactionDirection = TransactionDirection.Outflow,
         description = "Rent",
-        timestamp = Instant.parse("2024-03-03T09:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-03T09:00:00Z")
     )
 }
 
@@ -273,7 +287,8 @@ fun eonElectricityMarch(): TransactionEntity {
         transactionPartner = "E.ON",
         transactionDirection = TransactionDirection.Outflow,
         description = "Electricity bill",
-        timestamp = Instant.parse("2024-03-15T08:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-15T08:00:00Z")
     )
 }
 
@@ -286,7 +301,8 @@ fun aldiGroceriesMarch(): TransactionEntity {
         transactionPartner = "Aldi",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
-        timestamp = Instant.parse("2024-03-05T10:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-05T10:00:00Z")
     )
 }
 
@@ -299,7 +315,8 @@ fun netflixMarch(): TransactionEntity {
         transactionPartner = "Netflix",
         transactionDirection = TransactionDirection.Outflow,
         description = "Netflix subscription",
-        timestamp = Instant.parse("2024-03-05T18:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-05T18:00:00Z")
     )
 }
 
@@ -312,7 +329,8 @@ fun gymMembershipMarch(): TransactionEntity {
         transactionPartner = "Gym Membership",
         transactionDirection = TransactionDirection.Outflow,
         description = "Fitness Studio",
-        timestamp = Instant.parse("2024-03-10T12:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-10T12:00:00Z")
     )
 }
 
@@ -325,7 +343,8 @@ fun lidlGroceriesMarch(): TransactionEntity {
         transactionPartner = "Lidl",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
-        timestamp = Instant.parse("2024-03-20T14:00:00Z")
+        updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
+        createdAt = Instant.parse("2024-03-20T14:00:00Z")
     )
 }
 

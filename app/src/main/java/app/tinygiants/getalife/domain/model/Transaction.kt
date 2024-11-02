@@ -10,5 +10,6 @@ data class Transaction(
     val transactionPartner: String,
     val direction: TransactionDirection,
     val description: String,
-    val timestamp: Instant
+    val updatedAt: Instant,
+    val createdAt: Instant
 )

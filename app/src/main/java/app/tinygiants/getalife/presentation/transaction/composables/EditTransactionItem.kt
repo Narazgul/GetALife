@@ -222,7 +222,8 @@ private fun TransactionDialogPreview() {
                     transactionPartner = "Landlord",
                     direction = TransactionDirection.Unknown,
                     description = "Rent for Mai",
-                    timestamp = Clock.System.now()
+                    updatedAt = Clock.System.now(),
+                    createdAt = Clock.System.now()
                 ),
                 accounts = emptyList(),
                 categories = emptyList()

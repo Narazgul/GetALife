@@ -67,8 +67,8 @@ class AddTransactionViewModel @Inject constructor(
         direction: TransactionDirection,
         accountId: Long,
         category: Category?,
-        transactionPartner: String?,
-        description: String?
+        transactionPartner: String,
+        description: String
     ) {
         viewModelScope.launch {
             addTransaction(amount, direction, accountId, category, transactionPartner, description)

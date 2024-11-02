@@ -47,7 +47,7 @@ class GetTransactionsForAccountUseCase @Inject constructor(
         }
     }
 
-    private fun sortTransactionsByTimestamp(transactions: List<TransactionEntity>?) = transactions?.sortedBy { it.timestamp }
+    private fun sortTransactionsByTimestamp(transactions: List<TransactionEntity>?) = transactions?.sortedBy { it.createdAt }
 
     private suspend fun mapToTransactions(
         transactions: List<TransactionEntity>,
@@ -70,7 +70,8 @@ class GetTransactionsForAccountUseCase @Inject constructor(
                     transactionPartner = transactionEntity.transactionPartner,
                     direction = transactionEntity.transactionDirection,
                     description = transactionEntity.description,
-                    timestamp = transactionEntity.timestamp
+                    updatedAt = transactionEntity.updatedAt,
+                    createdAt = transactionEntity.createdAt
                 )
             }
         }

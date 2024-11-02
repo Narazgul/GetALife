@@ -20,7 +20,7 @@ class AddAccountUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(name: String, balance: Money, type: AccountType) {
+    suspend operator fun invoke(name: String, balance: Money, type: AccountType, startingBalanceName: String) {
 
         val accounts = repository.getAccountsFlow().first()
         val accountId = Random.nextLong()
@@ -29,26 +29,30 @@ class AddAccountUseCase @Inject constructor(
 
             val highestListPosition = accounts.maxOfOrNull { it.listPosition }
             val endOfListPosition = if (highestListPosition == null) 0 else highestListPosition + 1
+            val creationTime = Clock.System.now()
 
             AccountEntity(
                 id = accountId,
                 name = name,
-                balance = 0.0,
+                balance = balance.value,
                 type = type,
                 listPosition = endOfListPosition,
-                updatedAt = Clock.System.now(),
-                createdAt = Clock.System.now()
+                updatedAt = creationTime,
+                createdAt = creationTime
             )
         }
+
+        val direction = if (balance.value >= 0) TransactionDirection.Inflow else TransactionDirection.Outflow
 
         repository.addAccount(accountEntity = accountEntity)
         addTransaction(
             amount = Money(value = balance.value),
-            direction = TransactionDirection.Inflow,
+            direction = direction,
             accountId = accountId,
             category = null,
             transactionPartner = "",
-            description = "Starting Balance"
+            description = startingBalanceName,
+            isAccountCreation = true
         )
     }
 }

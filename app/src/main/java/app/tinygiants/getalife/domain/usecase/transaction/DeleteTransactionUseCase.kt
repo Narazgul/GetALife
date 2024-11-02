@@ -26,7 +26,8 @@ class DeleteTransactionUseCase @Inject constructor(
                 transactionPartner = transaction.transactionPartner,
                 transactionDirection = transaction.direction,
                 description = transaction.description,
-                timestamp = transaction.timestamp
+                updatedAt = transaction.updatedAt,
+                createdAt = transaction.createdAt
             )
 
             repository.deleteTransaction(transaction = transactionEntity)

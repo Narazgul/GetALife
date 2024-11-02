@@ -112,8 +112,8 @@ dependencies {
     testImplementation(libs.room.test)
     ksp(libs.room.compiler)
 
-    // Junit
+    // Testing
     testRuntimeOnly(libs.junit5.engine)
     testImplementation(libs.bundles.testing)
-    androidTestImplementation(libs.bundles.junit4)
+    androidTestImplementation(libs.bundles.testing.android)
 }

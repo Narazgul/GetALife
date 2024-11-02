@@ -25,7 +25,7 @@ interface TransactionDao {
     fun getCategoryTransactionsFlow(categoryId: Long): Flow<List<TransactionEntity>>
 
     @Transaction
-    @Query("SELECT * FROM transactions WHERE categoryId == :categoryId  AND timestamp >= :startTime AND timestamp <= :endTime")
+    @Query("SELECT * FROM transactions WHERE categoryId == :categoryId  AND createdAt >= :startTime AND createdAt <= :endTime")
     suspend fun getCategoryTransactions(categoryId: Long, startTime: Instant, endTime: Instant): List<TransactionEntity>
 
     @Query("SELECT * FROM transactions WHERE id == :transactionId")

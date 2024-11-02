@@ -16,7 +16,7 @@ class UpdateAccountUseCase @Inject constructor(private val repository: AccountRe
             type = account.type,
             listPosition = account.listPosition,
             updatedAt = Clock.System.now(),
-            createdAt = Clock.System.now()
+            createdAt = account.createdAt
         )
 
         repository.updateAccount(accountEntity = accountEntity)

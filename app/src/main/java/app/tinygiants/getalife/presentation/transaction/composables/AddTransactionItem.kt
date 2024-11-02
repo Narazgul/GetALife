@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.Surface
@@ -43,7 +42,6 @@ import app.tinygiants.getalife.theme.spacing
 typealias Description = String
 typealias TransactionPartner = String
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionItem(
     categories: List<Category>,

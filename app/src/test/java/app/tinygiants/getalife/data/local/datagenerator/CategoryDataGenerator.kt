@@ -4,7 +4,7 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import kotlinx.datetime.Instant
 
-fun categoryEntities() = listOf(
+val categoryEntities = listOf(
     rentCategoryEntity(),
     studentLoanRepaymentCategoryEntity(),
     insuranceCategoryEntity(),

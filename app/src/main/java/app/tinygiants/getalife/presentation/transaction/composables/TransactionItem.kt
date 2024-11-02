@@ -91,7 +91,8 @@ private fun TransactionItemPreview() {
                     transactionPartner = "Wimmer",
                     direction = TransactionDirection.Outflow,
                     description = "Bäckerei",
-                    timestamp = Clock.System.now()
+                    updatedAt = Clock.System.now(),
+                    createdAt = Clock.System.now()
                 ),
                 accounts = emptyList(),
                 categories = emptyList()

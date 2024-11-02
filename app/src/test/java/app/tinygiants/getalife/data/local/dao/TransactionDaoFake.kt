@@ -28,7 +28,7 @@ class TransactionDaoFake : TransactionDao {
         endTime: Instant
     ): List<TransactionEntity> {
         return transactions.value.filter {
-            it.categoryId == categoryId && it.timestamp >= startTime && it.timestamp <= endTime
+            it.categoryId == categoryId && it.createdAt >= startTime && it.createdAt <= endTime
         }
     }
 

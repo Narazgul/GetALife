@@ -77,7 +77,8 @@ class AccountViewModel @Inject constructor(
                 is UserClickEvent.AddAccount -> addAccount(
                     name = clickEvent.name,
                     balance = clickEvent.balance,
-                    type = clickEvent.type
+                    type = clickEvent.type,
+                    startingBalanceName = clickEvent.startingBalanceName
                 )
 
                 is UserClickEvent.UpdateAccount -> updateAccount(account = clickEvent.account)

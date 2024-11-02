@@ -53,7 +53,7 @@ class TransactionRepositoryImplTest {
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
-            fakeDao.transactions.value = transactionEntities()
+            fakeDao.transactions.value = transactionEntities
             val finalEmission = awaitItem()
 
             assertThat(finalEmission).hasSize(21)
@@ -62,7 +62,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Get Transactions for Account`(): Unit = runTest {
-        fakeDao.transactions.value = transactionEntities()
+        fakeDao.transactions.value = transactionEntities
 
         repository.getTransactionsByAccount(accountId = 1).test {
             val emission = awaitItem()
@@ -79,7 +79,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Get Transactions for Category`(): Unit = runTest {
-        fakeDao.transactions.value = transactionEntities()
+        fakeDao.transactions.value = transactionEntities
 
         repository.getTransactionsByCategory(categoryId = 1L).test {
             val emission = awaitItem()
@@ -100,7 +100,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Update transaction`(): Unit = runTest {
-        fakeDao.transactions.value = transactionEntities()
+        fakeDao.transactions.value = transactionEntities
 
         val tobeUpdatedTransaction =
             techCorpSalaryJanuary().copy(transactionDirection = TransactionDirection.Outflow, transactionPartner = "Testpartner")
@@ -113,7 +113,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Delete Transaction`(): Unit = runTest{
-        fakeDao.transactions.value = transactionEntities()
+        fakeDao.transactions.value = transactionEntities
 
         repository.deleteTransaction(aldiGroceriesJanuary())
 
