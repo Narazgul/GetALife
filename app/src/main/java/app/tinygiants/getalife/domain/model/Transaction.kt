@@ -8,7 +8,7 @@ data class Transaction(
     val account: Account?,
     val category: Category?,
     val transactionPartner: String,
-    val direction: TransactionDirection,
+    val transactionDirection: TransactionDirection,
     val description: String,
     val updatedAt: Instant,
     val createdAt: Instant

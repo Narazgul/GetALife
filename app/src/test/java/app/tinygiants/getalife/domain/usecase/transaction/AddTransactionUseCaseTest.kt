@@ -3,7 +3,7 @@ package app.tinygiants.getalife.domain.usecase.transaction
 import app.tinygiants.getalife.MainCoroutineExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
-import app.tinygiants.getalife.data.local.datagenerator.categoryEntities
+import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
@@ -77,7 +77,7 @@ class AddTransactionUseCaseTest {
     @Test
     fun `add Outflow transaction`(): Unit = runTest {
         accountRepositoryFake.accountsFlow.value = accounts
-        categoryRepositoryFake.categories.value = categoryEntities
+        categoryRepositoryFake.categories.value = categories
         val testBegin = Clock.System.now()
         val shortlyAfterTestBegin = testBegin + 50.milliseconds
         val category = rentCategoryEntity().run {
@@ -127,8 +127,7 @@ class AddTransactionUseCaseTest {
         val accountAfterTransaction = accountRepositoryFake.accountsFlow.value.first()
         assertThat(accountAfterTransaction.name).isEqualTo("Cash Account")
         assertThat(accountAfterTransaction.balance).isEqualTo(449.19)
-        assertThat(transaction.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
-        assertThat(transaction.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
+        assertThat(accountAfterTransaction.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
 
         val categoryAfterTransaction = categoryRepositoryFake.categories.value.first()
         assertThat(categoryAfterTransaction.name).isEqualTo("Miete")

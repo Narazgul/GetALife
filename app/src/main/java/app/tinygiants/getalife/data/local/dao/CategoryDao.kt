@@ -19,6 +19,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE groupId == :groupId")
     suspend fun getCategoriesInGroup(groupId: Long): List<CategoryEntity>
 
+    @Query("SELECT * FROM categories WHERE id == :categoryId")
+    suspend fun getCategory(categoryId: Long): CategoryEntity?
+
     @Insert
     suspend fun addCategory(categoryEntity: CategoryEntity)
 

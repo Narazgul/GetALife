@@ -62,7 +62,7 @@ fun TransactionItem(
         Text(
             text = transaction.amount.formattedMoney,
             style = MaterialTheme.typography.bodyLarge,
-            color = if (transaction.direction == TransactionDirection.Inflow) success else MaterialTheme.colorScheme.error
+            color = if (transaction.transactionDirection == TransactionDirection.Inflow) success else MaterialTheme.colorScheme.error
         )
     }
 
@@ -89,7 +89,7 @@ private fun TransactionItemPreview() {
                     account = Account(-1, "", Money(0.00), AccountType.Unknown, 0, Clock.System.now(), Clock.System.now()),
                     category = null,
                     transactionPartner = "Wimmer",
-                    direction = TransactionDirection.Outflow,
+                    transactionDirection = TransactionDirection.Outflow,
                     description = "Bäckerei",
                     updatedAt = Clock.System.now(),
                     createdAt = Clock.System.now()

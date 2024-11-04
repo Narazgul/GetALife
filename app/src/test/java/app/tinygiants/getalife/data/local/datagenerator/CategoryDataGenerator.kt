@@ -4,16 +4,21 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import kotlinx.datetime.Instant
 
-val categoryEntities = listOf(
+const val FIXED_COST_GROUP = 1L
+const val DAILY_LIFE_GROUP = 2L
+const val DREAMS_GROUP = 3L
+const val SAVINGS_GROUP = 4L
+
+val categories = listOf(
     rentCategoryEntity(),
     studentLoanRepaymentCategoryEntity(),
     insuranceCategoryEntity(),
-    healthInsuranceCategoryEntity(),
+    electricityCategoryEntity(),
     groceriesCategoryEntity(),
     transportCategoryEntity(),
     clothingCategoryEntity(),
     eatingOutCategoryEntity(),
-    petsCategoryEntity(),
+    fitnessCategoryEntity(),
     savingsCategoryEntity(),
     vacationCategoryEntity(),
     hobbiesCategoryEntity(),
@@ -21,7 +26,7 @@ val categoryEntities = listOf(
     investmentsCategoryEntity(),
     debtsCategoryEntity(),
     emergencyFundCategoryEntity(),
-    healthcareCategoryEntity(),
+    subscriptionCategoryEntity(),
     gymCategoryEntity(),
     dentistCategoryEntity(),
     personalCareCategoryEntity()
@@ -30,7 +35,7 @@ val categoryEntities = listOf(
 fun rentCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 1L,
-        groupId = 0L,
+        groupId = FIXED_COST_GROUP,
         emoji = "🏠",
         name = "Miete",
         budgetTarget = 1200.0,
@@ -48,7 +53,7 @@ fun rentCategoryEntity(): CategoryEntity {
 fun studentLoanRepaymentCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 2L,
-        groupId = 0L,
+        groupId = FIXED_COST_GROUP,
         emoji = "🎓",
         name = "Studienkredittilgung",
         budgetTarget = 300.0,
@@ -66,7 +71,7 @@ fun studentLoanRepaymentCategoryEntity(): CategoryEntity {
 fun insuranceCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 3L,
-        groupId = 0L,
+        groupId = FIXED_COST_GROUP,
         emoji = "🛡️",
         name = "Versicherungen",
         budgetTarget = 0.0,
@@ -81,12 +86,12 @@ fun insuranceCategoryEntity(): CategoryEntity {
     )
 }
 
-fun healthInsuranceCategoryEntity(): CategoryEntity {
+fun electricityCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 4L,
-        groupId = 0L,
-        emoji = "💊",
-        name = "Gesundheitsversicherung",
+        groupId = FIXED_COST_GROUP,
+        emoji = "⚡",
+        name = "EON",
         budgetTarget = 500.0,
         budgetPurpose = BudgetPurpose.Spending,
         assignedMoney = 0.0,
@@ -102,7 +107,7 @@ fun healthInsuranceCategoryEntity(): CategoryEntity {
 fun groceriesCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 5L,
-        groupId = 1L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🥦",
         name = "Lebensmittel",
         budgetTarget = 300.0,
@@ -120,7 +125,7 @@ fun groceriesCategoryEntity(): CategoryEntity {
 fun transportCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 6L,
-        groupId = 1L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🚍",
         name = "Transport",
         budgetTarget = null,
@@ -138,7 +143,7 @@ fun transportCategoryEntity(): CategoryEntity {
 fun clothingCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 7L,
-        groupId = 1L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "👗",
         name = "Kleidung",
         budgetTarget = 200.0,
@@ -156,7 +161,7 @@ fun clothingCategoryEntity(): CategoryEntity {
 fun eatingOutCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 8L,
-        groupId = 1L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🍽️",
         name = "Essen gehen",
         budgetTarget = 0.0,
@@ -171,12 +176,12 @@ fun eatingOutCategoryEntity(): CategoryEntity {
     )
 }
 
-fun petsCategoryEntity(): CategoryEntity {
+fun fitnessCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 9L,
-        groupId = 1L,
+        groupId = FIXED_COST_GROUP,
         emoji = "🐾",
-        name = "Haustiere",
+        name = "Fitness",
         budgetTarget = 150.0,
         budgetPurpose = BudgetPurpose.Spending,
         assignedMoney = 0.0,
@@ -192,7 +197,7 @@ fun petsCategoryEntity(): CategoryEntity {
 fun savingsCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 10L,
-        groupId = 2L,
+        groupId = SAVINGS_GROUP,
         emoji = "💰",
         name = "Ersparnisse",
         budgetTarget = null,
@@ -210,7 +215,7 @@ fun savingsCategoryEntity(): CategoryEntity {
 fun vacationCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 11L,
-        groupId = 2L,
+        groupId = DREAMS_GROUP,
         emoji = "🏖️",
         name = "Urlaub",
         budgetTarget = 1000.0,
@@ -228,7 +233,7 @@ fun vacationCategoryEntity(): CategoryEntity {
 fun hobbiesCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 12L,
-        groupId = 2L,
+        groupId = DREAMS_GROUP,
         emoji = "🎨",
         name = "Hobbys",
         budgetTarget = 0.0,
@@ -246,7 +251,7 @@ fun hobbiesCategoryEntity(): CategoryEntity {
 fun educationCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 13L,
-        groupId = 2L,
+        groupId = DREAMS_GROUP,
         emoji = "📚",
         name = "Weiterbildung",
         budgetTarget = 250.0,
@@ -264,7 +269,7 @@ fun educationCategoryEntity(): CategoryEntity {
 fun investmentsCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 14L,
-        groupId = 3L,
+        groupId = SAVINGS_GROUP,
         emoji = "📈",
         name = "Investitionen",
         budgetTarget = 500.0,
@@ -282,7 +287,7 @@ fun investmentsCategoryEntity(): CategoryEntity {
 fun debtsCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 15L,
-        groupId = 3L,
+        groupId = SAVINGS_GROUP,
         emoji = "💳",
         name = "Schulden",
         budgetTarget = 1000.0,
@@ -300,7 +305,7 @@ fun debtsCategoryEntity(): CategoryEntity {
 fun emergencyFundCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 16L,
-        groupId = 3L,
+        groupId = SAVINGS_GROUP,
         emoji = "🆘",
         name = "Notgroschen",
         budgetTarget = 300.0,
@@ -315,12 +320,12 @@ fun emergencyFundCategoryEntity(): CategoryEntity {
     )
 }
 
-fun healthcareCategoryEntity(): CategoryEntity {
+fun subscriptionCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 17L,
-        groupId = 4L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🏥",
-        name = "Gesundheitspflege",
+        name = "Abos",
         budgetTarget = 100.0,
         budgetPurpose = BudgetPurpose.Saving,
         assignedMoney = 0.0,
@@ -336,7 +341,7 @@ fun healthcareCategoryEntity(): CategoryEntity {
 fun gymCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 18L,
-        groupId = 4L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🏋️‍♂️",
         name = "Fitnessstudio",
         budgetTarget = 0.0,
@@ -354,7 +359,7 @@ fun gymCategoryEntity(): CategoryEntity {
 fun dentistCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 19L,
-        groupId = 4L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🦷",
         name = "Zahnarzt",
         budgetTarget = 200.0,
@@ -372,7 +377,7 @@ fun dentistCategoryEntity(): CategoryEntity {
 fun personalCareCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         id = 20L,
-        groupId = 4L,
+        groupId = DAILY_LIFE_GROUP,
         emoji = "🧴",
         name = "Körperpflege",
         budgetTarget = 0.0,

@@ -15,11 +15,10 @@ import eonElectricityMarch
 import kotlinx.coroutines.test.runTest
 import landlordRentJanuary
 import landlordRentMarch
-import lidlGroceriesMarch
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import techCorpSalaryJanuary
-import transactionEntities
+import transactions
 
 class TransactionRepositoryImplTest {
 
@@ -53,7 +52,7 @@ class TransactionRepositoryImplTest {
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
-            fakeDao.transactions.value = transactionEntities
+            fakeDao.transactions.value = transactions
             val finalEmission = awaitItem()
 
             assertThat(finalEmission).hasSize(21)
@@ -62,7 +61,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Get Transactions for Account`(): Unit = runTest {
-        fakeDao.transactions.value = transactionEntities
+        fakeDao.transactions.value = transactions
 
         repository.getTransactionsByAccount(accountId = 1).test {
             val emission = awaitItem()
@@ -72,20 +71,20 @@ class TransactionRepositoryImplTest {
 
         repository.getTransactionsByAccount(accountId = 2).test {
             val emission = awaitItem()
-            assertThat(emission).hasSize(3)
+            assertThat(emission).hasSize(2)
             assertThat(emission.first()).isEqualTo(techCorpSalaryJanuary())
         }
     }
 
     @Test
     fun `Get Transactions for Category`(): Unit = runTest {
-        fakeDao.transactions.value = transactionEntities
+        fakeDao.transactions.value = transactions
 
         repository.getTransactionsByCategory(categoryId = 1L).test {
             val emission = awaitItem()
-            assertThat(emission).hasSize(6)
-            assertThat(emission.first()).isEqualTo(aldiGroceriesJanuary())
-            assertThat(emission.last()).isEqualTo(lidlGroceriesMarch())
+            assertThat(emission).hasSize(3)
+            assertThat(emission.first()).isEqualTo(landlordRentJanuary())
+            assertThat(emission.last()).isEqualTo(landlordRentMarch())
         }
     }
 
@@ -100,7 +99,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Update transaction`(): Unit = runTest {
-        fakeDao.transactions.value = transactionEntities
+        fakeDao.transactions.value = transactions
 
         val tobeUpdatedTransaction =
             techCorpSalaryJanuary().copy(transactionDirection = TransactionDirection.Outflow, transactionPartner = "Testpartner")
@@ -113,7 +112,7 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Delete Transaction`(): Unit = runTest{
-        fakeDao.transactions.value = transactionEntities
+        fakeDao.transactions.value = transactions
 
         repository.deleteTransaction(aldiGroceriesJanuary())
 

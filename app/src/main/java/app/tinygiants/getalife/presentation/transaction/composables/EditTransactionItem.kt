@@ -62,7 +62,7 @@ fun EditTransaction(
     var amountUserInputText by rememberSaveable { mutableStateOf(amountMoney.value.toString()) }
     var descriptionUserInput by rememberSaveable { mutableStateOf(transaction.description) }
     var transactionPartnerUserInput by rememberSaveable { mutableStateOf(transaction.transactionPartner) }
-    var directionUserInput by rememberSaveable { mutableStateOf(transaction.direction) }
+    var directionUserInput by rememberSaveable { mutableStateOf(transaction.transactionDirection) }
     var categoryUserInput by remember { mutableStateOf(transaction.category) }
     var accountUserInput by remember { mutableStateOf(transaction.account) }
 
@@ -79,7 +79,7 @@ fun EditTransaction(
                         directionUserInput = if (isChecked) TransactionDirection.Inflow
                         else TransactionDirection.Unknown
 
-                        onEditTransactionClicked(transaction.copy(direction = directionUserInput))
+                        onEditTransactionClicked(transaction.copy(transactionDirection = directionUserInput))
                     },
                     shape = RoundedCornerShape(topStart = spacing.l, bottomStart = spacing.l),
                 ) {
@@ -91,7 +91,7 @@ fun EditTransaction(
                         directionUserInput = if (isChecked) TransactionDirection.Outflow
                         else TransactionDirection.Unknown
 
-                        onEditTransactionClicked(transaction.copy(direction = directionUserInput))
+                        onEditTransactionClicked(transaction.copy(transactionDirection = directionUserInput))
                     },
                     shape = RoundedCornerShape(topEnd = spacing.l, bottomEnd = spacing.l),
                 ) {
@@ -220,7 +220,7 @@ private fun TransactionDialogPreview() {
                     account = null,
                     category = null,
                     transactionPartner = "Landlord",
-                    direction = TransactionDirection.Unknown,
+                    transactionDirection = TransactionDirection.Unknown,
                     description = "Rent for Mai",
                     updatedAt = Clock.System.now(),
                     createdAt = Clock.System.now()

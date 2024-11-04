@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -41,7 +40,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
@@ -184,7 +182,6 @@ fun Category(
                 assignedMoney.value < (availableMoney.value) -> onWarning
                 else -> onSuccess
             }
-
             LinearProgressIndicator(
                 progress = { animatedProgress },
                 modifier = Modifier
@@ -193,6 +190,9 @@ fun Category(
                 color = progressColor,
                 trackColor = progressBackground,
                 strokeCap = StrokeCap.Round,
+                drawStopIndicator = {
+                    drawCircle(Color.Red)
+                }
             )
             LinearProgressIndicator(
                 progress = { animatedSpentProgress },
@@ -202,6 +202,7 @@ fun Category(
                 color = spentProgressColor,
                 trackColor = Color.Transparent,
                 strokeCap = StrokeCap.Round,
+                drawStopIndicator = { }
             )
             LinearProgressIndicator(
                 progress = { animatedOverspentProgress },
@@ -215,18 +216,6 @@ fun Category(
                 strokeCap = StrokeCap.Round,
                 drawStopIndicator = { }
             )
-
-            if (budgetTargetProgress != null)
-                Text(
-                    text = "🏁",
-                    modifier = Modifier.offset {
-                        IntOffset(
-                            x = (budgetTargetProgress * progressBarWidth).toInt() - 8.dp.value.toInt(),
-                            y = -32
-                        )
-                    }
-                )
-
         }
 
         Spacer(modifier = Modifier.height(spacing.default))
@@ -302,6 +291,28 @@ fun FullCategoryPreview() {
                 progress = 1f,
                 spentProgress = 0.2f,
                 optionalText = optionalExampleText(0.00)
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun OverspentCategroyPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🪩",
+                categoryName = "Party",
+                budgetTarget = Money(200.00),
+                budgetPurpose = BudgetPurpose.Spending,
+                assignedMoney = Money(200.00),
+                availableMoney = Money(-20.00),
+                progress = 1f,
+                spentProgress = 0f,
+                overspentProgress = 0f,
+                budgetTargetProgress = 0f,
+                optionalText = "20€ zu viel ausgegeben"
             )
         }
     }

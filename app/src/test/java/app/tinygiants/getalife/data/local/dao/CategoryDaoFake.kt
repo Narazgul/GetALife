@@ -14,6 +14,9 @@ class CategoryDaoFake: CategoryDao {
         return categories.value.filter { it.groupId == groupId }
     }
 
+    override suspend fun getCategory(categoryId: Long): CategoryEntity? =
+        categories.value.find { it.id == categoryId }
+
     override suspend fun addCategory(categoryEntity: CategoryEntity) {
         val updatedCategories = categories.value.toMutableList().apply {
             add(categoryEntity)

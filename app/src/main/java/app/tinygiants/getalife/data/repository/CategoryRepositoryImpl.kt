@@ -10,6 +10,7 @@ class CategoryRepositoryImpl @Inject constructor(private val categoryDao: Catego
 
     override fun getCategoriesFlow(): Flow<List<CategoryEntity>> = categoryDao.getCategoriesFlow()
     override suspend fun getCategoriesInGroup(groupId: Long) = categoryDao.getCategoriesInGroup(groupId = groupId)
+    override suspend fun getCategory(categoryId: Long) = categoryDao.getCategory(categoryId = categoryId)
     override suspend fun addCategory(categoryEntity: CategoryEntity) { categoryDao.addCategory(categoryEntity = categoryEntity) }
     override suspend fun updateCategory(categoryEntity: CategoryEntity) { categoryDao.updateCategory(categoryEntity) }
     override suspend fun deleteCategory(categoryEntity: CategoryEntity) { categoryDao.deleteCategory(categoryEntity) }

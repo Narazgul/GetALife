@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import app.tinygiants.getalife.MainCoroutineExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
-import app.tinygiants.getalife.data.local.datagenerator.categoryEntities
+import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.checkingAccount
 import app.tinygiants.getalife.data.local.datagenerator.creditCardAccount
 import app.tinygiants.getalife.data.local.datagenerator.depotAccount
@@ -114,7 +114,7 @@ class GetAssignableMoneySumUseCaseTest {
 
     @Test
     fun `Get assignable money if no accounts exist and several categories with assigned money`(): Unit = runTest {
-        categoryRepositoryFake.categories.value = categoryEntities
+        categoryRepositoryFake.categories.value = categories
 
         getAssignableMoney().test {
             val assignableMoney = awaitItem().getOrThrow()
@@ -147,7 +147,7 @@ class GetAssignableMoneySumUseCaseTest {
     @Test
     fun `Get assignable money if one account exists and several categories with money assigned to`(): Unit = runTest {
         accountRepositoryFake.accountsFlow.value = listOf(cashAccount())
-        categoryRepositoryFake.categories.value = categoryEntities
+        categoryRepositoryFake.categories.value = categories
 
         getAssignableMoney().test {
             val assignableMoney = awaitItem().getOrThrow()
@@ -169,7 +169,7 @@ class GetAssignableMoneySumUseCaseTest {
     @Test
     fun `Get assignable money if several accounts exist and several categories with money assigned to`(): Unit = runTest {
         accountRepositoryFake.accountsFlow.value = accounts
-        categoryRepositoryFake.categories.value = categoryEntities
+        categoryRepositoryFake.categories.value = categories
 
         getAssignableMoney().test {
             val assignableMoney = awaitItem().getOrThrow()

@@ -4,17 +4,25 @@ import kotlinx.datetime.Instant
 
 // Account IDs
 const val CASH_ACCOUNT: Long = 1L
-const val BANK_ACCOUNT: Long = 2L
+const val BANK_ACCOUNT_ONE: Long = 2L
+const val BANK_ACCOUNT_TWO: Long = 3L
+const val SAVINGS_ACCOUNT: Long = 4L
+const val CREDIT_CARD_ACCOUNT: Long = 5L
+const val MORTGAGE_ACCOUNT: Long = 6L
+const val LOAN_ACCOUNT: Long = 7L
+const val DEPOT_ACCOUNT: Long = 8L
 
 // Category IDs
-const val GROCERIES: Long = 1L
-const val SALARY: Long = 2L
-const val RENT: Long = 3L
+const val RENT: Long = 1L
+const val STUDENT_LOAN = 2L
+const val INSURANCE: Long = 3L
 const val ELECTRICITY_BILL: Long = 4L
-const val SUBSCRIPTION: Long = 5L
-const val FITNESS: Long = 6L
+const val GROCERIES: Long = 5L
+const val TRANSPORTATION: Long = 6L
+const val FITNESS: Long = 9L
+const val SUBSCRIPTIONS: Long = 17L
 
-val transactionEntities = listOf(
+val transactions = listOf(
 
     // January
     aldiGroceriesJanuary(),
@@ -63,8 +71,8 @@ fun aldiGroceriesJanuary(): TransactionEntity {
 fun techCorpSalaryJanuary(): TransactionEntity {
     return TransactionEntity(
         id = 2L,
-        accountId = BANK_ACCOUNT,
-        categoryId = SALARY,
+        accountId = BANK_ACCOUNT_ONE,
+        categoryId = null,
         amount = 2000.0,
         transactionPartner = "TechCorp Ltd.",
         transactionDirection = TransactionDirection.Inflow,
@@ -106,7 +114,7 @@ fun netflixJanuary(): TransactionEntity {
     return TransactionEntity(
         id = 5L,
         accountId = CASH_ACCOUNT,
-        categoryId = SUBSCRIPTION,
+        categoryId = SUBSCRIPTIONS,
         amount = -12.0,
         transactionPartner = "Netflix",
         transactionDirection = TransactionDirection.Outflow,
@@ -151,8 +159,8 @@ fun gymMembershipJanuary(): TransactionEntity {
 fun techCorpSalaryFebruary(): TransactionEntity {
     return TransactionEntity(
         id = 8L,
-        accountId = BANK_ACCOUNT,
-        categoryId = SALARY,
+        accountId = BANK_ACCOUNT_ONE,
+        categoryId = null,
         amount = 2000.0,
         transactionPartner = "TechCorp Ltd.",
         transactionDirection = TransactionDirection.Inflow,
@@ -208,7 +216,7 @@ fun netflixFebruary(): TransactionEntity {
     return TransactionEntity(
         id = 12L,
         accountId = CASH_ACCOUNT,
-        categoryId = SUBSCRIPTION,
+        categoryId = SUBSCRIPTIONS,
         amount = -12.0,
         transactionPartner = "Netflix",
         transactionDirection = TransactionDirection.Outflow,
@@ -253,8 +261,8 @@ fun reweGroceriesFebruary(): TransactionEntity {
 fun techCorpSalaryMarch(): TransactionEntity {
     return TransactionEntity(
         id = 15L,
-        accountId = BANK_ACCOUNT,
-        categoryId = SALARY,
+        accountId = BANK_ACCOUNT_TWO,
+        categoryId = null,
         amount = 2000.0,
         transactionPartner = "TechCorp Ltd.",
         transactionDirection = TransactionDirection.Inflow,
@@ -310,7 +318,7 @@ fun netflixMarch(): TransactionEntity {
     return TransactionEntity(
         id = 19L,
         accountId = CASH_ACCOUNT,
-        categoryId = SUBSCRIPTION,
+        categoryId = SUBSCRIPTIONS,
         amount = -12.0,
         transactionPartner = "Netflix",
         transactionDirection = TransactionDirection.Outflow,

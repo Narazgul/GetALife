@@ -14,6 +14,9 @@ class CategoryRepositoryFake : CategoryRepository {
     override suspend fun getCategoriesInGroup(groupId: Long) =
         categories.value.filter { it.groupId == groupId }
 
+    override suspend fun getCategory(categoryId: Long): CategoryEntity? =
+        categories.value.find { it.id == categoryId }
+
     override suspend fun addCategory(categoryEntity: CategoryEntity) =
         categories.update { it + categoryEntity }
 

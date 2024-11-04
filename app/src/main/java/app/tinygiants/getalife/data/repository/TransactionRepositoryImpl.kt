@@ -9,7 +9,8 @@ class TransactionRepositoryImpl @Inject constructor(private val transactionDao: 
 
     override fun getTransactions() = transactionDao.getAllTransactions()
     override fun getTransactionsByAccount(accountId: Long) = transactionDao.getAccountTransactionsFlow(accountId = accountId)
-    override suspend fun getTransactionsByCategory(categoryId: Long) = transactionDao.getCategoryTransactionsFlow(categoryId = categoryId)
+    override fun getTransactionsByCategory(categoryId: Long) = transactionDao.getCategoryTransactionsFlow(categoryId = categoryId)
+    override suspend fun getTransaction(transactionId: Long) = transactionDao.getTransaction(transactionId = transactionId)
     override suspend fun addTransaction(transaction: TransactionEntity) = transactionDao.addTransaction(transaction = transaction)
     override suspend fun updateTransaction(transaction: TransactionEntity) = transactionDao.updateTransaction(transaction = transaction)
     override suspend fun deleteTransaction(transaction: TransactionEntity) = transactionDao.deleteTransaction(transaction = transaction)

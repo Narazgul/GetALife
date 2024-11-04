@@ -1,7 +1,7 @@
 [versions]
 
-kotlinVersion = "2.0.20"
-ksp-version = "2.0.20-1.0.24"
+kotlinVersion = "2.0.21"
+ksp-version = "2.0.21-1.0.26"
 android-gradle-plugin = "8.7.2"
 splashscreenVersion = "1.0.1"
 datetime = "0.6.1"
@@ -26,7 +26,7 @@ lifecycleRuntimeCompose = "2.8.7"
 navigationCompose = "2.8.3"
 roomVersion = "2.6.1"
 
-emoji2Emojipicker = "1.5.0"
+emojipicker = "1.5.0"
 
 junit = "1.2.1"
 jUnit4Version = "4.13.2"
@@ -89,7 +89,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVer
 room-test = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
 # Misc
-emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emoji2Emojipicker" }
+emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emojipicker" }
 
 # Testing
 junit4 = { module = "junit:junit", version.ref = "jUnit4Version" }

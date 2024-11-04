@@ -15,8 +15,11 @@ class TransactionRepositoryFake : TransactionRepository {
     override fun getTransactionsByAccount(accountId: Long) =
         transactions.map { it.filter { transaction -> transaction.accountId == accountId } }
 
-    override suspend fun getTransactionsByCategory(categoryId: Long) =
+    override fun getTransactionsByCategory(categoryId: Long) =
         transactions.map { it.filter { transaction -> transaction.categoryId == categoryId } }
+
+    override suspend fun getTransaction(transactionId: Long): TransactionEntity? =
+        transactions.value.find { it.id == transactionId }
 
     override suspend fun addTransaction(transaction: TransactionEntity) =
         transactions.update { it + transaction }
