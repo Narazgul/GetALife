@@ -26,16 +26,17 @@ class AddGroupUseCase @Inject constructor(
 
             val highestListPosition = groups.maxOfOrNull { group -> group.listPosition }
             val endOfListPosition = if (highestListPosition == null) 0 else highestListPosition + 1
+            val trimmedGroupName = groupName.trim()
 
             val header = GroupEntity(
                 id = Random.nextLong(),
-                name = groupName,
+                name = trimmedGroupName,
                 listPosition = endOfListPosition,
                 isExpanded = true
             )
 
             repository.addGroup(groupEntity = header)
-            addCategory(groupId = header.id, categoryName = "Jetzt Kategorie hinzufügen", isInitialCategory = true)
+            addCategory(groupId = header.id, categoryName = "", isInitialCategory = true)
         }
     }
 }

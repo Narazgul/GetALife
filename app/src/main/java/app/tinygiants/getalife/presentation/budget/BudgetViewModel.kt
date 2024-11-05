@@ -10,7 +10,6 @@ import app.tinygiants.getalife.domain.usecase.account.GetAssignableMoneySumUseCa
 import app.tinygiants.getalife.domain.usecase.categories.GetCategoriesInGroupsUseCase
 import app.tinygiants.getalife.domain.usecase.categories.category.AddCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.categories.category.DeleteCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.categories.category.UpdateAssignedMoneyUseCase
 import app.tinygiants.getalife.domain.usecase.categories.category.UpdateCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.categories.group.AddGroupUseCase
 import app.tinygiants.getalife.domain.usecase.categories.group.DeleteGroupUseCase
@@ -20,7 +19,6 @@ import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddGroup
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteGroup
-import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateAssignedMoney
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateGroup
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
@@ -40,7 +38,6 @@ class BudgetViewModel @Inject constructor(
     private val updateGroup: UpdateGroupUseCase,
     private val deleteGroup: DeleteGroupUseCase,
     private val addCategory: AddCategoryUseCase,
-    private val updateAssignedMoney: UpdateAssignedMoneyUseCase,
     private val updateCategory: UpdateCategoryUseCase,
     private val deleteCategory: DeleteCategoryUseCase
 ) : ViewModel() {
@@ -97,11 +94,6 @@ class BudgetViewModel @Inject constructor(
                 is DeleteGroup -> deleteGroup(group = clickEvent.group)
 
                 is AddCategory -> addCategory(groupId = clickEvent.groupId, categoryName = clickEvent.categoryName)
-                is UpdateAssignedMoney -> updateAssignedMoney(
-                    category = clickEvent.category,
-                    newAssignedMoney = clickEvent.newAssignedMoney
-                )
-
                 is UpdateCategory -> updateCategory(category = clickEvent.category)
                 is DeleteCategory -> deleteCategory(category = clickEvent.category)
             }

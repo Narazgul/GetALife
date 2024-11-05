@@ -25,12 +25,13 @@ class AddCategoryUseCase @Inject constructor(
 
             val highestListPosition = categories.maxOfOrNull { it.listPosition }
             val endOfListPosition = if (highestListPosition == null) 0 else highestListPosition + 1
+            val trimmedCategoryName = categoryName.trim()
 
             CategoryEntity(
                 id = Random.nextLong(),
                 groupId = groupId,
                 emoji = "",
-                name = categoryName,
+                name = trimmedCategoryName,
                 budgetTarget = null,
                 budgetPurpose = BudgetPurpose.Unknown,
                 assignedMoney = 0.00,

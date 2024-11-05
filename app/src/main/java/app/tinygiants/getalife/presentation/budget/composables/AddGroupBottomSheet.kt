@@ -37,6 +37,7 @@ fun AddGroupBottomSheet(
     var groupName by rememberSaveable { mutableStateOf("") }
 
     val onNameChanged = { newName: String -> groupName = newName }
+
     val onAddGroupClicked = { onUserClickEvent(UserClickEvent.AddGroup(name = groupName)) }
 
     ModalBottomSheet(

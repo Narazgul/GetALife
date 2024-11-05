@@ -20,7 +20,6 @@ sealed class UserClickEvent {
     data class DeleteGroup(val group: Group) : UserClickEvent()
 
     data class AddCategory(val groupId: Long, val categoryName: String) : UserClickEvent()
-    data class UpdateAssignedMoney(val category: Category, val newAssignedMoney: Money): UserClickEvent()
     data class UpdateCategory(val category: Category) : UserClickEvent()
     data class DeleteCategory(val category: Category) : UserClickEvent()
 }
