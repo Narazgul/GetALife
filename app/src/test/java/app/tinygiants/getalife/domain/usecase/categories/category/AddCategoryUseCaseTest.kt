@@ -80,4 +80,20 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().optionalText).isEqualTo("")
         assertThat(categories.first().listPosition).isEqualTo(0)
     }
+
+    @Test
+    fun `Test second category gets listPosition 1`(): Unit = runTest {
+        addCategory(groupId = 1, categoryName = "Rent")
+        addCategory(groupId = 1, categoryName = "Gym")
+
+        val categories = categoryRepositoryFake.categories.value
+
+        assertThat(categories).hasSize(2)
+        assertThat(categories[0].name).isEqualTo("Rent")
+        assertThat(categories[1].name).isEqualTo("Gym")
+        assertThat(categories[0].groupId).isEqualTo(1)
+        assertThat(categories[1].groupId).isEqualTo(1)
+        assertThat(categories[0].listPosition).isEqualTo(0)
+        assertThat(categories[1].listPosition).isEqualTo(1)
+    }
 }

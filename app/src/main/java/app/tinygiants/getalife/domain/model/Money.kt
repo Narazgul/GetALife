@@ -16,7 +16,6 @@ data class Money(
     val formattedMoney: String = value.toCurrencyFormattedString()
     val formattedPositiveMoney: String = abs(value).toCurrencyFormattedString()
 
-    operator fun compareTo(other: Money) = value.compareTo(other.value)
     operator fun plus(other: Money) = Money(value = this.value + other.value)
     operator fun minus(other: Money) = Money(value = this.value - other.value)
 
@@ -28,6 +27,4 @@ data class Money(
         numberFormat.currency = Currency.getInstance(locale)
         return numberFormat.format(this)
     }
-
-    override fun toString() = formattedMoney
 }
