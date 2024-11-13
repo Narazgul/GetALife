@@ -117,7 +117,6 @@ class DeleteTransactionUseCase @Inject constructor(
                 budgetPurpose = budgetPurpose,
                 assignedMoney = assignedMoney.value,
                 availableMoney = updatedAvailableMoney,
-                optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = Clock.System.now(),

@@ -43,6 +43,7 @@ import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Progress
+import app.tinygiants.getalife.domain.model.ProgressColor
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
@@ -61,7 +62,6 @@ fun Category(
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Progress = EmptyProgress(),
-    optionalText: String? = null,
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money?) -> Unit = { },
@@ -73,10 +73,10 @@ fun Category(
     var showGeneralEditBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
-    val animateFirstProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "animatedProgress")
-    val animateSecondProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "animatedSpentProgress")
-    val animateThirdProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "overspentProgress")
-    val animateFourthProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "overspentProgress")
+    val animateBar1 by animateFloatAsState(targetValue = progress.bar1, label = "bar1")
+    val animateBar1Lite by animateFloatAsState(targetValue = progress.bar1Lite, label = "bar1Lite")
+    val animateBar2 by animateFloatAsState(targetValue = progress.bar2, label = "bar2")
+    val animateBar2Lite by animateFloatAsState(targetValue = progress.bar2Lite, label = "bar2Lite")
 
     Column(
         modifier = Modifier
@@ -119,7 +119,6 @@ fun Category(
             val budgetTargetBackground = when {
                 availableMoney.value < 0.0 -> MaterialTheme.colorScheme.error
                 availableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-                assignedMoney.value < (availableMoney.value) -> onWarning
                 else -> onSuccess
             }
 
@@ -165,63 +164,59 @@ fun Category(
                 .height(spacing.l)
         ) {
             val progressBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            val progressColor = when {
-                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.primary
-                assignedMoney.value < availableMoney.value -> warning
-                else -> success
-            }
-            val spentProgressColor = when {
-                availableMoney.value < 0.0 -> onSuccess
-                availableMoney.value == 0.0 && (assignedMoney.value == budgetTarget?.value)-> onSuccess
-                assignedMoney.value < (availableMoney.value) -> onWarning
-                else -> onSuccess
-            }
+            val bar1Color = getComposableColor(progressColor = progress.bar1Color)
+            val bar1LiteColor = getComposableColor(progressColor = progress.bar1LiteColor)
+            val bar2Color = getComposableColor(progressColor = progress.bar2Color)
+            val bar2LiteColor = getComposableColor(progressColor = progress.bar2LiteColor)
+
             LinearProgressIndicator(
-                progress = { 0f }, //{ animatedProgress },
+                progress = { animateBar1 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center),
-                color = progressColor,
+                color = bar1Color,
                 trackColor = progressBackground,
                 strokeCap = StrokeCap.Round
             )
             LinearProgressIndicator(
-                progress = { 0f }, //{ animatedSpentProgress },
+                progress = { animateBar1Lite },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center),
-                color = spentProgressColor,
+                color = bar1LiteColor,
                 trackColor = Color.Transparent,
                 strokeCap = StrokeCap.Round,
                 drawStopIndicator = { }
             )
-            LinearProgressIndicator(
-                progress = { 0f }, //{ animatedOverspentProgress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-                color = Color.Transparent,
-                trackColor = onWarning,
-                strokeCap = StrokeCap.Round,
-                drawStopIndicator = { }
-            )
-            LinearProgressIndicator(
-                progress = { 0f }, //{ animatedOverspentProgress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-                color = Color.Transparent,
-                trackColor = warning,
-                strokeCap = StrokeCap.Round,
-                drawStopIndicator = { }
-            )
+            if (progress.bar2VisibilityState) {
+                LinearProgressIndicator(
+                    progress = { animateBar2 },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center),
+                    color = Color.Transparent,
+                    trackColor = bar2Color,
+                    strokeCap = StrokeCap.Round,
+                    drawStopIndicator = { }
+                )
+                LinearProgressIndicator(
+                    progress = { animateBar2Lite },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center),
+                    color = Color.Transparent,
+                    trackColor = bar2LiteColor,
+                    strokeCap = StrokeCap.Round,
+                    drawStopIndicator = { }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(spacing.default))
 
-        if (!optionalText.isNullOrBlank()) {
+        if (progress.optionalText.isNotBlank()) {
             Text(
-                text = optionalText,
+                text = progress.optionalText,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Start
@@ -275,39 +270,37 @@ fun Category(
     }
 }
 
+@Composable
+fun getComposableColor(progressColor: ProgressColor): Color = when (progressColor) {
+    ProgressColor.Grey -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+    ProgressColor.Red -> MaterialTheme.colorScheme.error
+    ProgressColor.Yellow -> warning
+    ProgressColor.YellowLite -> onWarning
+    ProgressColor.Green -> success
+    ProgressColor.GreenLite -> onSuccess
+    ProgressColor.Primary -> MaterialTheme.colorScheme.primary
+    ProgressColor.PrimaryLite -> MaterialTheme.colorScheme.inversePrimary
+    else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+}
 
 @PreviewLightDark
 @Composable
-fun FullCategoryPreview() {
+fun NoTargetSomethingAssignedOverspentPreview() {
     GetALifeTheme {
         Surface {
             Category(
                 emoji = "🏠",
                 categoryName = "Rent",
-                budgetTarget = Money(940.00),
-                assignedMoney = Money(940.00),
-                availableMoney = Money(940.00),
-                progress = EmptyProgress(),
-                optionalText = optionalExampleText(0.00)
-            )
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-fun OverspentCategoryPreview() {
-    GetALifeTheme {
-        Surface {
-            Category(
-                emoji = "🪩",
-                categoryName = "Party",
-                budgetTarget = Money(200.00),
-                budgetPurpose = BudgetPurpose.Spending,
-                assignedMoney = Money(200.00),
+                budgetTarget = Money(0.00),
+                assignedMoney = Money(100.00),
                 availableMoney = Money(-20.00),
-                progress = EmptyProgress(),
-                optionalText = "20€ zu viel ausgegeben"
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Lite = (100.0/120.0).toFloat(),
+                    bar1Color = ProgressColor.Red,
+                    bar1LiteColor = ProgressColor.GreenLite,
+                    optionalText = "Spent 50,-€ more than available"
+                ),
             )
         }
     }
@@ -315,17 +308,20 @@ fun OverspentCategoryPreview() {
 
 @PreviewLightDark
 @Composable
-fun SemiFilledCategoryPreview() {
+fun NoTargetNothingAssignedOverspentPreview() {
     GetALifeTheme {
         Surface {
             Category(
                 emoji = "🏠",
                 categoryName = "Rent",
-                budgetTarget = Money(940.00),
-                assignedMoney = Money(470.00),
-                availableMoney = Money(470.00),
-                progress = EmptyProgress(),
-                optionalText = optionalExampleText(gap = 940.00 - 470.00)
+                budgetTarget = Money(0.00),
+                assignedMoney = Money(0.00),
+                availableMoney = Money(-20.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Color = ProgressColor.Red,
+                    optionalText = "Assign money to category or remove spending!"
+                ),
             )
         }
     }
@@ -333,7 +329,69 @@ fun SemiFilledCategoryPreview() {
 
 @PreviewLightDark
 @Composable
-fun EmptyCategoryPreview() {
+fun NoTargetSomeAssignedFullySpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(0.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(0.00),
+                progress = Progress(
+                    bar1Lite = 1f,
+                    bar1LiteColor = ProgressColor.GreenLite
+                ),
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun NoTargetSomeAssignedLittleSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(0.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(80.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Lite = 0.2f,
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite
+                ),
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun NoTargetSomeAssignedNoSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(0.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(100.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Color = ProgressColor.Green
+                ),
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun EmptyPreview() {
     GetALifeTheme {
         Surface {
             Category(
@@ -343,10 +401,7 @@ fun EmptyCategoryPreview() {
                 assignedMoney = Money(0.0),
                 availableMoney = Money(0.0),
                 progress = EmptyProgress(),
-                optionalText = optionalExampleText(gap = 940.00 - 0.00)
             )
         }
     }
 }
-
-fun optionalExampleText(gap: Double) = "$gap more needed by the 30th"

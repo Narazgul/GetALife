@@ -3,10 +3,24 @@ package app.tinygiants.getalife.domain.model
 typealias EmptyProgress = Progress
 
 data class Progress(
-    val budgetTargetState: BudgetTargetState = BudgetTargetState.Unknown,
-    val budgetTargetProgress: Float = 0f,
-    val spentProgress: Float = 0f,
-    val overspentProgress: Float = 0f,
+
+    val bar2VisibilityState: Boolean = false,
+    val optionalText: String = "",
+
+    val bar1: Float = 0f,
+    val bar1Lite: Float = 0f,
+    val bar2: Float = 0f,
+    val bar2Lite: Float = 0f,
+
+    val bar1Color: ProgressColor = ProgressColor.Unknown,
+    val bar1LiteColor: ProgressColor = ProgressColor.Unknown,
+    val bar2Color: ProgressColor = ProgressColor.Unknown,
+    val bar2LiteColor: ProgressColor = ProgressColor.Unknown
 )
 
-enum class BudgetTargetState { Unknown, NoTargetSet, TargetSet }
+enum class ProgressColor {
+    Unknown,
+    Grey,
+    Green, Yellow, Red, Primary,
+    GreenLite, YellowLite, PrimaryLite
+}

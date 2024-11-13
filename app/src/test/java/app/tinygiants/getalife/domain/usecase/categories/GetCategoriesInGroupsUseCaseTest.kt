@@ -33,9 +33,4 @@ class GetCategoriesInGroupsUseCaseTest {
             defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
-
-//    @Test
-//    fun `No target set no money assigned nothing spent - `(): Unit = runTest {
-//
-//    }
 }

@@ -169,7 +169,6 @@ private fun LazyListScope.categories(
                         assignedMoney = category.assignedMoney,
                         availableMoney = category.availableMoney,
                         progress = category.progress,
-                        optionalText = category.optionalText,
                         onUpdateEmojiClicked = onUpdateEmojiClicked,
                         onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,

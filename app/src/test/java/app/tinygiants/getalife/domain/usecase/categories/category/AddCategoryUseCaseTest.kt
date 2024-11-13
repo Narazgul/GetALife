@@ -59,7 +59,6 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().budgetTarget).isNull()
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)
-        assertThat(categories.first().optionalText).isEqualTo("")
         assertThat(categories.first().listPosition).isEqualTo(0)
     }
 
@@ -77,7 +76,6 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().budgetTarget).isNull()
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)
-        assertThat(categories.first().optionalText).isEqualTo("")
         assertThat(categories.first().listPosition).isEqualTo(0)
     }
 

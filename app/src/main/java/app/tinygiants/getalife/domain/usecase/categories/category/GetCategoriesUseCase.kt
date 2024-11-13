@@ -42,7 +42,6 @@ class GetCategoriesUseCase @Inject constructor(
                     assignedMoney = Money(value = categoryEntity.assignedMoney),
                     availableMoney = Money(value = categoryEntity.availableMoney),
                     progress = EmptyProgress(),
-                    optionalText = categoryEntity.optionalText,
                     listPosition = categoryEntity.listPosition,
                     isInitialCategory = categoryEntity.isInitialCategory,
                     updatedAt = categoryEntity.updatedAt,

@@ -54,7 +54,6 @@ class DeleteCategoryUseCaseTest {
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
-                optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = updatedAt,

@@ -12,7 +12,6 @@ data class Category(
     val assignedMoney: Money,
     val availableMoney: Money,
     val progress: Progress,
-    val optionalText: String,
     val listPosition: Int,
     val isInitialCategory: Boolean,
     val updatedAt: Instant,

@@ -16,7 +16,6 @@ data class CategoryEntity(
     val budgetPurpose: BudgetPurpose,
     val assignedMoney: Double,
     val availableMoney: Double,
-    val optionalText: String,
     val listPosition: Int,
     val isInitialCategory: Boolean,
     val updatedAt: Instant,

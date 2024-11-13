@@ -36,7 +36,6 @@ class AddCategoryUseCase @Inject constructor(
                 budgetPurpose = BudgetPurpose.Unknown,
                 assignedMoney = 0.00,
                 availableMoney = 0.00,
-                optionalText = "",
                 listPosition = endOfListPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = Clock.System.now(),

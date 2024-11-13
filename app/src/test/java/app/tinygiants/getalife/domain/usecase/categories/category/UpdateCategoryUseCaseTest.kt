@@ -59,7 +59,6 @@ class UpdateCategoryUseCaseTest {
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
-                optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = updatedAt,
@@ -74,6 +73,7 @@ class UpdateCategoryUseCaseTest {
         assertThat(categories).hasSize(20)
         assertThat(categories.first().name).isEqualTo(rentCategoryEntity().name)
         assertThat(categories.first().assignedMoney).isEqualTo(100.0)
+        assertThat(categories.first().availableMoney).isEqualTo(200.0)
     }
 
     @Test
@@ -91,7 +91,6 @@ class UpdateCategoryUseCaseTest {
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
-                optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = updatedAt,
@@ -106,6 +105,7 @@ class UpdateCategoryUseCaseTest {
         assertThat(categories).hasSize(20)
         assertThat(categories.first().name).isEqualTo(rentCategoryEntity().name)
         assertThat(categories.first().assignedMoney).isEqualTo(1200.0)
+        assertThat(categories.first().availableMoney).isEqualTo(1300.0)
     }
 
     @Test
@@ -123,7 +123,6 @@ class UpdateCategoryUseCaseTest {
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
-                optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = updatedAt,
@@ -138,5 +137,6 @@ class UpdateCategoryUseCaseTest {
         assertThat(categories).hasSize(20)
         assertThat(categories.first().name).isEqualTo(rentCategoryEntity().name)
         assertThat(categories.first().assignedMoney).isEqualTo(1500.0)
+        assertThat(categories.first().availableMoney).isEqualTo(1600.0)
     }
 }

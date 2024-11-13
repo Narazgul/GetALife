@@ -91,7 +91,6 @@ class GetCategoriesInGroupsUseCase @Inject constructor(
                     assignedMoney = Money(value = assignedMoney),
                     availableMoney = Money(value = availableMoney),
                     progress = progress,
-                    optionalText = optionalText,
                     listPosition = index,
                     isInitialCategory = isInitialCategory,
                     updatedAt = updatedAt,
