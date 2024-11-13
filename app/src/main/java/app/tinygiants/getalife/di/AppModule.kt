@@ -4,12 +4,13 @@ import android.content.Context
 import app.tinygiants.getalife.BuildConfig
 import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
-import app.tinygiants.getalife.data.remote.ai.GoogleGeminiAi
+import app.tinygiants.getalife.data.remote.ai.FirebaseVertexAi
 import app.tinygiants.getalife.domain.repository.AiRepository
 import com.aallam.openai.client.OpenAI
-import com.google.ai.client.generativeai.GenerativeModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.vertexai.FirebaseVertexAI
+import com.google.firebase.vertexai.GenerativeModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,11 +47,11 @@ object AppModule {
     // region AI
 
     @Provides
-    fun provideGeminiProGenerativeModel() = GenerativeModel(modelName = "gemini-1.5-flash", apiKey = BuildConfig.GEMINI_API_KEY)
+    fun provideFirebaseVertexAiGenerativeModel() = FirebaseVertexAI.instance.generativeModel(modelName = "gemini-1.5-flash")
 
     @Gemini
     @Provides
-    fun provideGeminiAi(generativeModel: GenerativeModel): AiRepository = GoogleGeminiAi(generativeModel = generativeModel)
+    fun provideFirebaseVertexAi(generativeModel: GenerativeModel): AiRepository = FirebaseVertexAi(generativeModel = generativeModel)
 
     @Provides
     fun provideOpenAi(): OpenAI = OpenAI(BuildConfig.CHATGPT_API_KEY)

@@ -27,7 +27,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
-        buildConfigField(type = "String", name = "GEMINI_API_KEY", value = System.getenv("GEMINI_API_KEY"))
         buildConfigField(type = "String", name = "CHATGPT_API_KEY", value = System.getenv("CHATGPT_API_KEY"))
     }
 
@@ -90,7 +89,7 @@ dependencies {
     implementation(libs.bundles.core)
 
     // AI
-    implementation(libs.gemini.ai)
+    implementation(libs.firebase.vertex.ai)
     implementation(libs.chatgpt.ai)
 
     // Jetpack Compose

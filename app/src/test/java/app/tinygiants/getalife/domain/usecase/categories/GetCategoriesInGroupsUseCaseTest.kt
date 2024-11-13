@@ -1,39 +1,41 @@
 package app.tinygiants.getalife.domain.usecase.categories
 
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.GroupRepositoryFake
-import kotlinx.coroutines.test.runTest
+import app.tinygiants.getalife.domain.usecase.categories.category.CalculateCategoryProgressUseCase
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
 class GetCategoriesInGroupsUseCaseTest {
 
     private lateinit var useCase: GetCategoriesInGroupsUseCase
+    private lateinit var calculateProgressUseCase: CalculateCategoryProgressUseCase
     private lateinit var groupsRepositoryFake: GroupRepositoryFake
     private lateinit var categoryRepositoryFake: CategoryRepositoryFake
 
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
     fun setUp() {
         groupsRepositoryFake = GroupRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
+        calculateProgressUseCase = CalculateCategoryProgressUseCase()
 
         useCase = GetCategoriesInGroupsUseCase(
             groupsRepository = groupsRepositoryFake,
             categoryRepository = categoryRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            calculateProgress = calculateProgressUseCase,
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 
-    @Test
-    fun `No target set no money assigned nothing spent - `(): Unit = runTest {
-
-    }
+//    @Test
+//    fun `No target set no money assigned nothing spent - `(): Unit = runTest {
+//
+//    }
 }

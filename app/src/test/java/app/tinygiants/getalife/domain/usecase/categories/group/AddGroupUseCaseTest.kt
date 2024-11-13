@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.domain.usecase.categories.group
 
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.remote.ai.AiRepositoryFake
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
@@ -26,7 +26,7 @@ class AddGroupUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -41,14 +41,14 @@ class AddGroupUseCaseTest {
         val addCategory = AddCategoryUseCase(
             repository = categoryRepositoryFake,
             addEmoji = addEmojiToCategory,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
 
         addGroup = AddGroupUseCase(
             repository = groupRepositoryFake,
             addCategory = addCategory,
-            ioDispatcher = mainCoroutineExtension.testDispatcher,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            ioDispatcher = testDispatcherExtension.testDispatcher,
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 

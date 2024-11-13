@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.domain.usecase.account
 
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
@@ -28,7 +28,7 @@ class AddAccountUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -39,7 +39,7 @@ class AddAccountUseCaseTest {
         addAccount = AddAccountUseCase(
             accountRepository = accountRepositoryFake,
             transactionRepository = transactionRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 

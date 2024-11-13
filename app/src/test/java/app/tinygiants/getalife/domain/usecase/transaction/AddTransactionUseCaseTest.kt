@@ -1,11 +1,12 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
@@ -33,7 +34,7 @@ class AddTransactionUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -46,7 +47,7 @@ class AddTransactionUseCaseTest {
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 
@@ -90,15 +91,12 @@ class AddTransactionUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = updatedAt,
-                createdAt = createdAt,
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f
+                createdAt = createdAt
             )
         }
 

@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.domain.usecase.categories.group
 
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.dailyLife
 import app.tinygiants.getalife.data.local.datagenerator.fixedCosts
 import app.tinygiants.getalife.data.local.datagenerator.groups
@@ -24,7 +24,7 @@ class DeleteGroupUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -33,7 +33,7 @@ class DeleteGroupUseCaseTest {
 
         deleteGroup = DeleteGroupUseCase(
             repository = groupRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
 
         groupRepositoryFake.groupFlow.value = groups

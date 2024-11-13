@@ -1,10 +1,11 @@
 package app.tinygiants.getalife.domain.usecase.categories.category
 
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.data.remote.ai.AiRepositoryFake
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
@@ -25,7 +26,7 @@ class UpdateCategoryUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -39,7 +40,7 @@ class UpdateCategoryUseCaseTest {
         updateCategory = UpdateCategoryUseCase(
             repository = categoryRepositoryFake,
             addEmoji = addEmoji,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 
@@ -57,10 +58,7 @@ class UpdateCategoryUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
@@ -92,10 +90,7 @@ class UpdateCategoryUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
@@ -127,10 +122,7 @@ class UpdateCategoryUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,

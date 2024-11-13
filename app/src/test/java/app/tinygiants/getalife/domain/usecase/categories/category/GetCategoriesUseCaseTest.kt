@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.domain.usecase.categories.category
 
 import app.cash.turbine.test
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.personalCareCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
@@ -22,7 +22,7 @@ class GetCategoriesUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -31,7 +31,7 @@ class GetCategoriesUseCaseTest {
 
         getCategories = GetCategoriesUseCase(
             repository = categoryRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 

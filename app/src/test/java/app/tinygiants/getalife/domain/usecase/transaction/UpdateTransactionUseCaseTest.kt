@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
 import aldiGroceriesJanuary
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
 import app.tinygiants.getalife.data.local.datagenerator.categories
@@ -9,6 +9,7 @@ import app.tinygiants.getalife.data.local.datagenerator.groceriesCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
@@ -34,7 +35,7 @@ class UpdateTransactionUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -47,7 +48,7 @@ class UpdateTransactionUseCaseTest {
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
 
         transactionRepositoryFake.transactions.value = transactions
@@ -78,10 +79,7 @@ class UpdateTransactionUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
@@ -134,10 +132,7 @@ class UpdateTransactionUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
@@ -189,10 +184,7 @@ class UpdateTransactionUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,

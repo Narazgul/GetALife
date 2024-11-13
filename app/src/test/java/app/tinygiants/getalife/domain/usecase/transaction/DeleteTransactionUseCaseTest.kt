@@ -1,11 +1,12 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
 import aldiGroceriesJanuary
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
@@ -32,7 +33,7 @@ class DeleteTransactionUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -45,7 +46,7 @@ class DeleteTransactionUseCaseTest {
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 
@@ -125,10 +126,7 @@ class DeleteTransactionUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                fundBudgetTargetProgress = 0f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalText,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,

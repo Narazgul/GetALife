@@ -66,6 +66,3 @@ val success = Color(0xFF82B73E)
 val onSuccess = Color(0xFFCEEA9F)
 val warning = Color(0xFFDFA41A)
 val onWarning = Color(0xFFFFD370)
-
-val onOverFunded = Color(0xFFFFD700)
-val onOverFundedLight = Color(0xFFFFECB3)

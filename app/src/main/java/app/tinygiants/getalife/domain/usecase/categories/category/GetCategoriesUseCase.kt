@@ -31,7 +31,6 @@ class GetCategoriesUseCase @Inject constructor(
             categoryEntities.map { categoryEntity ->
 
                 val budgetTarget = categoryEntity.budgetTarget ?: 0.00
-                val progress = (categoryEntity.availableMoney / budgetTarget).toFloat()
 
                 Category(
                     id = categoryEntity.id,

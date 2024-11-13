@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.domain.usecase.account
 
 import app.cash.turbine.test
-import app.tinygiants.getalife.MainCoroutineExtension
+import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
 import app.tinygiants.getalife.data.local.datagenerator.categories
@@ -35,7 +35,7 @@ class GetAssignableMoneySumUseCaseTest {
     companion object {
         @JvmField
         @RegisterExtension
-        val mainCoroutineExtension: MainCoroutineExtension = MainCoroutineExtension()
+        val testDispatcherExtension: TestDispatcherExtension = TestDispatcherExtension()
     }
 
     @BeforeEach
@@ -46,7 +46,7 @@ class GetAssignableMoneySumUseCaseTest {
         getAssignableMoney = GetAssignableMoneySumUseCase(
             accountsRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
-            defaultDispatcher = mainCoroutineExtension.testDispatcher
+            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
 
