@@ -3,6 +3,7 @@ package app.tinygiants.getalife.domain.usecase.categories.category
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,10 +42,7 @@ class GetCategoriesUseCase @Inject constructor(
                     budgetPurpose = categoryEntity.budgetPurpose,
                     assignedMoney = Money(value = categoryEntity.assignedMoney),
                     availableMoney = Money(value = categoryEntity.availableMoney),
-                    progress = progress,
-                    spentProgress = 0f,
-                    overspentProgress = 0f,
-                    budgetTargetProgress = null,
+                    progress = EmptyProgress(),
                     optionalText = categoryEntity.optionalText,
                     listPosition = categoryEntity.listPosition,
                     isInitialCategory = categoryEntity.isInitialCategory,

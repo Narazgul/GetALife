@@ -6,6 +6,7 @@ import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.AccountRepository
@@ -60,7 +61,7 @@ class GetTransactionsForAccountUseCase @Inject constructor(
 
                 val accountEntity =
                     accounts.find { account -> transactionEntity.accountId == account.id } ?: return@mapNotNull null
-                val categoryEntity = categories.find { cateogry -> transactionEntity.categoryId == cateogry.id }
+                val categoryEntity = categories.find { category -> transactionEntity.categoryId == category.id }
 
                 val account = accountEntity.run {
                     Account(
@@ -76,7 +77,7 @@ class GetTransactionsForAccountUseCase @Inject constructor(
 
                 val category = if (categoryEntity == null) null else {
                     val budgetTarget = categoryEntity.budgetTarget ?: 0.00
-                    val progress = (categoryEntity.availableMoney / budgetTarget).toFloat()
+
                     categoryEntity.run {
                         Category(
                             id = id,
@@ -87,10 +88,7 @@ class GetTransactionsForAccountUseCase @Inject constructor(
                             budgetPurpose = budgetPurpose,
                             assignedMoney = Money(assignedMoney),
                             availableMoney = Money(availableMoney),
-                            progress = progress,
-                            spentProgress = 0f,
-                            overspentProgress = 0f,
-                            budgetTargetProgress = null,
+                            progress = EmptyProgress(),
                             optionalText = optionalText,
                             listPosition = listPosition,
                             isInitialCategory = isInitialCategory,

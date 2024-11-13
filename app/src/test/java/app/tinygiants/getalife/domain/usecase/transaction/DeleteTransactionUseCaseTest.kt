@@ -125,7 +125,7 @@ class DeleteTransactionUseCaseTest {
                 budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
-                progress = 0f,
+                fundBudgetTargetProgress = 0f,
                 spentProgress = 0f,
                 overspentProgress = 0f,
                 budgetTargetProgress = 0f,

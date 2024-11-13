@@ -26,27 +26,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
 import app.tinygiants.getalife.domain.model.BudgetPurpose
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.Progress
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.ScreenPreview
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
 import app.tinygiants.getalife.theme.spacing
@@ -63,10 +60,7 @@ fun Category(
     budgetPurpose: BudgetPurpose = BudgetPurpose.Unknown,
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
-    progress: Float = 0f,
-    spentProgress: Float = 0f,
-    overspentProgress: Float = 0f,
-    budgetTargetProgress: Float? = null,
+    progress: Progress = EmptyProgress(),
     optionalText: String? = null,
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
@@ -79,10 +73,10 @@ fun Category(
     var showGeneralEditBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
 
-    val animatedProgress by animateFloatAsState(targetValue = progress, label = "animatedProgress")
-    val animatedSpentProgress by animateFloatAsState(targetValue = spentProgress, label = "animatedSpentProgress")
-    val animatedOverspentProgress by animateFloatAsState(targetValue = overspentProgress, label = "overspentProgress")
-    var progressBarWidth by remember { mutableFloatStateOf(0f) }
+    val animateFirstProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "animatedProgress")
+    val animateSecondProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "animatedSpentProgress")
+    val animateThirdProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "overspentProgress")
+    val animateFourthProgressBar by animateFloatAsState(targetValue = progress.spentProgress, label = "overspentProgress")
 
     Column(
         modifier = Modifier
@@ -183,19 +177,16 @@ fun Category(
                 else -> onSuccess
             }
             LinearProgressIndicator(
-                progress = { animatedProgress },
+                progress = { 0f }, //{ animatedProgress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center),
                 color = progressColor,
                 trackColor = progressBackground,
-                strokeCap = StrokeCap.Round,
-                drawStopIndicator = {
-                    drawCircle(Color.Red)
-                }
+                strokeCap = StrokeCap.Round
             )
             LinearProgressIndicator(
-                progress = { animatedSpentProgress },
+                progress = { 0f }, //{ animatedSpentProgress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center),
@@ -205,14 +196,22 @@ fun Category(
                 drawStopIndicator = { }
             )
             LinearProgressIndicator(
-                progress = { animatedOverspentProgress },
+                progress = { 0f }, //{ animatedOverspentProgress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .rotate(180f)
-                    .onGloballyPositioned { coordinates -> progressBarWidth = coordinates.size.width.toFloat() },
-                color = MaterialTheme.colorScheme.error,
-                trackColor = Color.Transparent,
+                    .align(Alignment.Center),
+                color = Color.Transparent,
+                trackColor = onWarning,
+                strokeCap = StrokeCap.Round,
+                drawStopIndicator = { }
+            )
+            LinearProgressIndicator(
+                progress = { 0f }, //{ animatedOverspentProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                color = Color.Transparent,
+                trackColor = warning,
                 strokeCap = StrokeCap.Round,
                 drawStopIndicator = { }
             )
@@ -288,8 +287,7 @@ fun FullCategoryPreview() {
                 budgetTarget = Money(940.00),
                 assignedMoney = Money(940.00),
                 availableMoney = Money(940.00),
-                progress = 1f,
-                spentProgress = 0.2f,
+                progress = EmptyProgress(),
                 optionalText = optionalExampleText(0.00)
             )
         }
@@ -298,7 +296,7 @@ fun FullCategoryPreview() {
 
 @PreviewLightDark
 @Composable
-fun OverspentCategroyPreview() {
+fun OverspentCategoryPreview() {
     GetALifeTheme {
         Surface {
             Category(
@@ -308,10 +306,7 @@ fun OverspentCategroyPreview() {
                 budgetPurpose = BudgetPurpose.Spending,
                 assignedMoney = Money(200.00),
                 availableMoney = Money(-20.00),
-                progress = 1f,
-                spentProgress = 0f,
-                overspentProgress = 0f,
-                budgetTargetProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = "20€ zu viel ausgegeben"
             )
         }
@@ -329,15 +324,14 @@ fun SemiFilledCategoryPreview() {
                 budgetTarget = Money(940.00),
                 assignedMoney = Money(470.00),
                 availableMoney = Money(470.00),
-                progress = (470.00 / 940.00).toFloat(),
-                spentProgress = 0.2f,
+                progress = EmptyProgress(),
                 optionalText = optionalExampleText(gap = 940.00 - 470.00)
             )
         }
     }
 }
 
-@ScreenPreview
+@PreviewLightDark
 @Composable
 fun EmptyCategoryPreview() {
     GetALifeTheme {
@@ -348,8 +342,7 @@ fun EmptyCategoryPreview() {
                 budgetTarget = Money(940.00),
                 assignedMoney = Money(0.0),
                 availableMoney = Money(0.0),
-                progress = (0.0 / 940.00).toFloat(),
-                spentProgress = 0f,
+                progress = EmptyProgress(),
                 optionalText = optionalExampleText(gap = 940.00 - 0.00)
             )
         }

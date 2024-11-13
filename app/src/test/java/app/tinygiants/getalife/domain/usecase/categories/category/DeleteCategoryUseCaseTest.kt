@@ -57,7 +57,7 @@ class DeleteCategoryUseCaseTest {
                 isInitialCategory = isInitialCategory,
                 updatedAt = updatedAt,
                 createdAt = createdAt,
-                progress = 0f,
+                fundBudgetTargetProgress = 0f,
                 spentProgress = 0f,
                 overspentProgress = 0f,
                 budgetTargetProgress = 0f
