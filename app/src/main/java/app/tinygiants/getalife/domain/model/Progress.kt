@@ -4,7 +4,7 @@ typealias EmptyProgress = Progress
 
 data class Progress(
 
-    val bar2VisibilityState: Boolean = false,
+    val showColorOnSecondBar: Boolean = false,
     val optionalText: String = "",
 
     val bar1: Float = 0f,

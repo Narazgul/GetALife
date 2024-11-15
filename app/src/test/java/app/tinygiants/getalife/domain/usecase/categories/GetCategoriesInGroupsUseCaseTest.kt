@@ -24,7 +24,9 @@ class GetCategoriesInGroupsUseCaseTest {
     fun setUp() {
         groupsRepositoryFake = GroupRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
-        calculateProgressUseCase = CalculateCategoryProgressUseCase()
+        calculateProgressUseCase = CalculateCategoryProgressUseCase(
+            defaultDispatcher = testDispatcherExtension.testDispatcher
+        )
 
         useCase = GetCategoriesInGroupsUseCase(
             groupsRepository = groupsRepositoryFake,

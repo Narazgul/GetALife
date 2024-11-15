@@ -75,7 +75,7 @@ class GetCategoriesInGroupsUseCase @Inject constructor(
         )
     }
 
-    private fun mapToCategories(categories: List<CategoryEntity>): List<Category> {
+    private suspend fun mapToCategories(categories: List<CategoryEntity>): List<Category> {
         return categories.mapIndexed { index, categoryEntity ->
 
             val progress = calculateProgress(categoryEntity = categoryEntity)

@@ -119,6 +119,7 @@ fun Category(
             val budgetTargetBackground = when {
                 availableMoney.value < 0.0 -> MaterialTheme.colorScheme.error
                 availableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
+                budgetTarget != null && assignedMoney.value < budgetTarget.value -> onWarning
                 else -> onSuccess
             }
 
@@ -188,7 +189,7 @@ fun Category(
                 strokeCap = StrokeCap.Round,
                 drawStopIndicator = { }
             )
-            if (progress.bar2VisibilityState) {
+            if (progress.showColorOnSecondBar) {
                 LinearProgressIndicator(
                     progress = { animateBar2 },
                     modifier = Modifier
@@ -285,6 +286,412 @@ fun getComposableColor(progressColor: ProgressColor): Color = when (progressColo
 
 @PreviewLightDark
 @Composable
+fun SetTargetAssignedBeyondTargetOverspentBeyondTargetPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(-20.00),
+                progress = Progress(
+                    bar1 = (100.0 / 140.0).toFloat(),
+                    bar2 = (100.0 / 140.0).toFloat(),
+                    bar2Lite = (120.0 / 140.0).toFloat(),
+                    bar1Color = ProgressColor.GreenLite,
+                    bar2Color = ProgressColor.PrimaryLite,
+                    bar2LiteColor = ProgressColor.Red,
+                    showColorOnSecondBar = true,
+                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetAllAssignedOverspentBeyondTargetPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(-20.00),
+                progress = Progress(
+                    bar1 = (100.0 / 120.0).toFloat(),
+                    bar2 = (100.0 / 120.0).toFloat(),
+                    bar2Lite = (100.0 / 120.0).toFloat(),
+                    bar1Color = ProgressColor.GreenLite,
+                    bar2Color = ProgressColor.Red,
+                    showColorOnSecondBar = true,
+                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetSomeAssignedOverspentBeyondTargetPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(40.00),
+                availableMoney = Money(-80.00),
+                progress = Progress(
+                    bar1 = (100.0 / 120.0).toFloat(),
+                    bar1Lite = (40.0 / 120.0).toFloat(),
+                    bar2 = (100.0 / 120.0).toFloat(),
+                    bar2Lite = (100.0 / 120.0).toFloat(),
+                    bar1Color = ProgressColor.Red,
+                    bar1LiteColor = ProgressColor.YellowLite,
+                    bar2Color = ProgressColor.Red,
+                    showColorOnSecondBar = true,
+                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetSomeAssignedOverspentBelowTargetPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(40.00),
+                availableMoney = Money(-20.00),
+                progress = Progress(
+                    bar1 = ((40.0 + 20.0) / 100.0).toFloat(),
+                    bar1Lite = (40.0 / 100.0).toFloat(),
+                    bar1Color = ProgressColor.Red,
+                    bar1LiteColor = ProgressColor.YellowLite,
+                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetNothingAssignedOverspentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(0.00),
+                availableMoney = Money(-20.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Color = ProgressColor.Red,
+                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetOverBudgetAssignedAllSpentOverBudgetPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(10.00),
+                progress = Progress(
+                    bar1 = (100.0 / 120.0).toFloat(),
+                    bar1Lite = (100.0 / 120.0).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite,
+                    bar2 = (100.0 / 120.0).toFloat(),
+                    bar2Lite = (100.0 / 120.0).toFloat(),
+                    showColorOnSecondBar = true,
+                    bar2Color = ProgressColor.PrimaryLite,
+                    optionalText = ""
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetOverBudgetAssignedLittleSpentOverBudgetPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(10.00),
+                progress = Progress(
+                    bar1 = (100.0 / 120.0).toFloat(),
+                    bar1Lite = (100.0 / 120.0).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite,
+                    bar2 = (100.0 / 120.0).toFloat(),
+                    bar2Lite = (110.0 / 120.0).toFloat(),
+                    showColorOnSecondBar = true,
+                    bar2Color = ProgressColor.PrimaryLite,
+                    bar2LiteColor = ProgressColor.Primary,
+                    optionalText = ""
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetOverBudgetAssignedAllBudgetedSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(20.00),
+                progress = Progress(
+                    bar1 = (100.0 / 120.0).toFloat(),
+                    bar1Lite = ((120.0 - 20.0) / 120.0).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite,
+                    bar2 = (100.0 / 120.0).toFloat(),
+                    bar2Lite = (100 / 120.0).toFloat(),
+                    showColorOnSecondBar = true,
+                    bar2Color = ProgressColor.Primary,
+                    optionalText = "Enjoy your 20,-€ extra"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetOverBudgetAssignedLittleSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(80.00),
+                progress = Progress(
+                    bar1 = (100.0 / 120.0).toFloat(),
+                    bar1Lite = ((120.0 - 80.0) / 120.0).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite,
+                    bar2 = (100.0 / 120.0).toFloat(),
+                    bar2Lite = (100 / 120.0).toFloat(),
+                    showColorOnSecondBar = true,
+                    bar2Color = ProgressColor.Primary,
+                    optionalText = "Enjoy your 20,-€ extra"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetFullyAssignedAllSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(0.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Color = ProgressColor.GreenLite
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetFullyAssignedLittleSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(70.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Lite = ((100.0 - 70.0) / 100.0).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetSomethingAssignedAllSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(60.00),
+                availableMoney = Money(40.00),
+                progress = Progress(
+                    bar1 = (60.0 / 100.0).toFloat(),
+                    bar1Color = ProgressColor.YellowLite,
+                    optionalText = "40,-€ more needed to reach budget target"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetSomethingAssignedLittleSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(60.00),
+                availableMoney = Money(40.00),
+                progress = Progress(
+                    bar1 = (60.0 / 100.0).toFloat(),
+                    bar1Lite = ((60.0 - 40.0) / 100.0).toFloat(),
+                    bar1Color = ProgressColor.Yellow,
+                    bar1LiteColor = ProgressColor.YellowLite,
+                    optionalText = "40,-€ more needed to reach budget target"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetOverBudgetAssignedNothingSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(120.00),
+                progress = Progress(
+                    bar1 = (100.00 / 120.00).toFloat(),
+                    bar2 = (100.00 / 120.00).toFloat(),
+                    bar2Lite = (100.00 / 120.00).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar2Color = ProgressColor.Primary,
+                    showColorOnSecondBar = true,
+                    optionalText = "Enjoy your 20,-€ extra"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetFullyAssignedNothingSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(100.00),
+                availableMoney = Money(100.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Color = ProgressColor.Green,
+                    optionalText = "Fully funded 👌"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetSomethingAssignedNothingSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(30.00),
+                availableMoney = Money(30.00),
+                progress = Progress(
+                    bar1 = (30.0 / 100.0).toFloat(),
+                    bar2 = (30.0 / 100.0).toFloat(),
+                    bar1Color = ProgressColor.Yellow,
+                    optionalText = "70,-€ more needed to reach budget target"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SetTargetNothingAssignedNothingSpentPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(0.00),
+                availableMoney = Money(0.00),
+                progress = Progress(
+                    bar1 = 1f,
+                    bar1Color = ProgressColor.Grey,
+                    optionalText = "100,-€ more needed to reach budget target"
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
 fun NoTargetSomethingAssignedOverspentPreview() {
     GetALifeTheme {
         Surface {
@@ -296,11 +703,11 @@ fun NoTargetSomethingAssignedOverspentPreview() {
                 availableMoney = Money(-20.00),
                 progress = Progress(
                     bar1 = 1f,
-                    bar1Lite = (100.0/120.0).toFloat(),
+                    bar1Lite = (100.0 / 120.0).toFloat(),
                     bar1Color = ProgressColor.Red,
                     bar1LiteColor = ProgressColor.GreenLite,
-                    optionalText = "Spent 50,-€ more than available"
-                ),
+                    optionalText = "Spent 20,-€ more than available"
+                )
             )
         }
     }
@@ -320,8 +727,8 @@ fun NoTargetNothingAssignedOverspentPreview() {
                 progress = Progress(
                     bar1 = 1f,
                     bar1Color = ProgressColor.Red,
-                    optionalText = "Assign money to category or remove spending!"
-                ),
+                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                )
             )
         }
     }
@@ -341,7 +748,7 @@ fun NoTargetSomeAssignedFullySpentPreview() {
                 progress = Progress(
                     bar1Lite = 1f,
                     bar1LiteColor = ProgressColor.GreenLite
-                ),
+                )
             )
         }
     }
@@ -363,7 +770,7 @@ fun NoTargetSomeAssignedLittleSpentPreview() {
                     bar1Lite = 0.2f,
                     bar1Color = ProgressColor.Green,
                     bar1LiteColor = ProgressColor.GreenLite
-                ),
+                )
             )
         }
     }
@@ -383,7 +790,7 @@ fun NoTargetSomeAssignedNoSpentPreview() {
                 progress = Progress(
                     bar1 = 1f,
                     bar1Color = ProgressColor.Green
-                ),
+                )
             )
         }
     }
