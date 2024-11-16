@@ -143,14 +143,14 @@ fun Category(
                         vertical = spacing.xs
                     )
             ) {
-                val formattedBudgetTarget = availableMoney.formattedMoney
                 val availableMoneyColor = when {
-                    availableMoney.value > 0.00 -> MaterialTheme.colorScheme.scrim
-                    else -> MaterialTheme.colorScheme.onSurface
+                    availableMoney.value < 0.0 -> MaterialTheme.colorScheme.onError
+                    availableMoney.value == 0.0 -> MaterialTheme.colorScheme.onSurface
+                    else -> MaterialTheme.colorScheme.scrim
                 }
 
                 Text(
-                    text = formattedBudgetTarget,
+                    text = availableMoney.formattedMoney,
                     style = MaterialTheme.typography.titleMedium,
                     color = availableMoneyColor
                 )
