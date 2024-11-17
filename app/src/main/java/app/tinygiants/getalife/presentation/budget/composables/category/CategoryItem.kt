@@ -34,11 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
@@ -126,7 +128,7 @@ fun Category(
             Spacer(modifier = Modifier.size(spacing.s))
 
             Text(
-                text = "Assigned: ${assignedMoney.formattedMoney}",
+                text = stringResource(R.string.assigned, assignedMoney.formattedMoney),
                 style = MaterialTheme.typography.titleSmall,
             )
 
