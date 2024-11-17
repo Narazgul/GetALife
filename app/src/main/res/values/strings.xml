@@ -35,4 +35,5 @@
     <string name="outflow">Outflow</string>
     <string name="transaction_saved">Transaction saved</string>
     <string name="starting_balance">Starting Balance</string>
+    <string name="assigned">Assigned: %1$s</string>
 </resources>

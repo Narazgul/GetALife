@@ -36,4 +36,5 @@
     <string name="outflow">Ausgabe</string>
     <string name="transaction_saved">Transaction gespeichert</string>
     <string name="starting_balance">Startguthaben</string>
+    <string name="assigned">Zugewiesen: %1$s</string>
 </resources>
