@@ -4,7 +4,6 @@ import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.FIXED_COST_GROUP
 import app.tinygiants.getalife.data.local.datagenerator.transportCategoryEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Progress
 import app.tinygiants.getalife.domain.model.ProgressColor
 import assertk.assertThat
@@ -40,7 +39,6 @@ class CalculateCategoryProgressUseCaseTest {
             emoji = "🏠",
             name = "Miete",
             budgetTarget = null,
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = 0.0,
             availableMoney = 0.0,
             listPosition = 0,

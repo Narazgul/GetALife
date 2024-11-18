@@ -16,7 +16,7 @@
     <string name="rename_category">Kategorie umbenennen</string>
     <string name="change_budget_target">Budget Ziel ändern</string>
     <string name="distribute_money">Geld zuweisen</string>
-    <string name="delete_argument">%1$s löschen</string>
+    <string name="delete_transaction">Transaktion löschen</string>
     <string name="add_group">Gruppe hinzufügen</string>
     <string name="choose_account">Konto wählen</string>
     <string name="add_account">Konto hinzufügen</string>
@@ -36,5 +36,6 @@
     <string name="outflow">Ausgabe</string>
     <string name="transaction_saved">Transaction gespeichert</string>
     <string name="starting_balance">Startguthaben</string>
+    <string name="starting_balance_description">Startguthaben für dieses Konto</string>
     <string name="assigned">Zugewiesen: %1$s</string>
 </resources>

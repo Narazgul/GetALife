@@ -76,7 +76,6 @@ class UpdateTransactionUseCaseTest {
                 emoji = emoji,
                 name = name,
                 budgetTarget = Money(budgetTarget ?: 0.0),
-                budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -109,7 +108,7 @@ class UpdateTransactionUseCaseTest {
     }
 
     @Test
-    fun `Test reducing transaction amount`(): Unit = runTest {
+    fun `Change transaction amount to spent less than previously spent`(): Unit = runTest {
         val account = cashAccount().run {
             Account(
                 id = id,
@@ -128,7 +127,6 @@ class UpdateTransactionUseCaseTest {
                 emoji = emoji,
                 name = name,
                 budgetTarget = Money(budgetTarget ?: 0.0),
-                budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -141,7 +139,7 @@ class UpdateTransactionUseCaseTest {
         val updatedTransaction = aldiGroceriesJanuary().run {
             Transaction(
                 id = id,
-                amount = Money(amount) - Money(10.0),
+                amount = Money(-40.0),
                 account = account,
                 category = category,
                 transactionPartner = transactionPartner,
@@ -154,13 +152,17 @@ class UpdateTransactionUseCaseTest {
 
         updateTransaction(updatedTransaction)
 
-        assertThat(transactionRepositoryFake.transactions.value.first().amount).isEqualTo(aldiGroceriesJanuary().amount - 10.0)
-        assertThat(categoryRepositoryFake.categories.value.first().availableMoney).isEqualTo(rentCategoryEntity().availableMoney + 10.0)
-        assertThat(accountRepositoryFake.accountsFlow.value.first().balance).isEqualTo(cashAccount().balance + 10.0)
+        val accountBalance = accountRepositoryFake.accountsFlow.value.find { it.id == cashAccount().id }!!.balance
+        val categoryAvailableMoney = categoryRepositoryFake.categories.value.find { it.id == rentCategoryEntity().id }!!.availableMoney
+        val transactionAmount = transactionRepositoryFake.transactions.value.find { it.id == aldiGroceriesJanuary().id }!!.amount
+
+        assertThat(accountBalance).isEqualTo(510.0)
+        assertThat(categoryAvailableMoney).isEqualTo(1310.0)
+        assertThat(transactionAmount).isEqualTo(-40.0)
     }
 
     @Test
-    fun `Test raising transaction amount`(): Unit = runTest {
+    fun `Change transaction amount to spent more than previously spent`(): Unit = runTest {
         val account = cashAccount().run {
             Account(
                 id = id,
@@ -179,7 +181,6 @@ class UpdateTransactionUseCaseTest {
                 emoji = emoji,
                 name = name,
                 budgetTarget = Money(budgetTarget ?: 0.0),
-                budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -192,11 +193,11 @@ class UpdateTransactionUseCaseTest {
         val updatedTransaction = aldiGroceriesJanuary().run {
             Transaction(
                 id = id,
-                amount = Money(amount) + Money(10.0),
+                amount = Money(-60.0),
                 account = account,
                 category = category,
                 transactionPartner = transactionPartner,
-                transactionDirection = TransactionDirection.Inflow,
+                transactionDirection = TransactionDirection.Outflow,
                 description = description,
                 updatedAt = updatedAt,
                 createdAt = createdAt,
@@ -205,8 +206,12 @@ class UpdateTransactionUseCaseTest {
 
         updateTransaction(updatedTransaction)
 
-        assertThat(transactionRepositoryFake.transactions.value.first().amount).isEqualTo(aldiGroceriesJanuary().amount + 10.0)
-        assertThat(categoryRepositoryFake.categories.value.first().availableMoney).isEqualTo(rentCategoryEntity().availableMoney - 10.0)
-        assertThat(accountRepositoryFake.accountsFlow.value.first().balance).isEqualTo(cashAccount().balance - 10.0)
+        val accountBalance = accountRepositoryFake.accountsFlow.value.find { it.id == cashAccount().id }!!.balance
+        val categoryAvailableMoney = categoryRepositoryFake.categories.value.find { it.id == rentCategoryEntity().id }!!.availableMoney
+        val transactionAmount = transactionRepositoryFake.transactions.value.find { it.id == aldiGroceriesJanuary().id }!!.amount
+
+        assertThat(accountBalance).isEqualTo(490.0)
+        assertThat(categoryAvailableMoney).isEqualTo(1290.0)
+        assertThat(transactionAmount).isEqualTo(-60.0)
     }
 }

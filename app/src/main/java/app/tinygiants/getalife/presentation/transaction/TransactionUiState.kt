@@ -15,6 +15,7 @@ data class TransactionUiState(
 )
 
 sealed class UserClickEvent {
+    data class ExchangeCategory(val transaction: Transaction, val oldCategory: Category?) : UserClickEvent()
     data class UpdateTransaction(val transaction: Transaction) : UserClickEvent()
     data class DeleteTransaction(val transaction: Transaction) : UserClickEvent()
 }

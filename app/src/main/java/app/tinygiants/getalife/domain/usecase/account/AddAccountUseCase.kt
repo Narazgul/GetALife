@@ -21,7 +21,13 @@ class AddAccountUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    suspend operator fun invoke(name: String, balance: Money, type: AccountType, startingBalanceName: String) {
+    suspend operator fun invoke(
+        name: String,
+        balance: Money,
+        type: AccountType,
+        startingBalanceName: String,
+        startingBalanceDescription: String
+    ) {
 
         val accountId = Random.nextLong()
 
@@ -36,7 +42,8 @@ class AddAccountUseCase @Inject constructor(
         addInitialStartingBalanceTransaction(
             accountId = accountId,
             amount = balance.value,
-            description = startingBalanceName,
+            startingBalanceName = startingBalanceName,
+            startingBalanceDescription = startingBalanceDescription,
             addTransaction = transactionRepository::addTransaction
         )
     }
@@ -72,7 +79,8 @@ class AddAccountUseCase @Inject constructor(
     private suspend fun addInitialStartingBalanceTransaction(
         accountId: Long,
         amount: Double,
-        description: String,
+        startingBalanceName: String,
+        startingBalanceDescription: String,
         addTransaction: suspend (TransactionEntity) -> Unit
     ) {
         val direction = if (amount >= 0) TransactionDirection.Inflow else TransactionDirection.Outflow
@@ -84,8 +92,8 @@ class AddAccountUseCase @Inject constructor(
             categoryId = null,
             amount = amount,
             transactionDirection = direction,
-            transactionPartner = "",
-            description = description,
+            transactionPartner = startingBalanceName,
+            description = startingBalanceDescription,
             updatedAt = currentTime,
             createdAt = currentTime
         )

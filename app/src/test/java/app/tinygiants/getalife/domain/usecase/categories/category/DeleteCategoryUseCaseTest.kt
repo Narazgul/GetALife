@@ -50,7 +50,6 @@ class DeleteCategoryUseCaseTest {
                 emoji = emoji,
                 name = name,
                 budgetTarget = Money(budgetTarget ?: 0.0),
-                budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),

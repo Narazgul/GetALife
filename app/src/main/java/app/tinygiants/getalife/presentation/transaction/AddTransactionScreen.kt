@@ -13,8 +13,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -33,6 +35,7 @@ import app.tinygiants.getalife.presentation.transaction.composables.Description
 import app.tinygiants.getalife.presentation.transaction.composables.TransactionPartner
 import app.tinygiants.getalife.presentation.transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.coroutines.launch
 
@@ -75,6 +78,11 @@ fun AddTransaction(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val neutralBackground = MaterialTheme.colorScheme.primary.toArgb()
+    val inflowBackground = onSuccess.toArgb()
+    val outflowBackground = MaterialTheme.colorScheme.errorContainer.toArgb()
+    var waveColor by remember { mutableIntStateOf(neutralBackground) }
+
     val transactionSavedString = stringResource(id = R.string.transaction_saved)
     val showTransactionAddedSnackbar = {
         scope.launch { snackbarHostState.showSnackbar(transactionSavedString) }
@@ -93,12 +101,19 @@ fun AddTransaction(
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
                     .height(450.dp)
-                    .waveAnimationBackground(color = MaterialTheme.colorScheme.primary.toArgb())
+                    .waveAnimationBackground(color = waveColor)
             )
 
             AddTransactionItem(
                 categories = categories,
                 accounts = accounts,
+                onTransactionDirectionClicked = { transactionDirection ->
+                    waveColor = when (transactionDirection) {
+                        TransactionDirection.Inflow -> inflowBackground
+                        TransactionDirection.Outflow -> outflowBackground
+                        TransactionDirection.Unknown -> neutralBackground
+                    }
+                },
                 onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner ->
 
                     onAddTransactionClicked(amount, account, category, direction, description, transactionPartner)

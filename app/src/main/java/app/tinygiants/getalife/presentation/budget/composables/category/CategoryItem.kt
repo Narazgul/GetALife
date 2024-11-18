@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Progress
@@ -60,14 +59,12 @@ fun Category(
     emoji: String = "",
     categoryName: String = "",
     budgetTarget: Money? = Money(value = 0.0),
-    budgetPurpose: BudgetPurpose = BudgetPurpose.Unknown,
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Progress = EmptyProgress(),
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money?) -> Unit = { },
-    onUpdateBudgetPurposeClicked: (BudgetPurpose) -> Unit = { },
     onUpdateAssignedMoneyClicked: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
@@ -230,10 +227,8 @@ fun Category(
     if (showGeneralEditBottomSheet) EditCategoryBottomSheet(
         categoryName = categoryName,
         budgetTarget = budgetTarget,
-        budgetPurpose = budgetPurpose,
         onUpdateCategoryName = onUpdateCategoryClicked,
         onBudgetTargetChanged = { money -> onUpdateBudgetTargetClicked(money) },
-        onUpdateBudgetPurposeClicked = onUpdateBudgetPurposeClicked,
         onDeleteCategoryClicked = onDeleteCategoryClicked,
         onDismissRequest = { showGeneralEditBottomSheet = false },
     )

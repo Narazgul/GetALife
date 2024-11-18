@@ -35,6 +35,7 @@ fun TransactionItem(
     accounts: List<Account>,
     categories: List<Category>,
     onUpdateTransactionClicked: (transaction: Transaction) -> Unit = {},
+    onExchangeCategoryClicked: (transaction: Transaction, oldCategory: Category?) -> Unit = { _, _->},
     onDeleteTransactionClicked: () -> Unit = {}
 
 ) {
@@ -48,7 +49,7 @@ fun TransactionItem(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = transaction.description,
+                text = transaction.transactionPartner,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -72,6 +73,7 @@ fun TransactionItem(
             accounts = accounts,
             categories = categories,
             onEditTransactionClicked = onUpdateTransactionClicked,
+            onExchangeCategoryClicked = onExchangeCategoryClicked,
             onDeleteTransactionClicked = onDeleteTransactionClicked,
             onDismissRequest = { isUpdateTransactionBottomSheetVisible = false }
         )
@@ -88,9 +90,9 @@ private fun TransactionItemPreview() {
                     amount = Money(value = -3.20),
                     account = Account(-1, "", Money(0.00), AccountType.Unknown, 0, Clock.System.now(), Clock.System.now()),
                     category = null,
-                    transactionPartner = "Wimmer",
+                    transactionPartner = "Telekom",
                     transactionDirection = TransactionDirection.Outflow,
-                    description = "Bäckerei",
+                    description = "Internet Bill",
                     updatedAt = Clock.System.now(),
                     createdAt = Clock.System.now()
                 ),

@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.presentation.transaction.composables
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ fun EditTransaction(
     accounts: List<Account>,
     categories: List<Category>,
     onEditTransactionClicked: (transaction: Transaction) -> Unit = {},
+    onExchangeCategoryClicked: (transaction: Transaction, oldCategory: Category?) -> Unit = { _, _ -> },
     onDeleteTransactionClicked: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
@@ -99,37 +101,39 @@ fun EditTransaction(
                 }
             }
             Spacer(modifier = Modifier.height(spacing.s))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
-                    modifier = Modifier
-                        .clickable { showCategoryDropdown = true }
-                        .padding(spacing.s)
-                )
-                DropdownMenu(
-                    expanded = showCategoryDropdown,
-                    onDismissRequest = { showCategoryDropdown = false },
-                    modifier = Modifier
-                        .width(200.dp)
+            AnimatedVisibility(visible = directionUserInput == TransactionDirection.Outflow) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    categories.forEach { category ->
-                        DropdownMenuItem(
-                            text = { Text(text = category.name) },
-                            onClick = {
-                                categoryUserInput = category
-                                showCategoryDropdown = false
+                    Text(
+                        text = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
+                        modifier = Modifier
+                            .clickable { showCategoryDropdown = true }
+                            .padding(spacing.s)
+                    )
+                    DropdownMenu(
+                        expanded = showCategoryDropdown,
+                        onDismissRequest = { showCategoryDropdown = false },
+                        modifier = Modifier
+                            .width(200.dp)
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(text = category.name) },
+                                onClick = {
+                                    categoryUserInput = category
+                                    showCategoryDropdown = false
 
-                                onEditTransactionClicked(transaction.copy(category = category))
-                            }
-                        )
+                                    onExchangeCategoryClicked(transaction.copy(category = category), transaction.category)
+                                }
+                            )
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(spacing.default))
             }
-            Spacer(modifier = Modifier.height(spacing.default))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -176,16 +180,6 @@ fun EditTransaction(
             )
             Spacer(modifier = Modifier.height(spacing.l))
             TextField(
-                value = descriptionUserInput,
-                onValueChange = { userInput ->
-                    descriptionUserInput = userInput
-                    onEditTransactionClicked(transaction.copy(description = descriptionUserInput))
-                },
-                label = { Text(stringResource(R.string.description)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(spacing.l))
-            TextField(
                 value = transactionPartnerUserInput,
                 onValueChange = { userInput ->
                     transactionPartnerUserInput = userInput
@@ -195,12 +189,22 @@ fun EditTransaction(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(spacing.l))
+            TextField(
+                value = descriptionUserInput,
+                onValueChange = { userInput ->
+                    descriptionUserInput = userInput
+                    onEditTransactionClicked(transaction.copy(description = descriptionUserInput))
+                },
+                label = { Text(stringResource(R.string.description)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(spacing.l))
             Button(
                 onClick = { onDeleteTransactionClicked() },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text(
-                    text = stringResource(id = R.string.delete_argument),
+                    text = stringResource(id = R.string.delete_transaction),
                     color = MaterialTheme.colorScheme.onError
                 )
             }

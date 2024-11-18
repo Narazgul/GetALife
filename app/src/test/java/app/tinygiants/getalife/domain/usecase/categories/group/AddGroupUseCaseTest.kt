@@ -2,7 +2,6 @@ package app.tinygiants.getalife.domain.usecase.categories.group
 
 import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.remote.ai.AiRepositoryFake
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.GroupRepositoryFake
 import app.tinygiants.getalife.domain.usecase.categories.category.AddCategoryUseCase
@@ -84,7 +83,6 @@ class AddGroupUseCaseTest {
 
         assertThat(categories).hasSize(1)
         assertThat(categories.first().name).isEqualTo("")
-        assertThat(categories.first().budgetPurpose).isEqualTo(BudgetPurpose.Unknown)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)
         assertThat(categories.first().groupId).isEqualTo(createdGroup.id)
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)

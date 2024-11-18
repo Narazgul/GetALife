@@ -86,7 +86,6 @@ class UpdateTransactionUseCase @Inject constructor(
                 emoji = emoji,
                 name = name,
                 budgetTarget = budgetTarget?.value,
-                budgetPurpose = budgetPurpose,
                 assignedMoney = assignedMoney.value,
                 availableMoney = updatedAvailableMoney,
                 listPosition = listPosition,
@@ -108,9 +107,6 @@ class UpdateTransactionUseCase @Inject constructor(
             transactionRepository.getTransaction(transactionId = transaction.id)?.amount ?: return toBeUpdatedBalance
         val differenceBetweenCurrentAndPreviousTransactionAmount = transaction.amount.value - previousTransactionAmount
 
-        return when {
-            differenceBetweenCurrentAndPreviousTransactionAmount == 0.0 -> toBeUpdatedBalance
-            else -> toBeUpdatedBalance - differenceBetweenCurrentAndPreviousTransactionAmount
-        }
+        return toBeUpdatedBalance + differenceBetweenCurrentAndPreviousTransactionAmount
     }
 }

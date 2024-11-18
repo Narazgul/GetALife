@@ -38,7 +38,6 @@ class GetCategoriesUseCase @Inject constructor(
                     emoji = categoryEntity.emoji,
                     name = categoryEntity.name,
                     budgetTarget = Money(value = budgetTarget),
-                    budgetPurpose = categoryEntity.budgetPurpose,
                     assignedMoney = Money(value = categoryEntity.assignedMoney),
                     availableMoney = Money(value = categoryEntity.availableMoney),
                     progress = EmptyProgress(),

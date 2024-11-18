@@ -2,7 +2,6 @@ package app.tinygiants.getalife.domain.usecase.categories.category
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,7 +32,6 @@ class AddCategoryUseCase @Inject constructor(
                 emoji = "",
                 name = trimmedCategoryName,
                 budgetTarget = null,
-                budgetPurpose = BudgetPurpose.Unknown,
                 assignedMoney = 0.00,
                 availableMoney = 0.00,
                 listPosition = endOfListPosition,

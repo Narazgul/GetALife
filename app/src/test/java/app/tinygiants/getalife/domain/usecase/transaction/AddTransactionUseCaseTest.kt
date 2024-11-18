@@ -88,7 +88,6 @@ class AddTransactionUseCaseTest {
                 emoji = emoji,
                 name = name,
                 budgetTarget = Money(budgetTarget!!),
-                budgetPurpose = budgetPurpose,
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),

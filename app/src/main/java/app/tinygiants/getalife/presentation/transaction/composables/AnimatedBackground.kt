@@ -4,6 +4,7 @@ import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -21,7 +22,9 @@ import org.intellij.lang.annotations.Language
 private data class AnimatedBackgroundElement(val color: Int) : ModifierNodeElement<AnimatedBackgroundNode>() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun create() = AnimatedBackgroundNode(color)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun update(node: AnimatedBackgroundNode) {
+        node.updateColor(newColor = color)
     }
 }
 
@@ -55,10 +58,14 @@ private class AnimatedBackgroundNode(color: Int) : DrawModifierNode, Modifier.No
             }
         }
     }
+
+    fun updateColor(newColor: Int) =shader.setColorUniform("color", newColor)
 }
 
-fun Modifier.waveAnimationBackground(color: Int): Modifier =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+@Composable
+fun Modifier.waveAnimationBackground(color: Int): Modifier {
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         this.then(AnimatedBackgroundElement(color))
     } else {
         drawWithCache {
@@ -69,6 +76,7 @@ fun Modifier.waveAnimationBackground(color: Int): Modifier =
             }
         }
     }
+}
 
 @Language("AGSL")
 val SHADER = """

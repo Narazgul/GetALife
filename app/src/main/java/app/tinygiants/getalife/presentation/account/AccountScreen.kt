@@ -67,13 +67,16 @@ fun AccountScreen(
     var isAddAccountBottomSheetVisible by remember { mutableStateOf(false) }
 
     val startingBalanceString = stringResource(R.string.starting_balance)
+    val startingBalanceDescription = stringResource(R.string.starting_balance_description)
+
     val onAddAccountClicked = { accountName: String, startingBalance: Money, type: AccountType ->
         onUserClickEvent(
             UserClickEvent.AddAccount(
                 name = accountName,
                 balance = startingBalance,
                 type = type,
-                startingBalanceName = startingBalanceString
+                startingBalanceName = startingBalanceString,
+                startingBalanceDescription = startingBalanceDescription
             )
         )
     }

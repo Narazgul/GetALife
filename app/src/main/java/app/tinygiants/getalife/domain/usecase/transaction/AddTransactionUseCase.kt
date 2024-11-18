@@ -33,9 +33,11 @@ class AddTransactionUseCase @Inject constructor(
         description: String
     ) {
         val account = accountRepository.getAccount(accountId) ?: return
-        val transformedAmount = transformAmount(direction = direction, amount = amount)
+        if (direction == TransactionDirection.Unknown) return
 
         withContext(defaultDispatcher) {
+
+            val transformedAmount = transformAmount(direction = direction, amount = amount)
 
             addTransaction(
                 accountId = accountId,
@@ -129,7 +131,6 @@ class AddTransactionUseCase @Inject constructor(
                 emoji = emoji,
                 name = name,
                 budgetTarget = budgetTarget?.value,
-                budgetPurpose = budgetPurpose,
                 assignedMoney = assignedMoney.value,
                 availableMoney = updatedAvailableMoney,
                 listPosition = listPosition,

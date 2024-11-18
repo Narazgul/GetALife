@@ -15,7 +15,7 @@
     <string name="rename_category">Rename category</string>
     <string name="change_budget_target">Change budget target</string>
     <string name="distribute_money">Allocate money</string>
-    <string name="delete_argument">Delete %1$s</string>
+    <string name="delete_transaction">Delete Transaction</string>
     <string name="add_group">Add group</string>
     <string name="choose_account">Choose Account</string>
     <string name="add_account">Add account</string>
@@ -35,5 +35,6 @@
     <string name="outflow">Outflow</string>
     <string name="transaction_saved">Transaction saved</string>
     <string name="starting_balance">Starting Balance</string>
+    <string name="starting_balance_description">Starting balance for this account</string>
     <string name="assigned">Assigned: %1$s</string>
 </resources>

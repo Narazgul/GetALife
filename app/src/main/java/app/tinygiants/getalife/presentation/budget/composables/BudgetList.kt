@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
@@ -139,9 +138,6 @@ private fun LazyListScope.categories(
         val onUpdateBudgetTargetClicked = { newBudgetTarget: Money? ->
             onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetTarget = newBudgetTarget)))
         }
-        val onUpdateBudgetPurposeClicked = { newBudgetPurpose: BudgetPurpose ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetPurpose = newBudgetPurpose)))
-        }
         val onUpdateAssignedMoneyClicked = { newAssignedMoney: Money ->
             onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(assignedMoney = newAssignedMoney)))
         }
@@ -165,14 +161,12 @@ private fun LazyListScope.categories(
                         emoji = category.emoji,
                         categoryName = category.name,
                         budgetTarget = category.budgetTarget,
-                        budgetPurpose = category.budgetPurpose,
                         assignedMoney = category.assignedMoney,
                         availableMoney = category.availableMoney,
                         progress = category.progress,
                         onUpdateEmojiClicked = onUpdateEmojiClicked,
                         onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
-                        onUpdateBudgetPurposeClicked = onUpdateBudgetPurposeClicked,
                         onUpdateAssignedMoneyClicked = onUpdateAssignedMoneyClicked,
                         onDeleteCategoryClicked = onDeleteCategoryClicked
                     )

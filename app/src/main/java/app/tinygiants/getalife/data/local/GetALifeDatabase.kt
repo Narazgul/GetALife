@@ -15,7 +15,6 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import kotlinx.datetime.Instant
 
 @Database(
@@ -57,8 +56,6 @@ abstract class GetALifeDatabase : RoomDatabase() {
 // region TypConverters
 
 private const val UNKNOWN = 0
-private const val SPENT = 1
-private const val SAVE = 2
 private const val CASH = 10
 private const val CHECKING = 11
 private const val SAVINGS = 12
@@ -68,19 +65,6 @@ private const val LOAN = 15
 private const val MORTGAGE = 16
 
 class Converters {
-    @TypeConverter
-    fun fromBudgetPurpose(value: BudgetPurpose) = when (value) {
-        BudgetPurpose.Unknown -> UNKNOWN
-        BudgetPurpose.Spending -> SPENT
-        BudgetPurpose.Saving -> SAVE
-    }
-
-    @TypeConverter
-    fun toBudgetPurpose(value: Int) = when (value) {
-        SPENT -> BudgetPurpose.Spending
-        SAVE -> BudgetPurpose.Saving
-        else -> BudgetPurpose.Unknown
-    }
 
     @TypeConverter
     fun fromAccountType(value: AccountType) = when (value) {

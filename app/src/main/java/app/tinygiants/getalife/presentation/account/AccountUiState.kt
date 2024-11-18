@@ -14,7 +14,14 @@ data class AccountUiState(
 )
 
 sealed class UserClickEvent {
-    data class AddAccount(val name: String, val balance: Money, val type: AccountType, val startingBalanceName: String) : UserClickEvent()
+    data class AddAccount(
+        val name: String,
+        val balance: Money,
+        val type: AccountType,
+        val startingBalanceName: String,
+        val startingBalanceDescription: String
+    ) : UserClickEvent()
+
     data class UpdateAccount(val account: Account) : UserClickEvent()
     data class DeleteAccount(val account: Account) : UserClickEvent()
 }

@@ -29,7 +29,6 @@ class UpdateCategoryUseCase @Inject constructor(
             emoji = category.emoji,
             name = category.name,
             budgetTarget = category.budgetTarget?.value,
-            budgetPurpose = category.budgetPurpose,
             assignedMoney = category.assignedMoney.value,
             availableMoney = newAvailableMoney,
             listPosition = category.listPosition,

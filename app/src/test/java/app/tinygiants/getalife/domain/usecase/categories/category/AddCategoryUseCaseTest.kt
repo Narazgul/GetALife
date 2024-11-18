@@ -2,7 +2,6 @@ package app.tinygiants.getalife.domain.usecase.categories.category
 
 import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.remote.ai.AiRepositoryFake
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import assertk.assertThat
@@ -55,7 +54,6 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().groupId).isEqualTo(1L)
         assertThat(categories.first().emoji).isEqualTo("")
         assertThat(categories.first().isInitialCategory).isTrue()
-        assertThat(categories.first().budgetPurpose).isEqualTo(BudgetPurpose.Unknown)
         assertThat(categories.first().budgetTarget).isNull()
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)
@@ -72,7 +70,6 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().groupId).isEqualTo(1L)
         assertThat(categories.first().emoji).isEqualTo("✅")
         assertThat(categories.first().isInitialCategory).isFalse()
-        assertThat(categories.first().budgetPurpose).isEqualTo(BudgetPurpose.Unknown)
         assertThat(categories.first().budgetTarget).isNull()
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)

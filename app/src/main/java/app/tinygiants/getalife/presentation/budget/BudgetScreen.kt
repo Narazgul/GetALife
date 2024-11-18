@@ -39,7 +39,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
@@ -183,7 +182,6 @@ fun fakeCategories() = mapOf(
             emoji = "🏠",
             name = "Rent",
             budgetTarget = Money(value = 1000.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 1000.00),
             availableMoney = Money(value = 1000.00),
             progress = EmptyProgress(),
@@ -198,7 +196,6 @@ fun fakeCategories() = mapOf(
             emoji = "🏥",
             name = "Barmenia",
             budgetTarget = Money(value = 28.55),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 28.55),
             availableMoney = Money(value = 28.55),
             progress = EmptyProgress(),
@@ -213,7 +210,6 @@ fun fakeCategories() = mapOf(
             emoji = "📱",
             name = "Fraenk",
             budgetTarget = Money(value = 10.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 10.00),
             availableMoney = Money(value = 10.00),
             progress = EmptyProgress(),
@@ -228,7 +224,6 @@ fun fakeCategories() = mapOf(
             emoji = "▶️",
             name = "YouTube Premium",
             budgetTarget = Money(value = 7.49),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 7.49),
             availableMoney = Money(value = 7.49),
             progress = EmptyProgress(),
@@ -243,7 +238,6 @@ fun fakeCategories() = mapOf(
             emoji = "🏋",
             name = "Gym",
             budgetTarget = Money(value = 29.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 13.00),
             availableMoney = Money(value = 13.00),
             progress = EmptyProgress(),
@@ -258,7 +252,6 @@ fun fakeCategories() = mapOf(
             emoji = "🍿",
             name = "Netflix",
             budgetTarget = Money(value = 9.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 2.00),
             availableMoney = Money(value = 2.00),
             progress = EmptyProgress(),
@@ -281,7 +274,6 @@ fun fakeCategories() = mapOf(
             emoji = "🛒",
             name = "Groceries",
             budgetTarget = Money(value = 100.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 27.00),
             availableMoney = Money(value = 27.00),
             progress = EmptyProgress(),
@@ -296,7 +288,6 @@ fun fakeCategories() = mapOf(
             emoji = "🚌",
             name = "Transportation",
             budgetTarget = Money(value = 50.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 0.00),
             availableMoney = Money(value = 0.00),
             progress = EmptyProgress(),
@@ -311,7 +302,6 @@ fun fakeCategories() = mapOf(
             emoji = "🍽",
             name = "Eating Out",
             budgetTarget = Money(value = 60.00),
-            budgetPurpose = BudgetPurpose.Spending,
             assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = EmptyProgress(),
@@ -334,7 +324,6 @@ fun fakeCategories() = mapOf(
             name = "Jetzt Kategorie hinzufügen",
             groupId = 8,
             budgetTarget = Money(value = 60.00),
-            budgetPurpose = BudgetPurpose.Unknown,
             assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = EmptyProgress(),

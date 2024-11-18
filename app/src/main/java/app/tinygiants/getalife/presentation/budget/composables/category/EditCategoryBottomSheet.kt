@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.MultiChoiceSegmentedButtonRow
-import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -28,9 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.domain.model.BudgetPurpose
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.spacing
 
@@ -39,10 +34,8 @@ import app.tinygiants.getalife.theme.spacing
 fun EditCategoryBottomSheet(
     categoryName: String,
     budgetTarget: Money?,
-    budgetPurpose: BudgetPurpose,
     onUpdateCategoryName: (String) -> Unit = { },
     onBudgetTargetChanged: (Money?) -> Unit = { },
-    onUpdateBudgetPurposeClicked: (BudgetPurpose) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { },
     onDismissRequest: () -> Unit = { }
 ) {
@@ -57,30 +50,6 @@ fun EditCategoryBottomSheet(
         containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column(modifier = Modifier.padding(horizontal = spacing.l)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                MultiChoiceSegmentedButtonRow {
-                    SegmentedButton(
-                        checked = budgetPurpose == BudgetPurpose.Spending,
-                        onCheckedChange = { isChecked ->
-                            if (isChecked) onUpdateBudgetPurposeClicked(BudgetPurpose.Spending)
-                            else onUpdateBudgetPurposeClicked(BudgetPurpose.Unknown)
-                        },
-                        shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp),
-                    ) {
-                        Text(text = stringResource(R.string.spent))
-                    }
-                    SegmentedButton(
-                        checked = budgetPurpose == BudgetPurpose.Saving,
-                        onCheckedChange = { isChecked ->
-                            if (isChecked) onUpdateBudgetPurposeClicked(BudgetPurpose.Saving)
-                            else onUpdateBudgetPurposeClicked(BudgetPurpose.Unknown)
-                        },
-                        shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
-                    ) {
-                        Text(text = stringResource(R.string.savings))
-                    }
-                }
-            }
             Spacer(modifier = Modifier.height(spacing.default))
             Row {
                 TextField(
@@ -123,7 +92,7 @@ fun EditCategoryBottomSheet(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text(
-                        text = stringResource(R.string.delete_argument, categoryName),
+                        text = stringResource(R.string.delete_transaction, categoryName),
                         color = MaterialTheme.colorScheme.onError
                     )
                 }

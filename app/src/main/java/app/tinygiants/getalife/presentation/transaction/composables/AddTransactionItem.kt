@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ typealias TransactionPartner = String
 fun AddTransactionItem(
     categories: List<Category>,
     accounts: List<Account>,
+    onTransactionDirectionClicked: (TransactionDirection) -> Unit,
     onAddTransactionClicked: (
         amount: Money,
         account: Account,
@@ -56,6 +58,7 @@ fun AddTransactionItem(
     ) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
 
     var showCategoryDropdown by rememberSaveable { mutableStateOf(false) }
     var showAccountDropdown by rememberSaveable { mutableStateOf(false) }
@@ -79,6 +82,8 @@ fun AddTransactionItem(
                 onCheckedChange = { isChecked ->
                     directionUserInput = if (isChecked) TransactionDirection.Inflow
                     else TransactionDirection.Unknown
+
+                    onTransactionDirectionClicked(directionUserInput)
                 },
                 shape = RoundedCornerShape(topStart = spacing.l, bottomStart = spacing.l),
             ) {
@@ -89,6 +94,8 @@ fun AddTransactionItem(
                 onCheckedChange = { isChecked ->
                     directionUserInput = if (isChecked) TransactionDirection.Outflow
                     else TransactionDirection.Unknown
+
+                    onTransactionDirectionClicked(directionUserInput)
                 },
                 shape = RoundedCornerShape(topEnd = spacing.l, bottomEnd = spacing.l),
             ) {
@@ -159,9 +166,9 @@ fun AddTransactionItem(
         TextField(
             value = amountUserInputText,
             onValueChange = { userInput ->
-                amountUserInputText = userInput
+                amountUserInputText = userInput.replace(oldChar = ',', newChar = '.')
                 amountMoney = Money(
-                    value = userInput.toDoubleOrNull() ?: amountMoney.value
+                    value = amountUserInputText.toDoubleOrNull() ?: amountMoney.value
                 )
             },
             label = { Text(stringResource(R.string.amount)) },
@@ -174,16 +181,16 @@ fun AddTransactionItem(
         )
         Spacer(modifier = Modifier.height(spacing.l))
         TextField(
-            value = descriptionUserInput,
-            onValueChange = { userInput -> descriptionUserInput = userInput },
-            label = { Text(stringResource(R.string.description)) },
+            value = transactionPartnerUserInput,
+            onValueChange = { userInput -> transactionPartnerUserInput = userInput },
+            label = { Text(stringResource(R.string.transaction_partner)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(spacing.l))
         TextField(
-            value = transactionPartnerUserInput,
-            onValueChange = { userInput -> transactionPartnerUserInput = userInput },
-            label = { Text(stringResource(R.string.transaction_partner)) },
+            value = descriptionUserInput,
+            onValueChange = { userInput -> descriptionUserInput = userInput },
+            label = { Text(stringResource(R.string.description)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(spacing.xl))
@@ -197,8 +204,12 @@ fun AddTransactionItem(
                     descriptionUserInput,
                     transactionPartnerUserInput,
                 )
+
+                focusManager.clearFocus()
             },
-            enabled = accountUserInput != null && (categoryUserInput != null || directionUserInput == TransactionDirection.Inflow)
+            enabled = accountUserInput != null &&
+                    directionUserInput != TransactionDirection.Unknown &&
+                    (categoryUserInput != null || directionUserInput == TransactionDirection.Inflow)
         ) {
             Text(text = stringResource(id = R.string.save))
         }
@@ -213,6 +224,7 @@ private fun EnterTransactionPreview() {
             AddTransactionItem(
                 categories = emptyList(),
                 accounts = emptyList(),
+                onTransactionDirectionClicked = { _ -> },
                 onAddTransactionClicked = { _, _, _, _, _, _ -> })
         }
     }
