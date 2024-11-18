@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.transaction
+package app.tinygiants.getalife.presentation.transaction.add_transaction
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

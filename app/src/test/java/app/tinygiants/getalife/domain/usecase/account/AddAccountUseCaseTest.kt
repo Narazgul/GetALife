@@ -47,7 +47,13 @@ class AddAccountUseCaseTest {
     fun `Add new account with positive balance and AccountType and has positive starting balance`(): Unit = runTest {
         val testBegin = Clock.System.now()
         val shortlyAfterTestBegin = testBegin + 50.milliseconds
-        addAccount(name = "Bargeld", balance = Money(value = 1.00), type = AccountType.Cash, startingBalanceName = "Starting balance")
+        addAccount(
+            name = "Bargeld",
+            balance = Money(value = 1.00),
+            type = AccountType.Cash,
+            startingBalanceName = "Starting balance",
+            startingBalanceDescription = "Starting balance for this account"
+        )
 
         advanceUntilIdle()
 
@@ -61,7 +67,7 @@ class AddAccountUseCaseTest {
         assertThat(insertedAccount.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
 
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
-        assertThat(startingBalanceTransaction.description).isEqualTo("Starting balance")
+        assertThat(startingBalanceTransaction.transactionPartner).isEqualTo("Starting balance")
         assertThat(startingBalanceTransaction.amount).isEqualTo(1.00)
     }
 
@@ -69,7 +75,13 @@ class AddAccountUseCaseTest {
     fun `Add new account with negative balance and AccountType and has negative starting balance`(): Unit = runTest {
         val testBegin = Clock.System.now()
         val shortlyAfterTestBegin = testBegin + 50.milliseconds
-        addAccount(name = "Bargeld", balance = Money(value = -1.00), type = AccountType.Cash, startingBalanceName = "Starting balance")
+        addAccount(
+            name = "Bargeld",
+            balance = Money(value = -1.00),
+            type = AccountType.Cash,
+            startingBalanceName = "Starting balance",
+            startingBalanceDescription = "Starting balance for this account"
+        )
 
         advanceUntilIdle()
 
@@ -83,7 +95,7 @@ class AddAccountUseCaseTest {
         assertThat(insertedAccount.createdAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
 
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
-        assertThat(startingBalanceTransaction.description).isEqualTo("Starting balance")
+        assertThat(startingBalanceTransaction.transactionPartner).isEqualTo("Starting balance")
         assertThat(startingBalanceTransaction.amount).isEqualTo(-1.00)
     }
 
@@ -91,7 +103,13 @@ class AddAccountUseCaseTest {
     fun `Test zero available starting balance`(): Unit = runTest {
         val testBegin = Clock.System.now()
         val shortlyAfterTestBegin = testBegin + 50.milliseconds
-        addAccount(name = "Bargeld", balance = Money(0.00), type = AccountType.Cash, startingBalanceName = "Starting balance")
+        addAccount(
+            name = "Bargeld",
+            balance = Money(0.00),
+            type = AccountType.Cash,
+            startingBalanceName = "Starting balance",
+            startingBalanceDescription = "Starting balance for this account"
+        )
 
         advanceUntilIdle()
 
@@ -106,7 +124,7 @@ class AddAccountUseCaseTest {
 
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
         val calculatedStartingBalance = insertedAccount.balance + startingBalanceTransaction.amount
-        assertThat(startingBalanceTransaction.description).isEqualTo("Starting balance")
+        assertThat(startingBalanceTransaction.transactionPartner).isEqualTo("Starting balance")
         assertThat(calculatedStartingBalance).isEqualTo(0.00)
     }
 }

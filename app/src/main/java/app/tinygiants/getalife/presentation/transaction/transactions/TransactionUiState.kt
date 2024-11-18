@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.transaction
+package app.tinygiants.getalife.presentation.transaction.transactions
 
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category

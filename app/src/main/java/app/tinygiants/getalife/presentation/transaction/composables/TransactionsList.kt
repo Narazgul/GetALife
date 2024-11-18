@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Transaction
-import app.tinygiants.getalife.presentation.transaction.UserClickEvent
+import app.tinygiants.getalife.presentation.transaction.transactions.UserClickEvent
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Composable

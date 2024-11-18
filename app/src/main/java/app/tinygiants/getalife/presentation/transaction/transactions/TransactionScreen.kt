@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.transaction
+package app.tinygiants.getalife.presentation.transaction.transactions
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons

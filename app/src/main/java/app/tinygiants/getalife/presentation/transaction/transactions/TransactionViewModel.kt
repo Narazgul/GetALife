@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.transaction
+package app.tinygiants.getalife.presentation.transaction.transactions
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
