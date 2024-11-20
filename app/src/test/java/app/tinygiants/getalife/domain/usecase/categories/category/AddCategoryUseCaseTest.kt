@@ -8,7 +8,6 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
@@ -54,7 +53,7 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().groupId).isEqualTo(1L)
         assertThat(categories.first().emoji).isEqualTo("")
         assertThat(categories.first().isInitialCategory).isTrue()
-        assertThat(categories.first().budgetTarget).isNull()
+        assertThat(categories.first().budgetTarget).isEqualTo(0.0)
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)
         assertThat(categories.first().listPosition).isEqualTo(0)
@@ -70,7 +69,7 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().groupId).isEqualTo(1L)
         assertThat(categories.first().emoji).isEqualTo("✅")
         assertThat(categories.first().isInitialCategory).isFalse()
-        assertThat(categories.first().budgetTarget).isNull()
+        assertThat(categories.first().budgetTarget).isEqualTo(0.0)
         assertThat(categories.first().assignedMoney).isEqualTo(0.0)
         assertThat(categories.first().availableMoney).isEqualTo(0.0)
         assertThat(categories.first().listPosition).isEqualTo(0)

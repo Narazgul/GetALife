@@ -76,7 +76,7 @@ class GetTransactionsForAccountUseCase @Inject constructor(
                 }
 
                 val category = if (categoryEntity == null) null else {
-                    val budgetTarget = categoryEntity.budgetTarget ?: 0.00
+                    val budgetTarget = categoryEntity.budgetTarget
 
                     categoryEntity.run {
                         Category(

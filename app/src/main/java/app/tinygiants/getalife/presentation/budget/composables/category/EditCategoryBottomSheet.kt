@@ -33,9 +33,9 @@ import app.tinygiants.getalife.theme.spacing
 @Composable
 fun EditCategoryBottomSheet(
     categoryName: String,
-    budgetTarget: Money?,
+    budgetTarget: Money,
     onUpdateCategoryName: (String) -> Unit = { },
-    onBudgetTargetChanged: (Money?) -> Unit = { },
+    onBudgetTargetChanged: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { },
     onDismissRequest: () -> Unit = { }
 ) {
@@ -43,7 +43,7 @@ fun EditCategoryBottomSheet(
     var categoryNameUserInput by rememberSaveable { mutableStateOf(categoryName) }
 
     var budgetTargetMoney by remember { mutableStateOf(budgetTarget) }
-    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney?.value?.toString() ?: "") }
+    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.value.toString()) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -72,13 +72,13 @@ fun EditCategoryBottomSheet(
                             Money(value = budgetTargetUserInput.toDoubleOrNull() ?: return@TextField)
                         onBudgetTargetChanged(budgetTargetMoney)
                     },
-                    prefix = { Text(budgetTarget?.currencySymbol ?: "") },
+                    prefix = { Text(budgetTarget.currencySymbol) },
                     label = { Text(stringResource(R.string.change_budget_target)) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .weight(1f)
                         .onFocusChanged { focusState ->
-                            budgetTargetUserInput = if (focusState.hasFocus) "" else budgetTarget?.value.toString()
+                            budgetTargetUserInput = if (focusState.hasFocus) "" else budgetTarget.value.toString()
                         }
                 )
             }

@@ -1,9 +1,14 @@
 package app.tinygiants.getalife.data.repository
 
-import aldiGroceriesJanuary
-import aldiGroceriesMarch
 import app.cash.turbine.test
 import app.tinygiants.getalife.data.local.dao.TransactionDaoFake
+import app.tinygiants.getalife.data.local.datagenerator.aldiGroceriesJanuary
+import app.tinygiants.getalife.data.local.datagenerator.aldiGroceriesMarch
+import app.tinygiants.getalife.data.local.datagenerator.eonElectricityMarch
+import app.tinygiants.getalife.data.local.datagenerator.landlordRentJanuary
+import app.tinygiants.getalife.data.local.datagenerator.landlordRentMarch
+import app.tinygiants.getalife.data.local.datagenerator.techCorpSalaryJanuary
+import app.tinygiants.getalife.data.local.datagenerator.transactions
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -11,14 +16,9 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import eonElectricityMarch
 import kotlinx.coroutines.test.runTest
-import landlordRentJanuary
-import landlordRentMarch
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import techCorpSalaryJanuary
-import transactions
 
 class TransactionRepositoryImplTest {
 
@@ -43,10 +43,10 @@ class TransactionRepositoryImplTest {
             assertThat(emission1).hasSize(1)
             assertThat(emission1.first().id).isEqualTo(techCorpSalaryJanuary().id)
 
-            val updatedGroup = techCorpSalaryJanuary().copy(transactionPartner = "Arbeitgeber")
+            val updatedGroup = techCorpSalaryJanuary().copy(transactionPartner = "Employer")
             fakeDao.updateTransaction(updatedGroup)
             val emission2 = awaitItem()
-            assertThat(emission2.first().transactionPartner).isEqualTo("Arbeitgeber")
+            assertThat(emission2.first().transactionPartner).isEqualTo("Employer")
 
             fakeDao.deleteTransaction(techCorpSalaryJanuary())
             val emission3 = awaitItem()
@@ -102,12 +102,12 @@ class TransactionRepositoryImplTest {
         fakeDao.transactions.value = transactions
 
         val tobeUpdatedTransaction =
-            techCorpSalaryJanuary().copy(transactionDirection = TransactionDirection.Outflow, transactionPartner = "Testpartner")
+            techCorpSalaryJanuary().copy(transactionDirection = TransactionDirection.Outflow, transactionPartner = "Seven")
         repository.updateTransaction(tobeUpdatedTransaction)
 
         val updatedTransaction = fakeDao.transactions.value.find { it.id == techCorpSalaryJanuary().id }
         assertThat(updatedTransaction).isNotNull()
-        assertThat(updatedTransaction?.transactionPartner).isEqualTo("Testpartner")
+        assertThat(updatedTransaction?.transactionPartner).isEqualTo("Seven")
     }
 
     @Test

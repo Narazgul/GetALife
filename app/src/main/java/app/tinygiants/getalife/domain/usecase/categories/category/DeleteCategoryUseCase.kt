@@ -21,7 +21,7 @@ class DeleteCategoryUseCase @Inject constructor(
                 groupId = category.groupId,
                 emoji = category.emoji,
                 name = category.name,
-                budgetTarget = category.budgetTarget?.value,
+                budgetTarget = category.budgetTarget.value,
                 assignedMoney = category.assignedMoney.value,
                 availableMoney = category.availableMoney.value,
                 listPosition = category.listPosition,

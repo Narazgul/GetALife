@@ -44,7 +44,7 @@ class UpdateGroupUseCaseTest {
         val groupToBeUpdated = fixedCosts().run {
             Group(
                 id = id,
-                name = "new Groupname",
+                name = "new group name",
                 sumOfAvailableMoney = Money(0.0),
                 listPosition = listPosition,
                 isExpanded = isExpanded
@@ -56,7 +56,7 @@ class UpdateGroupUseCaseTest {
         val groups = groupRepositoryFake.groupFlow.value
 
         assertThat(groups).hasSize(4)
-        assertThat(groups.first().name).isEqualTo("new Groupname")
+        assertThat(groups.first().name).isEqualTo("new group name")
         assertThat(groups.first().listPosition).isEqualTo(fixedCosts().listPosition)
     }
 

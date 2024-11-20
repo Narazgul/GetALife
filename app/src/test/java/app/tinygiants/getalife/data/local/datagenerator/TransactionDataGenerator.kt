@@ -1,3 +1,5 @@
+package app.tinygiants.getalife.data.local.datagenerator
+
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import kotlinx.datetime.Instant
@@ -33,14 +35,14 @@ val transactions = listOf(
     lidlGroceriesJanuary(),
     gymMembershipJanuary(),
 
-    // Februar
+    // February
     techCorpSalaryFebruary(),
     landlordRentFebruary(),
     eonElectricityFebruary(),
-    tescoGroceriesFebruary(),
+    sevenElevenGroceriesFebruary(),
     netflixFebruary(),
     gymMembershipFebruary(),
-    reweGroceriesFebruary(),
+    walmartGroceriesFebruary(),
 
     // March
     techCorpSalaryMarch(),
@@ -198,13 +200,13 @@ fun eonElectricityFebruary(): TransactionEntity {
     )
 }
 
-fun tescoGroceriesFebruary(): TransactionEntity {
+fun sevenElevenGroceriesFebruary(): TransactionEntity {
     return TransactionEntity(
         id = 11L,
         accountId = CASH_ACCOUNT,
         categoryId = GROCERIES,
         amount = -45.0,
-        transactionPartner = "Tesco",
+        transactionPartner = "7/11",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
         updatedAt = Instant.parse("2024-01-05T10:30:00Z"),
@@ -240,13 +242,13 @@ fun gymMembershipFebruary(): TransactionEntity {
     )
 }
 
-fun reweGroceriesFebruary(): TransactionEntity {
+fun walmartGroceriesFebruary(): TransactionEntity {
     return TransactionEntity(
         id = 14L,
         accountId = CASH_ACCOUNT,
         categoryId = GROCERIES,
         amount = -25.0,
-        transactionPartner = "Rewe",
+        transactionPartner = "Walmart",
         transactionDirection = TransactionDirection.Outflow,
         description = "Groceries",
         updatedAt = Instant.parse("2024-01-05T10:30:00Z"),

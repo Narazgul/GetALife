@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.categories
+import app.tinygiants.getalife.data.local.datagenerator.transactions
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
@@ -13,7 +14,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import transactions
 
 class GetTransactionsForAccountUseCaseTest {
 

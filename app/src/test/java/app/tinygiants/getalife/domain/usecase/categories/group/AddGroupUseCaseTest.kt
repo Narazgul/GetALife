@@ -63,20 +63,20 @@ class AddGroupUseCaseTest {
 
     @Test
     fun `Test second group got correct listPosition`(): Unit = runTest {
-        addGroup(groupName = "Fix costs")
+        addGroup(groupName = "Fixed costs")
         addGroup(groupName = "Dreams")
 
         val groups = groupRepositoryFake.groupFlow.value
 
         assertThat(groups).hasSize(2)
-        assertThat(groups[0].name).isEqualTo("Fix costs")
+        assertThat(groups[0].name).isEqualTo("Fixed costs")
         assertThat(groups[1].name).isEqualTo("Dreams")
         assertThat(groups[1].listPosition).isEqualTo(1)
     }
 
     @Test
     fun `Test empty category gets created with group`(): Unit = runTest {
-        addGroup(groupName = "Testgruppe")
+        addGroup(groupName = "Fixed costs")
 
         val createdGroup = groupRepositoryFake.groupFlow.value.first()
         val categories = categoryRepositoryFake.categories.value

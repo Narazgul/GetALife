@@ -5,14 +5,12 @@
     <string name="more_distributed_than_available">คุณได้แจกจ่ายเงินมากกว่าที่คุณเป็นเจ้าของ ลบ %1$s ออกจากหมวดหมู่</string>
     <string name="error_title">เกิดข้อผิดพลาด</string>
     <string name="error_subtitle">มันน่ากลัว. ดูแลตัวเอง</string>
-    <string name="enter_groupname">ป้อนชื่อกลุ่ม</string>
+    <string name="enter_group_name">ป้อนชื่อกลุ่ม</string>
     <string name="no_name_entered">ไม่มีชื่อป้อน</string>
     <string name="save">บันทึก</string>
     <string name="add_category">เพิ่มหมวดหมู่</string>
     <string name="change_title">เปลี่ยนชื่อเรื่อง</string>
     <string name="delete_group">%1$s-ลบกลุ่ม</string>
-    <string name="spent">ใช้จ่าย</string>
-    <string name="savings">บันทึก</string>
     <string name="rename_category">เปลี่ยนชื่อหมวดหมู่</string>
     <string name="change_budget_target">เปลี่ยนเป้าหมายงบประมาณ</string>
     <string name="distribute_money">จัดสรรเงิน</string>
@@ -27,7 +25,6 @@
     <string name="chose_category">เลือกหมวดหมู่</string>
     <string name="amount">จำนวน</string>
     <string name="description">คำอธิบาย</string>
-    <string name="add_transaction">เพิ่มธุรกรรม</string>
     <string name="transaction_partner">พันธมิตรการทำธุรกรรม</string>
     <string name="budget">งบประมาณ</string>
     <string name="account">บัญชี</string>

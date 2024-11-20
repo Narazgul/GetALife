@@ -58,13 +58,13 @@ import kotlinx.coroutines.launch
 fun Category(
     emoji: String = "",
     categoryName: String = "",
-    budgetTarget: Money? = Money(value = 0.0),
+    budgetTarget: Money = Money(value = 0.0),
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Progress = EmptyProgress(),
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
-    onUpdateBudgetTargetClicked: (Money?) -> Unit = { },
+    onUpdateBudgetTargetClicked: (Money) -> Unit = { },
     onUpdateAssignedMoneyClicked: (Money) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
@@ -118,7 +118,7 @@ fun Category(
             val budgetTargetBackground = when {
                 availableMoney.value < 0.0 -> MaterialTheme.colorScheme.error
                 availableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-                budgetTarget != null && assignedMoney.value < budgetTarget.value -> onWarning
+                budgetTarget.value != 0.0 && assignedMoney.value < budgetTarget.value -> onWarning
                 else -> onSuccess
             }
 

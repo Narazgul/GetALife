@@ -1,12 +1,13 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
-import aldiGroceriesJanuary
 import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.accounts
+import app.tinygiants.getalife.data.local.datagenerator.aldiGroceriesJanuary
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.groceriesCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
+import app.tinygiants.getalife.data.local.datagenerator.transactions
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
@@ -23,7 +24,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import transactions
 
 class UpdateTransactionUseCaseTest {
 
@@ -75,7 +75,7 @@ class UpdateTransactionUseCaseTest {
                 groupId = groupId,
                 emoji = emoji,
                 name = name,
-                budgetTarget = Money(budgetTarget ?: 0.0),
+                budgetTarget = Money(budgetTarget),
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -126,7 +126,7 @@ class UpdateTransactionUseCaseTest {
                 groupId = groupId,
                 emoji = emoji,
                 name = name,
-                budgetTarget = Money(budgetTarget ?: 0.0),
+                budgetTarget = Money(budgetTarget),
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -180,7 +180,7 @@ class UpdateTransactionUseCaseTest {
                 groupId = groupId,
                 emoji = emoji,
                 name = name,
-                budgetTarget = Money(budgetTarget ?: 0.0),
+                budgetTarget = Money(budgetTarget),
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),

@@ -11,28 +11,28 @@ val groups = listOf(
 
 fun fixedCosts() = GroupEntity(
     id = 1L,
-    name = "Fixkosten",
+    name = "Fixed costs",
     listPosition = 0,
     isExpanded = false
 )
 
 fun dailyLife() = GroupEntity(
     id = 2L,
-    name = "tägliches Leben",
+    name = "Daily life",
     listPosition = 1,
     isExpanded = false
 )
 
 fun dreams() = GroupEntity(
     id = 3L,
-    name = "Träume",
+    name = "Dreams",
     listPosition = 2,
     isExpanded = false
 )
 
 fun savings() = GroupEntity(
     id = 4L,
-    name = "Sparen",
+    name = "Savings",
     listPosition = 3,
     isExpanded = false
 )

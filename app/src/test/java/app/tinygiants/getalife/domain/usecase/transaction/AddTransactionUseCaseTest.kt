@@ -62,7 +62,7 @@ class AddTransactionUseCaseTest {
             accountId = 1L,
             category = null,
             transactionPartner = "",
-            description = "Startguthaben"
+            description = "Starting balance"
         )
         val transactions = transactionRepositoryFake.transactions.value
         val transaction = transactions.first()
@@ -87,7 +87,7 @@ class AddTransactionUseCaseTest {
                 groupId = groupId,
                 emoji = emoji,
                 name = name,
-                budgetTarget = Money(budgetTarget!!),
+                budgetTarget = Money(budgetTarget),
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -126,7 +126,7 @@ class AddTransactionUseCaseTest {
         assertThat(accountAfterTransaction.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
 
         val categoryAfterTransaction = categoryRepositoryFake.categories.value.first()
-        assertThat(categoryAfterTransaction.name).isEqualTo("Miete")
+        assertThat(categoryAfterTransaction.name).isEqualTo("Rent")
         assertThat(categoryAfterTransaction.budgetTarget).isEqualTo(1200.0)
         assertThat(categoryAfterTransaction.assignedMoney).isEqualTo(1200.0)
         assertThat(categoryAfterTransaction.availableMoney).isEqualTo(1249.19)

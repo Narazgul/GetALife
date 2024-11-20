@@ -7,7 +7,7 @@ data class Category(
     val groupId: Long,
     val emoji: String,
     val name: String,
-    val budgetTarget: Money?,
+    val budgetTarget: Money,
     val assignedMoney: Money,
     val availableMoney: Money,
     val progress: Progress,

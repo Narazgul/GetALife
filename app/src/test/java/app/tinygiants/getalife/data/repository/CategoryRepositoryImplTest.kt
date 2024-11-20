@@ -36,10 +36,10 @@ class CategoryRepositoryImplTest {
             assertThat(emission1).hasSize(1)
             assertThat(emission1.first().name).isEqualTo(rentCategoryEntity().name)
 
-            fakeDao.updateCategory(rentCategoryEntity().copy(name = "Mieeete"))
+            fakeDao.updateCategory(rentCategoryEntity().copy(name = "UpdatedRent"))
             val emission2 = awaitItem()
             assertThat(emission2).hasSize(1)
-            assertThat(emission2.first().name).isEqualTo("Mieeete")
+            assertThat(emission2.first().name).isEqualTo("UpdatedRent")
 
             fakeDao.deleteCategory(rentCategoryEntity())
             val emission3 = awaitItem()
@@ -79,11 +79,11 @@ class CategoryRepositoryImplTest {
     fun `Update Category`(): Unit = runTest {
         fakeDao.categories.value = categories
 
-        val updatedCategory = rentCategoryEntity().copy(name = "UpdatedMiete")
+        val updatedCategory = rentCategoryEntity().copy(name = "UpdatedRent")
         repository.updateCategory(categoryEntity = updatedCategory)
 
         val categoryUnderTest = fakeDao.categories.value.find { it.id == rentCategoryEntity().id }
-        assertThat(categoryUnderTest?.name).isEqualTo("UpdatedMiete")
+        assertThat(categoryUnderTest?.name).isEqualTo("UpdatedRent")
     }
 
     @Test

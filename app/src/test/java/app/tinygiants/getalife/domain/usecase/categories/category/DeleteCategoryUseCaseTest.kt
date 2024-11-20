@@ -49,7 +49,7 @@ class DeleteCategoryUseCaseTest {
                 groupId = groupId,
                 emoji = emoji,
                 name = name,
-                budgetTarget = Money(budgetTarget ?: 0.0),
+                budgetTarget = Money(budgetTarget),
                 assignedMoney = Money(assignedMoney),
                 availableMoney = Money(availableMoney),
                 progress = EmptyProgress(),
@@ -64,6 +64,6 @@ class DeleteCategoryUseCaseTest {
 
         val categoriesAfterDeletion = categoryRepositoryFake.categories.value
         assertThat(categoriesAfterDeletion).hasSize(19)
-        assertThat(categoriesAfterDeletion.first().name).isEqualTo("Studienkredittilgung")
+        assertThat(categoriesAfterDeletion.first().name).isEqualTo("Student loan repayment")
     }
 }

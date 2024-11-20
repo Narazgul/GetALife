@@ -53,7 +53,7 @@ fun AddGroupBottomSheet(
                     isSaveGroupNameButtonEnabled = newName.isNotBlank()
                     onNameChanged(newName)
                 },
-                label = { Text(stringResource(R.string.enter_groupname)) },
+                label = { Text(stringResource(R.string.enter_group_name)) },
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(spacing.default))

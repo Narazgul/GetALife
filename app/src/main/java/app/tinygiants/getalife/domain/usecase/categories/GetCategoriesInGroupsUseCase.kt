@@ -86,7 +86,7 @@ class GetCategoriesInGroupsUseCase @Inject constructor(
                     groupId = groupId,
                     emoji = emoji,
                     name = name,
-                    budgetTarget = Money(value = budgetTarget ?: 0.0),
+                    budgetTarget = Money(value = budgetTarget),
                     assignedMoney = Money(value = assignedMoney),
                     availableMoney = Money(value = availableMoney),
                     progress = progress,

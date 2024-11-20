@@ -22,7 +22,7 @@ class CalculateCategoryProgressUseCase @Inject constructor(
             val assignedMoney = categoryEntity.assignedMoney
             val availableMoney = categoryEntity.availableMoney
 
-            if (budgetTarget == null || budgetTarget == 0.0)
+            if (budgetTarget == 0.0)
                 getProgressWithoutSetBudgetTarget(assignedMoney, availableMoney)
             else
                 getProgressWithSetBudgetTarget(budgetTarget, assignedMoney, availableMoney)

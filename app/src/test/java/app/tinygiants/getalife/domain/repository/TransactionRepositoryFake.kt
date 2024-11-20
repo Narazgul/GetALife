@@ -30,5 +30,5 @@ class TransactionRepositoryFake : TransactionRepository {
         }
 
     override suspend fun deleteTransaction(transaction: TransactionEntity) =
-        transactions.update { it.filterNot { it.id == transaction.id } }
+        transactions.update { it.filterNot { entity -> entity.id == transaction.id } }
 }

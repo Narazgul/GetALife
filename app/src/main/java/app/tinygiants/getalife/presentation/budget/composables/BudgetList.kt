@@ -135,7 +135,7 @@ private fun LazyListScope.categories(
         val onUpdateName = { categoryName: String ->
             onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(name = categoryName)))
         }
-        val onUpdateBudgetTargetClicked = { newBudgetTarget: Money? ->
+        val onUpdateBudgetTargetClicked = { newBudgetTarget: Money ->
             onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetTarget = newBudgetTarget)))
         }
         val onUpdateAssignedMoneyClicked = { newAssignedMoney: Money ->

@@ -4,7 +4,7 @@ import app.tinygiants.getalife.domain.repository.AiRepository
 
 class AiRepositoryFake: AiRepository {
 
-    var hasFailedToRetrieveEmoji = false
+    private val hasFailedToRetrieveEmoji = false
 
     override suspend fun generateEmojiBy(tag: String): Result<String?> {
 

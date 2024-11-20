@@ -40,10 +40,10 @@ class GroupRepositoryImplTest {
             assertThat(emission1).hasSize(1)
             assertThat(emission1.first().name).isEqualTo(fixedCosts().name)
 
-            val updatedGroup = fixedCosts().copy(name = "Fickkosten")
+            val updatedGroup = fixedCosts().copy(name = "updated fixed costs")
             fakeDao.updateGroup(updatedGroup)
             val emission2 = awaitItem()
-            assertThat(emission2.first().name).isEqualTo("Fickkosten")
+            assertThat(emission2.first().name).isEqualTo("updated fixed costs")
 
             fakeDao.deleteGroup(fixedCosts())
             val emission3 = awaitItem()
@@ -81,11 +81,11 @@ class GroupRepositoryImplTest {
 
         assertThat(firstItem.name).isEqualTo(fixedCosts().name)
 
-        val updatedEntity = fixedCosts().copy(name = "Fickkosten")
+        val updatedEntity = fixedCosts().copy(name = "Fixed costs")
         repository.updateGroup(updatedEntity)
 
         val updatedFirstItem = fakeDao.groups.value.first()
-        assertThat(updatedFirstItem.name).isEqualTo("Fickkosten")
+        assertThat(updatedFirstItem.name).isEqualTo("Fixed costs")
     }
 
     @Test

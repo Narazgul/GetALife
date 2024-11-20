@@ -321,7 +321,7 @@ fun fakeCategories() = mapOf(
         Category(
             id = 201,
             emoji = "",
-            name = "Jetzt Kategorie hinzufügen",
+            name = "Add category now",
             groupId = 8,
             budgetTarget = Money(value = 60.00),
             assignedMoney = Money(value = 60.00),

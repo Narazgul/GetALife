@@ -30,7 +30,7 @@ class GetCategoriesUseCase @Inject constructor(
         withContext(defaultDispatcher) {
             categoryEntities.map { categoryEntity ->
 
-                val budgetTarget = categoryEntity.budgetTarget ?: 0.00
+                val budgetTarget = categoryEntity.budgetTarget
 
                 Category(
                     id = categoryEntity.id,

@@ -5,14 +5,12 @@
     <string name="more_distributed_than_available">Zu hast mehr Geld verteilt als du hast. Entferne %1$s aus den Kategorien</string>
     <string name="error_title">Zefix</string>
     <string name="error_subtitle">Ein fürchterlicher Fehler ist aufgetreten.</string>
-    <string name="enter_groupname">Gruppenname eingeben</string>
+    <string name="enter_group_name">Gruppenname eingeben</string>
     <string name="no_name_entered">kein Name eingegeben</string>
     <string name="save">Speichern</string>
     <string name="add_category">Kategorie hinzufügen</string>
     <string name="change_title">Titel ändern</string>
     <string name="delete_group">%1$s-Gruppe löschen</string>
-    <string name="spent">Ausgeben</string>
-    <string name="savings">Sparen</string>
     <string name="rename_category">Kategorie umbenennen</string>
     <string name="change_budget_target">Budget Ziel ändern</string>
     <string name="distribute_money">Geld zuweisen</string>
@@ -27,7 +25,6 @@
     <string name="chose_category">Kategorie wählen</string>
     <string name="amount">Betrag</string>
     <string name="description">Beschreibung</string>
-    <string name="add_transaction">Transaktion hinzufügen</string>
     <string name="transaction_partner">Transaktionspartner</string>
     <string name="budget">Budget</string>
     <string name="account">Konten</string>

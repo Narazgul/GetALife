@@ -25,5 +25,5 @@ class CategoryRepositoryFake : CategoryRepository {
     }
 
     override suspend fun deleteCategory(categoryEntity: CategoryEntity) =
-        categories.update { it.filterNot { it.id == categoryEntity.id } }
+        categories.update { it.filterNot { entity -> entity.id == categoryEntity.id } }
 }

@@ -113,7 +113,7 @@ class DeleteTransactionUseCase @Inject constructor(
                 groupId = groupId,
                 emoji = emoji,
                 name = name,
-                budgetTarget = budgetTarget?.value,
+                budgetTarget = budgetTarget.value,
                 assignedMoney = assignedMoney.value,
                 availableMoney = updatedAvailableMoney,
                 listPosition = listPosition,
