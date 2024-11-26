@@ -56,7 +56,7 @@ class ExchangeCategoryUseCaseTest {
     }
 
     @Test
-    fun `Change category with previous category available`(): Unit = runTest {
+    fun `Change category to another category`(): Unit = runTest {
         val account = cashAccount().run {
             Account(
                 id = id,

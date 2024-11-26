@@ -52,6 +52,7 @@ fun EditTransaction(
     accounts: List<Account>,
     categories: List<Category>,
     onEditTransactionClicked: (transaction: Transaction) -> Unit = {},
+    onExchangeAccountClicked: (transaction: Transaction, oldAccount: Account?) -> Unit = { _, _ -> },
     onExchangeCategoryClicked: (transaction: Transaction, oldCategory: Category?) -> Unit = { _, _ -> },
     onDeleteTransactionClicked: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
@@ -79,7 +80,7 @@ fun EditTransaction(
                     checked = directionUserInput == TransactionDirection.Inflow,
                     onCheckedChange = { isChecked ->
                         directionUserInput = if (isChecked) TransactionDirection.Inflow
-                        else TransactionDirection.Unknown
+                        else TransactionDirection.Outflow
 
                         onEditTransactionClicked(transaction.copy(transactionDirection = directionUserInput))
                     },
@@ -91,7 +92,7 @@ fun EditTransaction(
                     checked = directionUserInput == TransactionDirection.Outflow,
                     onCheckedChange = { isChecked ->
                         directionUserInput = if (isChecked) TransactionDirection.Outflow
-                        else TransactionDirection.Unknown
+                        else TransactionDirection.Inflow
 
                         onEditTransactionClicked(transaction.copy(transactionDirection = directionUserInput))
                     },
@@ -158,7 +159,7 @@ fun EditTransaction(
                                 accountUserInput = account
                                 showAccountDropdown = false
 
-                                onEditTransactionClicked(transaction.copy(account = account))
+                                onExchangeAccountClicked(transaction.copy(account = account), transaction.account)
                             }
                         )
                     }

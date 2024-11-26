@@ -43,6 +43,8 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.presentation.UiText.DynamicString
+import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
 import app.tinygiants.getalife.presentation.budget.composables.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList
@@ -108,13 +110,13 @@ fun BudgetScreen(
                         )
 
                     AnimatedVisibility(
-                        visible = uiState.assignableMoney != null && uiState.assignableMoney.value != 0.00,
+                        visible = uiState.bannerState !is BannerUiState.AllAssigned,
                         enter = fadeIn(tween(1500)),
                         exit = fadeOut(tween(3000)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(spacing.default)
-                    ) { if (uiState.assignableMoney != null) AssignableMoney(assignableMoney = uiState.assignableMoney) }
+                    ) { AssignableMoney(banner = uiState.bannerState) }
 
                     BudgetList(
                         groups = uiState.groups,
@@ -160,7 +162,7 @@ class BudgetScreenPreviewProvider : PreviewParameterProvider<BudgetUiState> {
     override val values: Sequence<BudgetUiState>
         get() = sequenceOf(
             BudgetUiState(
-                assignableMoney = Money(value = 100.00),
+                bannerState = AssignableMoneyAvailable(text = DynamicString("Distribute available money to categories: 100,-€")),
                 groups = fakeCategories(),
                 isLoading = false,
                 errorMessage = null

@@ -11,48 +11,46 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import app.tinygiants.getalife.R
-import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.presentation.UiText.DynamicString
+import app.tinygiants.getalife.presentation.budget.BannerUiState
+import app.tinygiants.getalife.presentation.budget.BannerUiState.AllAssigned
+import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
+import app.tinygiants.getalife.presentation.budget.BannerUiState.OverDistributed
+import app.tinygiants.getalife.presentation.budget.BannerUiState.Overspent
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
 
 @Composable
-fun AssignableMoney(assignableMoney: Money) {
-    val background = when {
-        assignableMoney.value > 0.0 -> success
-        assignableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-        else -> MaterialTheme.colorScheme.error
+fun AssignableMoney(banner: BannerUiState) {
+
+    val backgroundColor = when (banner) {
+        is AssignableMoneyAvailable -> success
+        is AllAssigned -> MaterialTheme.colorScheme.outlineVariant
+        is OverDistributed -> MaterialTheme.colorScheme.error
+        is Overspent -> MaterialTheme.colorScheme.onPrimaryContainer
     }
-    val textColor = when {
-        assignableMoney.value > 0.0 -> MaterialTheme.colorScheme.onPrimary
-        assignableMoney.value == 0.0 -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.onError
-    }
-    val text = when {
-        assignableMoney.value > 0.0 -> stringResource(
-            R.string.distribute_available_money,
-            assignableMoney.formattedMoney
-        )
-        assignableMoney.value == 0.0 -> stringResource(R.string.everything_distributed)
-        else -> stringResource(R.string.more_distributed_than_available, assignableMoney.formattedPositiveMoney)
+    val textColor = when (banner) {
+        is AssignableMoneyAvailable -> MaterialTheme.colorScheme.onPrimary
+        is AllAssigned -> MaterialTheme.colorScheme.primary
+        is OverDistributed -> MaterialTheme.colorScheme.onError
+        is Overspent -> MaterialTheme.colorScheme.primaryContainer
     }
 
     Spacer(modifier = Modifier.height(spacing.s))
 
     Text(
-        text = text,
+        text = banner.text.asString(),
         textAlign = TextAlign.Center,
         color = textColor,
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier
             .background(
-                color = background,
+                color = backgroundColor,
                 shape = RoundedCornerShape(size = spacing.m)
             )
             .padding(spacing.l)
@@ -63,21 +61,22 @@ fun AssignableMoney(assignableMoney: Money) {
 
 @PreviewLightDark
 @Composable
-private fun AssignableMoneyPreview(@PreviewParameter(AssignableMoneyPreviewProvider::class) money: Money) {
+private fun AssignableMoneyPreview(@PreviewParameter(AssignableMoneyPreviewProvider::class) banner: BannerUiState) {
     GetALifeTheme {
         Surface {
             Column {
-                AssignableMoney(assignableMoney = money)
+                AssignableMoney(banner = banner)
             }
         }
     }
 }
 
-class AssignableMoneyPreviewProvider : PreviewParameterProvider<Money> {
-    override val values: Sequence<Money>
+class AssignableMoneyPreviewProvider : PreviewParameterProvider<BannerUiState> {
+    override val values: Sequence<BannerUiState>
         get() = sequenceOf(
-            Money(value = 100.00),
-            Money(value = 0.00),
-            Money(value = -100.00)
+            AssignableMoneyAvailable(text = DynamicString("Distribute available money to categories: 100,00 €")),
+            AllAssigned(text = DynamicString("Everything is distributed 👍🏼")),
+            OverDistributed(text = DynamicString("You've distributed more than you own. Remove 100,00 € from categories")),
+            Overspent(text = DynamicString("Remove 10,00 € from overspent categories"))
         )
 }

@@ -81,7 +81,7 @@ fun AddTransactionItem(
                 checked = directionUserInput == TransactionDirection.Inflow,
                 onCheckedChange = { isChecked ->
                     directionUserInput = if (isChecked) TransactionDirection.Inflow
-                    else TransactionDirection.Unknown
+                    else TransactionDirection.Outflow
 
                     onTransactionDirectionClicked(directionUserInput)
                 },
@@ -93,7 +93,7 @@ fun AddTransactionItem(
                 checked = directionUserInput == TransactionDirection.Outflow,
                 onCheckedChange = { isChecked ->
                     directionUserInput = if (isChecked) TransactionDirection.Outflow
-                    else TransactionDirection.Unknown
+                    else TransactionDirection.Inflow
 
                     onTransactionDirectionClicked(directionUserInput)
                 },

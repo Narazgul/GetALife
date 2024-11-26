@@ -11,6 +11,7 @@ import app.tinygiants.getalife.domain.usecase.account.GetAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.DeleteTransactionUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.ExchangeAccountUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.ExchangeCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsForAccountUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.UpdateTransactionUseCase
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
     private val getTransactionsForAccount: GetTransactionsForAccountUseCase,
+    private val exchangeAccount: ExchangeAccountUseCase,
     private val exchangeCategory: ExchangeCategoryUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
     private val deleteTransaction: DeleteTransactionUseCase,
@@ -101,6 +103,7 @@ class TransactionViewModel @Inject constructor(
     fun onUserClickEvent(clickEvent: UserClickEvent) {
         viewModelScope.launch {
             when (clickEvent) {
+                is UserClickEvent.ExchangeAccount -> exchangeAccount(transaction = clickEvent.transaction, oldAccount = clickEvent.oldAccount)
                 is UserClickEvent.ExchangeCategory -> exchangeCategory(transaction = clickEvent.transaction, oldCategory = clickEvent.oldCategory)
                 is UserClickEvent.UpdateTransaction -> updateTransaction(transaction = clickEvent.transaction)
                 is UserClickEvent.DeleteTransaction -> deleteTransaction(transaction = clickEvent.transaction)

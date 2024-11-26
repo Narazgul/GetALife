@@ -24,20 +24,18 @@ class GetCategoriesInGroupsUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    operator fun invoke(): Flow<Result<Map<Group, List<Category>>>> {
-        return flow {
-            val groupsFlow = groupsRepository.getGroupsFlow()
-            val categoriesFlow = categoryRepository.getCategoriesFlow()
+    operator fun invoke(): Flow<Result<Map<Group, List<Category>>>> = flow {
+        val groupsFlow = groupsRepository.getGroupsFlow()
+        val categoriesFlow = categoryRepository.getCategoriesFlow()
 
-            groupsFlow.combine(categoriesFlow) { groups, categories ->
-                mapToGroupsWithCategories(
-                    groupEntities = groups,
-                    categoryEntities = categories
-                )
-            }
-                .catch { throwable -> emit(Result.failure(throwable)) }
-                .collect { groups -> emit(groups) }
+        groupsFlow.combine(categoriesFlow) { groups, categories ->
+            mapToGroupsWithCategories(
+                groupEntities = groups,
+                categoryEntities = categories
+            )
         }
+            .catch { throwable -> emit(Result.failure(throwable)) }
+            .collect { groups -> emit(groups) }
     }
 
     private suspend fun mapToGroupsWithCategories(groupEntities: List<GroupEntity>, categoryEntities: List<CategoryEntity>) =

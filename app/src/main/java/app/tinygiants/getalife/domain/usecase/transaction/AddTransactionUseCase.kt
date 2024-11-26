@@ -8,6 +8,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
+import app.tinygiants.getalife.domain.repository.BudgetRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +22,7 @@ class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
+    private val budgetRepository: BudgetRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
@@ -45,23 +47,20 @@ class AddTransactionUseCase @Inject constructor(
                 amount = transformedAmount,
                 direction = direction,
                 transactionPartner = transactionPartner,
-                description = description,
-                addTransaction = transactionRepository::addTransaction
+                description = description
             )
 
             updateAccount(
                 account = account,
-                direction = direction,
-                amount = transformedAmount,
-                updateAccount = accountRepository::updateAccount,
+                amount = transformedAmount
             )
 
             updateCategory(
                 category = category,
-                amount = transformedAmount,
-                direction = direction,
-                updateCategory = categoryRepository::updateCategory,
+                amount = transformedAmount
             )
+
+            updateReadyToAssignCategory(direction = direction, amount = amount.value)
         }
     }
 
@@ -78,8 +77,7 @@ class AddTransactionUseCase @Inject constructor(
         amount: Double,
         direction: TransactionDirection,
         transactionPartner: String,
-        description: String,
-        addTransaction: suspend (TransactionEntity) -> Unit
+        description: String
     ) {
 
         val currentTime = Clock.System.now()
@@ -95,33 +93,40 @@ class AddTransactionUseCase @Inject constructor(
             createdAt = currentTime
         )
 
-        addTransaction(transactionEntity)
+        transactionRepository.addTransaction(transactionEntity)
     }
 
-    private suspend fun updateAccount(
-        account: AccountEntity,
-        direction: TransactionDirection,
-        amount: Double,
-        updateAccount: suspend (AccountEntity) -> Unit
-    ) {
-        if (direction == TransactionDirection.Unknown) return
+    private suspend fun updateAccount(account: AccountEntity, amount: Double) {
 
         val updatedAccountBalance = account.balance + amount
         val updatedAccount = account.copy(balance = updatedAccountBalance, updatedAt = Clock.System.now())
 
-        updateAccount(updatedAccount)
+        accountRepository.updateAccount(updatedAccount)
     }
 
     private suspend fun updateCategory(
         category: Category?,
-        amount: Double,
-        direction: TransactionDirection,
-        updateCategory: suspend (CategoryEntity) -> Unit
+        amount: Double
     ) {
-
         if (category == null) return
-        if (direction == TransactionDirection.Unknown) return
 
+        updateUserCategory(category = category, amount = amount)
+    }
+
+    private suspend fun updateReadyToAssignCategory(direction: TransactionDirection, amount: Double) {
+        if (direction != TransactionDirection.Inflow) return
+
+        val readyToAssignCategory = budgetRepository.getBudget()
+
+        val updatedReadyToAssignCategory = readyToAssignCategory.copy(
+            readyToAssign =  readyToAssignCategory.readyToAssign + amount,
+            updatedAt = Clock.System.now()
+        )
+
+        budgetRepository.updateBudget(updatedReadyToAssignCategory)
+    }
+
+    private suspend fun updateUserCategory(category: Category, amount: Double) {
         val updatedAvailableMoney = category.availableMoney.value + amount
 
         val updatedCategoryEntity = category.run {
@@ -140,6 +145,6 @@ class AddTransactionUseCase @Inject constructor(
             )
         }
 
-        updateCategory(updatedCategoryEntity)
+        categoryRepository.updateCategory(updatedCategoryEntity)
     }
 }

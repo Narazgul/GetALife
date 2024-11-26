@@ -10,6 +10,7 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.budget.UpdateAssignableMoneyUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
@@ -17,6 +18,7 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 class DeleteTransactionUseCase @Inject constructor(
+    private val updateAssignableMoney: UpdateAssignableMoneyUseCase,
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
@@ -24,28 +26,16 @@ class DeleteTransactionUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(transaction: Transaction) {
+        if (transaction.account == null) return
 
         val transformedAmount = transformAmount(direction = transaction.transactionDirection, amount = transaction.amount)
         val transactionWithTransformedAmount = transaction.copy(amount = Money(transformedAmount))
 
-        if (transactionWithTransformedAmount.account == null) return
-
         withContext(defaultDispatcher) {
-
-            deleteTransaction(
-                transaction = transactionWithTransformedAmount,
-                deleteTransaction = transactionRepository::deleteTransaction
-            )
-
-            updateAccount(
-                transaction = transactionWithTransformedAmount,
-                updateAccount = accountRepository::updateAccount
-            )
-
-            updateCategory(
-                transaction = transactionWithTransformedAmount,
-                updateCategory = categoryRepository::updateCategory
-            )
+            deleteTransaction(transaction = transactionWithTransformedAmount)
+            updateAccount(transaction = transactionWithTransformedAmount)
+            updateCategory(transaction = transactionWithTransformedAmount)
+            reduceAssignableMoney(transaction = transactionWithTransformedAmount)
         }
     }
 
@@ -56,7 +46,7 @@ class DeleteTransactionUseCase @Inject constructor(
             TransactionDirection.Unknown -> amount.value
         }
 
-    private suspend fun deleteTransaction(transaction: Transaction, deleteTransaction: suspend (TransactionEntity) -> Unit) {
+    private suspend fun deleteTransaction(transaction: Transaction) {
 
         val transactionEntity = TransactionEntity(
             id = transaction.id,
@@ -70,13 +60,10 @@ class DeleteTransactionUseCase @Inject constructor(
             createdAt = transaction.createdAt
         )
 
-        deleteTransaction(transactionEntity)
+        transactionRepository.deleteTransaction(transactionEntity)
     }
 
-    private suspend fun updateAccount(
-        transaction: Transaction,
-        updateAccount: suspend (AccountEntity) -> Unit
-    ) {
+    private suspend fun updateAccount(transaction: Transaction) {
         if (transaction.account == null) return
 
         val account = transaction.account
@@ -93,13 +80,10 @@ class DeleteTransactionUseCase @Inject constructor(
             )
         }
 
-        updateAccount(updatedAccountEntity)
+        accountRepository.updateAccount(updatedAccountEntity)
     }
 
-    private suspend fun updateCategory(
-        transaction: Transaction,
-        updateCategory: suspend (CategoryEntity) -> Unit
-    ) {
+    private suspend fun updateCategory(transaction: Transaction) {
 
         if (transaction.category == null) return
         if (transaction.transactionDirection == TransactionDirection.Unknown) return
@@ -123,6 +107,12 @@ class DeleteTransactionUseCase @Inject constructor(
             )
         }
 
-        updateCategory(updatedCategoryEntity)
+        categoryRepository.updateCategory(updatedCategoryEntity)
+    }
+
+    private suspend fun reduceAssignableMoney(transaction: Transaction) {
+        if (transaction.transactionDirection != TransactionDirection.Inflow) return
+
+        updateAssignableMoney(newAmount = transaction.amount)
     }
 }

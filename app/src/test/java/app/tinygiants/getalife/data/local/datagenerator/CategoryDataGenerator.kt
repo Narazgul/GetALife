@@ -1,6 +1,9 @@
 package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
+import app.tinygiants.getalife.domain.model.Money
 import kotlinx.datetime.Instant
 
 const val FIXED_COST_GROUP = 1L
@@ -350,3 +353,18 @@ fun personalCareCategoryEntity(): CategoryEntity {
         createdAt = Instant.parse("2024-01-01T12:00:00Z")
     )
 }
+
+fun CategoryEntity.toCategory() = Category(
+    id = id,
+    groupId = groupId,
+    emoji = emoji,
+    name = name,
+    budgetTarget = Money(budgetTarget),
+    assignedMoney = Money(assignedMoney),
+    availableMoney = Money(availableMoney),
+    progress = EmptyProgress(),
+    listPosition = listPosition,
+    isInitialCategory = isInitialCategory,
+    updatedAt = updatedAt,
+    createdAt = createdAt,
+)

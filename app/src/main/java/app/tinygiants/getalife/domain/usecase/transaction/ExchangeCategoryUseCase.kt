@@ -25,13 +25,13 @@ class ExchangeCategoryUseCase @Inject constructor(
 
         withContext(defaultDispatcher) {
 
-            updateTransaction(transaction = transaction, transactionRepository::updateTransaction)
-            updateOldCategory(category = oldCategory, amount = transaction.amount, categoryRepository::updateCategory)
-            updateNewCategory(category = transaction.category, amount = transaction.amount, categoryRepository::updateCategory)
+            updateTransaction(transaction = transaction)
+            updateOldCategory(category = oldCategory, amount = transaction.amount)
+            updateNewCategory(category = transaction.category, amount = transaction.amount)
         }
     }
 
-    private suspend fun updateTransaction(transaction: Transaction, updateTransaction: suspend (TransactionEntity) -> Unit) {
+    private suspend fun updateTransaction(transaction: Transaction) {
         if (transaction.account == null) return
 
         val transactionEntity = transaction.run {
@@ -48,10 +48,10 @@ class ExchangeCategoryUseCase @Inject constructor(
             )
         }
 
-        updateTransaction(transactionEntity)
+        transactionRepository.updateTransaction(transactionEntity)
     }
 
-    private suspend fun updateOldCategory(category: Category?, amount: Money, updateCategory: suspend (CategoryEntity) -> Unit) {
+    private suspend fun updateOldCategory(category: Category?, amount: Money) {
         if (category == null) return
 
         val updatedAvailableMoney = category.availableMoney - amount
@@ -72,10 +72,10 @@ class ExchangeCategoryUseCase @Inject constructor(
             )
         }
 
-        updateCategory(oldCategoryEntity)
+        categoryRepository.updateCategory(oldCategoryEntity)
     }
 
-    private suspend fun updateNewCategory(category: Category, amount: Money, updateCategory: suspend (CategoryEntity) -> Unit) {
+    private suspend fun updateNewCategory(category: Category, amount: Money) {
 
         val updatedAvailableMoney = category.availableMoney + amount
 
@@ -95,6 +95,6 @@ class ExchangeCategoryUseCase @Inject constructor(
             )
         }
 
-        updateCategory(oldCategoryEntity)
+        categoryRepository.updateCategory(oldCategoryEntity)
     }
 }

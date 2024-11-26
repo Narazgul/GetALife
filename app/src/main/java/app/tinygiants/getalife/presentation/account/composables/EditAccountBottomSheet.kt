@@ -106,7 +106,7 @@ fun EditAccountBottomSheet(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text(
-                            text = stringResource(id = R.string.delete_transaction, accountName ?: ""),
+                            text = stringResource(id = R.string.delete_account, accountName ?: ""),
                             color = MaterialTheme.colorScheme.onError
                         )
                     }

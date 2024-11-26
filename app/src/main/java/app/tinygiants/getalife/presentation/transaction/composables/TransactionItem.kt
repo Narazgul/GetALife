@@ -35,6 +35,7 @@ fun TransactionItem(
     accounts: List<Account>,
     categories: List<Category>,
     onUpdateTransactionClicked: (transaction: Transaction) -> Unit = {},
+    onExchangeAccountClicked: (transaction: Transaction, oldAccount: Account?) -> Unit = { _, _ -> },
     onExchangeCategoryClicked: (transaction: Transaction, oldCategory: Category?) -> Unit = { _, _->},
     onDeleteTransactionClicked: () -> Unit = {}
 
@@ -73,6 +74,7 @@ fun TransactionItem(
             accounts = accounts,
             categories = categories,
             onEditTransactionClicked = onUpdateTransactionClicked,
+            onExchangeAccountClicked = onExchangeAccountClicked,
             onExchangeCategoryClicked = onExchangeCategoryClicked,
             onDeleteTransactionClicked = onDeleteTransactionClicked,
             onDismissRequest = { isUpdateTransactionBottomSheetVisible = false }

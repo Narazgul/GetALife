@@ -4,16 +4,21 @@ import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.budget.UpdateAssignableMoneyUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import javax.inject.Inject
+import kotlin.math.abs
 
 class UpdateTransactionUseCase @Inject constructor(
+    private val updateAssignableMoney: UpdateAssignableMoneyUseCase,
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
@@ -24,15 +29,20 @@ class UpdateTransactionUseCase @Inject constructor(
 
         if (transaction.account == null) return
 
+
         withContext(defaultDispatcher) {
 
-            updateAccount(transaction = transaction, updateAccount = accountRepository::updateAccount)
-            updateCategory(transaction = transaction, updateCategory = categoryRepository::updateCategory)
-            updateTransaction(transaction = transaction, updateTransaction = transactionRepository::updateTransaction)
+            val transformedAmount = transformAmount(direction = transaction.transactionDirection, amount = transaction.amount)
+            val transformedTransaction = transaction.copy(amount = Money(transformedAmount))
+
+            adjustAssignableMoney(transaction = transformedTransaction)
+            updateAccount(transaction = transformedTransaction)
+            updateCategory(transaction = transformedTransaction)
+            updateTransaction(transaction = transformedTransaction)
         }
     }
 
-    private suspend fun updateTransaction(transaction: Transaction, updateTransaction: suspend (TransactionEntity) -> Unit) {
+    private suspend fun updateTransaction(transaction: Transaction) {
 
         val transactionEntity = TransactionEntity(
             id = transaction.id,
@@ -46,10 +56,10 @@ class UpdateTransactionUseCase @Inject constructor(
             createdAt = transaction.createdAt
         )
 
-        updateTransaction(transactionEntity)
+        transactionRepository.updateTransaction(transactionEntity)
     }
 
-    private suspend fun updateAccount(transaction: Transaction, updateAccount: suspend (AccountEntity) -> Unit) {
+    private suspend fun updateAccount(transaction: Transaction) {
 
         val updatedBalance = calculateUpdatedBalance(
             transaction = transaction,
@@ -68,10 +78,10 @@ class UpdateTransactionUseCase @Inject constructor(
             )
         }
 
-        updateAccount(updatedAccount)
+        accountRepository.updateAccount(updatedAccount)
     }
 
-    private suspend fun updateCategory(transaction: Transaction, updateCategory: suspend (CategoryEntity) -> Unit) {
+    private suspend fun updateCategory(transaction: Transaction) {
 
         if (transaction.category == null) return
 
@@ -95,7 +105,21 @@ class UpdateTransactionUseCase @Inject constructor(
             )
         }
 
-        updateCategory(updatedCategory)
+        categoryRepository.updateCategory(updatedCategory)
+    }
+
+    private suspend fun adjustAssignableMoney(transaction: Transaction) {
+        if (transaction.transactionDirection != TransactionDirection.Inflow) return
+
+        val updatedBalance = calculateAssignableMoneyDifference(transaction = transaction)
+
+        updateAssignableMoney(Money(updatedBalance))
+    }
+
+    private suspend fun calculateAssignableMoneyDifference(transaction: Transaction): Double {
+        val previousTransactionAmount =
+            transactionRepository.getTransaction(transactionId = transaction.id)?.amount
+        return transaction.amount.value - (previousTransactionAmount ?: 0.0)
     }
 
     private suspend fun calculateUpdatedBalance(
@@ -109,4 +133,11 @@ class UpdateTransactionUseCase @Inject constructor(
 
         return toBeUpdatedBalance + differenceBetweenCurrentAndPreviousTransactionAmount
     }
+
+    private fun transformAmount(direction: TransactionDirection, amount: Money) =
+        when (direction) {
+            TransactionDirection.Inflow -> abs(amount.value)
+            TransactionDirection.Outflow -> -abs(amount.value)
+            TransactionDirection.Unknown -> amount.value
+        }
 }

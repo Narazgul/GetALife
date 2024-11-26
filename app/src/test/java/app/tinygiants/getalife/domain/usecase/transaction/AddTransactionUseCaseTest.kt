@@ -10,6 +10,7 @@ import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.BudgetRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
 import assertk.assertThat
@@ -30,6 +31,7 @@ class AddTransactionUseCaseTest {
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
     private lateinit var accountRepositoryFake: AccountRepositoryFake
     private lateinit var categoryRepositoryFake: CategoryRepositoryFake
+    private lateinit var budgetRepositoryFake: BudgetRepositoryFake
 
     companion object {
         @JvmField
@@ -42,11 +44,13 @@ class AddTransactionUseCaseTest {
         transactionRepositoryFake = TransactionRepositoryFake()
         accountRepositoryFake = AccountRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
+        budgetRepositoryFake = BudgetRepositoryFake()
 
         addTransaction = AddTransactionUseCase(
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
+            budgetRepository = budgetRepositoryFake,
             defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
@@ -56,6 +60,7 @@ class AddTransactionUseCaseTest {
         accountRepositoryFake.accountsFlow.value = listOf(cashAccount())
         val testBegin = Clock.System.now()
         val shortlyAfterTestBegin = testBegin + 50.milliseconds
+
         addTransaction(
             amount = Money(value = 10.71),
             direction = TransactionDirection.Inflow,

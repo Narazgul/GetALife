@@ -8,6 +8,7 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.budget.UpdateAssignableMoneyUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -16,6 +17,7 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 class AddAccountUseCase @Inject constructor(
+    private val updateAssignableMoney: UpdateAssignableMoneyUseCase,
     private val accountRepository: AccountRepository,
     private val transactionRepository: TransactionRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
@@ -28,32 +30,18 @@ class AddAccountUseCase @Inject constructor(
         startingBalanceName: String,
         startingBalanceDescription: String
     ) {
-
         val accountId = Random.nextLong()
 
-        addAccount(
-            accountId = accountId,
-            name = name,
-            balance = balance.value,
-            type = type,
-            accountRepository::addAccount
-        )
-
-        addInitialStartingBalanceTransaction(
-            accountId = accountId,
-            amount = balance.value,
-            startingBalanceName = startingBalanceName,
-            startingBalanceDescription = startingBalanceDescription,
-            addTransaction = transactionRepository::addTransaction
-        )
+        addAccount(accountId = accountId, name = name, balance = balance.value, type = type)
+        addAssignableMoney(amount = balance)
+        addStartingBalanceTransaction(accountId = accountId, amount = balance.value, startingBalanceName = startingBalanceName, startingBalanceDescription = startingBalanceDescription)
     }
 
     private suspend fun addAccount(
         accountId: Long,
         name: String,
         balance: Double,
-        type: AccountType,
-        addAccount: suspend (AccountEntity) -> Unit
+        type: AccountType
     ) {
         val accounts = accountRepository.getAccountsFlow().first()
         val accountEntity = withContext(defaultDispatcher) {
@@ -73,15 +61,18 @@ class AddAccountUseCase @Inject constructor(
             )
         }
 
-        addAccount(accountEntity)
+        accountRepository.addAccount(accountEntity)
     }
 
-    private suspend fun addInitialStartingBalanceTransaction(
+    private suspend fun addAssignableMoney(amount: Money) {
+        updateAssignableMoney(amount)
+    }
+
+    private suspend fun addStartingBalanceTransaction(
         accountId: Long,
         amount: Double,
         startingBalanceName: String,
         startingBalanceDescription: String,
-        addTransaction: suspend (TransactionEntity) -> Unit
     ) {
         val direction = if (amount >= 0) TransactionDirection.Inflow else TransactionDirection.Outflow
         val currentTime = Clock.System.now()
@@ -98,6 +89,6 @@ class AddAccountUseCase @Inject constructor(
             createdAt = currentTime
         )
 
-        addTransaction(transactionEntity)
+        transactionRepository.addTransaction(transactionEntity)
     }
 }

@@ -45,6 +45,9 @@ fun TransactionsList(
                     val onUpdateTransactionClicked = { updatedTransaction: Transaction ->
                         onUserClickEvent(UserClickEvent.UpdateTransaction(transaction = updatedTransaction))
                     }
+                    val onExchangeAccountClicked = { updatedTransaction: Transaction, oldAccount: Account? ->
+                        onUserClickEvent(UserClickEvent.ExchangeAccount(transaction = updatedTransaction, oldAccount = oldAccount))
+                    }
                     val onExchangeCategoryClicked = { updatedTransaction: Transaction, oldCategory: Category? ->
                         onUserClickEvent(UserClickEvent.ExchangeCategory(transaction = updatedTransaction, oldCategory = oldCategory))
                     }
@@ -57,6 +60,7 @@ fun TransactionsList(
                         accounts = accounts,
                         categories = categories,
                         onUpdateTransactionClicked = onUpdateTransactionClicked,
+                        onExchangeAccountClicked = onExchangeAccountClicked,
                         onExchangeCategoryClicked = onExchangeCategoryClicked,
                         onDeleteTransactionClicked = onDeleteTransactionClicked
                     )

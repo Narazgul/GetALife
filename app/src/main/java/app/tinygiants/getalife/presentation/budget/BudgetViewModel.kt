@@ -6,7 +6,7 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.usecase.account.GetAssignableMoneySumUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetAssignableMoneyUseCase
 import app.tinygiants.getalife.domain.usecase.categories.GetCategoriesInGroupsUseCase
 import app.tinygiants.getalife.domain.usecase.categories.category.AddCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.categories.category.DeleteCategoryUseCase
@@ -15,6 +15,12 @@ import app.tinygiants.getalife.domain.usecase.categories.group.AddGroupUseCase
 import app.tinygiants.getalife.domain.usecase.categories.group.DeleteGroupUseCase
 import app.tinygiants.getalife.domain.usecase.categories.group.UpdateGroupUseCase
 import app.tinygiants.getalife.presentation.UiText
+import app.tinygiants.getalife.presentation.UiText.DynamicString
+import app.tinygiants.getalife.presentation.UiText.StringResource
+import app.tinygiants.getalife.presentation.budget.BannerUiState.AllAssigned
+import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
+import app.tinygiants.getalife.presentation.budget.BannerUiState.OverDistributed
+import app.tinygiants.getalife.presentation.budget.BannerUiState.Overspent
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.AddGroup
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteCategory
@@ -33,7 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
     private val getBudget: GetCategoriesInGroupsUseCase,
-    private val getAssignableMoney: GetAssignableMoneySumUseCase,
+    private val getAssignableMoney: GetAssignableMoneyUseCase,
     private val addGroup: AddGroupUseCase,
     private val updateGroup: UpdateGroupUseCase,
     private val deleteGroup: DeleteGroupUseCase,
@@ -44,7 +50,7 @@ class BudgetViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         BudgetUiState(
-            assignableMoney = null,
+            bannerState = AllAssigned(text = DynamicString("")),
             groups = emptyMap(),
             isLoading = true,
             errorMessage = null
@@ -72,10 +78,12 @@ class BudgetViewModel @Inject constructor(
 
             launch {
                 getAssignableMoney()
-                    .catch { displayAssignableMoneyErrorState() }
+                    .catch { throwable -> displayAssignableMoneyErrorState(throwable) }
                     .collect { result ->
-                        result.onSuccess { assignableMoney -> displayAssignableMoney(assignableMoney) }
-                        result.onFailure { displayAssignableMoneyErrorState() } }
+                        result.onSuccess { (assignableMoney, overspentCategoryText) ->
+                            displayAssignableMoney(assignableMoney, overspentCategoryText) }
+                        result.onFailure { throwable -> displayAssignableMoneyErrorState(throwable) }
+                    }
             }
 
         }
@@ -113,9 +121,35 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    private fun displayAssignableMoney(assignableMoney: Money) {
+    private fun displayAssignableMoney(assignableMoney: Money, overspentCategory: UiText?) {
         _uiState.update { budgetUiState ->
-            budgetUiState.copy(assignableMoney = assignableMoney)
+            budgetUiState.copy(
+                bannerState = getBannerState(
+                    assignableMoney = assignableMoney,
+                    overspentCategoryText = overspentCategory
+                )
+            )
+        }
+    }
+
+    private fun getBannerState(assignableMoney: Money, overspentCategoryText: UiText?): BannerUiState {
+
+        if (assignableMoney.value == 0.0 && overspentCategoryText != null) return Overspent(overspentCategoryText)
+
+        return when {
+            assignableMoney.value == 0.0 -> AllAssigned(StringResource(resId = R.string.everything_distributed))
+            assignableMoney.value > 0.0 -> AssignableMoneyAvailable(
+                StringResource(
+                    resId = R.string.distribute_available_money,
+                    assignableMoney.formattedPositiveMoney
+                )
+            )
+            else -> OverDistributed(
+                StringResource(
+                    resId = R.string.more_distributed_than_available,
+                    assignableMoney.formattedPositiveMoney
+                )
+            )
         }
     }
 
@@ -124,22 +158,27 @@ class BudgetViewModel @Inject constructor(
             budgetUiState.copy(
                 isLoading = false,
                 errorMessage = ErrorMessage(
-                    title = UiText.StringResource(resId = R.string.error_title),
-                    subtitle = if (exception?.message != null) UiText.DynamicString(value = exception.message!!)
-                    else UiText.StringResource(R.string.error_subtitle)
+                    title = StringResource(resId = R.string.error_title),
+                    subtitle = if (exception?.message != null) DynamicString(value = exception.message!!)
+                    else StringResource(R.string.error_subtitle)
                 )
             )
         }
     }
 
-    private fun displayAssignableMoneyErrorState() {
+    private fun displayAssignableMoneyErrorState(throwable: Throwable) {
         _uiState.update { budgetUiState ->
-            budgetUiState.copy(
-                assignableMoney = null,
-                errorMessage = ErrorMessage(
-                    title = UiText.StringResource(resId = R.string.error_title),
-                    subtitle = UiText.StringResource(R.string.error_subtitle)
+            val errorMessage = when (throwable) {
+                is NoSuchElementException -> null
+                else -> ErrorMessage(
+                    title = StringResource(resId = R.string.error_title),
+                    subtitle = StringResource(R.string.error_subtitle)
                 )
+            }
+
+            budgetUiState.copy(
+                bannerState = AllAssigned(text = DynamicString("")),
+                errorMessage = errorMessage
             )
         }
     }

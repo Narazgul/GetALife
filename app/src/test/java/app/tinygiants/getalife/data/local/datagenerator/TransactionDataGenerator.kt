@@ -1,6 +1,10 @@
 package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import kotlinx.datetime.Instant
 
@@ -357,5 +361,17 @@ fun lidlGroceriesMarch(): TransactionEntity {
         createdAt = Instant.parse("2024-03-20T14:00:00Z")
     )
 }
+
+fun TransactionEntity.toTransaction(account: Account? = null, category: Category? = null) = Transaction(
+    id = id,
+    amount = Money(amount),
+    account = account,
+    category = category,
+    transactionPartner = transactionPartner,
+    transactionDirection = transactionDirection,
+    description = description,
+    updatedAt = updatedAt,
+    createdAt = createdAt
+)
 
 // endregion

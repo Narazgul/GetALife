@@ -4,7 +4,9 @@ import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.BudgetRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
+import app.tinygiants.getalife.domain.usecase.budget.UpdateAssignableMoneyUseCase
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isBetween
@@ -23,7 +25,9 @@ class AddAccountUseCaseTest {
 
     private lateinit var addAccount: AddAccountUseCase
     private lateinit var accountRepositoryFake: AccountRepositoryFake
+    private lateinit var budgetRepositoryFake: BudgetRepositoryFake
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
+    private lateinit var updateAssignableMoney: UpdateAssignableMoneyUseCase
 
     companion object {
         @JvmField
@@ -34,9 +38,15 @@ class AddAccountUseCaseTest {
     @BeforeEach
     fun setUp() {
         accountRepositoryFake = AccountRepositoryFake()
+        budgetRepositoryFake = BudgetRepositoryFake()
         transactionRepositoryFake = TransactionRepositoryFake()
+        updateAssignableMoney = UpdateAssignableMoneyUseCase(
+            repository = budgetRepositoryFake,
+            defaultDispatcher = testDispatcherExtension.testDispatcher
+        )
 
         addAccount = AddAccountUseCase(
+            updateAssignableMoney = updateAssignableMoney,
             accountRepository = accountRepositoryFake,
             transactionRepository = transactionRepositoryFake,
             defaultDispatcher = testDispatcherExtension.testDispatcher

@@ -18,7 +18,7 @@ class UpdateCategoryUseCase @Inject constructor(
 
     suspend operator fun invoke(category: Category) = withContext(defaultDispatcher) {
 
-        val oldCategory = repository.getCategory(categoryId = category.id) ?: return@withContext
+        val oldCategory = repository.getCategory(categoryId = category.id)
 
         val assignedMoneyDifference = category.assignedMoney.value - oldCategory.assignedMoney
         val newAvailableMoney = category.availableMoney.value + assignedMoneyDifference

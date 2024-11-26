@@ -26,6 +26,7 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,8 +48,9 @@ fun AssignableMoneyBottomSheet(
             value = assignedMoneyUserInput,
             onValueChange = { userInput ->
                 assignedMoneyUserInput = userInput.replace(oldChar = ',', newChar = '.')
-                assignedMoneyInCategory =
-                    Money(value = assignedMoneyUserInput.toDoubleOrNull() ?: return@TextField)
+                val positiveOrNegativeValue = assignedMoneyUserInput.toDoubleOrNull() ?: return@TextField
+                val positiveValue = abs(positiveOrNegativeValue)
+                assignedMoneyInCategory = Money(value = positiveValue)
                 onAssignedMoneyChanged(assignedMoneyInCategory)
             },
             prefix = { Text(assignedMoney.currencySymbol) },

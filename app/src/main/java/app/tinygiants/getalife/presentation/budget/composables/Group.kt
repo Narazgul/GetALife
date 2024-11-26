@@ -59,6 +59,9 @@ fun Group(
     var groupNameUserInput by rememberSaveable { mutableStateOf(name) }
     var categoryNameUserInput by rememberSaveable { mutableStateOf("") }
 
+    val availableText = stringResource(R.string.available)
+    val forSpendingText = stringResource(R.string.to_spend)
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -91,8 +94,8 @@ fun Group(
         Spacer(modifier = Modifier.width(spacing.l))
         val alignment = if (isExpanded) Alignment.CenterHorizontally else Alignment.End
         Column(horizontalAlignment = alignment) {
-            Text(text = "Available", color = MaterialTheme.colorScheme.onPrimaryContainer)
-            val text = if (isExpanded) "to spend" else sumOfAvailableMoney.formattedMoney
+            Text(text = availableText, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            val text = if (isExpanded) forSpendingText else sumOfAvailableMoney.formattedMoney
             val style = if (!isExpanded) MaterialTheme.typography.titleMedium else LocalTextStyle.current
             Text(text = text, style = style, color = MaterialTheme.colorScheme.onPrimaryContainer)
         }
