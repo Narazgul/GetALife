@@ -30,6 +30,8 @@ import app.tinygiants.getalife.presentation.budget.UserClickEvent.DeleteGroup
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateCategory
 import app.tinygiants.getalife.presentation.budget.UserClickEvent.UpdateGroup
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -175,13 +177,15 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    private fun displayErrorState(exception: Throwable?) {
+    private fun displayErrorState(throwable: Throwable?) {
+        if (throwable != null) Firebase.crashlytics.recordException(throwable)
+
         _uiState.update { budgetUiState ->
             budgetUiState.copy(
                 isLoading = false,
                 errorMessage = ErrorMessage(
                     title = StringResource(resId = R.string.error_title),
-                    subtitle = if (exception?.message != null) DynamicString(value = exception.message!!)
+                    subtitle = if (throwable?.message != null) DynamicString(value = throwable.message!!)
                     else StringResource(R.string.error_subtitle)
                 )
             )
@@ -189,6 +193,8 @@ class BudgetViewModel @Inject constructor(
     }
 
     private fun displayAssignableMoneyErrorState(throwable: Throwable) {
+        Firebase.crashlytics.recordException(throwable)
+
         _uiState.update { budgetUiState ->
             val errorMessage = when (throwable) {
                 is NoSuchElementException -> null

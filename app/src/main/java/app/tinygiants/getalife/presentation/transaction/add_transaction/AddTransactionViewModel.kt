@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.transaction.add_transaction
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.domain.model.Category
@@ -9,6 +8,8 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +39,7 @@ class AddTransactionViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 getCategories()
-                    .catch { throwable -> Log.e("AddTransactionViewModel", "Error: ${throwable.message}") }
+                    .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
                     .collect { categories ->
                         _uiState.update { uiState -> uiState.copy(categories = categories) }
                     }
@@ -50,7 +51,7 @@ class AddTransactionViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 getAccounts()
-                    .catch { throwable -> Log.e("AddTransactionViewModel", "Error: ${throwable.message}") }
+                    .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
                     .collect { result ->
                         result.onSuccess { accounts -> _uiState.update { uiState -> uiState.copy(accounts = accounts) } }
                     }

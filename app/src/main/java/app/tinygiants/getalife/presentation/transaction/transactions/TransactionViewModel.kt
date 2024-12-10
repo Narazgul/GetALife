@@ -15,6 +15,8 @@ import app.tinygiants.getalife.domain.usecase.transaction.GetTransactionsForAcco
 import app.tinygiants.getalife.domain.usecase.transaction.UpdateTransactionUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -122,13 +124,15 @@ class TransactionViewModel @Inject constructor(
     private fun listAvailableCategories(categories: List<Category>) =
         _uiState.update { uiState -> uiState.copy(categories = categories) }
 
-    private fun displayErrorState(exception: Throwable?) {
+    private fun displayErrorState(throwable: Throwable?) {
+        if (throwable != null) Firebase.crashlytics.recordException(throwable)
+
         _uiState.update { transactionUiState ->
             transactionUiState.copy(
                 isLoading = false,
                 errorMessage = ErrorMessage(
                     title = UiText.StringResource(resId = R.string.error_title),
-                    subtitle = if (exception?.message != null) UiText.DynamicString(value = exception.message!!)
+                    subtitle = if (throwable?.message != null) UiText.DynamicString(value = throwable.message!!)
                     else UiText.StringResource(R.string.error_subtitle)
                 )
             )
