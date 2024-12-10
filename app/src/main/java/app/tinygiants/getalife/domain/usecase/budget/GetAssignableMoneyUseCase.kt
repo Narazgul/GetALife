@@ -1,68 +1,102 @@
 package app.tinygiants.getalife.domain.usecase.budget
 
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.data.local.entities.BudgetEntity
-import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Default
+import app.tinygiants.getalife.domain.model.AccountType
+import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.repository.BudgetRepository
+import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.presentation.UiText.StringResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 typealias AssignableMoney = Money
 typealias OverspentCategoryText = StringResource?
-typealias AssignableBanner = Pair<AssignableMoney, OverspentCategoryText>
+typealias AssignableMoneyBanner = Pair<AssignableMoney, OverspentCategoryText>
 
 class GetAssignableMoneyUseCase @Inject constructor(
-    private val categoryRepository: CategoryRepository,
-    private val budgetRepository: BudgetRepository,
+    private val transactionRepository: TransactionRepository,
+    private val categoriesRepository: CategoryRepository,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
-    operator fun invoke(): Flow<Result<AssignableBanner>> = flow {
-        val categoriesFlow = categoryRepository.getCategoriesFlow()
-        val budgetsFlow = budgetRepository.getBudgets()
+    private val accountTypesAvailableForAssignment = setOf(
+        AccountType.Cash, AccountType.Checking, AccountType.Savings, AccountType.CreditCard
+    )
 
-        if (budgetsFlow.first().isEmpty()) emit(Result.failure(NoSuchElementException("Budget still empty")))
+    operator fun invoke(): Flow<Result<AssignableMoneyBanner>> = flow {
+        val transactionFlow = transactionRepository.getTransactionsFlow()
+        val categoriesFlow = categoriesRepository.getCategoriesFlow()
 
-        categoriesFlow.combine(budgetsFlow) { categories, budgets ->
-            getAssignableBanner(categories = categories, budget = budgets.first())
+        transactionFlow.combine(categoriesFlow) { transactions, categories ->
+            getAssignableBanner(transactions = transactions, categories = categories)
         }
             .catch { throwable -> emit(Result.failure(throwable)) }
-            .collect { assignableBanner -> emit(assignableBanner) }
+            .collect { assignableMoneyBanner -> emit(assignableMoneyBanner) }
     }
 
-    private suspend fun getAssignableBanner(categories: List<CategoryEntity>, budget: BudgetEntity): Result<AssignableBanner> {
-        val availableMoneyForAssignment = budget.readyToAssign
+    private suspend fun getAssignableBanner(transactions: List<Transaction>, categories: List<Category>) =
+        withContext(defaultDispatcher) {
+            val sumInflow = getInflowSum(transactions = transactions)
+            val sumAssignedMoneyInCategories = getAssignedMoneyInCategoriesSum(categories = categories)
+            val sumOverspentMoneyInCategories = getOverspentMoneyInCategoriesSum(categories = categories)
 
-        return withContext(defaultDispatcher) {
-            val availableMoneyInCategories = categories.sumOf { category -> category.assignedMoney }
-            val assignableMoney = Money(value = availableMoneyForAssignment - availableMoneyInCategories)
-            val overspentCategoriesText =
-                if (assignableMoney.value == 0.0) getOverspentCategoriesText(categories = categories) else null
+            val availableMoneyForAssignment = sumInflow - sumAssignedMoneyInCategories - sumOverspentMoneyInCategories
+
+            val overspentCategoriesText = getOverspentCategoriesText(
+                assignableMoney = availableMoneyForAssignment,
+                categories = categories
+            )
 
             Result.success(
-                AssignableBanner(
-                    first = assignableMoney,
+                AssignableMoneyBanner(
+                    first = availableMoneyForAssignment,
                     second = overspentCategoriesText
                 )
             )
         }
+
+    private fun getInflowSum(transactions: List<Transaction>): Money {
+        val sumInflow = transactions
+            .filter { transaction ->
+                transaction.account.type in accountTypesAvailableForAssignment &&
+                        transaction.transactionDirection == TransactionDirection.Inflow
+            }
+            .sumOf { transaction -> transaction.amount.asBigDecimal() }
+            .toDouble()
+
+        return Money(value = sumInflow)
     }
 
-    private fun getOverspentCategoriesText(categories: List<CategoryEntity>): StringResource? {
-        val overspentCategories = categories.filter { categoryEntity -> categoryEntity.availableMoney < 0.0 }
+    private fun getAssignedMoneyInCategoriesSum(categories: List<Category>): Money {
+        val assignedInCategorySum = categories.sumOf { category -> category.assignedMoney.asBigDecimal() }
+        return Money(value = assignedInCategorySum)
+    }
+
+    private fun getOverspentMoneyInCategoriesSum(categories: List<Category>): Money {
+        val overspentInCategorySum = categories
+            .filter { category -> category.availableMoney < EmptyMoney() }
+            .sumOf { category -> category.availableMoney.positiveMoney().asBigDecimal()  }
+            .toDouble()
+        return Money(value = overspentInCategorySum)
+    }
+
+    private fun getOverspentCategoriesText(assignableMoney: Money, categories: List<Category>): StringResource? {
+        if (assignableMoney != EmptyMoney()) return null
+
+        val overspentCategories = categories.filter { categoryEntity -> categoryEntity.availableMoney < EmptyMoney() }
         if (overspentCategories.isEmpty()) return null
 
-        val overspentSum = overspentCategories.sumOf { categoryEntity -> categoryEntity.availableMoney }
+        val overspentSum = overspentCategories.sumOf { categoryEntity -> categoryEntity.availableMoney.asBigDecimal() }
         val amountOfOverspentCategories = overspentCategories.count()
 
         val singularOrPluralCategoryText = if (amountOfOverspentCategories == 1) StringResource(R.string.category)
@@ -72,7 +106,7 @@ class GetAssignableMoneyUseCase @Inject constructor(
             R.string.overspent_category,
             amountOfOverspentCategories,
             singularOrPluralCategoryText,
-            Money(overspentSum).formattedPositiveMoney
+            Money(value = overspentSum).formattedPositiveMoney
         )
     }
 }

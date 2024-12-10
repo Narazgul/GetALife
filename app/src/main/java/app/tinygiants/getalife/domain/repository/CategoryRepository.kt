@@ -1,15 +1,15 @@
 package app.tinygiants.getalife.domain.repository
 
-import app.tinygiants.getalife.data.local.entities.CategoryEntity
+import app.tinygiants.getalife.domain.model.Category
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {
 
-    fun getCategoriesFlow(): Flow<List<CategoryEntity>>
-    suspend fun getCategoriesInGroup(groupId: Long): List<CategoryEntity>
-    suspend fun getCategory(categoryId: Long): CategoryEntity
-    suspend fun addCategory(categoryEntity: CategoryEntity)
-    suspend fun updateCategory(categoryEntity: CategoryEntity)
-    suspend fun deleteCategory(categoryEntity: CategoryEntity)
+    fun getCategoriesFlow(): Flow<List<Category>>
+    suspend fun getCategoriesInGroup(groupId: Long): List<Category>
+    suspend fun getCategory(categoryId: Long): Category
+    suspend fun addCategory(category: Category)
+    suspend fun updateCategory(category: Category?)
+    suspend fun deleteCategory(category: Category)
 
 }

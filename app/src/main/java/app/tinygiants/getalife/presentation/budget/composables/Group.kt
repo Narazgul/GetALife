@@ -83,7 +83,7 @@ fun Group(
         Text(
             text = name,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(start = spacing.default)
+            modifier = Modifier.padding(start = spacing.m)
         )
         Spacer(modifier = Modifier.weight(1f))
         Icon(
@@ -115,7 +115,7 @@ fun Group(
                             .weight(1f)
                             .background(color = MaterialTheme.colorScheme.background)
                     )
-                    Spacer(modifier = Modifier.width(spacing.default))
+                    Spacer(modifier = Modifier.width(spacing.m))
                     Button(
                         onClick = {
                             if (categoryNameUserInput.isNotBlank()) {
@@ -126,7 +126,7 @@ fun Group(
                         }
                     ) { Text(text = stringResource(id = R.string.save)) }
                 }
-                Spacer(modifier = Modifier.height(spacing.default))
+                Spacer(modifier = Modifier.height(spacing.m))
                 Row {
                     TextField(
                         value = groupNameUserInput,
@@ -134,7 +134,7 @@ fun Group(
                         label = { Text(stringResource(R.string.change_title)) },
                         modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.width(spacing.default))
+                    Spacer(modifier = Modifier.width(spacing.m))
                     Button(
                         onClick = {
                             if (groupNameUserInput.isNotBlank()) {
@@ -145,7 +145,7 @@ fun Group(
                         }
                     ) { Text(text = stringResource(id = R.string.save)) }
                 }
-                Spacer(modifier = Modifier.height(spacing.default))
+                Spacer(modifier = Modifier.height(spacing.m))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center

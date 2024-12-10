@@ -5,20 +5,13 @@ import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.aldiGroceriesJanuary
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
 import app.tinygiants.getalife.data.local.datagenerator.categories
-import app.tinygiants.getalife.data.local.datagenerator.checkingAccount
 import app.tinygiants.getalife.data.local.datagenerator.groceriesCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
-import app.tinygiants.getalife.data.local.datagenerator.techCorpSalaryJanuary
-import app.tinygiants.getalife.data.local.datagenerator.toAccount
-import app.tinygiants.getalife.data.local.datagenerator.toCategory
-import app.tinygiants.getalife.data.local.datagenerator.toTransaction
 import app.tinygiants.getalife.data.local.datagenerator.transactions
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
-import app.tinygiants.getalife.domain.repository.BudgetRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
-import app.tinygiants.getalife.domain.usecase.budget.UpdateAssignableMoneyUseCase
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
@@ -33,8 +26,6 @@ class UpdateTransactionUseCaseTest {
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
     private lateinit var accountRepositoryFake: AccountRepositoryFake
     private lateinit var categoryRepositoryFake: CategoryRepositoryFake
-    private lateinit var budgetRepositoryFake: BudgetRepositoryFake
-    private lateinit var updateAssignableMoney: UpdateAssignableMoneyUseCase
 
     companion object {
         @JvmField
@@ -44,17 +35,11 @@ class UpdateTransactionUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        transactionRepositoryFake = TransactionRepositoryFake()
         accountRepositoryFake = AccountRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
-        budgetRepositoryFake = BudgetRepositoryFake()
-        updateAssignableMoney = UpdateAssignableMoneyUseCase(
-            repository = budgetRepositoryFake,
-            defaultDispatcher = testDispatcherExtension.testDispatcher
-        )
+        transactionRepositoryFake = TransactionRepositoryFake(accountRepositoryFake, categoryRepositoryFake)
 
         updateTransaction = UpdateTransactionUseCase(
-            updateAssignableMoney = updateAssignableMoney,
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
@@ -62,86 +47,62 @@ class UpdateTransactionUseCaseTest {
         )
 
         transactionRepositoryFake.transactions.value = transactions
-        accountRepositoryFake.accountsFlow.value = accounts
+        accountRepositoryFake.accounts.value = accounts
         categoryRepositoryFake.categories.value = categories
     }
 
     @Test
     fun `Test changing nothing on the update`(): Unit = runTest {
-        val account = cashAccount().toAccount()
-        val category = groceriesCategoryEntity().toCategory()
-        val updatedTransaction = aldiGroceriesJanuary().toTransaction(account = account, category = category)
+        val account = cashAccount().toDomain()
+        val category = groceriesCategoryEntity().toDomain()
+        val updatedTransaction = aldiGroceriesJanuary().toDomain(account = account, category = category)
 
         updateTransaction(updatedTransaction)
 
-        assertThat(transactionRepositoryFake.transactions.value).contains(aldiGroceriesJanuary())
+        assertThat(transactionRepositoryFake.transactions.value).contains(aldiGroceriesJanuary().toDomain(account, category))
         assertThat(transactionRepositoryFake.transactions.value[updatedTransaction.id.toInt() - 1].amount).isEqualTo(
-            aldiGroceriesJanuary().amount
+            aldiGroceriesJanuary().toDomain(account, category).amount
         )
-        assertThat(accountRepositoryFake.accountsFlow.value[account.id.toInt() - 1].balance).isEqualTo(cashAccount().balance)
+        assertThat(accountRepositoryFake.accounts.value[account.id.toInt() - 1].balance).isEqualTo(cashAccount().toDomain().balance)
         assertThat(categoryRepositoryFake.categories.value[category.id.toInt() - 1].availableMoney).isEqualTo(
-            groceriesCategoryEntity().availableMoney
+            groceriesCategoryEntity().toDomain().availableMoney
         )
     }
 
     @Test
     fun `Spent less on Outflow Transaction Amount`(): Unit = runTest {
-        val account = cashAccount().toAccount()
-        val category = rentCategoryEntity().toCategory()
+        val account = cashAccount().toDomain()
+        val category = rentCategoryEntity().toDomain()
         val updatedTransaction =
-            aldiGroceriesJanuary().toTransaction(account = account, category = category).copy(amount = Money(-40.0))
+            aldiGroceriesJanuary().toDomain(account = account, category = category).copy(amount = Money(-40.0))
 
         updateTransaction(updatedTransaction)
 
-        val accountBalance = accountRepositoryFake.accountsFlow.value.find { it.id == cashAccount().id }!!.balance
+        val accountBalance = accountRepositoryFake.accounts.value.find { it.id == cashAccount().id }!!.balance
         val categoryAvailableMoney =
             categoryRepositoryFake.categories.value.find { it.id == rentCategoryEntity().id }!!.availableMoney
         val transactionAmount = transactionRepositoryFake.transactions.value.find { it.id == aldiGroceriesJanuary().id }!!.amount
 
-        assertThat(accountBalance).isEqualTo(510.0)
-        assertThat(categoryAvailableMoney).isEqualTo(1310.0)
-        assertThat(transactionAmount).isEqualTo(-40.0)
+        assertThat(accountBalance).isEqualTo(Money(510.0))
+        assertThat(categoryAvailableMoney).isEqualTo(Money(1310.0))
+        assertThat(transactionAmount).isEqualTo(Money(-40.0))
     }
 
     @Test
     fun `Spent more on Outflow Transaction Amount`(): Unit = runTest {
-        val account = cashAccount().toAccount()
-        val category = rentCategoryEntity().toCategory()
-        val updatedTransaction = aldiGroceriesJanuary().toTransaction(account = account, category = category).copy(amount = Money(-60.0))
+        val account = cashAccount().toDomain()
+        val category = rentCategoryEntity().toDomain()
+        val updatedTransaction = aldiGroceriesJanuary().toDomain(account = account, category = category).copy(amount = Money(-60.0))
 
         updateTransaction(updatedTransaction)
 
-        val accountBalance = accountRepositoryFake.accountsFlow.value.find { it.id == cashAccount().id }!!.balance
+        val accountBalance = accountRepositoryFake.accounts.value.find { it.id == cashAccount().id }!!.balance
         val categoryAvailableMoney =
             categoryRepositoryFake.categories.value.find { it.id == rentCategoryEntity().id }!!.availableMoney
         val transactionAmount = transactionRepositoryFake.transactions.value.find { it.id == aldiGroceriesJanuary().id }!!.amount
 
-        assertThat(accountBalance).isEqualTo(490.0)
-        assertThat(categoryAvailableMoney).isEqualTo(1290.0)
-        assertThat(transactionAmount).isEqualTo(-60.0)
-    }
-
-    @Test
-    fun `Raise Inflow Transaction Amount`(): Unit = runTest {
-        budgetRepositoryFake.budgetsFlow.value = listOf(budgetRepositoryFake.initialBudget.copy(readyToAssign = 2000.0))
-        val account = checkingAccount().toAccount()
-        val updatedTransaction = techCorpSalaryJanuary().toTransaction(account = account).copy(amount = Money(2500.0))
-
-        updateTransaction(updatedTransaction)
-
-        val assignableMoney = budgetRepositoryFake.budgetsFlow.value.first().readyToAssign
-        assertThat(assignableMoney).isEqualTo(2500.0)
-    }
-
-    @Test
-    fun `Lower Inflow transaction amount`(): Unit = runTest {
-        budgetRepositoryFake.budgetsFlow.value = listOf(budgetRepositoryFake.initialBudget.copy(readyToAssign = 2000.0))
-        val account = checkingAccount().toAccount()
-        val updatedTransaction = techCorpSalaryJanuary().toTransaction(account = account).copy(amount = Money(1500.0))
-
-        updateTransaction(updatedTransaction)
-
-        val assignableMoney = budgetRepositoryFake.budgetsFlow.value.first().readyToAssign
-        assertThat(assignableMoney).isEqualTo(1500.0)
+        assertThat(accountBalance).isEqualTo(Money(490.0))
+        assertThat(categoryAvailableMoney).isEqualTo(Money(1290.0))
+        assertThat(transactionAmount).isEqualTo(Money(-60.0))
     }
 }

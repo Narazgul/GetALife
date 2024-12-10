@@ -1,12 +1,10 @@
 package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.AccountEntity
-import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
-import app.tinygiants.getalife.domain.model.Money
 import kotlinx.datetime.Instant
 
-val accounts = listOf(
+val accountEntities = listOf(
     cashAccount(),
     checkingAccount(),
     secondCheckingAccount(),
@@ -16,6 +14,8 @@ val accounts = listOf(
     loanAccount(),
     depotAccount()
 )
+
+val accounts = accountEntities.map { accountEntity -> accountEntity.toDomain() }
 
 fun cashAccount() = AccountEntity(
     id = 1L,
@@ -95,14 +95,4 @@ fun depotAccount() = AccountEntity(
     listPosition = 7,
     updatedAt = Instant.parse("2024-01-01T12:00:00Z"),
     createdAt = Instant.parse("2024-01-01T12:00:00Z")
-)
-
-fun AccountEntity.toAccount() = Account(
-    id = id,
-    name = name,
-    balance = Money(balance),
-    type = type,
-    listPosition = listPosition,
-    updatedAt = updatedAt,
-    createdAt = createdAt,
 )

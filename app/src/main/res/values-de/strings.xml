@@ -21,6 +21,7 @@
     <string name="distribute_money">Geld zuweisen</string>
     <string name="delete_transaction">Transaktion löschen</string>
     <string name="delete_account">%s löschen</string>
+    <string name="delete_category">Kategorie löschen</string>
     <string name="add_group">Gruppe hinzufügen</string>
     <string name="choose_account">Konto wählen</string>
     <string name="add_account">Konto hinzufügen</string>
@@ -41,4 +42,11 @@
     <string name="starting_balance">Startguthaben</string>
     <string name="starting_balance_description">Startguthaben für dieses Konto</string>
     <string name="assigned">Zugewiesen: %1$s</string>
+    <string name="assign_more_or_remove_spending">Assign at least %1$s€ to category or remove spending!</string>
+    <string name="all_spent">All spent</string>
+    <string name="spent_more_than_available">Spent %1$s€ more than available</string>
+    <string name="amount_spent">%1$s spent</string>
+    <string name="more_needed_to_reach_budget_target">%1$s more needed to reach budget target</string>
+    <string name="fully_funded">Fully funded 👌</string>
+    <string name="enjoy_your_extra_money">Enjoy your %1$s extra</string>
 </resources>

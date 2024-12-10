@@ -42,26 +42,18 @@ fun TransactionsList(
             ) {
                 items(items = transactions, key = { transaction -> transaction.id }) { transaction ->
 
-                    val onUpdateTransactionClicked = { updatedTransaction: Transaction ->
-                        onUserClickEvent(UserClickEvent.UpdateTransaction(transaction = updatedTransaction))
-                    }
-                    val onExchangeAccountClicked = { updatedTransaction: Transaction, oldAccount: Account? ->
-                        onUserClickEvent(UserClickEvent.ExchangeAccount(transaction = updatedTransaction, oldAccount = oldAccount))
-                    }
-                    val onExchangeCategoryClicked = { updatedTransaction: Transaction, oldCategory: Category? ->
-                        onUserClickEvent(UserClickEvent.ExchangeCategory(transaction = updatedTransaction, oldCategory = oldCategory))
+                    val onSaveTransactionClicked = { updatedTransaction: Transaction ->
+                        onUserClickEvent(UserClickEvent.SaveTransaction(transaction = updatedTransaction))
                     }
                     val onDeleteTransactionClicked = {
                         onUserClickEvent(UserClickEvent.DeleteTransaction(transaction = transaction))
                     }
 
-                    TransactionItem(
+                    SingleTransactionItem(
                         transaction = transaction,
                         accounts = accounts,
                         categories = categories,
-                        onUpdateTransactionClicked = onUpdateTransactionClicked,
-                        onExchangeAccountClicked = onExchangeAccountClicked,
-                        onExchangeCategoryClicked = onExchangeCategoryClicked,
+                        onSaveTransactionClicked = onSaveTransactionClicked,
                         onDeleteTransactionClicked = onDeleteTransactionClicked
                     )
                 }

@@ -4,9 +4,9 @@ import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
-import app.tinygiants.getalife.domain.repository.BudgetRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
-import app.tinygiants.getalife.domain.usecase.budget.UpdateAssignableMoneyUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isBetween
@@ -24,10 +24,10 @@ import kotlin.time.Duration.Companion.milliseconds
 class AddAccountUseCaseTest {
 
     private lateinit var addAccount: AddAccountUseCase
+    private lateinit var addTransaction: AddTransactionUseCase
     private lateinit var accountRepositoryFake: AccountRepositoryFake
-    private lateinit var budgetRepositoryFake: BudgetRepositoryFake
+    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
-    private lateinit var updateAssignableMoney: UpdateAssignableMoneyUseCase
 
     companion object {
         @JvmField
@@ -38,17 +38,21 @@ class AddAccountUseCaseTest {
     @BeforeEach
     fun setUp() {
         accountRepositoryFake = AccountRepositoryFake()
-        budgetRepositoryFake = BudgetRepositoryFake()
-        transactionRepositoryFake = TransactionRepositoryFake()
-        updateAssignableMoney = UpdateAssignableMoneyUseCase(
-            repository = budgetRepositoryFake,
+        categoryRepositoryFake = CategoryRepositoryFake()
+        transactionRepositoryFake = TransactionRepositoryFake(
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
+        addTransaction = AddTransactionUseCase(
+            transactionRepository = transactionRepositoryFake,
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake,
             defaultDispatcher = testDispatcherExtension.testDispatcher
         )
 
         addAccount = AddAccountUseCase(
-            updateAssignableMoney = updateAssignableMoney,
             accountRepository = accountRepositoryFake,
-            transactionRepository = transactionRepositoryFake,
+            addTransaction = addTransaction,
             defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
@@ -67,10 +71,10 @@ class AddAccountUseCaseTest {
 
         advanceUntilIdle()
 
-        val insertedAccount = accountRepositoryFake.accountsFlow.value.first()
-        assertThat(accountRepositoryFake.accountsFlow.value).hasSize(1)
+        val insertedAccount = accountRepositoryFake.accounts.value.first()
+        assertThat(accountRepositoryFake.accounts.value).hasSize(1)
         assertThat(insertedAccount.name).isEqualTo("Bargeld")
-        assertThat(insertedAccount.balance).isEqualTo(1.00)
+        assertThat(insertedAccount.balance).isEqualTo(Money(1.00))
         assertThat(insertedAccount.type).isEqualTo(AccountType.Cash)
         assertThat(insertedAccount.listPosition).isEqualTo(0)
         assertThat(insertedAccount.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
@@ -78,7 +82,7 @@ class AddAccountUseCaseTest {
 
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
         assertThat(startingBalanceTransaction.transactionPartner).isEqualTo("Starting balance")
-        assertThat(startingBalanceTransaction.amount).isEqualTo(1.00)
+        assertThat(startingBalanceTransaction.amount).isEqualTo(Money(1.00))
     }
 
     @Test
@@ -95,10 +99,10 @@ class AddAccountUseCaseTest {
 
         advanceUntilIdle()
 
-        val insertedAccount = accountRepositoryFake.accountsFlow.value.first()
-        assertThat(accountRepositoryFake.accountsFlow.value).hasSize(1)
+        val insertedAccount = accountRepositoryFake.accounts.value.first()
+        assertThat(accountRepositoryFake.accounts.value).hasSize(1)
         assertThat(insertedAccount.name).isEqualTo("Bargeld")
-        assertThat(insertedAccount.balance).isEqualTo(-1.00)
+        assertThat(insertedAccount.balance).isEqualTo(Money(-1.00))
         assertThat(insertedAccount.type).isEqualTo(AccountType.Cash)
         assertThat(insertedAccount.listPosition).isEqualTo(0)
         assertThat(insertedAccount.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
@@ -106,7 +110,7 @@ class AddAccountUseCaseTest {
 
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
         assertThat(startingBalanceTransaction.transactionPartner).isEqualTo("Starting balance")
-        assertThat(startingBalanceTransaction.amount).isEqualTo(-1.00)
+        assertThat(startingBalanceTransaction.amount).isEqualTo(Money(-1.00))
     }
 
     @Test
@@ -123,10 +127,10 @@ class AddAccountUseCaseTest {
 
         advanceUntilIdle()
 
-        val insertedAccount = accountRepositoryFake.accountsFlow.value.first()
-        assertThat(accountRepositoryFake.accountsFlow.value).hasSize(1)
+        val insertedAccount = accountRepositoryFake.accounts.value.first()
+        assertThat(accountRepositoryFake.accounts.value).hasSize(1)
         assertThat(insertedAccount.name).isEqualTo("Bargeld")
-        assertThat(insertedAccount.balance).isEqualTo(0.00)
+        assertThat(insertedAccount.balance).isEqualTo(Money(0.00))
         assertThat(insertedAccount.type).isEqualTo(AccountType.Cash)
         assertThat(insertedAccount.listPosition).isEqualTo(0)
         assertThat(insertedAccount.updatedAt).isBetween(start = testBegin, end = shortlyAfterTestBegin)
@@ -135,6 +139,6 @@ class AddAccountUseCaseTest {
         val startingBalanceTransaction = transactionRepositoryFake.transactions.value.first()
         val calculatedStartingBalance = insertedAccount.balance + startingBalanceTransaction.amount
         assertThat(startingBalanceTransaction.transactionPartner).isEqualTo("Starting balance")
-        assertThat(calculatedStartingBalance).isEqualTo(0.00)
+        assertThat(calculatedStartingBalance).isEqualTo(Money(0.00))
     }
 }

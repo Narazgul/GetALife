@@ -2,7 +2,7 @@ package app.tinygiants.getalife.data.repository
 
 import app.cash.turbine.test
 import app.tinygiants.getalife.data.local.dao.AccountDaoFake
-import app.tinygiants.getalife.data.local.datagenerator.accounts
+import app.tinygiants.getalife.data.local.datagenerator.accountEntities
 import app.tinygiants.getalife.data.local.datagenerator.cashAccount
 import app.tinygiants.getalife.data.local.datagenerator.checkingAccount
 import app.tinygiants.getalife.data.local.datagenerator.savingsAccount
@@ -48,7 +48,7 @@ class AccountsRepositoryImplTest {
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
-            fakeDao.accounts.value = accounts
+            fakeDao.accounts.value = accountEntities
             val finalEmission = awaitItem()
 
             assertThat(finalEmission).hasSize(8)
@@ -57,7 +57,7 @@ class AccountsRepositoryImplTest {
 
     @Test
     fun `Get account`(): Unit = runTest {
-        fakeDao.accounts.value = accounts
+        fakeDao.accounts.value = accountEntities
 
         val account = repository.getAccount(checkingAccount().id)
 
@@ -70,13 +70,13 @@ class AccountsRepositoryImplTest {
         val accounts = fakeDao.accounts.value
         assertThat(accounts).isEmpty()
 
-        repository.addAccount(cashAccount())
+        repository.addAccount(cashAccount().toDomain())
 
         val firstItem = fakeDao.accounts.value.first()
         assertThat(fakeDao.accounts.value).hasSize(1)
         assertThat(firstItem.name).isEqualTo(cashAccount().name)
 
-        repository.addAccount(checkingAccount())
+        repository.addAccount(checkingAccount().toDomain())
 
         val secondItem = fakeDao.accounts.value[1]
         assertThat(fakeDao.accounts.value).hasSize(2)
@@ -85,13 +85,13 @@ class AccountsRepositoryImplTest {
 
     @Test
     fun `Update account in list`(): Unit = runTest {
-        fakeDao.accounts.value = accounts
+        fakeDao.accounts.value = accountEntities
         val firstItem = fakeDao.accounts.value.first()
 
         assertThat(firstItem.name).isEqualTo(cashAccount().name)
 
         val updatedEntity = cashAccount().copy(name = "Cash")
-        repository.updateAccount(updatedEntity)
+        repository.updateAccount(updatedEntity.toDomain())
 
         val updatedFirstItem = fakeDao.accounts.value.first()
         assertThat(updatedFirstItem.name).isEqualTo("Cash")
@@ -99,16 +99,16 @@ class AccountsRepositoryImplTest {
 
     @Test
     fun `Delete account from list`(): Unit = runTest {
-        fakeDao.accounts.value = accounts
+        fakeDao.accounts.value = accountEntities
 
-        repository.deleteAccount(cashAccount())
+        repository.deleteAccount(cashAccount().toDomain())
 
         val accountsAfterFirstDeletion = fakeDao.accounts.value
         assertThat(accountsAfterFirstDeletion).hasSize(7)
         assertThat(accountsAfterFirstDeletion.first().name).isEqualTo(checkingAccount().name)
         assertThat(accountsAfterFirstDeletion[1].name).isEqualTo(secondCheckingAccount().name)
 
-        repository.deleteAccount(savingsAccount())
+        repository.deleteAccount(savingsAccount().toDomain())
 
         val accountsAfterSecondDeletion = fakeDao.accounts.value
         assertThat(accountsAfterSecondDeletion).hasSize(6)

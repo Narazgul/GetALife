@@ -1,33 +1,33 @@
 package app.tinygiants.getalife.domain.repository
 
-import app.tinygiants.getalife.data.local.entities.AccountEntity
+import app.tinygiants.getalife.domain.model.Account
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class AccountRepositoryFake : AccountRepository {
 
-    val accountsFlow = MutableStateFlow<List<AccountEntity>>(emptyList())
+    val accounts = MutableStateFlow<List<Account>>(emptyList())
 
-    override fun getAccountsFlow(): Flow<List<AccountEntity>> = accountsFlow
+    override fun getAccountsFlow(): Flow<List<Account>> = accounts
 
-    override suspend fun getAccount(accountId: Long): AccountEntity = accountsFlow.value.first { it.id == accountId }
+    override suspend fun getAccount(accountId: Long): Account = accounts.value.first { it.id == accountId }
 
-    override suspend fun addAccount(accountEntity: AccountEntity) {
-        accountsFlow.value = accountsFlow.value.toMutableList().apply { add(accountEntity) }
+    override suspend fun addAccount(account: Account) {
+        accounts.value = accounts.value.toMutableList().apply { add(account) }
     }
 
-    override suspend fun updateAccount(accountEntity: AccountEntity) {
-        accountsFlow.value = accountsFlow.value.toMutableList().apply {
-            val index = indexOfFirst { it.id == accountEntity.id }
+    override suspend fun updateAccount(account: Account) {
+        accounts.value = accounts.value.toMutableList().apply {
+            val index = indexOfFirst { it.id == account.id }
             if (index != -1) {
-                set(index, accountEntity)
+                set(index, account)
             }
         }
     }
 
-    override suspend fun deleteAccount(accountEntity: AccountEntity) {
-        accountsFlow.value = accountsFlow.value.toMutableList().apply {
-            removeIf { it.id == accountEntity.id }
+    override suspend fun deleteAccount(account: Account) {
+        accounts.value = accounts.value.toMutableList().apply {
+            removeIf { it.id == account.id }
         }
     }
 }

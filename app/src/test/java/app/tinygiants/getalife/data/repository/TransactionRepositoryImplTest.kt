@@ -2,14 +2,22 @@ package app.tinygiants.getalife.data.repository
 
 import app.cash.turbine.test
 import app.tinygiants.getalife.data.local.dao.TransactionDaoFake
+import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.data.local.datagenerator.aldiGroceriesJanuary
 import app.tinygiants.getalife.data.local.datagenerator.aldiGroceriesMarch
+import app.tinygiants.getalife.data.local.datagenerator.cashAccount
+import app.tinygiants.getalife.data.local.datagenerator.categories
+import app.tinygiants.getalife.data.local.datagenerator.checkingAccount
 import app.tinygiants.getalife.data.local.datagenerator.eonElectricityMarch
+import app.tinygiants.getalife.data.local.datagenerator.groceriesCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.landlordRentJanuary
 import app.tinygiants.getalife.data.local.datagenerator.landlordRentMarch
+import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.techCorpSalaryJanuary
-import app.tinygiants.getalife.data.local.datagenerator.transactions
+import app.tinygiants.getalife.data.local.datagenerator.transactionEntities
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
@@ -22,37 +30,49 @@ import org.junit.jupiter.api.Test
 
 class TransactionRepositoryImplTest {
 
-    private lateinit var fakeDao: TransactionDaoFake
     private lateinit var repository: TransactionRepositoryImpl
+    private lateinit var transactionDaoFake: TransactionDaoFake
+    private lateinit var accountRepositoryFake: AccountRepositoryFake
+    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
 
     @BeforeEach
     fun setUp() {
-        fakeDao = TransactionDaoFake()
-        repository = TransactionRepositoryImpl(fakeDao)
+        transactionDaoFake = TransactionDaoFake()
+        accountRepositoryFake = AccountRepositoryFake()
+        categoryRepositoryFake = CategoryRepositoryFake()
+
+        repository = TransactionRepositoryImpl(
+            transactionDao = transactionDaoFake,
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
     }
 
     @Test
     fun `Test Transactions Flow`(): Unit = runTest {
-        repository.getTransactions().test {
+        accountRepositoryFake.accounts.value = accounts
+        categoryRepositoryFake.categories.value = categories
+
+        repository.getTransactionsFlow().test {
             val initialEmission = awaitItem()
             assertThat(initialEmission).isNotNull()
             assertThat(initialEmission).isEmpty()
 
-            fakeDao.addTransaction(techCorpSalaryJanuary())
+            transactionDaoFake.addTransaction(techCorpSalaryJanuary())
             val emission1 = awaitItem()
             assertThat(emission1).hasSize(1)
             assertThat(emission1.first().id).isEqualTo(techCorpSalaryJanuary().id)
 
             val updatedGroup = techCorpSalaryJanuary().copy(transactionPartner = "Employer")
-            fakeDao.updateTransaction(updatedGroup)
+            transactionDaoFake.updateTransaction(updatedGroup)
             val emission2 = awaitItem()
             assertThat(emission2.first().transactionPartner).isEqualTo("Employer")
 
-            fakeDao.deleteTransaction(techCorpSalaryJanuary())
+            transactionDaoFake.deleteTransaction(techCorpSalaryJanuary())
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
-            fakeDao.transactions.value = transactions
+            transactionDaoFake.transactions.value = transactionEntities
             val finalEmission = awaitItem()
 
             assertThat(finalEmission).hasSize(21)
@@ -61,70 +81,97 @@ class TransactionRepositoryImplTest {
 
     @Test
     fun `Get Transactions for Account`(): Unit = runTest {
-        fakeDao.transactions.value = transactions
+        accountRepositoryFake.accounts.value = listOf(cashAccount().toDomain(), checkingAccount().toDomain())
+        categoryRepositoryFake.categories.value = categories
+        transactionDaoFake.transactions.value = transactionEntities
 
-        repository.getTransactionsByAccount(accountId = 1).test {
+        repository.getTransactionsByAccountFlow(accountId = 1).test {
             val emission = awaitItem()
             assertThat(emission).hasSize(18)
-            assertThat(emission.first()).isEqualTo(aldiGroceriesJanuary())
+            assertThat(emission.first()).isEqualTo(
+                aldiGroceriesJanuary().toDomain(
+                    cashAccount().toDomain(),
+                    groceriesCategoryEntity().toDomain()
+                )
+            )
         }
 
-        repository.getTransactionsByAccount(accountId = 2).test {
+        repository.getTransactionsByAccountFlow(accountId = 2).test {
             val emission = awaitItem()
             assertThat(emission).hasSize(2)
-            assertThat(emission.first()).isEqualTo(techCorpSalaryJanuary())
+            assertThat(emission.first()).isEqualTo(
+                techCorpSalaryJanuary().toDomain(
+                    checkingAccount().toDomain(),
+                    null
+                )
+            )
         }
     }
 
     @Test
     fun `Get Transactions for Category`(): Unit = runTest {
-        fakeDao.transactions.value = transactions
+        transactionDaoFake.transactions.value = transactionEntities
+        categoryRepositoryFake.categories.value = categories
+        accountRepositoryFake.accounts.value = accounts
 
-        repository.getTransactionsByCategory(categoryId = 1L).test {
+        repository.getTransactionsByCategoryFlow(categoryId = 1L).test {
             val emission = awaitItem()
             assertThat(emission).hasSize(3)
-            assertThat(emission.first()).isEqualTo(landlordRentJanuary())
-            assertThat(emission.last()).isEqualTo(landlordRentMarch())
+            assertThat(emission.first()).isEqualTo(
+                landlordRentJanuary().toDomain(
+                    cashAccount().toDomain(), rentCategoryEntity().toDomain()
+                )
+            )
+            assertThat(emission.last()).isEqualTo(
+                landlordRentMarch().toDomain(
+                    cashAccount().toDomain(), rentCategoryEntity().toDomain()
+                )
+            )
         }
     }
 
     @Test
     fun `Add transaction`(): Unit = runTest {
-        repository.addTransaction(techCorpSalaryJanuary())
+        val account = checkingAccount().toDomain()
+        repository.addTransaction(transaction = techCorpSalaryJanuary().toDomain(account, null))
 
-        val transactions = fakeDao.transactions.value
+        val transactions = transactionDaoFake.transactions.value
         assertThat(transactions).hasSize(1)
         assertThat(transactions.first()).isEqualTo(techCorpSalaryJanuary())
     }
 
     @Test
     fun `Update transaction`(): Unit = runTest {
-        fakeDao.transactions.value = transactions
+        transactionDaoFake.transactions.value = transactionEntities
+        val account = cashAccount().toDomain()
+        val category = rentCategoryEntity().toDomain()
 
         val tobeUpdatedTransaction =
             techCorpSalaryJanuary().copy(transactionDirection = TransactionDirection.Outflow, transactionPartner = "Seven")
-        repository.updateTransaction(tobeUpdatedTransaction)
+        repository.updateTransaction(tobeUpdatedTransaction.toDomain(account, category))
 
-        val updatedTransaction = fakeDao.transactions.value.find { it.id == techCorpSalaryJanuary().id }
+        val updatedTransaction = transactionDaoFake.transactions.value.find { it.id == techCorpSalaryJanuary().id }
         assertThat(updatedTransaction).isNotNull()
         assertThat(updatedTransaction?.transactionPartner).isEqualTo("Seven")
     }
 
     @Test
-    fun `Delete Transaction`(): Unit = runTest{
-        fakeDao.transactions.value = transactions
+    fun `Delete Transaction`(): Unit = runTest {
+        transactionDaoFake.transactions.value = transactionEntities
+        val account = cashAccount().toDomain()
+        val category = rentCategoryEntity().toDomain()
 
-        repository.deleteTransaction(aldiGroceriesJanuary())
+        repository.deleteTransaction(aldiGroceriesJanuary().toDomain(account, category))
 
-        val transactionsAfterFirstDeletion = fakeDao.transactions.value
+        val transactionsAfterFirstDeletion = transactionDaoFake.transactions.value
         assertThat(transactionsAfterFirstDeletion).hasSize(20)
         assertThat(transactionsAfterFirstDeletion.find { it.id == aldiGroceriesJanuary().id }).isNull()
         assertThat(transactionsAfterFirstDeletion.first().transactionPartner).isEqualTo(techCorpSalaryJanuary().transactionPartner)
         assertThat(transactionsAfterFirstDeletion[1].transactionPartner).isEqualTo(landlordRentJanuary().transactionPartner)
 
-        repository.deleteTransaction(eonElectricityMarch())
+        repository.deleteTransaction(eonElectricityMarch().toDomain(account, category))
 
-        val transactionsAfterSecondDeletion = fakeDao.transactions.value
+        val transactionsAfterSecondDeletion = transactionDaoFake.transactions.value
         assertThat(transactionsAfterSecondDeletion).hasSize(19)
         assertThat(transactionsAfterSecondDeletion.find { it.id == eonElectricityMarch().id }).isNull()
         assertThat(transactionsAfterSecondDeletion[14].id).isEqualTo(landlordRentMarch().id)

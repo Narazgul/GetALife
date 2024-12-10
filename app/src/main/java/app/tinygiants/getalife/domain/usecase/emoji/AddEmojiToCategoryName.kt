@@ -1,8 +1,8 @@
 package app.tinygiants.getalife.domain.usecase.emoji
 
 import android.util.Log
-import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.di.Gemini
+import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.repository.AiRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -13,21 +13,21 @@ class AddEmojiToCategoryNameUseCase @Inject constructor(
     @Gemini private val aiRepository: AiRepository,
     private val repository: CategoryRepository) {
 
-    suspend operator fun invoke(categoryEntity: CategoryEntity) {
+    suspend operator fun invoke(category: Category) {
 
-        val emojiResponse = aiRepository.generateEmojiBy(tag = categoryEntity.name)
+        val emojiResponse = aiRepository.generateEmojiBy(tag = category.name)
 
         emojiResponse.onFailure { exception ->
             Firebase.crashlytics.recordException(exception)
-            Log.e("Emoji", "Failure: ${exception.message}")
+            Log.e("Emoji", "Emoji: ${exception.localizedMessage} ${exception.cause}")
 
-            repository.updateCategory(categoryEntity.copy(emoji = "💸"))
+            repository.updateCategory(category.copy(emoji = "💸"))
         }
 
         emojiResponse.onSuccess { emojis ->
             if (emojis.isNullOrBlank()) return@onSuccess
 
-            repository.updateCategory(categoryEntity.copy(emoji = emojis))
+            repository.updateCategory(category.copy(emoji = emojis))
         }
     }
 }

@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.domain.model
 
+import app.tinygiants.getalife.presentation.UiText
 import kotlinx.datetime.Instant
 
 data class Category(
@@ -11,6 +12,7 @@ data class Category(
     val assignedMoney: Money,
     val availableMoney: Money,
     val progress: Progress,
+    val optionalText: UiText,
     val listPosition: Int,
     val isInitialCategory: Boolean,
     val updatedAt: Instant,

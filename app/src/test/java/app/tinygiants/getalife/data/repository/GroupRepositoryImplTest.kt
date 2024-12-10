@@ -5,7 +5,7 @@ import app.tinygiants.getalife.data.local.dao.GroupDaoFake
 import app.tinygiants.getalife.data.local.datagenerator.dailyLife
 import app.tinygiants.getalife.data.local.datagenerator.dreams
 import app.tinygiants.getalife.data.local.datagenerator.fixedCosts
-import app.tinygiants.getalife.data.local.datagenerator.groups
+import app.tinygiants.getalife.data.local.datagenerator.groupEntities
 import app.tinygiants.getalife.data.local.datagenerator.savings
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -49,7 +49,7 @@ class GroupRepositoryImplTest {
             val emission3 = awaitItem()
             assertThat(emission3).isEmpty()
 
-            fakeDao.groups.value = groups
+            fakeDao.groups.value = groupEntities
             val finalEmission = awaitItem()
 
             assertThat(finalEmission).hasSize(4)
@@ -61,13 +61,13 @@ class GroupRepositoryImplTest {
         val groups = fakeDao.groups.value
         assertThat(groups).isEmpty()
 
-        repository.addGroup(fixedCosts())
+        repository.addGroup(fixedCosts().toDomain())
 
         val firstItem = fakeDao.groups.value.first()
         assertThat(fakeDao.groups.value).hasSize(1)
         assertThat(firstItem.name).isEqualTo(fixedCosts().name)
 
-        repository.addGroup(dailyLife())
+        repository.addGroup(dailyLife().toDomain())
 
         val secondItem = fakeDao.groups.value[1]
         assertThat(fakeDao.groups.value).hasSize(2)
@@ -76,13 +76,13 @@ class GroupRepositoryImplTest {
 
     @Test
     fun `Update group in list`(): Unit = runTest {
-        fakeDao.groups.value = groups
+        fakeDao.groups.value = groupEntities
         val firstItem = fakeDao.groups.value.first()
 
         assertThat(firstItem.name).isEqualTo(fixedCosts().name)
 
         val updatedEntity = fixedCosts().copy(name = "Fixed costs")
-        repository.updateGroup(updatedEntity)
+        repository.updateGroup(updatedEntity.toDomain())
 
         val updatedFirstItem = fakeDao.groups.value.first()
         assertThat(updatedFirstItem.name).isEqualTo("Fixed costs")
@@ -90,9 +90,9 @@ class GroupRepositoryImplTest {
 
     @Test
     fun `Delete group from list`(): Unit = runTest {
-        fakeDao.groups.value = groups
+        fakeDao.groups.value = groupEntities
 
-        repository.deleteGroup(fixedCosts())
+        repository.deleteGroup(fixedCosts().toDomain())
 
         val groupsAfterFirstDeletion = fakeDao.groups.value
         assertThat(groupsAfterFirstDeletion).hasSize(3)
@@ -100,7 +100,7 @@ class GroupRepositoryImplTest {
         assertThat(groupsAfterFirstDeletion.first().name).isEqualTo(dailyLife().name)
         assertThat(groupsAfterFirstDeletion[1].name).isEqualTo(dreams().name)
 
-        repository.deleteGroup(dailyLife())
+        repository.deleteGroup(dailyLife().toDomain())
 
         val groupsAfterSecondDeletion = fakeDao.groups.value
         assertThat(groupsAfterSecondDeletion).hasSize(2)

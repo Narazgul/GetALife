@@ -124,7 +124,7 @@ fun EditAccountBottomSheet(
                         )
                         onDismissRequest()
                     },
-                    modifier = Modifier.padding(spacing.default),
+                    modifier = Modifier.padding(spacing.m),
                 ) {
                     Text(text = stringResource(id = R.string.save))
                 }

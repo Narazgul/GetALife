@@ -21,23 +21,25 @@ class GetAccountUseCaseTest {
 
     @Test
     fun `Get Account for accountId 1`(): Unit = runTest {
-        accountRepositoryFake.accountsFlow.value = accounts
+        accountRepositoryFake.accounts.value = accounts
 
         val account = getAccount(accountId = 1)
 
-        assertThat(account?.name).isEqualTo(accounts.first().name)
-        assertThat(account?.balance?.value).isEqualTo(accounts.first().balance)
-        assertThat(account?.listPosition).isEqualTo(accounts.first().listPosition)
+        val firstAccount = accounts.first()
+        assertThat(account.name).isEqualTo(firstAccount.name)
+        assertThat(account.balance).isEqualTo(firstAccount.balance)
+        assertThat(account.listPosition).isEqualTo(firstAccount.listPosition)
     }
 
     @Test
     fun `Get Account for accountId 8`(): Unit = runTest {
-        accountRepositoryFake.accountsFlow.value = accounts
+        accountRepositoryFake.accounts.value = accounts
 
         val account = getAccount(accountId = 8)
 
-        assertThat(account?.name).isEqualTo(accounts.last().name)
-        assertThat(account?.balance?.value).isEqualTo(accounts.last().balance)
-        assertThat(account?.listPosition).isEqualTo(accounts.last().listPosition)
+        val lastAccount = accounts.last()
+        assertThat(account.name).isEqualTo(lastAccount.name)
+        assertThat(account.balance).isEqualTo(lastAccount.balance)
+        assertThat(account.listPosition).isEqualTo(lastAccount.listPosition)
     }
 }

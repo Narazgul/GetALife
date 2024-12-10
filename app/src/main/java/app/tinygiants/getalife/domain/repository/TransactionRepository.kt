@@ -1,16 +1,16 @@
 package app.tinygiants.getalife.domain.repository
 
-import app.tinygiants.getalife.data.local.entities.TransactionEntity
+import app.tinygiants.getalife.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
 
-    fun getTransactions(): Flow<List<TransactionEntity>>
-    fun getTransactionsByAccount(accountId: Long): Flow<List<TransactionEntity>>
-    fun getTransactionsByCategory(categoryId: Long): Flow<List<TransactionEntity>>
-    suspend fun getTransaction(transactionId: Long): TransactionEntity?
-    suspend fun addTransaction(transaction: TransactionEntity)
-    suspend fun updateTransaction(transaction: TransactionEntity)
-    suspend fun deleteTransaction(transaction: TransactionEntity)
+    fun getTransactionsFlow(): Flow<List<Transaction>>
+    fun getTransactionsByAccountFlow(accountId: Long): Flow<List<Transaction>>
+    fun getTransactionsByCategoryFlow(categoryId: Long): Flow<List<Transaction>>
+    suspend fun getTransaction(transactionId: Long): Transaction?
+    suspend fun addTransaction(transaction: Transaction)
+    suspend fun updateTransaction(transaction: Transaction)
+    suspend fun deleteTransaction(transaction: Transaction)
 
 }

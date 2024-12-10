@@ -20,6 +20,7 @@
     <string name="distribute_money">Allocate money</string>
     <string name="delete_transaction">Delete Transaction</string>
     <string name="delete_account">Delete %s</string>
+    <string name="delete_category">Delete Category</string>
     <string name="add_group">Add group</string>
     <string name="choose_account">Choose Account</string>
     <string name="add_account">Add account</string>
@@ -40,4 +41,11 @@
     <string name="starting_balance">Starting Balance</string>
     <string name="starting_balance_description">Starting balance for this account</string>
     <string name="assigned">Assigned: %1$s</string>
+    <string name="assign_more_or_remove_spending">Assign at least %1$s to category or remove spending!</string>
+    <string name="all_spent">All spent</string>
+    <string name="spent_more_than_available">Spent %1$s more than available</string>
+    <string name="amount_spent">%1$s spent</string>
+    <string name="more_needed_to_reach_budget_target">%1$s more needed to reach budget target</string>
+    <string name="fully_funded">Fully funded 👌</string>
+    <string name="enjoy_your_extra_money">Enjoy your %1$s extra</string>
 </resources>

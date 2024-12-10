@@ -115,7 +115,7 @@ fun BudgetScreen(
                         exit = fadeOut(tween(3000)),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(spacing.default)
+                            .padding(spacing.m)
                     ) { AssignableMoney(banner = uiState.bannerState) }
 
                     BudgetList(
@@ -187,6 +187,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 1000.00),
             availableMoney = Money(value = 1000.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 0,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -201,6 +202,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 28.55),
             availableMoney = Money(value = 28.55),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 1,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -215,6 +217,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 10.00),
             availableMoney = Money(value = 10.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 2,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -229,6 +232,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 7.49),
             availableMoney = Money(value = 7.49),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 3,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -243,6 +247,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 13.00),
             availableMoney = Money(value = 13.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 4,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -257,6 +262,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 2.00),
             availableMoney = Money(value = 2.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 5,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -279,6 +285,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 27.00),
             availableMoney = Money(value = 27.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 0,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -293,6 +300,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 0.00),
             availableMoney = Money(value = 0.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 1,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -307,6 +315,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 2,
             isInitialCategory = false,
             updatedAt = Clock.System.now(),
@@ -329,6 +338,7 @@ fun fakeCategories() = mapOf(
             assignedMoney = Money(value = 60.00),
             availableMoney = Money(value = 60.00),
             progress = EmptyProgress(),
+            optionalText = DynamicString(value = ""),
             listPosition = 0,
             isInitialCategory = true,
             updatedAt = Clock.System.now(),

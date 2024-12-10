@@ -43,14 +43,14 @@ fun EditCategoryBottomSheet(
     var categoryNameUserInput by rememberSaveable { mutableStateOf(categoryName) }
 
     var budgetTargetMoney by remember { mutableStateOf(budgetTarget) }
-    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.value.toString()) }
+    var budgetTargetUserInput by rememberSaveable { mutableStateOf(budgetTargetMoney.formattedPositiveMoney) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
         Column(modifier = Modifier.padding(horizontal = spacing.l)) {
-            Spacer(modifier = Modifier.height(spacing.default))
+            Spacer(modifier = Modifier.height(spacing.m))
             Row {
                 TextField(
                     value = categoryNameUserInput,
@@ -62,7 +62,7 @@ fun EditCategoryBottomSheet(
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(spacing.default))
+            Spacer(modifier = Modifier.height(spacing.m))
             Row {
                 TextField(
                     value = budgetTargetUserInput,
@@ -72,17 +72,18 @@ fun EditCategoryBottomSheet(
                             Money(value = budgetTargetUserInput.toDoubleOrNull() ?: return@TextField)
                         onBudgetTargetChanged(budgetTargetMoney)
                     },
-                    prefix = { Text(budgetTarget.currencySymbol) },
                     label = { Text(stringResource(R.string.change_budget_target)) },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .weight(1f)
                         .onFocusChanged { focusState ->
-                            budgetTargetUserInput = if (focusState.hasFocus) "" else budgetTarget.value.toString()
+                            budgetTargetUserInput =
+                                if (focusState.hasFocus) ""
+                                else budgetTargetUserInput
                         }
                 )
             }
-            Spacer(modifier = Modifier.height(spacing.default))
+            Spacer(modifier = Modifier.height(spacing.m))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -92,7 +93,7 @@ fun EditCategoryBottomSheet(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text(
-                        text = stringResource(R.string.delete_transaction, categoryName),
+                        text = stringResource(R.string.delete_account, categoryName),
                         color = MaterialTheme.colorScheme.onError
                     )
                 }

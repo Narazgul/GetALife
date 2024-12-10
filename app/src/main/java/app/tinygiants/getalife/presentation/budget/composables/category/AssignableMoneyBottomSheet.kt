@@ -37,7 +37,7 @@ fun AssignableMoneyBottomSheet(
 ) {
 
     var assignedMoneyInCategory by remember { mutableStateOf(assignedMoney) }
-    var assignedMoneyUserInput by rememberSaveable { mutableStateOf(assignedMoneyInCategory.value.toString()) }
+    var assignedMoneyUserInput by rememberSaveable { mutableStateOf(assignedMoneyInCategory.formattedPositiveMoney) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -53,7 +53,6 @@ fun AssignableMoneyBottomSheet(
                 assignedMoneyInCategory = Money(value = positiveValue)
                 onAssignedMoneyChanged(assignedMoneyInCategory)
             },
-            prefix = { Text(assignedMoney.currencySymbol) },
             label = { Text(stringResource(R.string.distribute_money)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier
@@ -61,7 +60,8 @@ fun AssignableMoneyBottomSheet(
                 .padding(horizontal = spacing.l)
                 .onFocusChanged { focusState ->
                     assignedMoneyUserInput =
-                        if (focusState.isFocused) "" else assignedMoney.value.toString()
+                        if (focusState.isFocused) ""
+                        else assignedMoneyUserInput
                 }
         )
 

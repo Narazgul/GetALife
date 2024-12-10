@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import app.tinygiants.getalife.domain.model.AccountType
+import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.md_theme_dark_outline
@@ -45,7 +46,7 @@ fun AccountItem(
                 onClick = { onNavigateToAccountDetails() },
                 onLongClick = { isAccountDialogVisible = true }
             )
-            .padding(spacing.default),
+            .padding(spacing.m),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -54,8 +55,8 @@ fun AccountItem(
             modifier = Modifier.weight(1f)
         )
         val moneyColor = when {
-            balance.value > 0.00 -> success
-            balance.value == 0.00 -> md_theme_dark_outline
+            balance > EmptyMoney() -> success
+            balance == EmptyMoney() -> md_theme_dark_outline
             else -> warning
         }
         Text(

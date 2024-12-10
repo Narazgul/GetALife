@@ -7,7 +7,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
-import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,8 +39,8 @@ class AddTransactionViewModel @Inject constructor(
             launch {
                 getCategories()
                     .catch { throwable -> Log.e("AddTransactionViewModel", "Error: ${throwable.message}") }
-                    .collect { result ->
-                        result.onSuccess { categories -> _uiState.update { uiState -> uiState.copy(categories = categories) } }
+                    .collect { categories ->
+                        _uiState.update { uiState -> uiState.copy(categories = categories) }
                     }
             }
         }
@@ -71,7 +71,14 @@ class AddTransactionViewModel @Inject constructor(
         description: String
     ) {
         viewModelScope.launch {
-            addTransaction(amount, direction, accountId, category, transactionPartner, description)
+            addTransaction(
+                accountId = accountId,
+                category = category,
+                amount = amount,
+                direction = direction,
+                transactionPartner = transactionPartner,
+                description = description
+            )
         }
     }
 

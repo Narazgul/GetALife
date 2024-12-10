@@ -1,30 +1,58 @@
 package app.tinygiants.getalife.domain.model
 
 import androidx.compose.runtime.Immutable
+import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
-import kotlin.math.abs
+
+typealias EmptyMoney = Money
 
 @Immutable
 data class Money(
-    val value: Double,
-    val maximumDigits: Int = 2,
+    private val value: BigDecimal = BigDecimal.valueOf(0.0),
     val locale: Locale = Locale.getDefault()
 ) {
-    val currencySymbol: String = getCurrencySymbol()
-    val formattedMoney: String = value.toCurrencyFormattedString()
-    val formattedPositiveMoney: String = abs(value).toCurrencyFormattedString()
+    private val currency: Currency = Currency.getInstance(locale)
 
-    operator fun plus(other: Money) = Money(value = this.value + other.value)
-    operator fun minus(other: Money) = Money(value = this.value - other.value)
+    val currencySymbol: String = currency.symbol
+    val formattedMoney: String = formatMoney(value)
+    val formattedPositiveMoney: String = formatMoney(value.abs())
 
-    private fun getCurrencySymbol(locale: Locale = Locale.getDefault()): String = Currency.getInstance(locale).symbol
+    constructor(value: Double, locale: Locale = Locale.getDefault()): this(
+        value = BigDecimal.valueOf(value),
+        locale = locale
+    )
 
-    private fun Double.toCurrencyFormattedString(): String {
-        val numberFormat = NumberFormat.getCurrencyInstance()
-        numberFormat.maximumFractionDigits = maximumDigits
-        numberFormat.currency = Currency.getInstance(locale)
-        return numberFormat.format(this)
+    fun asBigDecimal() = value
+    fun asDouble() = value.toDouble()
+    fun positiveMoney() = Money(value = value.abs(), locale = locale)
+    fun negativeMoney() = Money(value = -value.abs(), locale = locale)
+    fun toFloat() = value.toFloat()
+
+    operator fun compareTo(other: Money): Int {
+        require(this.locale == other.locale) { "Locales must match for comparison" }
+        return this.value.compareTo(other.value)
+    }
+
+    operator fun plus(other: Money): Money {
+        require(this.locale == other.locale) { "Locales must match for addition" }
+        return Money(value = this.value.add(other.value), locale = this.locale)
+    }
+
+    operator fun minus(other: Money): Money {
+        require(this.locale == other.locale) { "Locales must match for subtraction" }
+        return Money(value = this.value.subtract(other.value), locale = this.locale)
+    }
+
+    operator fun div(other: Money): Money {
+        require(this.locale == other.locale) { "Locales must match for division" }
+        return Money(value = this.value.div(other.value), locale = this.locale)
+    }
+
+    private fun formatMoney(amount: BigDecimal): String {
+        val numberFormat = NumberFormat.getCurrencyInstance(locale)
+        numberFormat.currency = currency
+        return numberFormat.format(amount)
     }
 }

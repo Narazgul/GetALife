@@ -8,11 +8,7 @@ import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.insuranceCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.data.local.datagenerator.transactions
-import app.tinygiants.getalife.domain.model.Account
-import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
@@ -40,9 +36,9 @@ class ExchangeCategoryUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        transactionRepositoryFake = TransactionRepositoryFake()
         accountRepositoryFake = AccountRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
+        transactionRepositoryFake = TransactionRepositoryFake(accountRepositoryFake, categoryRepositoryFake)
 
         exchangeCategory = ExchangeCategoryUseCase(
             transactionRepository = transactionRepositoryFake,
@@ -51,82 +47,30 @@ class ExchangeCategoryUseCaseTest {
         )
 
         transactionRepositoryFake.transactions.value = transactions
-        accountRepositoryFake.accountsFlow.value = accounts
+        accountRepositoryFake.accounts.value = accounts
         categoryRepositoryFake.categories.value = categories
     }
 
     @Test
     fun `Change category to another category`(): Unit = runTest {
-        val account = cashAccount().run {
-            Account(
-                id = id,
-                name = name,
-                balance = Money(balance),
-                type = type,
-                listPosition = listPosition,
-                updatedAt = updatedAt,
-                createdAt = createdAt,
-            )
-        }
-        val oldCategory = rentCategoryEntity().run {
-            Category(
-                id = id,
-                groupId = groupId,
-                emoji = emoji,
-                name = name,
-                budgetTarget = Money(budgetTarget),
-                assignedMoney = Money(assignedMoney),
-                availableMoney = Money(availableMoney),
-                progress = EmptyProgress(),
-                listPosition = listPosition,
-                isInitialCategory = isInitialCategory,
-                updatedAt = updatedAt,
-                createdAt = createdAt
-            )
-        }
-        val newCategory = insuranceCategoryEntity().run {
-            Category(
-                id = id,
-                groupId = groupId,
-                emoji = emoji,
-                name = name,
-                budgetTarget = Money(budgetTarget),
-                assignedMoney = Money(assignedMoney),
-                availableMoney = Money(availableMoney),
-                progress = EmptyProgress(),
-                listPosition = listPosition,
-                isInitialCategory = isInitialCategory,
-                updatedAt = updatedAt,
-                createdAt = createdAt,
-            )
-        }
-        val updatedTransaction = aldiGroceriesJanuary().run {
-            Transaction(
-                id = id,
-                amount = Money(amount),
-                account = account,
-                category = newCategory,
-                transactionPartner = transactionPartner,
-                transactionDirection = TransactionDirection.Inflow,
-                description = description,
-                updatedAt = updatedAt,
-                createdAt = createdAt,
-            )
-        }
+        val account = cashAccount().toDomain()
+        val oldCategory = rentCategoryEntity().toDomain()
+        val newCategory = insuranceCategoryEntity().toDomain()
+        val updatedTransaction = aldiGroceriesJanuary().toDomain(account, newCategory).copy(transactionDirection = TransactionDirection.Inflow)
 
         exchangeCategory(transaction = updatedTransaction, oldCategory = oldCategory)
 
-        val accountBalance = accountRepositoryFake.accountsFlow.value.find { it.id == cashAccount().id }!!.balance
+        val accountBalance = accountRepositoryFake.accounts.value.find { it.id == cashAccount().id }!!.balance
         val updatedOldCategory = categoryRepositoryFake.categories.value.find { it.id == oldCategory.id }!!
         val updatedNewCategory = categoryRepositoryFake.categories.value.find { it.id == newCategory.id }!!
         val transactionAfterUpdate = transactionRepositoryFake.transactions.value.find { it.id == aldiGroceriesJanuary().id }!!
 
-        assertThat(accountBalance).isEqualTo(500.0)
-        assertThat(updatedOldCategory.availableMoney).isEqualTo(1350.0)
-        assertThat(updatedNewCategory.availableMoney).isEqualTo(250.0)
+        assertThat(accountBalance).isEqualTo(Money(500.0))
+        assertThat(updatedOldCategory.availableMoney).isEqualTo(Money(1350.0))
+        assertThat(updatedNewCategory.availableMoney).isEqualTo(Money(250.0))
         assertThat(transactionAfterUpdate.id).isEqualTo(updatedTransaction.id)
         assertThat(transactionAfterUpdate.id).isNotNull()
-        assertThat(transactionAfterUpdate.categoryId).isEqualTo(newCategory.id)
-        assertThat(transactionAfterUpdate.amount).isEqualTo(-50.0)
+        assertThat(transactionAfterUpdate.category?.id).isEqualTo(newCategory.id)
+        assertThat(transactionAfterUpdate.amount).isEqualTo(Money(-50.0))
     }
 }

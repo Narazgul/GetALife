@@ -1,7 +1,5 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
-import app.tinygiants.getalife.data.local.entities.CategoryEntity
-import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
@@ -32,23 +30,10 @@ class ExchangeCategoryUseCase @Inject constructor(
     }
 
     private suspend fun updateTransaction(transaction: Transaction) {
-        if (transaction.account == null) return
 
-        val transactionEntity = transaction.run {
-            TransactionEntity(
-                id = id,
-                accountId = account!!.id,
-                categoryId = category?.id,
-                amount = amount.value,
-                transactionPartner = transactionPartner,
-                transactionDirection = transactionDirection,
-                description = description,
-                updatedAt = Clock.System.now(),
-                createdAt = createdAt
-            )
-        }
+        val updatedTransaction = transaction.copy(updatedAt = Clock.System.now())
 
-        transactionRepository.updateTransaction(transactionEntity)
+        transactionRepository.updateTransaction(updatedTransaction)
     }
 
     private suspend fun updateOldCategory(category: Category?, amount: Money) {
@@ -56,45 +41,23 @@ class ExchangeCategoryUseCase @Inject constructor(
 
         val updatedAvailableMoney = category.availableMoney - amount
 
-        val oldCategoryEntity = category.run {
-            CategoryEntity(
-                id = id,
-                groupId = groupId,
-                emoji = emoji,
-                name = name,
-                budgetTarget = budgetTarget.value,
-                assignedMoney = assignedMoney.value,
-                availableMoney = updatedAvailableMoney.value,
-                listPosition = listPosition,
-                isInitialCategory = isInitialCategory,
-                updatedAt = Clock.System.now(),
-                createdAt = createdAt,
-            )
-        }
+        val updatedCategory = category.copy(
+            availableMoney = updatedAvailableMoney,
+            updatedAt = Clock.System.now()
+        )
 
-        categoryRepository.updateCategory(oldCategoryEntity)
+        categoryRepository.updateCategory(updatedCategory)
     }
 
     private suspend fun updateNewCategory(category: Category, amount: Money) {
 
         val updatedAvailableMoney = category.availableMoney + amount
 
-        val oldCategoryEntity = category.run {
-            CategoryEntity(
-                id = id,
-                groupId = groupId,
-                emoji = emoji,
-                name = name,
-                budgetTarget = budgetTarget.value,
-                assignedMoney = assignedMoney.value,
-                availableMoney = updatedAvailableMoney.value,
-                listPosition = listPosition,
-                isInitialCategory = isInitialCategory,
-                updatedAt = Clock.System.now(),
-                createdAt = createdAt,
-            )
-        }
+        val updatedCategory = category.copy(
+            availableMoney = updatedAvailableMoney,
+            updatedAt = Clock.System.now()
+        )
 
-        categoryRepository.updateCategory(oldCategoryEntity)
+        categoryRepository.updateCategory(updatedCategory)
     }
 }

@@ -2,12 +2,14 @@ package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 
-val groups = listOf(
+val groupEntities = listOf(
     fixedCosts(),
     dailyLife(),
     dreams(),
     savings()
 )
+
+val groups = groupEntities.map { groupEntity -> groupEntity.toDomain() }
 
 fun fixedCosts() = GroupEntity(
     id = 1L,

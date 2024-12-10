@@ -30,19 +30,18 @@ class GetTransactionsForAccountUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        transactionsRepositoryFake = TransactionRepositoryFake()
         accountsRepositoryFake = AccountRepositoryFake()
         categoriesRepositoryFake = CategoryRepositoryFake()
+        transactionsRepositoryFake = TransactionRepositoryFake(accountsRepositoryFake, categoriesRepositoryFake)
 
         getTransactionsForAccount = GetTransactionsForAccountUseCase(
             transactions = transactionsRepositoryFake,
             accounts = accountsRepositoryFake,
             categories = categoriesRepositoryFake,
-            defaultDispatcher = testDispatcherExtension.testDispatcher
         )
 
         transactionsRepositoryFake.transactions.value = transactions
-        accountsRepositoryFake.accountsFlow.value = accounts
+        accountsRepositoryFake.accounts.value = accounts
         categoriesRepositoryFake.categories.value = categories
     }
 

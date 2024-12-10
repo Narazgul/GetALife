@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,17 +35,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
-import app.tinygiants.getalife.R
+import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Progress
 import app.tinygiants.getalife.domain.model.ProgressColor
+import app.tinygiants.getalife.domain.model.UserHint
+import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
@@ -53,7 +56,7 @@ import app.tinygiants.getalife.theme.success
 import app.tinygiants.getalife.theme.warning
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Category(
     emoji: String = "",
@@ -62,6 +65,7 @@ fun Category(
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Progress = EmptyProgress(),
+    optionalText: UiText = UiText.DynamicString(value = ""),
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money) -> Unit = { },
@@ -71,11 +75,6 @@ fun Category(
     var showAssignMoneyBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showGeneralEditBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
-
-    val animateBar1 by animateFloatAsState(targetValue = progress.bar1, label = "bar1")
-    val animateBar1Lite by animateFloatAsState(targetValue = progress.bar1Lite, label = "bar1Lite")
-    val animateBar2 by animateFloatAsState(targetValue = progress.bar2, label = "bar2")
-    val animateBar2Lite by animateFloatAsState(targetValue = progress.bar2Lite, label = "bar2Lite")
 
     Column(
         modifier = Modifier
@@ -95,133 +94,21 @@ fun Category(
                 vertical = spacing.s
             )
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = emoji,
-                maxLines = 1,
-                modifier = Modifier
-                    .clickable(onClick = { showEmojiPicker = true })
-                    .widthIn(max = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.size(spacing.s))
-
-            Text(
-                text = categoryName,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.weight(1f)
-            )
-            val budgetTargetBackground = when {
-                availableMoney.value < 0.0 -> MaterialTheme.colorScheme.error
-                availableMoney.value == 0.0 -> MaterialTheme.colorScheme.outlineVariant
-                budgetTarget.value != 0.0 && assignedMoney.value < budgetTarget.value -> onWarning
-                else -> onSuccess
-            }
-
-            Spacer(modifier = Modifier.size(spacing.s))
-
-            Text(
-                text = stringResource(R.string.assigned, assignedMoney.formattedMoney),
-                style = MaterialTheme.typography.titleSmall,
-            )
-
-            Spacer(modifier = Modifier.size(spacing.l))
-
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = budgetTargetBackground,
-                        shape = RoundedCornerShape(spacing.l)
-                    )
-                    .padding(
-                        horizontal = spacing.default,
-                        vertical = spacing.xs
-                    )
-            ) {
-                val availableMoneyColor = when {
-                    availableMoney.value < 0.0 -> MaterialTheme.colorScheme.onError
-                    availableMoney.value == 0.0 -> MaterialTheme.colorScheme.onSurface
-                    else -> MaterialTheme.colorScheme.scrim
-                }
-
-                Text(
-                    text = availableMoney.formattedMoney,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = availableMoneyColor
+        TextRowScaffold(
+            emoji = { Emoji(emoji = emoji, onClick = { showEmojiPicker = true }) },
+            categoryName = { CategoryName(categoryName = categoryName) },
+            availableMoney = {
+                AvailableMoney(
+                    availableMoney = availableMoney,
+                    budgetTarget = budgetTarget,
+                    assignedMoney = assignedMoney
                 )
             }
-        }
-
+        )
         Spacer(modifier = Modifier.height(spacing.xs))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(spacing.l)
-        ) {
-            val progressBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            val bar1Color = getComposableColor(progressColor = progress.bar1Color)
-            val bar1LiteColor = getComposableColor(progressColor = progress.bar1LiteColor)
-            val bar2Color = getComposableColor(progressColor = progress.bar2Color)
-            val bar2LiteColor = getComposableColor(progressColor = progress.bar2LiteColor)
-
-            LinearProgressIndicator(
-                progress = { animateBar1 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-                color = bar1Color,
-                trackColor = progressBackground,
-                strokeCap = StrokeCap.Round
-            )
-            LinearProgressIndicator(
-                progress = { animateBar1Lite },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-                color = bar1LiteColor,
-                trackColor = Color.Transparent,
-                strokeCap = StrokeCap.Round,
-                drawStopIndicator = { }
-            )
-            if (progress.showColorOnSecondBar) {
-                LinearProgressIndicator(
-                    progress = { animateBar2 },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center),
-                    color = Color.Transparent,
-                    trackColor = bar2Color,
-                    strokeCap = StrokeCap.Round,
-                    drawStopIndicator = { }
-                )
-                LinearProgressIndicator(
-                    progress = { animateBar2Lite },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center),
-                    color = Color.Transparent,
-                    trackColor = bar2LiteColor,
-                    strokeCap = StrokeCap.Round,
-                    drawStopIndicator = { }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(spacing.default))
-
-        if (progress.optionalText.isNotBlank()) {
-            Text(
-                text = progress.optionalText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Start
-            )
-        }
+        CategoryProgress(progress = progress)
+        Spacer(modifier = Modifier.height(spacing.m))
+        OptionalText(optionalText = optionalText)
     }
 
     if (showGeneralEditBottomSheet) EditCategoryBottomSheet(
@@ -240,31 +127,197 @@ fun Category(
     )
 
     if (showEmojiPicker) {
-        val sheetSate = rememberModalBottomSheetState()
-        val scope = rememberCoroutineScope()
-        fun hideModalBottomSheetIfFullyExpanded() {
-            if (sheetSate.currentValue == SheetValue.Expanded) {
-                scope.launch { sheetSate.hide() }.invokeOnCompletion { showEmojiPicker = false }
-            }
-        }
+        EmojiPicker(
+            hideEmojiPicker = { showEmojiPicker = false },
+            onUpdateEmojiClicked = onUpdateEmojiClicked
+        )
+    }
+}
 
-        ModalBottomSheet(
-            onDismissRequest = { showEmojiPicker = false },
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            sheetState = sheetSate
-        ) {
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { context ->
-                    EmojiPickerView(context).apply {
-                        setOnEmojiPickedListener { emojiViewItem ->
-                            onUpdateEmojiClicked(emojiViewItem.emoji)
-                            hideModalBottomSheetIfFullyExpanded()
-                        }
-                    }
-                }
+@Composable
+fun TextRowScaffold(
+    emoji: @Composable () -> Unit,
+    categoryName: @Composable RowScope.() -> Unit,
+    availableMoney: @Composable () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        emoji()
+        Spacer(modifier = Modifier.size(spacing.s))
+        categoryName()
+        Spacer(modifier = Modifier.size(spacing.s))
+        availableMoney()
+        Spacer(modifier = Modifier.padding(bottom = spacing.xl))
+    }
+}
+
+@Composable
+fun Emoji(emoji: String, onClick: () -> Unit) {
+    Text(
+        text = emoji,
+        maxLines = 1,
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .widthIn(max = 20.dp)
+    )
+}
+
+@Composable
+fun RowScope.CategoryName(
+    categoryName: String,
+    modifier: Modifier = Modifier,
+    weight: Float = 1.5f,
+    maxLines: Int = 1
+) {
+    Text(
+        text = categoryName,
+        style = MaterialTheme.typography.titleSmall,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier.weight(weight)
+    )
+}
+
+@Composable
+fun AvailableMoney(availableMoney: Money, budgetTarget: Money, assignedMoney: Money) {
+    val budgetTargetBackground = when {
+        availableMoney < EmptyMoney() -> MaterialTheme.colorScheme.error
+        availableMoney == EmptyMoney() -> MaterialTheme.colorScheme.outlineVariant
+        budgetTarget != EmptyMoney() && assignedMoney < budgetTarget -> onWarning
+        else -> onSuccess
+    }
+    val availableMoneyColor = when {
+        availableMoney < EmptyMoney() -> MaterialTheme.colorScheme.onError
+        availableMoney == EmptyMoney() -> MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.scrim
+    }
+
+    Box(
+        modifier = Modifier
+            .background(
+                color = budgetTargetBackground,
+                shape = RoundedCornerShape(spacing.l)
+            )
+            .padding(
+                horizontal = spacing.m,
+                vertical = spacing.xs
+            )
+    ) {
+        Text(
+            text = availableMoney.formattedMoney,
+            style = MaterialTheme.typography.titleMedium,
+            color = availableMoneyColor
+        )
+    }
+}
+
+@Composable
+fun CategoryProgress(progress: Progress) {
+    val animateBar1 by animateFloatAsState(targetValue = progress.bar1, label = "bar1")
+    val animateBar1Lite by animateFloatAsState(targetValue = progress.bar1Lite, label = "bar1Lite")
+    val animateBar2 by animateFloatAsState(targetValue = progress.bar2, label = "bar2")
+    val animateBar2Lite by animateFloatAsState(targetValue = progress.bar2Lite, label = "bar2Lite")
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(spacing.m)
+    ) {
+        val progressBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+        val bar1Color = getComposableColor(progressColor = progress.bar1Color)
+        val bar1LiteColor = getComposableColor(progressColor = progress.bar1LiteColor)
+        val bar2Color = getComposableColor(progressColor = progress.bar2Color)
+        val bar2LiteColor = getComposableColor(progressColor = progress.bar2LiteColor)
+
+        LinearProgressIndicator(
+            progress = { animateBar1 },
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            color = bar1Color,
+            trackColor = progressBackground,
+            strokeCap = StrokeCap.Round
+        )
+        LinearProgressIndicator(
+            progress = { animateBar1Lite },
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            color = bar1LiteColor,
+            trackColor = Color.Transparent,
+            strokeCap = StrokeCap.Round,
+            drawStopIndicator = { }
+        )
+        if (progress.showColorOnSecondBar) {
+            LinearProgressIndicator(
+                progress = { animateBar2 },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                color = Color.Transparent,
+                trackColor = bar2Color,
+                strokeCap = StrokeCap.Round,
+                drawStopIndicator = { }
+            )
+            LinearProgressIndicator(
+                progress = { animateBar2Lite },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                color = Color.Transparent,
+                trackColor = bar2LiteColor,
+                strokeCap = StrokeCap.Round,
+                drawStopIndicator = { }
             )
         }
+    }
+}
+
+@Composable
+fun OptionalText(optionalText: UiText) {
+    if (optionalText.asString().isNotBlank()) {
+        Text(
+            text = optionalText.asString(),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Start
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmojiPicker(
+    hideEmojiPicker: () -> Unit,
+    onUpdateEmojiClicked: (String) -> Unit
+) {
+    val sheetSate = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    fun hideModalBottomSheetIfFullyExpanded() {
+        if (sheetSate.currentValue == SheetValue.Expanded) {
+            scope.launch { sheetSate.hide() }.invokeOnCompletion { hideEmojiPicker() }
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = { hideEmojiPicker() },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        sheetState = sheetSate
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                EmojiPickerView(context).apply {
+                    setOnEmojiPickedListener { emojiViewItem ->
+                        onUpdateEmojiClicked(emojiViewItem.emoji)
+                        hideModalBottomSheetIfFullyExpanded()
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -288,7 +341,7 @@ fun SetTargetAssignedBeyondTargetOverspentBeyondTargetPreview() {
         Surface {
             Category(
                 emoji = "🏠",
-                categoryName = "Rent",
+                categoryName = "sehr langer Text der umgebrochen werden muss",
                 budgetTarget = Money(100.00),
                 assignedMoney = Money(120.00),
                 availableMoney = Money(-20.00),
@@ -300,7 +353,7 @@ fun SetTargetAssignedBeyondTargetOverspentBeyondTargetPreview() {
                     bar2Color = ProgressColor.PrimaryLite,
                     bar2LiteColor = ProgressColor.Red,
                     showColorOnSecondBar = true,
-                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                    userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
         }
@@ -325,7 +378,7 @@ fun SetTargetAllAssignedOverspentBeyondTargetPreview() {
                     bar1Color = ProgressColor.GreenLite,
                     bar2Color = ProgressColor.Red,
                     showColorOnSecondBar = true,
-                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                    userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
         }
@@ -352,7 +405,7 @@ fun SetTargetSomeAssignedOverspentBeyondTargetPreview() {
                     bar1LiteColor = ProgressColor.YellowLite,
                     bar2Color = ProgressColor.Red,
                     showColorOnSecondBar = true,
-                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                    userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
         }
@@ -375,7 +428,7 @@ fun SetTargetSomeAssignedOverspentBelowTargetPreview() {
                     bar1Lite = (40.0 / 100.0).toFloat(),
                     bar1Color = ProgressColor.Red,
                     bar1LiteColor = ProgressColor.YellowLite,
-                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                    userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
         }
@@ -396,7 +449,7 @@ fun SetTargetNothingAssignedOverspentPreview() {
                 progress = Progress(
                     bar1 = 1f,
                     bar1Color = ProgressColor.Red,
-                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                    userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
         }
@@ -413,7 +466,7 @@ fun SetTargetOverBudgetAssignedAllSpentOverBudgetPreview() {
                 categoryName = "Rent",
                 budgetTarget = Money(100.00),
                 assignedMoney = Money(120.00),
-                availableMoney = Money(10.00),
+                availableMoney = Money(0.00),
                 progress = Progress(
                     bar1 = (100.0 / 120.0).toFloat(),
                     bar1Lite = (100.0 / 120.0).toFloat(),
@@ -423,7 +476,7 @@ fun SetTargetOverBudgetAssignedAllSpentOverBudgetPreview() {
                     bar2Lite = (100.0 / 120.0).toFloat(),
                     showColorOnSecondBar = true,
                     bar2Color = ProgressColor.PrimaryLite,
-                    optionalText = ""
+                    userHint = UserHint.NoHint
                 )
             )
         }
@@ -451,7 +504,35 @@ fun SetTargetOverBudgetAssignedLittleSpentOverBudgetPreview() {
                     showColorOnSecondBar = true,
                     bar2Color = ProgressColor.PrimaryLite,
                     bar2LiteColor = ProgressColor.Primary,
-                    optionalText = ""
+                    userHint = UserHint.NoHint
+                )
+            )
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SecondPreview() {
+    GetALifeTheme {
+        Surface {
+            Category(
+                emoji = "🏠",
+                categoryName = "Rent",
+                budgetTarget = Money(200.00),
+                assignedMoney = Money(460.00),
+                availableMoney = Money(10.00),
+                progress = Progress(
+                    bar1 = (200.0 / 460.0).toFloat(),
+                    bar1Lite = (200.0 / 460.0).toFloat(),
+                    bar1Color = ProgressColor.Green,
+                    bar1LiteColor = ProgressColor.GreenLite,
+                    bar2 = (200.0 / 460.0).toFloat(),
+                    bar2Lite = (450.0 / 460.0).toFloat(),
+                    showColorOnSecondBar = true,
+                    bar2Color = ProgressColor.PrimaryLite,
+                    bar2LiteColor = ProgressColor.Primary,
+                    userHint = UserHint.NoHint
                 )
             )
         }
@@ -478,7 +559,7 @@ fun SetTargetOverBudgetAssignedAllBudgetedSpentPreview() {
                     bar2Lite = (100 / 120.0).toFloat(),
                     showColorOnSecondBar = true,
                     bar2Color = ProgressColor.Primary,
-                    optionalText = "Enjoy your 20,-€ extra"
+                    userHint = UserHint.ExtraMoney(amount = "20,-€")
                 )
             )
         }
@@ -505,7 +586,7 @@ fun SetTargetOverBudgetAssignedLittleSpentPreview() {
                     bar2Lite = (100 / 120.0).toFloat(),
                     showColorOnSecondBar = true,
                     bar2Color = ProgressColor.Primary,
-                    optionalText = "Enjoy your 20,-€ extra"
+                    userHint = UserHint.ExtraMoney(amount = "20,-€")
                 )
             )
         }
@@ -568,7 +649,7 @@ fun SetTargetSomethingAssignedAllSpentPreview() {
                 progress = Progress(
                     bar1 = (60.0 / 100.0).toFloat(),
                     bar1Color = ProgressColor.YellowLite,
-                    optionalText = "40,-€ more needed to reach budget target"
+                    userHint = UserHint.MoreNeedForBudgetTarget(amount = "40,0€")
                 )
             )
         }
@@ -591,7 +672,7 @@ fun SetTargetSomethingAssignedLittleSpentPreview() {
                     bar1Lite = ((60.0 - 40.0) / 100.0).toFloat(),
                     bar1Color = ProgressColor.Yellow,
                     bar1LiteColor = ProgressColor.YellowLite,
-                    optionalText = "40,-€ more needed to reach budget target"
+                    userHint = UserHint.MoreNeedForBudgetTarget(amount = "40,0€")
                 )
             )
         }
@@ -616,7 +697,7 @@ fun SetTargetOverBudgetAssignedNothingSpentPreview() {
                     bar1Color = ProgressColor.Green,
                     bar2Color = ProgressColor.Primary,
                     showColorOnSecondBar = true,
-                    optionalText = "Enjoy your 20,-€ extra"
+                    userHint = UserHint.ExtraMoney(amount = "20,-€")
                 )
             )
         }
@@ -637,7 +718,7 @@ fun SetTargetFullyAssignedNothingSpentPreview() {
                 progress = Progress(
                     bar1 = 1f,
                     bar1Color = ProgressColor.Green,
-                    optionalText = "Fully funded 👌"
+                    userHint = UserHint.FullyFunded
                 )
             )
         }
@@ -659,7 +740,7 @@ fun SetTargetSomethingAssignedNothingSpentPreview() {
                     bar1 = (30.0 / 100.0).toFloat(),
                     bar2 = (30.0 / 100.0).toFloat(),
                     bar1Color = ProgressColor.Yellow,
-                    optionalText = "70,-€ more needed to reach budget target"
+                    userHint = UserHint.MoreNeedForBudgetTarget(amount = "70,-€")
                 )
             )
         }
@@ -680,7 +761,7 @@ fun SetTargetNothingAssignedNothingSpentPreview() {
                 progress = Progress(
                     bar1 = 1f,
                     bar1Color = ProgressColor.Grey,
-                    optionalText = "100,-€ more needed to reach budget target"
+                    userHint = UserHint.MoreNeedForBudgetTarget(amount = "100,-€")
                 )
             )
         }
@@ -703,7 +784,7 @@ fun NoTargetSomethingAssignedOverspentPreview() {
                     bar1Lite = (100.0 / 120.0).toFloat(),
                     bar1Color = ProgressColor.Red,
                     bar1LiteColor = ProgressColor.GreenLite,
-                    optionalText = "Spent 20,-€ more than available"
+                    userHint = UserHint.SpentMoreThanAvailable(amount = "20,-€")
                 )
             )
         }
@@ -724,7 +805,7 @@ fun NoTargetNothingAssignedOverspentPreview() {
                 progress = Progress(
                     bar1 = 1f,
                     bar1Color = ProgressColor.Red,
-                    optionalText = "Assign at least 20,-€ to category or remove spending!"
+                    userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
         }

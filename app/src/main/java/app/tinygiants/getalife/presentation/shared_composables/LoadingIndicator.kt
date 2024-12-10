@@ -17,7 +17,7 @@ fun LoadingIndicator(
 ) {
     AnimatedVisibility(
         visible = isLoading && errorMessage == null,
-        modifier = modifier.padding(top = spacing.default)
+        modifier = modifier.padding(top = spacing.m)
     ) {
         CircularProgressIndicator(
             strokeWidth = spacing.xs,

@@ -31,9 +31,6 @@ object AppModule {
     fun provideDatabase(@ApplicationContext appContext: Context) = GetALifeDatabase.getDatabase(appContext)
 
     @Provides
-    fun provideBudgetDao(database: GetALifeDatabase) = database.budgetDao()
-
-    @Provides
     fun provideGroupDao(database: GetALifeDatabase) = database.groupDao()
 
     @Provides

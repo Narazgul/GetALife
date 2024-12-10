@@ -2,17 +2,34 @@ package app.tinygiants.getalife.data.repository
 
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
+import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class CategoryRepositoryImpl @Inject constructor(private val categoryDao: CategoryDao) : CategoryRepository {
+class CategoryRepositoryImpl @Inject constructor(
+    private val categoryDao: CategoryDao
+) : CategoryRepository {
 
-    override fun getCategoriesFlow(): Flow<List<CategoryEntity>> = categoryDao.getCategoriesFlow()
-    override suspend fun getCategoriesInGroup(groupId: Long) = categoryDao.getCategoriesInGroup(groupId = groupId)
-    override suspend fun getCategory(categoryId: Long) = categoryDao.getCategory(categoryId = categoryId)
-    override suspend fun addCategory(categoryEntity: CategoryEntity) { categoryDao.addCategory(categoryEntity = categoryEntity) }
-    override suspend fun updateCategory(categoryEntity: CategoryEntity) { categoryDao.updateCategory(categoryEntity) }
-    override suspend fun deleteCategory(categoryEntity: CategoryEntity) { categoryDao.deleteCategory(categoryEntity) }
+    override fun getCategoriesFlow(): Flow<List<Category>> =
+        categoryDao.getCategoriesFlow()
+            .map { entities -> entities.map { it.toDomain() } }
 
+    override suspend fun getCategoriesInGroup(groupId: Long): List<Category> =
+        categoryDao.getCategoriesInGroup(groupId = groupId).map { it.toDomain() }
+
+    override suspend fun getCategory(categoryId: Long): Category =
+        categoryDao.getCategory(categoryId = categoryId).toDomain()
+
+    override suspend fun addCategory(category: Category) =
+        categoryDao.addCategory(CategoryEntity.fromDomain(category))
+
+    override suspend fun updateCategory(category: Category?) {
+        if (category == null) return
+        categoryDao.updateCategory(CategoryEntity.fromDomain(category))
+    }
+
+    override suspend fun deleteCategory(category: Category) =
+        categoryDao.deleteCategory(CategoryEntity.fromDomain(category))
 }

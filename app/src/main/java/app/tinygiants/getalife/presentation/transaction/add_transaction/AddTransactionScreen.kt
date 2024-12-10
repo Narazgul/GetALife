@@ -30,10 +30,10 @@ import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.presentation.shared_composables.waveAnimationBackground
 import app.tinygiants.getalife.presentation.transaction.composables.AddTransactionItem
 import app.tinygiants.getalife.presentation.transaction.composables.Description
 import app.tinygiants.getalife.presentation.transaction.composables.TransactionPartner
-import app.tinygiants.getalife.presentation.transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
@@ -121,7 +121,7 @@ fun AddTransaction(
                 },
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .padding(spacing.default)
+                    .padding(spacing.m)
             )
         }
     }

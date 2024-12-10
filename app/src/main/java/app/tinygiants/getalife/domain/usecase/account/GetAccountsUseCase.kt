@@ -1,9 +1,7 @@
 package app.tinygiants.getalife.domain.usecase.account
 
-import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Account
-import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -21,26 +19,17 @@ class GetAccountsUseCase @Inject constructor(
         accountRepository.getAccountsFlow()
             .catch { throwable -> emit(Result.failure(throwable)) }
             .collect { accounts ->
-                emit(getSortedAccounts(accounts))
+                val sortedAccounts = getSortedAccounts(accounts)
+                emit(sortedAccounts)
             }
     }
 
-    private suspend fun getSortedAccounts(accounts: List<AccountEntity>): Result<List<Account>> {
+    private suspend fun getSortedAccounts(accounts: List<Account>): Result<List<Account>> {
         return Result.success(
             withContext(defaultDispatcher) {
                 accounts
                     .sortedBy { account -> account.listPosition }
-                    .mapIndexed { index, account ->
-                        Account(
-                            id = account.id,
-                            name = account.name,
-                            balance = Money(value = account.balance),
-                            type = account.type,
-                            listPosition = index,
-                            updatedAt = account.updatedAt,
-                            createdAt = account.createdAt
-                        )
-                    }
+                    .mapIndexed { index, account -> account.copy(listPosition = index) }
             }
         )
     }

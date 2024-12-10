@@ -43,7 +43,7 @@ fun EmptyCategoryItem(
             label = { Text(stringResource(id = R.string.add_category)) },
             modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.width(spacing.default))
+        Spacer(modifier = Modifier.width(spacing.m))
         Button(
             onClick = {
                 if (categoryName.isBlank()) {

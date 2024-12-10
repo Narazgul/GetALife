@@ -58,10 +58,10 @@ fun AddTransactionItem(
     ) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
+    val focusManager = LocalFocusManager.current // nicht mehr benötigt im BottomSheet -> close via onDismissClicked
 
-    var showCategoryDropdown by rememberSaveable { mutableStateOf(false) }
-    var showAccountDropdown by rememberSaveable { mutableStateOf(false) }
+    var showCategoryDropdown by rememberSaveable { mutableStateOf(false) } // done
+    var showAccountDropdown by rememberSaveable { mutableStateOf(false) } // done
 
     var amountMoney by remember { mutableStateOf(Money(value = 0.0)) }
     var amountUserInputText by rememberSaveable { mutableStateOf("") }
@@ -132,7 +132,7 @@ fun AddTransactionItem(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(spacing.default))
+            Spacer(modifier = Modifier.height(spacing.m))
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -167,9 +167,7 @@ fun AddTransactionItem(
             value = amountUserInputText,
             onValueChange = { userInput ->
                 amountUserInputText = userInput.replace(oldChar = ',', newChar = '.')
-                amountMoney = Money(
-                    value = amountUserInputText.toDoubleOrNull() ?: amountMoney.value
-                )
+                amountMoney = Money(value = amountUserInputText.toDoubleOrNull() ?: amountMoney.asDouble())
             },
             label = { Text(stringResource(R.string.amount)) },
             modifier = Modifier

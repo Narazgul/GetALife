@@ -2,6 +2,7 @@ package app.tinygiants.getalife.domain.usecase.account
 
 import app.cash.turbine.test
 import app.tinygiants.getalife.TestDispatcherExtension
+import app.tinygiants.getalife.data.local.datagenerator.accountEntities
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
 import assertk.assertThat
@@ -36,14 +37,14 @@ class GetAccountsUseCaseTest {
 
     @Test
     fun `Test getting accounts`(): Unit = runTest {
-        accountRepositoryFake.accountsFlow.value = accounts
+        accountRepositoryFake.accounts.value = accounts
 
         getAccounts().test {
             val receivedAccounts = awaitItem().getOrNull()
             assertThat(receivedAccounts).isNotNull()
             assertThat(receivedAccounts!!).hasSize(8)
-            assertThat(receivedAccounts.first().name).isEqualTo(accounts.first().name)
-            assertThat(receivedAccounts.last().name).isEqualTo(accounts.last().name)
+            assertThat(receivedAccounts.first().name).isEqualTo(accountEntities.first().name)
+            assertThat(receivedAccounts.last().name).isEqualTo(accountEntities.last().name)
         }
     }
 }

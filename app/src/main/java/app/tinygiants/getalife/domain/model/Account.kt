@@ -13,3 +13,5 @@ data class Account(
     val updatedAt: Instant,
     val createdAt: Instant
 )
+
+enum class AccountType { Unknown, Cash, Checking, Savings, CreditCard, Mortgage, Loan, Depot  }

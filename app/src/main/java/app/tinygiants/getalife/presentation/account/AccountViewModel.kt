@@ -9,7 +9,7 @@ import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
-import app.tinygiants.getalife.domain.usecase.categories.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,10 +58,7 @@ class AccountViewModel @Inject constructor(
             launch {
                 getCategories()
                     .catch { throwable -> displayErrorState(throwable) }
-                    .collect { result ->
-                        result.onSuccess { categories -> displayCategories(categories) }
-                        result.onFailure { throwable -> displayErrorState(throwable) }
-                    }
+                    .collect { categories -> displayCategories(categories) }
             }
         }
     }
@@ -117,7 +114,7 @@ class AccountViewModel @Inject constructor(
                 errorMessage = ErrorMessage(
                     title = UiText.StringResource(R.string.error_title),
                     subtitle = if (exception?.message != null) UiText.DynamicString(exception.message ?: "")
-                        else UiText.StringResource(R.string.error_subtitle)
+                    else UiText.StringResource(R.string.error_subtitle)
                 )
             )
         }
