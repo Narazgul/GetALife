@@ -21,12 +21,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.GetALifeNavHost
-import app.tinygiants.getalife.Screens
+import app.tinygiants.getalife.NestedNavGraph
+import app.tinygiants.getalife.navigateToGraph
 import app.tinygiants.getalife.theme.GetALifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,18 +40,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GetALifeTheme {
-                val navController = rememberNavController()
+                val bottomBarNavController = rememberNavController()
 
                 Scaffold(
-                    bottomBar = { BottomNavigation(navController = navController) }
+                    bottomBar = { BottomNavigation(bottomBarNavController = bottomBarNavController) }
                 ) { innerPadding ->
 
                     val bottomPadding = innerPadding.calculateBottomPadding()
-
                     GetALifeNavHost(
-                        navController = navController,
-                        modifier = Modifier.padding(PaddingValues(bottom = bottomPadding))
-                    )
+                        bottomBarNavController = bottomBarNavController,
+                        modifier = Modifier.padding(PaddingValues(bottom = bottomPadding)))
                 }
             }
         }
@@ -59,39 +57,33 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BottomNavigation(navController: NavHostController) {
+fun BottomNavigation(bottomBarNavController: NavHostController) {
     NavigationBar {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val navBackStackEntry by bottomBarNavController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
-        bottomNavigationItems.forEach { screen ->
+        bottomNavigationItems.forEach { nestedGraph ->
             NavigationBarItem(
                 icon = {
                     Icon(
-                        painter = painterResource(id = screen.iconId),
-                        contentDescription = "${screen.label} Icon"
+                        painter = painterResource(id = nestedGraph.iconId),
+                        contentDescription = "${nestedGraph.label}"
                     )
                 },
                 label = {
                     Text(
-                        text = stringResource(id = screen.label),
+                        text = stringResource(id = nestedGraph.label),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 },
-                selected = currentDestination?.hierarchy?.any { navDestination -> navDestination.route == screen.route } == true,
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                selected = currentDestination?.hierarchy?.any { navDestination -> navDestination.route == nestedGraph.route } == true,
+                onClick = { navigateToGraph(bottomBarNavController = bottomBarNavController, graph = nestedGraph) }
             )
         }
     }
 }
 
 val bottomNavigationItems = listOf(
-    Screens.Budget,
-    Screens.AddTransaction,
-    Screens.Account
+    NestedNavGraph.BudgetNavGraph,
+    NestedNavGraph.AddTransactionGraph,
+    NestedNavGraph.AccountNavGraph
 )
