@@ -5,6 +5,9 @@
     <string name="overspent_category">Take care of %1$s overspent %2$s: %3$s</string>
     <string name="error_title">An error occurred</string>
     <string name="error_subtitle">It\'s terrible. Safe yourself</string>
+    <string name="error_transactions_in_category">Remove transactions of category first</string>
+    <string name="error_transactions_in_account">Remove transactions of account first</string>
+    <string name="error_categories_in_group">Remove categories of group first</string>
     <string name="enter_group_name">Enter group name</string>
     <string name="no_name_entered">No name entered</string>
     <string name="save">Save</string>

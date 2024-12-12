@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.budget.composables
+package app.tinygiants.getalife.presentation.budget.composables.group
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

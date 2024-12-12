@@ -17,36 +17,36 @@ class TransactionRepositoryImpl @Inject constructor(
 
     override fun getTransactionsFlow() = transactionDao.getAllTransactions()
         .map { transactionEntities ->
-            transactionEntities.map { transactionEntity ->
-                val account = accountRepository.getAccount(transactionEntity.accountId)
-                val category = transactionEntity.categoryId?.let { categoryRepository.getCategory(it) }
+            transactionEntities.mapNotNull { transactionEntity ->
+                val account = accountRepository.getAccount(transactionEntity.accountId) ?: return@mapNotNull null
+                val category = transactionEntity.categoryId?.let { categoryId -> categoryRepository.getCategory(categoryId) }
                 transactionEntity.toDomain(account = account, category = category)
             }
         }
 
     override fun getTransactionsByAccountFlow(accountId: Long) = transactionDao.getAccountTransactionsFlow(accountId)
         .map { transactionEntities ->
-            val account = accountRepository.getAccount(accountId)
-            transactionEntities.map { entity ->
-                val category = entity.categoryId?.let { categoryRepository.getCategory(it) }
-                entity.toDomain(account = account, category = category)
+            transactionEntities.mapNotNull { transactionEntity ->
+                val account = accountRepository.getAccount(accountId) ?: return@mapNotNull null
+                val category = transactionEntity.categoryId?.let { categoryId -> categoryRepository.getCategory(categoryId) }
+                transactionEntity.toDomain(account = account, category = category)
             }
         }
 
     override fun getTransactionsByCategoryFlow(categoryId: Long) = transactionDao.getCategoryTransactionsFlow(categoryId)
         .map { transactionEntities ->
-            val category = categoryRepository.getCategory(categoryId)
-            transactionEntities.map { entity ->
-                val account = accountRepository.getAccount(entity.accountId)
-                entity.toDomain(account = account, category = category)
+            transactionEntities.mapNotNull { transactionEntity ->
+                val account = accountRepository.getAccount(transactionEntity.accountId) ?: return@mapNotNull null
+                val category = categoryRepository.getCategory(categoryId)
+                transactionEntity.toDomain(account = account, category = category)
             }
         }
 
-    override suspend fun getTransaction(transactionId: Long): Transaction {
-        val entity = transactionDao.getTransaction(transactionId)
-        val account = accountRepository.getAccount(entity.accountId)
-        val category = entity.categoryId?.let { categoryRepository.getCategory(it) }
-        return entity.toDomain(account = account, category = category)
+    override suspend fun getTransaction(transactionId: Long): Transaction? {
+        val transactionEntity = transactionDao.getTransaction(transactionId)
+        val account = accountRepository.getAccount(transactionEntity.accountId) ?: return null
+        val category = transactionEntity.categoryId?.let { categoryRepository.getCategory(it) }
+        return transactionEntity.toDomain(account = account, category = category)
     }
 
     override suspend fun addTransaction(transaction: Transaction) =

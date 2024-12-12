@@ -21,11 +21,15 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,7 +49,7 @@ import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.UiText.DynamicString
 import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
-import app.tinygiants.getalife.presentation.budget.composables.AddGroupBottomSheet
+import app.tinygiants.getalife.presentation.budget.composables.group.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
@@ -62,19 +66,30 @@ fun BudgetScreen() {
 
     BudgetScreen(
         uiState = uiState,
-        onUserClickEvent = viewModel::onUserClickEvent
+        onUserClickEvent = viewModel::onUserClickEvent,
+        onUserMessageShown = viewModel::onUserMessageShown
     )
 }
 
 @Composable
 fun BudgetScreen(
     uiState: BudgetUiState,
-    onUserClickEvent: (UserClickEvent) -> Unit = { }
+    onUserClickEvent: (UserClickEvent) -> Unit = { },
+    onUserMessageShown: () -> Unit = { }
 ) {
     val focusManager = LocalFocusManager.current
 
     var isAddGroupFabVisible by rememberSaveable { mutableStateOf(true) }
     var isAddGroupBottomSheetVisible by rememberSaveable { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    uiState.userMessage?.let { userMessage ->
+        val userMessageString = userMessage.asString()
+        LaunchedEffect(userMessage) {
+            snackbarHostState.showSnackbar(userMessageString)
+            onUserMessageShown()
+        }
+    }
 
     Column {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
@@ -92,7 +107,9 @@ fun BudgetScreen(
                         text = { Text(text = stringResource(id = R.string.add_group)) }
                     )
                 }
-            }) { innerPadding ->
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) { innerPadding ->
             Box(
                 modifier = Modifier
                     .consumeWindowInsets(innerPadding)
@@ -165,6 +182,7 @@ class BudgetScreenPreviewProvider : PreviewParameterProvider<BudgetUiState> {
                 bannerState = AssignableMoneyAvailable(text = DynamicString("Distribute available money to categories: 100,-€")),
                 groups = fakeCategories(),
                 isLoading = false,
+                userMessage = null,
                 errorMessage = null
             )
         )

@@ -4,7 +4,6 @@ import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.CategoryRepository
-import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -13,7 +12,6 @@ import javax.inject.Inject
 
 class UpdateCategoryUseCase @Inject constructor(
     private val categoryRepository: CategoryRepository,
-    private val transactionRepository: TransactionRepository,
     private val addEmoji: AddEmojiToCategoryNameUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
@@ -35,7 +33,8 @@ class UpdateCategoryUseCase @Inject constructor(
 
     private suspend fun calculateUpdatedAvailableMoney(updatedCategory: Category): Money {
 
-        val categoryBeforeUpdate = categoryRepository.getCategory(categoryId = updatedCategory.id)
+        val categoryBeforeUpdate =
+            categoryRepository.getCategory(categoryId = updatedCategory.id) ?: return updatedCategory.availableMoney
 
         return withContext(defaultDispatcher) {
             val assignedMoneyBeforeUpdate = categoryBeforeUpdate.assignedMoney

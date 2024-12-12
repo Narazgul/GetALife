@@ -14,20 +14,16 @@ class CategoryRepositoryFake : CategoryRepository {
     override suspend fun getCategoriesInGroup(groupId: Long) =
         categories.value.filter { it.groupId == groupId }
 
-    override suspend fun getCategory(categoryId: Long): Category =
-        categories.value.find { it.id == categoryId } ?:
-        throw NoSuchElementException("Category with categoryId: $categoryId not found")
+    override suspend fun getCategory(categoryId: Long) =
+        categories.value.find { it.id == categoryId }
 
     override suspend fun addCategory(category: Category) =
         categories.update { it + category }
 
-    override suspend fun updateCategory(category: Category?) {
-        if (category == null) return
-
+    override suspend fun updateCategory(category: Category) =
         categories.update { current ->
             current.map { if (it.id == category.id) category else it }
         }
-    }
 
     override suspend fun deleteCategory(category: Category) =
         categories.update { it.filterNot { entity -> entity.id == category.id } }

@@ -13,20 +13,18 @@ class CategoryRepositoryImpl @Inject constructor(
 ) : CategoryRepository {
 
     override fun getCategoriesFlow(): Flow<List<Category>> =
-        categoryDao.getCategoriesFlow()
-            .map { entities -> entities.map { it.toDomain() } }
+        categoryDao.getCategoriesFlow().map { entities -> entities.map { entity -> entity.toDomain() } }
 
     override suspend fun getCategoriesInGroup(groupId: Long): List<Category> =
-        categoryDao.getCategoriesInGroup(groupId = groupId).map { it.toDomain() }
+        categoryDao.getCategoriesInGroup(groupId = groupId).map {  entity -> entity.toDomain() }
 
-    override suspend fun getCategory(categoryId: Long): Category =
-        categoryDao.getCategory(categoryId = categoryId).toDomain()
+    override suspend fun getCategory(categoryId: Long): Category? =
+        categoryDao.getCategory(categoryId = categoryId)?.toDomain()
 
     override suspend fun addCategory(category: Category) =
         categoryDao.addCategory(CategoryEntity.fromDomain(category))
 
-    override suspend fun updateCategory(category: Category?) {
-        if (category == null) return
+    override suspend fun updateCategory(category: Category) {
         categoryDao.updateCategory(CategoryEntity.fromDomain(category))
     }
 

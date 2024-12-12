@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.presentation.UiText
-import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Immutable
@@ -44,7 +44,7 @@ fun ErrorMessage(
     }
 }
 
-@ComponentPreview
+@PreviewLightDark
 @Composable
 fun ErrorMessagePreview() {
     GetALifeTheme {

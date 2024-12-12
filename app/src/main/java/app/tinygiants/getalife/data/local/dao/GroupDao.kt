@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GroupDao {
 
-    @Query("SELECT * FROM headers")
+    @Query("SELECT * FROM groups")
     fun getGroupsFlow(): Flow<List<GroupEntity>>
 
     @Insert

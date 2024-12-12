@@ -6,11 +6,13 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
+import app.tinygiants.getalife.domain.usecase.account.DeleteAccountStatus.AccountHasTransactionsException
 import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.presentation.UiText
+import app.tinygiants.getalife.presentation.UiText.StringResource
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -36,6 +38,7 @@ class AccountViewModel @Inject constructor(
             accounts = emptyList(),
             categories = emptyList(),
             isLoading = true,
+            userMessage = null,
             errorMessage = null
         )
     )
@@ -51,15 +54,24 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 getAccounts()
-                    .catch { throwable -> displayErrorState(throwable) }
+                    .catch { throwable ->
+                        Firebase.crashlytics.recordException(throwable)
+                        displayErrorState(throwable)
+                    }
                     .collect { result ->
                         result.onSuccess { accounts -> displayAccounts(accounts) }
-                        result.onFailure { throwable -> displayErrorState(throwable) }
+                        result.onFailure { throwable ->
+                            Firebase.crashlytics.recordException(throwable)
+                            displayErrorState(throwable)
+                        }
                     }
             }
             launch {
                 getCategories()
-                    .catch { throwable -> displayErrorState(throwable) }
+                    .catch { throwable ->
+                        Firebase.crashlytics.recordException(throwable)
+                        displayErrorState(throwable)
+                    }
                     .collect { categories -> displayCategories(categories) }
             }
         }
@@ -67,7 +79,7 @@ class AccountViewModel @Inject constructor(
 
     // endregion
 
-    // region User interaction
+    // region Interaction from UI
 
     fun onUserClickEvent(clickEvent: UserClickEvent) {
         viewModelScope.launch {
@@ -83,8 +95,14 @@ class AccountViewModel @Inject constructor(
 
                 is UserClickEvent.UpdateAccount -> updateAccount(account = clickEvent.account)
                 is UserClickEvent.DeleteAccount -> deleteAccount(account = clickEvent.account)
+                    .onFailure { throwable -> displayUserMessage(throwable)
+                }
             }
         }
+    }
+
+    fun onUserMessageShown() = _uiState.update { accountUiState ->
+        accountUiState.copy(userMessage = null)
     }
 
     // endregion
@@ -107,18 +125,25 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    private fun displayErrorState(throwable: Throwable?) {
-        if (throwable != null) Firebase.crashlytics.recordException(throwable)
+    private fun displayUserMessage(throwable: Throwable) {
+        when (throwable) {
+            is AccountHasTransactionsException -> _uiState.update { accountUiState ->
+                accountUiState.copy(userMessage = StringResource(R.string.error_transactions_in_account))
+            }
+        }
+    }
 
+    private fun displayErrorState(throwable: Throwable?) {
         _uiState.update {
             AccountUiState(
                 accounts = emptyList(),
                 categories = emptyList(),
                 isLoading = false,
+                userMessage = null,
                 errorMessage = ErrorMessage(
-                    title = UiText.StringResource(R.string.error_title),
+                    title = StringResource(R.string.error_title),
                     subtitle = if (throwable?.message != null) UiText.DynamicString(throwable.message ?: "")
-                    else UiText.StringResource(R.string.error_subtitle)
+                    else StringResource(R.string.error_subtitle)
                 )
             )
         }

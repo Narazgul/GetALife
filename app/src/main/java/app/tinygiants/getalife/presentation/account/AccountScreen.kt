@@ -18,9 +18,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +55,8 @@ fun AccountScreen(onNavigateToTransactionScreen: (accountId: Long) -> Unit) {
     AccountScreen(
         uiState = uiState,
         onNavigateToTransactionScreen = onNavigateToTransactionScreen,
-        onUserClickEvent = viewModel::onUserClickEvent
+        onUserClickEvent = viewModel::onUserClickEvent,
+        onUserMessageShown = viewModel::onUserMessageShown
     )
 }
 
@@ -60,7 +64,8 @@ fun AccountScreen(onNavigateToTransactionScreen: (accountId: Long) -> Unit) {
 fun AccountScreen(
     uiState: AccountUiState,
     onNavigateToTransactionScreen: (accountId: Long) -> Unit = { },
-    onUserClickEvent: (UserClickEvent) -> Unit = { }
+    onUserClickEvent: (UserClickEvent) -> Unit = { },
+    onUserMessageShown: () -> Unit = { }
 ) {
 
     var areFabButtonsVisible by rememberSaveable { mutableStateOf(true) }
@@ -68,6 +73,15 @@ fun AccountScreen(
 
     val startingBalanceString = stringResource(R.string.starting_balance)
     val startingBalanceDescription = stringResource(R.string.starting_balance_description)
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    uiState.userMessage?.let { userMessage ->
+        val userMessageString = userMessage.asString()
+        LaunchedEffect(userMessage) {
+            snackbarHostState.showSnackbar(userMessageString)
+            onUserMessageShown()
+        }
+    }
 
     val onAddAccountClicked = { accountName: String, startingBalance: Money, type: AccountType ->
         onUserClickEvent(
@@ -84,19 +98,22 @@ fun AccountScreen(
     Column {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
 
-        Scaffold(floatingActionButton = {
-            AnimatedVisibility(
-                visible = areFabButtonsVisible,
-                enter = fadeIn(tween(500)),
-                exit = fadeOut(tween(500))
-            ) {
-                ExtendedFloatingActionButton(
-                    onClick = { isAddAccountBottomSheetVisible = true },
-                    icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
-                    text = { Text(text = stringResource(id = R.string.add_account)) }
-                )
-            }
-        }) { innerPadding ->
+        Scaffold(
+            floatingActionButton = {
+                AnimatedVisibility(
+                    visible = areFabButtonsVisible,
+                    enter = fadeIn(tween(500)),
+                    exit = fadeOut(tween(500))
+                ) {
+                    ExtendedFloatingActionButton(
+                        onClick = { isAddAccountBottomSheetVisible = true },
+                        icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
+                        text = { Text(text = stringResource(id = R.string.add_account)) }
+                    )
+                }
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+            ) { innerPadding ->
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
 
             Box(
@@ -147,6 +164,7 @@ fun AccountScreenPreview() {
                     accounts = accounts(),
                     categories = emptyList(),
                     isLoading = false,
+                    userMessage = null,
                     errorMessage = null
                 )
             )

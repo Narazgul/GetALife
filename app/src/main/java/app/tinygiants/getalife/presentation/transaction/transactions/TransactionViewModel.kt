@@ -60,19 +60,31 @@ class TransactionViewModel @Inject constructor(
 
             launch {
                 getTransactionsForAccount(accountId = accountId)
-                    .catch { throwable -> displayErrorState(throwable) }
+                    .catch { throwable ->
+                        Firebase.crashlytics.recordException(throwable)
+                        displayErrorState(throwable)
+                    }
                     .collect { result ->
                         result.onSuccess { transactions -> displayTransactions(transactions) }
-                        result.onFailure { throwable -> displayErrorState(throwable) }
+                        result.onFailure { throwable ->
+                            Firebase.crashlytics.recordException(throwable)
+                            displayErrorState(throwable)
+                        }
                     }
             }
 
             launch {
                 getAccounts()
-                    .catch { throwable -> displayErrorState(throwable) }
+                    .catch { throwable ->
+                        Firebase.crashlytics.recordException(throwable)
+                        displayErrorState(throwable)
+                    }
                     .collect { result ->
                         result.onSuccess { accounts -> listAvailableAccounts(accounts = accounts) }
-                        result.onFailure { throwable -> displayErrorState(throwable) }
+                        result.onFailure { throwable ->
+                            Firebase.crashlytics.recordException(throwable)
+                            displayErrorState(throwable)
+                        }
                     }
             }
 
@@ -106,7 +118,10 @@ class TransactionViewModel @Inject constructor(
 
     // region Private Helper functions
 
-    private fun displayAccountName(account: Account) = _uiState.update { uiState -> uiState.copy(title = account.name) }
+    private fun displayAccountName(account: Account?) =
+        _uiState.update { uiState ->
+            uiState.copy(title = account?.name ?: "")
+        }
 
     private fun displayTransactions(transactions: List<Transaction>) {
         _uiState.update { uiState ->
@@ -125,8 +140,6 @@ class TransactionViewModel @Inject constructor(
         _uiState.update { uiState -> uiState.copy(categories = categories) }
 
     private fun displayErrorState(throwable: Throwable?) {
-        if (throwable != null) Firebase.crashlytics.recordException(throwable)
-
         _uiState.update { transactionUiState ->
             transactionUiState.copy(
                 isLoading = false,

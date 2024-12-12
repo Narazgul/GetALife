@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Group
 
-@Entity(tableName = "headers")
+@Entity(tableName = "groups")
 data class GroupEntity(
     @PrimaryKey
     val id: Long,

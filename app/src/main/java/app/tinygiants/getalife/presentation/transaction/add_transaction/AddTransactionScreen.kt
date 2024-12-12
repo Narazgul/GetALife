@@ -84,9 +84,7 @@ fun AddTransaction(
     var waveColor by remember { mutableIntStateOf(neutralBackground) }
 
     val transactionSavedString = stringResource(id = R.string.transaction_saved)
-    val showTransactionAddedSnackbar = {
-        scope.launch { snackbarHostState.showSnackbar(transactionSavedString) }
-    }
+    val showTransactionAddedSnackbar = { scope.launch { snackbarHostState.showSnackbar(transactionSavedString) } }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -115,7 +113,6 @@ fun AddTransaction(
                     }
                 },
                 onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner ->
-
                     onAddTransactionClicked(amount, account, category, direction, description, transactionPartner)
                     showTransactionAddedSnackbar()
                 },

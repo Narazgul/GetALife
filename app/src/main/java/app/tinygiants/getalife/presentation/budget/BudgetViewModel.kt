@@ -8,12 +8,15 @@ import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.UserHint
+import app.tinygiants.getalife.domain.usecase.budget.AssignableMoneyException
 import app.tinygiants.getalife.domain.usecase.budget.GetAssignableMoneyUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetBudgetUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.AddCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryStatus.CategoryHasTransactionsException
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.UpdateCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.AddGroupUseCase
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupStatus.GroupHasCategoriesException
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.UpdateGroupUseCase
 import app.tinygiants.getalife.presentation.UiText
@@ -57,6 +60,7 @@ class BudgetViewModel @Inject constructor(
             bannerState = AllAssigned(text = DynamicString("")),
             groups = emptyMap(),
             isLoading = true,
+            userMessage = null,
             errorMessage = null
         )
     )
@@ -73,30 +77,41 @@ class BudgetViewModel @Inject constructor(
 
             launch {
                 getBudget()
-                    .catch { throwable -> displayErrorState(throwable) }
+                    .catch { throwable ->
+                        Firebase.crashlytics.recordException(throwable)
+                        displayErrorState(throwable)
+                    }
                     .collect { result ->
                         result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
-                        result.onFailure { throwable -> displayErrorState(throwable) }
+                        result.onFailure { throwable ->
+                            Firebase.crashlytics.recordException(throwable)
+                            displayErrorState(throwable)
+                        }
                     }
             }
 
             launch {
                 getAssignableMoney()
-                    .catch { throwable -> displayAssignableMoneyErrorState(throwable) }
+                    .catch { throwable ->
+                        Firebase.crashlytics.recordException(throwable)
+                        displayErrorState(throwable as AssignableMoneyException)
+                    }
                     .collect { result ->
                         result.onSuccess { (assignableMoney, overspentCategoryText) ->
                             displayAssignableMoney(assignableMoney, overspentCategoryText)
                         }
-                        result.onFailure { throwable -> displayAssignableMoneyErrorState(throwable) }
+                        result.onFailure { throwable ->
+                            Firebase.crashlytics.recordException(throwable)
+                            displayErrorState(throwable)
+                        }
                     }
             }
-
         }
     }
 
     // endregion
 
-    // region User interaction
+    // region Interaction from UI
 
     fun onUserClickEvent(clickEvent: UserClickEvent) {
         viewModelScope.launch {
@@ -105,12 +120,18 @@ class BudgetViewModel @Inject constructor(
                 is AddGroup -> addGroup(groupName = clickEvent.name)
                 is UpdateGroup -> updateGroup(group = clickEvent.group)
                 is DeleteGroup -> deleteGroup(group = clickEvent.group)
+                    .onFailure { throwable -> displayUserMessage(throwable) }
 
                 is AddCategory -> addCategory(groupId = clickEvent.groupId, categoryName = clickEvent.categoryName)
                 is UpdateCategory -> updateCategory(updatedCategory = clickEvent.category)
                 is DeleteCategory -> deleteCategory(category = clickEvent.category)
+                    .onFailure { throwable -> displayUserMessage(throwable) }
             }
         }
+    }
+
+    fun onUserMessageShown() = _uiState.update { budgetUiState ->
+        budgetUiState.copy(userMessage = null)
     }
 
     // endregion
@@ -135,6 +156,45 @@ class BudgetViewModel @Inject constructor(
                     overspentCategoryText = overspentCategory
                 )
             )
+        }
+    }
+
+    private fun displayUserMessage(throwable: Throwable) {
+
+        val userMessage = when (throwable) {
+            is CategoryHasTransactionsException -> StringResource(R.string.error_transactions_in_category)
+            is GroupHasCategoriesException -> StringResource(R.string.error_categories_in_group)
+            else -> DynamicString(value = "")
+        }
+
+        _uiState.update { budgetUiState ->
+            budgetUiState.copy(userMessage = userMessage)
+        }
+    }
+
+    private fun displayErrorState(throwable: Throwable) {
+
+        val errorMessage = ErrorMessage(
+            title = StringResource(resId = R.string.error_title),
+            subtitle = if (throwable.message != null) DynamicString(value = throwable.message ?: "")
+            else StringResource(resId = R.string.error_subtitle)
+        )
+
+        when (throwable) {
+
+            is AssignableMoneyException -> _uiState.update { budgetUiState ->
+                budgetUiState.copy(
+                    bannerState = AllAssigned(text = DynamicString("")),
+                    errorMessage = errorMessage
+                )
+            }
+
+            else -> _uiState.update { budgetUiState ->
+                budgetUiState.copy(
+                    isLoading = false,
+                    errorMessage = errorMessage
+                )
+            }
         }
     }
 
@@ -173,40 +233,6 @@ class BudgetViewModel @Inject constructor(
                     resId = R.string.more_distributed_than_available,
                     assignableMoney.formattedPositiveMoney
                 )
-            )
-        }
-    }
-
-    private fun displayErrorState(throwable: Throwable?) {
-        if (throwable != null) Firebase.crashlytics.recordException(throwable)
-
-        _uiState.update { budgetUiState ->
-            budgetUiState.copy(
-                isLoading = false,
-                errorMessage = ErrorMessage(
-                    title = StringResource(resId = R.string.error_title),
-                    subtitle = if (throwable?.message != null) DynamicString(value = throwable.message!!)
-                    else StringResource(R.string.error_subtitle)
-                )
-            )
-        }
-    }
-
-    private fun displayAssignableMoneyErrorState(throwable: Throwable) {
-        Firebase.crashlytics.recordException(throwable)
-
-        _uiState.update { budgetUiState ->
-            val errorMessage = when (throwable) {
-                is NoSuchElementException -> null
-                else -> ErrorMessage(
-                    title = StringResource(resId = R.string.error_title),
-                    subtitle = StringResource(R.string.error_subtitle)
-                )
-            }
-
-            budgetUiState.copy(
-                bannerState = AllAssigned(text = DynamicString("")),
-                errorMessage = errorMessage
             )
         }
     }

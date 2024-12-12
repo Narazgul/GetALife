@@ -4,12 +4,14 @@ import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 
 data class AccountUiState(
     val accounts: List<Account>,
     val categories: List<Category>,
     val isLoading: Boolean,
+    val userMessage: UiText?,
     val errorMessage: ErrorMessage?
 )
 

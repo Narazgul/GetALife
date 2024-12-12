@@ -23,6 +23,8 @@ typealias AssignableMoney = Money
 typealias OverspentCategoryText = StringResource?
 typealias AssignableMoneyBanner = Pair<AssignableMoney, OverspentCategoryText>
 
+data class AssignableMoneyException(override val message: String): Exception(message)
+
 class GetAssignableMoneyUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val categoriesRepository: CategoryRepository,
@@ -40,7 +42,9 @@ class GetAssignableMoneyUseCase @Inject constructor(
         transactionFlow.combine(categoriesFlow) { transactions, categories ->
             getAssignableBanner(transactions = transactions, categories = categories)
         }
-            .catch { throwable -> emit(Result.failure(throwable)) }
+            .catch { throwable ->
+                emit(Result.failure(AssignableMoneyException(message = throwable.message ?: "")))
+            }
             .collect { assignableMoneyBanner -> emit(assignableMoneyBanner) }
     }
 

@@ -29,6 +29,7 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.budget.composables.category.Category
 import app.tinygiants.getalife.presentation.budget.composables.category.EmptyCategoryItem
+import app.tinygiants.getalife.presentation.budget.composables.group.Group
 import app.tinygiants.getalife.presentation.budget.fakeCategories
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.isScrollingDown
@@ -104,7 +105,7 @@ private fun LazyListScope.stickyGroups(
 
     stickyHeader(key = group.id) {
         Group(
-            name = group.name,
+            groupName = group.name,
             sumOfAvailableMoney = group.sumOfAvailableMoney,
             isExpanded = group.isExpanded,
             onGroupClicked = onGroupClicked,

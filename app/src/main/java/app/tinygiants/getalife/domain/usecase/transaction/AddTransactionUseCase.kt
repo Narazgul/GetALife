@@ -31,7 +31,7 @@ class AddTransactionUseCase @Inject constructor(
         transactionPartner: String,
         description: String
     ) {
-        val account = accountRepository.getAccount(accountId)
+        val account = accountRepository.getAccount(accountId) ?: return
         if (direction == TransactionDirection.Unknown) return
 
         withContext(defaultDispatcher) {

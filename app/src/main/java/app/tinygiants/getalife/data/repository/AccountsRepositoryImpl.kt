@@ -14,8 +14,8 @@ class AccountsRepositoryImpl @Inject constructor(private val accountDao: Account
         accountEntities.map { accountEntity -> accountEntity.toDomain() }
     }
 
-    override suspend fun getAccount(accountId: Long): Account =
-        accountDao.getAccount(accountId = accountId).toDomain()
+    override suspend fun getAccount(accountId: Long): Account? =
+        accountDao.getAccount(accountId = accountId)?.toDomain()
 
     override suspend fun addAccount(account: Account) =
         accountDao.addAccount(accountEntity = AccountEntity.fromDomain(account))

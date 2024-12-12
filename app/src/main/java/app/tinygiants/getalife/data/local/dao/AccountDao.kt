@@ -17,7 +17,7 @@ interface AccountDao {
     fun getAccountsFlow(): Flow<List<AccountEntity>>
 
     @Query("SELECT * FROM accounts WHERE id == :accountId")
-    suspend fun getAccount(accountId: Long): AccountEntity
+    suspend fun getAccount(accountId: Long): AccountEntity?
 
     @Insert
     suspend fun addAccount(accountEntity: AccountEntity)

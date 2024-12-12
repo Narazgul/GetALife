@@ -47,7 +47,6 @@ class UpdateCategoryUseCaseTest {
 
         updateCategory = UpdateCategoryUseCase(
             categoryRepository = categoryRepositoryFake,
-            transactionRepository = transactionRepositoryFake,
             addEmoji = addEmoji,
             defaultDispatcher = testDispatcherExtension.testDispatcher,
         )

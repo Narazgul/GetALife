@@ -89,7 +89,10 @@ fun EditCategoryBottomSheet(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = onDeleteCategoryClicked,
+                    onClick = {
+                        onDeleteCategoryClicked()
+                        onDismissRequest()
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text(

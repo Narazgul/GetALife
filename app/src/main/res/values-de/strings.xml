@@ -6,6 +6,9 @@
     <string name="overspent_category">Kümmere dich um %1$s überzogene %2$s: %3$ss</string>
     <string name="error_title">Zefix</string>
     <string name="error_subtitle">Ein fürchterlicher Fehler ist aufgetreten.</string>
+    <string name="error_transactions_in_category">Entferne zunächst die Transaktionen dieser Kategorie</string>
+    <string name="error_transactions_in_account">Entferne zunächst die Transaktionen dieses Accounts</string>
+    <string name="error_categories_in_group">Entferne zunächst die Kategorien dieser Gruppe</string>
     <string name="enter_group_name">Gruppenname eingeben</string>
     <string name="no_name_entered">kein Name eingegeben</string>
     <string name="save">Speichern</string>

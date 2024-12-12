@@ -11,6 +11,7 @@ data class BudgetUiState(
     val bannerState: BannerUiState,
     val groups: Map<Group, List<Category>>,
     val isLoading: Boolean,
+    val userMessage: UiText?,
     val errorMessage: ErrorMessage?
 )
 

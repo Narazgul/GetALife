@@ -102,7 +102,10 @@ fun EditAccountBottomSheet(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = { onDeleteAccountClicked() },
+                        onClick = {
+                            onDeleteAccountClicked()
+                            onDismissRequest()
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text(

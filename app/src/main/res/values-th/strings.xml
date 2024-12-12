@@ -6,6 +6,9 @@
     <string name="overspent_category">ดูแล%1$ssใช้จ่ายเกิน%2$sรายการ: %3$s</string>
     <string name="error_title">เกิดข้อผิดพลาด</string>
     <string name="error_subtitle">มันน่ากลัว. ดูแลตัวเอง</string>
+    <string name="error_transactions_in_category">ขั้นแรกให้ลบธุรกรรมในหมวดหมู่นี้ออก</string>
+    <string name="error_transactions_in_account">ขั้นแรก ลบธุรกรรมออกจากบัญชีนี้</string>
+    <string name="error_categories_in_group">ขั้นแรก ให้ลบหมวดหมู่ออกจากกลุ่มนี้</string>
     <string name="enter_group_name">ป้อนชื่อกลุ่ม</string>
     <string name="no_name_entered">ไม่มีชื่อป้อน</string>
     <string name="save">บันทึก</string>
