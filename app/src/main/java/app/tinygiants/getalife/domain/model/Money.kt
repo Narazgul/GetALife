@@ -28,7 +28,7 @@ data class Money(
     fun asBigDecimal(): BigDecimal = value
     fun asDouble(): Double = value.toDouble()
     fun positiveMoney(): Money = Money(value.abs(), locale)
-    fun negativeMoney(): Money = Money(value.negate(), locale)
+    fun negativeMoney(): Money = Money(-value.abs(), locale)
     fun toFloat(): Float = value.toFloat()
 
     operator fun compareTo(other: Money): Int {
