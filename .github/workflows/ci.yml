@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Run Fastlane internal release
-        run: exec bundle tests
+      - name: Run JUnit tests
+        run: bundle exec fastlane tests
