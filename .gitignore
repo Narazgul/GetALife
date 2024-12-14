@@ -71,7 +71,7 @@ captures/
 
 # Google Services (e.g. APIs or Firebase)
 /app/google-services.json
-/firebase/googleServiceCredentials.json
+/google/googleServiceCredentials.json
 
 # Freeline
 freeline.py
