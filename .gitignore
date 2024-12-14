@@ -97,4 +97,4 @@ lint/tmp/
 
 # kotlin compiler sessions
 .kotlin/sessions
-/fastlane/getalife-1-f98bf5180e2d.json
+/fastlane/google_credentials.json
