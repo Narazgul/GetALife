@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      # Hier musst du deinen Service Account Key ins CI bringen.
+      # Entweder du hinterlegst ihn als Base64-encoded Secret und dekodierst ihn hier
+      # oder nutzt das "Encrypted Secret" Feature von GitHub Actions.
+      - name: Set up Play Store credentials
+        run: echo "${{ secrets.PLAYSTORE_CREDENTIALS_JSON }}" > fastlane/playstore-service-account.json
+
+      - name: Run Fastlane internal release
+        run: fastlane internal_release

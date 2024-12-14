@@ -6,12 +6,14 @@ desc "Deploy a new internal test version to Google Play"
 lane :playstore_internal do
 
     gradle(task: "test")
+
     gradle(
         task: "bundle",
         build_type: "Release"
       )
 
     upload_to_play_store(
-        track: "internal"
+        track: "internal",
+        skip_upload_apk: true
     )
   end
