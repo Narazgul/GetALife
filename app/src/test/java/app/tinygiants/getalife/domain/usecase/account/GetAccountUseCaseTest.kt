@@ -26,9 +26,9 @@ class GetAccountUseCaseTest {
         val account = getAccount(accountId = 1)
 
         val firstAccount = accounts.first()
-        assertThat(account.name).isEqualTo(firstAccount.name)
-        assertThat(account.balance).isEqualTo(firstAccount.balance)
-        assertThat(account.listPosition).isEqualTo(firstAccount.listPosition)
+        assertThat(account?.name).isEqualTo(firstAccount.name)
+        assertThat(account?.balance).isEqualTo(firstAccount.balance)
+        assertThat(account?.listPosition).isEqualTo(firstAccount.listPosition)
     }
 
     @Test
@@ -38,8 +38,8 @@ class GetAccountUseCaseTest {
         val account = getAccount(accountId = 8)
 
         val lastAccount = accounts.last()
-        assertThat(account.name).isEqualTo(lastAccount.name)
-        assertThat(account.balance).isEqualTo(lastAccount.balance)
-        assertThat(account.listPosition).isEqualTo(lastAccount.listPosition)
+        assertThat(account?.name).isEqualTo(lastAccount.name)
+        assertThat(account?.balance).isEqualTo(lastAccount.balance)
+        assertThat(account?.listPosition).isEqualTo(lastAccount.listPosition)
     }
 }

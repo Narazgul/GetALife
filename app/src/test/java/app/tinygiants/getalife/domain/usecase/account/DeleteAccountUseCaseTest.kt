@@ -2,6 +2,8 @@ package app.tinygiants.getalife.domain.usecase.account
 
 import app.tinygiants.getalife.data.local.datagenerator.accounts
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
+import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
@@ -13,11 +15,21 @@ class DeleteAccountUseCaseTest {
 
     private lateinit var deleteAccount: DeleteAccountUseCase
     private lateinit var accountRepositoryFake: AccountRepositoryFake
+    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
+    private lateinit var transactionRepositoryFake: TransactionRepositoryFake
 
     @BeforeEach
     fun setUp() {
         accountRepositoryFake = AccountRepositoryFake()
-        deleteAccount = DeleteAccountUseCase(repository = accountRepositoryFake)
+        categoryRepositoryFake = CategoryRepositoryFake()
+        transactionRepositoryFake = TransactionRepositoryFake(
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
+        deleteAccount = DeleteAccountUseCase(
+            accountRepository = accountRepositoryFake,
+            transactionRepository = transactionRepositoryFake
+        )
     }
 
     @Test

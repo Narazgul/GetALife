@@ -6,7 +6,9 @@ import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
+import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
 import app.tinygiants.getalife.presentation.UiText
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -20,6 +22,8 @@ class DeleteCategoryUseCaseTest {
 
     private lateinit var deleteCategory: DeleteCategoryUseCase
     private lateinit var categoryRepositoryFake: CategoryRepositoryFake
+    private lateinit var accountRepositoryFake: AccountRepositoryFake
+    private lateinit var transactionRepositoryFake: TransactionRepositoryFake
 
     companion object {
         @JvmField
@@ -29,9 +33,17 @@ class DeleteCategoryUseCaseTest {
 
     @BeforeEach
     fun setUp() {
+        accountRepositoryFake = AccountRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
+        transactionRepositoryFake = TransactionRepositoryFake(
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
 
-        deleteCategory = DeleteCategoryUseCase(repository = categoryRepositoryFake)
+        deleteCategory = DeleteCategoryUseCase(
+            categoryRepository = categoryRepositoryFake,
+            transactionRepository = transactionRepositoryFake
+        )
 
         categoryRepositoryFake.categories.value = categories
     }

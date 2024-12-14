@@ -5,7 +5,11 @@ import app.tinygiants.getalife.data.local.datagenerator.dailyLife
 import app.tinygiants.getalife.data.local.datagenerator.fixedCosts
 import app.tinygiants.getalife.data.local.datagenerator.groups
 import app.tinygiants.getalife.data.local.datagenerator.savings
+import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.GroupRepositoryFake
+import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryUseCase
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
@@ -17,7 +21,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 class DeleteGroupUseCaseTest {
 
     private lateinit var deleteGroup: DeleteGroupUseCase
+    private lateinit var deleteCategory: DeleteCategoryUseCase
     private lateinit var groupRepositoryFake: GroupRepositoryFake
+    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
+    private lateinit var accountRepositoryFake: AccountRepositoryFake
+    private lateinit var transactionRepositoryFake: TransactionRepositoryFake
 
     companion object {
         @JvmField
@@ -28,8 +36,22 @@ class DeleteGroupUseCaseTest {
     @BeforeEach
     fun setUp() {
         groupRepositoryFake = GroupRepositoryFake()
+        categoryRepositoryFake = CategoryRepositoryFake()
+        accountRepositoryFake = AccountRepositoryFake()
+        transactionRepositoryFake = TransactionRepositoryFake(
+            accountRepository = accountRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
+        deleteCategory = DeleteCategoryUseCase(
+            categoryRepository = categoryRepositoryFake,
+            transactionRepository = transactionRepositoryFake
+        )
 
-        deleteGroup = DeleteGroupUseCase(repository = groupRepositoryFake)
+        deleteGroup = DeleteGroupUseCase(
+            deleteCategoryUseCase = deleteCategory,
+            groupRepository = groupRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
 
         groupRepositoryFake.groupFlow.value = groups
     }

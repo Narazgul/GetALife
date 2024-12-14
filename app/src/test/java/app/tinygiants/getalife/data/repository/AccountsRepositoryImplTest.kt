@@ -62,7 +62,7 @@ class AccountsRepositoryImplTest {
         val account = repository.getAccount(checkingAccount().id)
 
         assertThat(account).isNotNull()
-        assertThat(account.name).isEqualTo(checkingAccount().name)
+        assertThat(account?.name).isEqualTo(checkingAccount().name)
     }
 
     @Test
