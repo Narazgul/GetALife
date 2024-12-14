@@ -1,0 +1,6 @@
+<de-DE>
+Beta Version für Budget- & Account Feature
+</de-DE>
+<en-US>
+Beta version for Budget- & Account Feature
+</en-US>
