@@ -16,7 +16,6 @@ data class Money(
 ) {
     private val currency: Currency = Currency.getInstance(locale)
 
-    val currencySymbol: String = currency.symbol
     val formattedMoney: String = formatMoney(value)
     val formattedPositiveMoney: String = formatMoney(value.abs())
 
