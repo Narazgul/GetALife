@@ -2,6 +2,11 @@ update_fastlane
 
 default_platform(:android)
 
+desc "Run tests"
+lane :tests do
+    gradle(task: "test")
+end
+
 desc "Deploy a new internal test version to Google Play"
 lane :playstore_internal do
 
