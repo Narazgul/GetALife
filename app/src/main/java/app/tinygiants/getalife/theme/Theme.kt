@@ -89,7 +89,7 @@ fun GetALifeTheme(
             if (darkTheme) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
         }
-        darkTheme                                                      -> darkColors
+        darkTheme -> darkColors
         else -> lightColors
     }
 
