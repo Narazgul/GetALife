@@ -20,4 +20,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Install Dependencies
+        run: |
+          gem install bundler
+          bundle install
+
       - run: bundle exec fastlane tests
