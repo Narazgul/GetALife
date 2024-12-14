@@ -71,7 +71,7 @@ captures/
 
 # Google Services (e.g. APIs or Firebase)
 /app/google-services.json
-/google/googleServiceCredentials.json
+/google/google_firebase_credentials.json
 
 # Freeline
 freeline.py
@@ -97,4 +97,4 @@ lint/tmp/
 
 # kotlin compiler sessions
 .kotlin/sessions
-/fastlane/google_credentials.json
+/google/google_fastlane_credentials.json
