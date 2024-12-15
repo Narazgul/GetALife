@@ -25,6 +25,13 @@ jobs:
           gem install bundler
           bundle install
 
+
+      - name: Set up google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > google/google-fastlane_credentials.json
+        # Optional: Stelle sicher, dass die Datei die richtigen Berechtigungen hat
+        # chmod 600 app/google-services.json
+
       - name: Run Tests
         run: bundle exec fastlane tests
         env:
