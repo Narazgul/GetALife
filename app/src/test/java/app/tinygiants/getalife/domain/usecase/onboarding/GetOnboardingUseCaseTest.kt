@@ -25,4 +25,14 @@ class GetOnboardingUseCaseTest {
             assertThat(firstEmission).isEqualTo("OnboardingScreen")
         }
     }
+
+    @Test
+    fun `get Wrong Title`(): Unit = runTest {
+        getOnboarding().test {
+            val firstEmission = awaitItem().getOrThrow()
+            awaitComplete()
+
+            assertThat(firstEmission).isEqualTo("Test")
+        }
+    }
 }
