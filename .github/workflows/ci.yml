@@ -28,7 +28,7 @@ jobs:
       - name: Load Google Service file
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $DATA | base64 -di > app/google-services.json
+        run: base64 --decode $DATA > app/google-services.json
 
       - name: Run Tests
         run: bundle exec fastlane tests
