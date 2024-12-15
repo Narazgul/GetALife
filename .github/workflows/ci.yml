@@ -25,4 +25,7 @@ jobs:
           gem install bundler
           bundle install
 
-      - run: bundle exec fastlane tests
+      - name: Run Tests
+        run: bundle exec fastlane tests
+        env:
+          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
