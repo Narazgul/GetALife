@@ -25,9 +25,10 @@ jobs:
           gem install bundler
           bundle install
 
-      - name: Set up google-services.json
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo "$DATA" | base64 -D -i > app/google-services.json
 
       - name: Run Tests
         run: bundle exec fastlane tests
