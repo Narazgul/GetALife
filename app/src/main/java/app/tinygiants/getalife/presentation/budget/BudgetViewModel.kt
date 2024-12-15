@@ -79,13 +79,13 @@ class BudgetViewModel @Inject constructor(
                 getBudget()
                     .catch { throwable ->
                         Firebase.crashlytics.recordException(throwable)
-                        displayErrorState(throwable)
+                        displayError(throwable)
                     }
                     .collect { result ->
                         result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
                         result.onFailure { throwable ->
                             Firebase.crashlytics.recordException(throwable)
-                            displayErrorState(throwable)
+                            displayError(throwable)
                         }
                     }
             }
@@ -94,7 +94,7 @@ class BudgetViewModel @Inject constructor(
                 getAssignableMoney()
                     .catch { throwable ->
                         Firebase.crashlytics.recordException(throwable)
-                        displayErrorState(throwable as AssignableMoneyException)
+                        displayError(throwable as AssignableMoneyException)
                     }
                     .collect { result ->
                         result.onSuccess { (assignableMoney, overspentCategoryText) ->
@@ -102,7 +102,7 @@ class BudgetViewModel @Inject constructor(
                         }
                         result.onFailure { throwable ->
                             Firebase.crashlytics.recordException(throwable)
-                            displayErrorState(throwable)
+                            displayError(throwable)
                         }
                     }
             }
@@ -172,7 +172,7 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    private fun displayErrorState(throwable: Throwable) {
+    private fun displayError(throwable: Throwable) {
 
         val errorMessage = ErrorMessage(
             title = StringResource(resId = R.string.error_title),
