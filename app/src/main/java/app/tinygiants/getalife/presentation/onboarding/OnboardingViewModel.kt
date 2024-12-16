@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.usecase.onboarding.GetOnboardingUseCase
+import app.tinygiants.getalife.domain.usecase.onboarding.OnboardingStep
 import app.tinygiants.getalife.presentation.UiText.DynamicString
 import app.tinygiants.getalife.presentation.UiText.StringResource
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +22,8 @@ class OnboardingViewModel @Inject constructor(private val getOnboarding: GetOnbo
 
     private val _uiState = MutableStateFlow(
         OnboardingUiState(
-            title = "",
+            quote = DynamicString(value = ""),
+            appName = DynamicString(value = ""),
             isLoading = true,
             errorMessage = null
         )
@@ -37,12 +40,12 @@ class OnboardingViewModel @Inject constructor(private val getOnboarding: GetOnbo
         viewModelScope.launch {
 
             launch {
-//                getOnboarding()
-//                    .catch { throwable -> displayErrorState(throwable = throwable) }
-//                    .collect { result ->
-//                        result.onFailure { throwable -> displayErrorState(throwable = throwable) }
-//                        result.onSuccess { title -> displayTitle(title = title) }
-//                    }
+                getOnboarding()
+                    .catch { throwable -> displayErrorState(throwable = throwable) }
+                    .collect { result ->
+                        result.onFailure { throwable -> displayErrorState(throwable = throwable) }
+                        result.onSuccess { onboardingStep -> displayTitle(onboardingStep) }
+                    }
             }
         }
     }
@@ -61,9 +64,16 @@ class OnboardingViewModel @Inject constructor(private val getOnboarding: GetOnbo
 
     // region Private
 
-    private fun displayTitle(title: String) {
-        _uiState.update { onboardingUiState ->
-            onboardingUiState.copy(title = title)
+    private fun displayTitle(onboardingStep: OnboardingStep) {
+        when (onboardingStep) {
+            OnboardingStep.Quote -> _uiState.update { onboardingUiState ->
+                onboardingUiState.copy(
+                    quote = StringResource(resId = R.string.quote),
+                    appName = StringResource(resId = R.string.appName),
+                    isLoading = false,
+                    errorMessage = null
+                )
+            }
         }
     }
 
@@ -76,7 +86,8 @@ class OnboardingViewModel @Inject constructor(private val getOnboarding: GetOnbo
 
         _uiState.update { onboardingUiState ->
             onboardingUiState.copy(
-                title = "",
+                quote = DynamicString(value = ""),
+                appName = DynamicString(value = ""),
                 isLoading = false,
                 errorMessage = errorMessage
             )

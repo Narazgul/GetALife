@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="appName">Get A Life</string>
     <string name="distribute_available_money">กระจายเงินที่มีอยู่ตามหมวดหมู่: %1$s</string>
     <string name="everything_distributed">ทุกอย่างมีการกระจาย 👍🏼</string>
     <string name="more_distributed_than_available">คุณได้แจกจ่ายเงินมากกว่าที่คุณเป็นเจ้าของ ลบ %1$s ออกจากหมวดหมู่</string>
@@ -53,4 +54,5 @@
     <string name="more_needed_to_reach_budget_target">%1$s more needed to reach budget target</string>
     <string name="fully_funded">Fully funded 👌</string>
     <string name="enjoy_your_extra_money">Enjoy your %1$s extra</string>
+    <string name="quote">Finanzielle Freiheit ist kein Ziel, sondern eine Reise, die mit einem Budget beginnt.</string>
 </resources>

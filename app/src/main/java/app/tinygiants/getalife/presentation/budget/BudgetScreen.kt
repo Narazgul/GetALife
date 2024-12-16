@@ -49,9 +49,9 @@ import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.UiText.DynamicString
 import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
-import app.tinygiants.getalife.presentation.budget.composables.group.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList
+import app.tinygiants.getalife.presentation.budget.composables.group.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme

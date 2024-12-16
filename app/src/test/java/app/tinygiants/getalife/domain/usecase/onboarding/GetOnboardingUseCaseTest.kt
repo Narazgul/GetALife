@@ -22,7 +22,7 @@ class GetOnboardingUseCaseTest {
             val firstEmission = awaitItem().getOrNull()
             awaitComplete()
 
-            assertThat(firstEmission).isEqualTo("OnboardingScreen")
+            assertThat(firstEmission).isEqualTo(OnboardingStep.Quote)
         }
     }
 }

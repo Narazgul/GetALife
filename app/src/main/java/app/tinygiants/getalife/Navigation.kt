@@ -20,7 +20,7 @@ import app.tinygiants.getalife.presentation.transaction.transactions.Transaction
 @Composable
 fun GetALifeNavHost(
     bottomBarNavController: NavHostController,
-    startDestination: String = NestedNavGraph.BudgetNavGraph.route,
+    startDestination: String = NestedNavGraph.OnboardingNavGraph.route,
     modifier: Modifier
 ) {
     NavHost(
@@ -38,7 +38,7 @@ fun GetALifeNavHost(
 sealed class NestedNavGraph(@StringRes val label: Int, val iconId: Int, val route: String) {
 
     data object OnboardingNavGraph :
-    NestedNavGraph(label = R.string.onboarding, iconId = R.drawable.ic_launcher_monochrome, route = "onboardingNavGraph")
+    NestedNavGraph(label = R.string.onboarding, iconId = R.drawable.ic_navigation, route = "onboardingNavGraph")
 
     data object BudgetNavGraph :
         NestedNavGraph(label = R.string.budget, iconId = R.drawable.ic_dashboard, route = "budgetNavGraph")
