@@ -2,7 +2,7 @@
 <resources>
     <string name="distribute_available_money">Verfügbares Geld auf Kategorien verteilen: %1$s</string>
     <string name="everything_distributed">Alles verteilt 👍🏼</string>
-    <string name="more_distributed_than_available">Zu hast mehr Geld verteilt als du hast. Entferne %1$s aus den Kategorien</string>
+    <string name="more_distributed_than_available">Du hast mehr Geld verteilt als du hast. Entferne %1$s aus den Kategorien</string>
     <string name="overspent_category">Kümmere dich um %1$s überzogene %2$s: %3$ss</string>
     <string name="error_title">Zefix</string>
     <string name="error_subtitle">Ein fürchterlicher Fehler ist aufgetreten.</string>
