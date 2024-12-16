@@ -38,6 +38,7 @@
     <string name="budget">Budget</string>
     <string name="account">Accounts</string>
     <string name="transaction">Transaction</string>
+    <string name="onboarding">Onboarding</string>
     <string name="inflow">Inflow</string>
     <string name="outflow">Outflow</string>
     <string name="transaction_saved">Transaction saved</string>

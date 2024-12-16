@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import app.tinygiants.getalife.presentation.account.AccountScreen
 import app.tinygiants.getalife.presentation.budget.BudgetScreen
+import app.tinygiants.getalife.presentation.onboarding.OnboardingScreen
 import app.tinygiants.getalife.presentation.transaction.add_transaction.AddTransaction
 import app.tinygiants.getalife.presentation.transaction.transactions.TransactionScreen
 
@@ -27,6 +28,7 @@ fun GetALifeNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
+        onboardingGraph()
         budgetGraph()
         addTransactionGraph()
         accountGraph()
@@ -34,6 +36,10 @@ fun GetALifeNavHost(
 }
 
 sealed class NestedNavGraph(@StringRes val label: Int, val iconId: Int, val route: String) {
+
+    data object OnboardingNavGraph :
+    NestedNavGraph(label = R.string.onboarding, iconId = R.drawable.ic_launcher_monochrome, route = "onboardingNavGraph")
+
     data object BudgetNavGraph :
         NestedNavGraph(label = R.string.budget, iconId = R.drawable.ic_dashboard, route = "budgetNavGraph")
 
@@ -42,6 +48,19 @@ sealed class NestedNavGraph(@StringRes val label: Int, val iconId: Int, val rout
 
     data object AccountNavGraph :
         NestedNavGraph(label = R.string.account, iconId = R.drawable.ic_account, route = "accountNavGraph")
+}
+
+fun NavGraphBuilder.onboardingGraph() {
+    composable(route = NestedNavGraph.OnboardingNavGraph.route) {
+
+        val onboardingNavController = rememberNavController()
+        NavHost(
+            navController = onboardingNavController,
+            startDestination = Screens.Onboarding.route
+        ) {
+            composable(Screens.Onboarding.route) { OnboardingScreen() }
+        }
+    }
 }
 
 fun NavGraphBuilder.budgetGraph() {
@@ -94,6 +113,7 @@ fun NavGraphBuilder.accountGraph() {
 }
 
 sealed class Screens(val route: String) {
+    data object Onboarding : Screens(route = "onboarding")
     data object Budget : Screens(route = "budget")
     data object AddTransaction : Screens(route = "add_transaction")
     data object Transactions : Screens(route = "transaction/{accountId}")
