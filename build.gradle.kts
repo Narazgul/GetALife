@@ -4,7 +4,6 @@ buildscript {
     }
     dependencies {
         classpath(libs.google.services)
-        classpath(libs.firebase.appdistribution.gradle)
         classpath(libs.firebase.perf.plugin)
         classpath(libs.kotlin.gradle.plugin)
     }

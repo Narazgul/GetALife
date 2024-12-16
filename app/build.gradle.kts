@@ -1,11 +1,8 @@
-import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
-
 plugins {
     id("com.google.devtools.ksp")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("com.google.firebase.appdistribution")
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
     id("com.google.dagger.hilt.android")
@@ -40,11 +37,6 @@ android {
         }
     }
 
-    firebaseAppDistribution {
-        serviceCredentialsFile = "firebase/googleServiceCredentials.json"
-        groups = "internal"
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -52,8 +44,6 @@ android {
 
             manifestPlaceholders["appName"] = "Get A Life Debug"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"debug\"")
-
-            firebaseAppDistribution { artifactType = "APK" }
 
             @Suppress("UnstableApiUsage")
             vcsInfo { include = true }
@@ -65,8 +55,6 @@ android {
 
             manifestPlaceholders["appName"] = "Get A Life"
             buildConfigField(type = "String", name = "FIRESTORE_ROOT_COLLECTION", value = "\"release\"")
-
-            firebaseAppDistribution { artifactType = "AAB" }
         }
     }
 
