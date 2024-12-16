@@ -10,7 +10,6 @@ import com.aallam.openai.client.OpenAI
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.vertexai.FirebaseVertexAI
-import com.google.firebase.vertexai.GenerativeModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,26 +45,26 @@ object AppModule {
 
     // region AI
 
+    @Vertex
     @Provides
-    fun provideFirebaseVertexAiGenerativeModel() = FirebaseVertexAI.instance.generativeModel(modelName = "gemini-1.5-flash")
-
-    @Gemini
-    @Provides
-    fun provideFirebaseVertexAi(generativeModel: GenerativeModel): AiRepository = FirebaseVertexAi(generativeModel = generativeModel)
-
-    @Provides
-    fun provideOpenAi(): OpenAI = OpenAI(BuildConfig.CHATGPT_API_KEY)
+    fun provideFirebaseVertexAi(): AiRepository =
+        FirebaseVertexAi(
+            generativeModel = FirebaseVertexAI.instance.generativeModel(modelName = "gemini-1.5-flash")
+        )
 
     @ChatGPT
     @Provides
-    fun provideChatGPT(openAi: OpenAI): AiRepository = ChatGptAi(openAi = openAi)
+    fun provideChatGPT(): AiRepository =
+        ChatGptAi(
+            openAi = OpenAI(BuildConfig.CHATGPT_API_KEY)
+        )
 
     // endregion
 }
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class Gemini
+annotation class Vertex
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
