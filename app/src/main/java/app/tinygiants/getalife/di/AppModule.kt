@@ -7,6 +7,7 @@ import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseVertexAi
 import app.tinygiants.getalife.domain.repository.AiRepository
 import com.aallam.openai.client.OpenAI
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.vertexai.FirebaseVertexAI
@@ -40,6 +41,9 @@ object AppModule {
 
     @Provides
     fun provideTransactionDao(database: GetALifeDatabase) = database.transactionDao()
+
+    @Provides
+    fun provideAppUpdateManager(@ApplicationContext appContext: Context) = AppUpdateManagerFactory.create(appContext)
 
     // endregion
 

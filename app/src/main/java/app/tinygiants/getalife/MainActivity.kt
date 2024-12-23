@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation
+package app.tinygiants.getalife
 
 import android.os.Build
 import android.os.Bundle
@@ -24,14 +24,12 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import app.tinygiants.getalife.GetALifeNavHost
-import app.tinygiants.getalife.NestedNavGraph
-import app.tinygiants.getalife.navigateToGraph
 import app.tinygiants.getalife.theme.GetALifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.presentation.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 
 @Immutable

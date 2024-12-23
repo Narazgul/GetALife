@@ -47,7 +47,7 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Progress
 import app.tinygiants.getalife.domain.model.ProgressColor
 import app.tinygiants.getalife.domain.model.UserHint
-import app.tinygiants.getalife.presentation.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning

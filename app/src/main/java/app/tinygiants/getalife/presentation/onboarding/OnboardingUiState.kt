@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.presentation.onboarding
 
 import androidx.compose.runtime.Immutable
-import app.tinygiants.getalife.presentation.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 
 @Immutable
@@ -13,5 +13,5 @@ data class OnboardingUiState(
 )
 
 sealed class UserClickEvent {
-    data object Click : UserClickEvent()
+    data object NavigateToNextScreen : UserClickEvent()
 }

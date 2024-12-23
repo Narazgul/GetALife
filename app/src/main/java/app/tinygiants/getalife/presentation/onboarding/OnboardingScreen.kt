@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.onboarding
 
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.presentation.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.coroutines.delay
@@ -45,14 +45,14 @@ fun OnboardingScreen() {
 
     OnboardingScreen(
         uiState = uiState,
-        onUserClickEvent = viewModel::onUserClickEvent
+        onNavigateToNextScreen = viewModel::onUserClickEvent
     )
 }
 
 @Composable
 fun OnboardingScreen(
     uiState: OnboardingUiState,
-    onUserClickEvent: (UserClickEvent) -> Unit = { }
+    onNavigateToNextScreen: (UserClickEvent) -> Unit = { }
 ) {
     var quoteAlphaTarget by remember { mutableFloatStateOf(0f) }
     var quoteScaleTarget by remember { mutableFloatStateOf(1f) }
@@ -61,47 +61,20 @@ fun OnboardingScreen(
     var appNameScaleTarget by remember { mutableFloatStateOf(1f) }
     var appNameLetterSpacingTarget by remember { mutableFloatStateOf(0f) }
 
-    val quoteAlpha by animateFloatAsState(
-        targetValue = quoteAlphaTarget,
-        animationSpec = tween(durationMillis = 5000),
-        label = "quoteAlpha"
-    )
-    val quoteScale by animateFloatAsState(
-        targetValue = quoteScaleTarget,
-        animationSpec = tween(durationMillis = 7000),
-        label = "quoteScale"
-    )
-
-    val appNameAlpha by animateFloatAsState(
-        targetValue = appNameAlphaTarget,
-        animationSpec = tween(8000),
-        label = "appNameAlpha"
-    )
-    val appNameScale by animateFloatAsState(
-        targetValue = appNameScaleTarget,
-        animationSpec = tween(
-            durationMillis = 15000,
-            easing = FastOutSlowInEasing
-        ),
-        label = "appNameScale"
-    )
-    val appNameLetterSpacing by animateFloatAsState(
-        targetValue = appNameLetterSpacingTarget,
-        animationSpec = tween(durationMillis = 8000),
-        label = "quoteLetterSpacing"
-    )
-
     LaunchedEffect(Unit) {
         quoteAlphaTarget = 1f
         quoteScaleTarget = 1.1f
         delay(timeMillis = 5000)
+
         appNameAlphaTarget = 1f
         appNameScaleTarget = 1.5f
         appNameLetterSpacingTarget = 0.2f
         delay(timeMillis = 2000)
+
         quoteAlphaTarget = 0f
         delay(timeMillis = 5000)
-        onUserClickEvent(UserClickEvent.Click)
+
+        onNavigateToNextScreen(UserClickEvent.NavigateToNextScreen)
     }
 
     Column(
@@ -110,31 +83,71 @@ fun OnboardingScreen(
         modifier = Modifier.fillMaxSize()
     ) {
 
-        Text(
+        WelcomeText(
             text = uiState.quote.asString(),
             style = MaterialTheme.typography.titleMedium.copy(textMotion = TextMotion.Animated),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .alpha(quoteAlpha)
-                .padding(horizontal = spacing.xl)
-                .scale(quoteScale)
+            alphaTarget = quoteAlphaTarget,
+            alphaDuration = 5000,
+            scaleTarget = quoteScaleTarget,
+            scaleDuration = 7000,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.size(spacing.m))
 
-        Text(
+        WelcomeText(
             text = uiState.appName.asString(),
             style = MaterialTheme.typography.headlineSmall.copy(textMotion = TextMotion.Animated),
-            letterSpacing = TextUnit(value = appNameLetterSpacing, TextUnitType.Em),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .alpha(appNameAlpha)
-                .padding(horizontal = spacing.xl)
-                .scale(appNameScale)
+            alphaTarget = appNameAlphaTarget,
+            alphaDuration = 8000,
+            scaleTarget = appNameScaleTarget,
+            scaleDuration = 15000,
+            letterSpacingTarget = appNameLetterSpacingTarget,
+            letterSpacingDuration = 8000,
+            modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+@Composable
+fun WelcomeText(
+    text: String,
+    style: TextStyle,
+    alphaTarget: Float,
+    alphaDuration: Int,
+    scaleTarget: Float,
+    scaleDuration: Int,
+    letterSpacingTarget: Float = 0f,
+    letterSpacingDuration: Int = 0,
+    modifier: Modifier = Modifier,
+) {
+    val letterSpacing by animateFloatAsState(
+        targetValue = letterSpacingTarget,
+        animationSpec = tween(durationMillis = letterSpacingDuration),
+        label = "${text}letterSpacing"
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = alphaTarget,
+        animationSpec = tween(durationMillis = alphaDuration),
+        label = "${text}Alpha"
+    )
+    val scale by animateFloatAsState(
+        targetValue = scaleTarget,
+        animationSpec = tween(durationMillis = scaleDuration),
+        label = "${text}Scale"
+    )
+
+    Text(
+        text = text,
+        style = style,
+        letterSpacing = TextUnit(value = letterSpacing, TextUnitType.Em),
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .alpha(alpha)
+            .padding(horizontal = spacing.xl)
+            .scale(scale)
+    )
 }
 
 @Preview

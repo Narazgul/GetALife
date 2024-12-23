@@ -19,9 +19,9 @@ import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupStatus.GroupHasCategoriesException
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.UpdateGroupUseCase
-import app.tinygiants.getalife.presentation.UiText
-import app.tinygiants.getalife.presentation.UiText.DynamicString
-import app.tinygiants.getalife.presentation.UiText.StringResource
+import app.tinygiants.getalife.presentation.shared_composables.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
+import app.tinygiants.getalife.presentation.shared_composables.UiText.StringResource
 import app.tinygiants.getalife.presentation.budget.BannerUiState.AllAssigned
 import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
 import app.tinygiants.getalife.presentation.budget.BannerUiState.OverDistributed

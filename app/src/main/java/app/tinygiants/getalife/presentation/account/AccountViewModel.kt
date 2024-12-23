@@ -11,8 +11,8 @@ import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
-import app.tinygiants.getalife.presentation.UiText
-import app.tinygiants.getalife.presentation.UiText.StringResource
+import app.tinygiants.getalife.presentation.shared_composables.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText.StringResource
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase

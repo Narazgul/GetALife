@@ -10,7 +10,7 @@ import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
-import app.tinygiants.getalife.presentation.UiText.StringResource
+import app.tinygiants.getalife.presentation.shared_composables.UiText.StringResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

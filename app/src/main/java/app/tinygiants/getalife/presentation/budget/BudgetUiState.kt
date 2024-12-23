@@ -3,7 +3,7 @@ package app.tinygiants.getalife.presentation.budget
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
-import app.tinygiants.getalife.presentation.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 
 @Immutable

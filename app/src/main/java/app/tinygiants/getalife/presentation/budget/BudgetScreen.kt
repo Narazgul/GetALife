@@ -47,7 +47,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.UiText.DynamicString
+import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
 import app.tinygiants.getalife.presentation.budget.BannerUiState.AssignableMoneyAvailable
 import app.tinygiants.getalife.presentation.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.budget.composables.BudgetList

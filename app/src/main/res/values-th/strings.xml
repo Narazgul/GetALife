@@ -14,7 +14,7 @@
     <string name="no_name_entered">ไม่มีชื่อป้อน</string>
     <string name="save">บันทึก</string>
     <string name="add_category">เพิ่มหมวดหมู่</string>
-    <string name="available">มีอยู่</string>
+    <string name="available">ยอดเงินคงเหลือ</string>
     <string name="to_spend">เพื่อการใช้จ่าย</string>
     <string name="category">หมวดหมู่</string>
     <string name="categories">หมวดหมู่</string>
@@ -41,8 +41,8 @@
     <string name="account">บัญชี</string>
     <string name="transaction">ธุรกรรม</string>
     <string name="onboarding">การต้อนรับแขก</string>
-    <string name="inflow">การบริโภค</string>
-    <string name="outflow">เอาท์พุท</string>
+    <string name="inflow">รายรับ</string>
+    <string name="outflow">รายจ่าย</string>
     <string name="transaction_saved">บันทึกธุรกรรมแล้ว</string>
     <string name="starting_balance">ยอดคงเหลือเริ่มต้น</string>
     <string name="starting_balance_description">ยอดคงเหลือเริ่มต้นสำหรับบัญชีนี้</string>
