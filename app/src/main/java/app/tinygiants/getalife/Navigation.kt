@@ -16,6 +16,8 @@ import app.tinygiants.getalife.presentation.budget.BudgetScreen
 import app.tinygiants.getalife.presentation.onboarding.OnboardingScreen
 import app.tinygiants.getalife.presentation.transaction.add_transaction.AddTransaction
 import app.tinygiants.getalife.presentation.transaction.transactions.TransactionScreen
+import com.superwall.sdk.Superwall
+import com.superwall.sdk.paywall.presentation.register
 
 @Composable
 fun GetALifeNavHost(
@@ -28,7 +30,7 @@ fun GetALifeNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        onboardingGraph()
+        onboardingGraph(bottomBarNavController)
         budgetGraph()
         addTransactionGraph()
         accountGraph()
@@ -38,7 +40,7 @@ fun GetALifeNavHost(
 sealed class NestedNavGraph(@StringRes val label: Int, val iconId: Int, val route: String) {
 
     data object OnboardingNavGraph :
-    NestedNavGraph(label = R.string.onboarding, iconId = R.drawable.ic_navigation, route = "onboardingNavGraph")
+        NestedNavGraph(label = R.string.onboarding, iconId = R.drawable.ic_navigation, route = "onboardingNavGraph")
 
     data object BudgetNavGraph :
         NestedNavGraph(label = R.string.budget, iconId = R.drawable.ic_dashboard, route = "budgetNavGraph")
@@ -50,7 +52,7 @@ sealed class NestedNavGraph(@StringRes val label: Int, val iconId: Int, val rout
         NestedNavGraph(label = R.string.account, iconId = R.drawable.ic_account, route = "accountNavGraph")
 }
 
-fun NavGraphBuilder.onboardingGraph() {
+fun NavGraphBuilder.onboardingGraph(bottomNavController: NavHostController) {
     composable(route = NestedNavGraph.OnboardingNavGraph.route) {
 
         val onboardingNavController = rememberNavController()
@@ -58,7 +60,20 @@ fun NavGraphBuilder.onboardingGraph() {
             navController = onboardingNavController,
             startDestination = Screens.Onboarding.route
         ) {
-            composable(Screens.Onboarding.route) { OnboardingScreen() }
+            val onNavigateToPaywall = {
+                onboardingNavController.navigate(Screens.Paywall.route) {
+                    popUpTo(onboardingNavController.graph.findStartDestination().id) { inclusive = true }
+                }
+            }
+            val onNavigateToBudgetScreen = {
+                navigateToGraph(bottomBarNavController = bottomNavController, NestedNavGraph.BudgetNavGraph)
+            }
+            composable(Screens.Onboarding.route) {
+                OnboardingScreen(onNavigateToPaywall = onNavigateToPaywall)
+            }
+            composable(Screens.Paywall.route) {
+                Superwall.instance.register("ShowPaywall") { onNavigateToBudgetScreen() }
+            }
         }
     }
 }
@@ -114,6 +129,7 @@ fun NavGraphBuilder.accountGraph() {
 
 sealed class Screens(val route: String) {
     data object Onboarding : Screens(route = "onboarding")
+    data object Paywall : Screens(route = "paywall")
     data object Budget : Screens(route = "budget")
     data object AddTransaction : Screens(route = "add_transaction")
     data object Transactions : Screens(route = "transaction/{accountId}")

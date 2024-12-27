@@ -39,20 +39,22 @@ import app.tinygiants.getalife.theme.spacing
 import kotlinx.coroutines.delay
 
 @Composable
-fun OnboardingScreen() {
+fun OnboardingScreen(onNavigateToPaywall: () -> Unit) {
     val viewModel: OnboardingViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     OnboardingScreen(
         uiState = uiState,
-        onNavigateToNextScreen = viewModel::onUserClickEvent
+        onNavigateToNextScreen = viewModel::onUserClickEvent,
+        onNavigateToPaywall = onNavigateToPaywall
     )
 }
 
 @Composable
 fun OnboardingScreen(
     uiState: OnboardingUiState,
-    onNavigateToNextScreen: (UserClickEvent) -> Unit = { }
+    onNavigateToNextScreen: (UserClickEvent) -> Unit = { },
+    onNavigateToPaywall: () -> Unit = { }
 ) {
     var quoteAlphaTarget by remember { mutableFloatStateOf(0f) }
     var quoteScaleTarget by remember { mutableFloatStateOf(1f) }
@@ -75,6 +77,8 @@ fun OnboardingScreen(
         delay(timeMillis = 5000)
 
         onNavigateToNextScreen(UserClickEvent.NavigateToNextScreen)
+        delay(timeMillis = 2000)
+        onNavigateToPaywall()
     }
 
     Column(

@@ -1,14 +1,13 @@
 package app.tinygiants.getalife.presentation.onboarding
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.usecase.onboarding.GetOnboardingUseCase
 import app.tinygiants.getalife.domain.usecase.onboarding.OnboardingStep
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
 import app.tinygiants.getalife.presentation.shared_composables.UiText.StringResource
-import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,7 +56,7 @@ class OnboardingViewModel @Inject constructor(private val getOnboarding: GetOnbo
     fun onUserClickEvent(clickEvent: UserClickEvent) {
         viewModelScope.launch {
             when (clickEvent) {
-                UserClickEvent.NavigateToNextScreen -> Log.d("OnboardingViewModel", "Clicked")
+                UserClickEvent.NavigateToNextScreen -> println("Next Screen")
             }
         }
     }
