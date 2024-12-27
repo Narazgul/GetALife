@@ -26,6 +26,7 @@ android {
         vectorDrawables { useSupportLibrary = true }
 
         buildConfigField(type = "String", name = "CHATGPT_API_KEY", value = System.getenv("CHATGPT_API_KEY"))
+        buildConfigField(type = "String", name = "SUPERWALL_PUBLIC_KEY", value = System.getenv("SUPERWALL_PUBLIC_KEY"))
     }
 
     signingConfigs {
@@ -75,30 +76,35 @@ kotlin {
 }
 
 dependencies {
+    // Core
     implementation(libs.bundles.core)
-
-    // AI
-    implementation(libs.firebase.vertex.ai)
-    implementation(libs.chatgpt.ai)
 
     // Jetpack Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
-    implementation(libs.emoji2.emojipicker)
     debugImplementation(libs.bundles.compose.debug)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.bundles.firebase)
-
-    // Hilt
-    implementation(libs.bundles.hilt)
-    ksp(libs.hilt.compiler)
 
     // Room
     implementation(libs.bundles.room)
     testImplementation(libs.room.test)
     ksp(libs.room.compiler)
+
+    // Hilt
+    implementation(libs.bundles.hilt)
+    ksp(libs.hilt.compiler)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
+
+    // AI
+    implementation(libs.firebase.vertex.ai)
+    implementation(libs.chatgpt.ai)
+
+    // Misc
+    implementation(libs.emoji2.emojipicker)
+    implementation(libs.superwall)
+    implementation(libs.revenuecat)
 
     // Testing
     testRuntimeOnly(libs.junit5.engine)

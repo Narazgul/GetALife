@@ -21,11 +21,13 @@ composeBomVersion = "2024.12.01"
 activityCompose = "1.9.3"
 core-ktx = "1.15.0"
 lifecycleRuntimeCompose = "2.8.7"
-navigationCompose = "2.8.5"
+navigationComposeVersion = "2.8.5"
 roomVersion = "2.6.1"
 appUpdateVersion = "2.1.0"
 
-emojipicker = "1.5.0"
+emojipickerVersion = "1.5.0"
+superwallVersion = "1.5.1"
+revenuecatVersion = "7.0.0"
 
 junit = "1.2.1"
 jUnit4Version = "4.13.2"
@@ -51,7 +53,7 @@ core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreenVersion" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 app-update = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateVersion" }
@@ -89,8 +91,14 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersi
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 room-test = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
-# Misc
-emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emojipicker" }
+# Superwall
+superwall = { module = "com.superwall.sdk:superwall-android", version.ref = "superwallVersion"}
+
+# RevenueCat
+revenuecat = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecatVersion"}
+
+# Emoji
+emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emojipickerVersion" }
 
 # Testing
 junit4 = { module = "junit:junit", version.ref = "jUnit4Version" }

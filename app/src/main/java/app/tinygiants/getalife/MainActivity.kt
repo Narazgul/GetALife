@@ -25,17 +25,23 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.theme.GetALifeTheme
+import com.superwall.sdk.Superwall
+import com.superwall.sdk.delegate.SuperwallDelegate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), SuperwallDelegate {
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         installSplashScreen()
+
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+        configureSuperwall()
+
         setContent {
             GetALifeTheme {
                 val bottomBarNavController = rememberNavController()
@@ -47,11 +53,19 @@ class MainActivity : ComponentActivity() {
                     val bottomPadding = innerPadding.calculateBottomPadding()
                     GetALifeNavHost(
                         bottomBarNavController = bottomBarNavController,
-                        modifier = Modifier.padding(PaddingValues(bottom = bottomPadding)))
+                        modifier = Modifier.padding(PaddingValues(bottom = bottomPadding))
+                    )
                 }
             }
         }
     }
+}
+
+private fun ComponentActivity.configureSuperwall() {
+    Superwall.configure(
+        applicationContext = application,
+        apiKey = BuildConfig.SUPERWALL_PUBLIC_KEY
+    )
 }
 
 @Composable
