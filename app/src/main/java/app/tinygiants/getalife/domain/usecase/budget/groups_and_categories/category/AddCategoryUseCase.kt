@@ -6,7 +6,7 @@ import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
-import app.tinygiants.getalife.presentation.shared_composables.UiText
+import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock

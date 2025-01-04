@@ -2,6 +2,7 @@ package app.tinygiants.getalife.di
 
 import android.content.Context
 import app.tinygiants.getalife.BuildConfig
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseVertexAi
@@ -10,6 +11,9 @@ import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.google.firebase.vertexai.FirebaseVertexAI
 import dagger.Module
 import dagger.Provides
@@ -45,23 +49,31 @@ object AppModule {
     @Provides
     fun provideAppUpdateManager(@ApplicationContext appContext: Context) = AppUpdateManagerFactory.create(appContext)
 
+    @Provides
+    fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
+        val remoteConfig = Firebase.remoteConfig
+        val configSettings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 60
+        }
+        remoteConfig.setConfigSettingsAsync(configSettings)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+
+        return remoteConfig
+    }
+
     // endregion
 
     // region AI
 
     @Vertex
     @Provides
-    fun provideFirebaseVertexAi(): AiRepository =
-        FirebaseVertexAi(
-            generativeModel = FirebaseVertexAI.instance.generativeModel(modelName = "gemini-1.5-flash")
-        )
+    fun provideFirebaseVertexAi(): AiRepository = FirebaseVertexAi(
+        generativeModel = FirebaseVertexAI.instance.generativeModel(modelName = "gemini-1.5-flash")
+    )
 
     @ChatGPT
     @Provides
-    fun provideChatGPT(): AiRepository =
-        ChatGptAi(
-            openAi = OpenAI(BuildConfig.CHATGPT_API_KEY)
-        )
+    fun provideChatGPT(): AiRepository = ChatGptAi(openAi = OpenAI(BuildConfig.CHATGPT_API_KEY))
 
     // endregion
 }

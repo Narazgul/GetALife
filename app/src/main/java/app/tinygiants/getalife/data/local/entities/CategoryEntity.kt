@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.shared_composables.UiText
+import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
 import kotlinx.datetime.Instant
 
 @Entity(tableName = "categories")

@@ -22,7 +22,7 @@
             android:value="true" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:launchMode="singleTop"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
@@ -38,9 +38,8 @@
 
         <activity
             android:name="com.superwall.sdk.paywall.vc.SuperwallPaywallActivity"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            android:configChanges="orientation|screenSize|keyboardHidden">
         </activity>
         <activity android:name="com.superwall.sdk.debug.DebugViewActivity" />
         <activity android:name="com.superwall.sdk.debug.localizations.SWLocalizationActivity" />

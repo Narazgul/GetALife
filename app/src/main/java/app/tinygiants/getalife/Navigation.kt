@@ -2,38 +2,50 @@ package app.tinygiants.getalife
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import app.tinygiants.getalife.presentation.account.AccountScreen
-import app.tinygiants.getalife.presentation.budget.BudgetScreen
+import app.tinygiants.getalife.domain.model.SubscriptionStatus
+import app.tinygiants.getalife.presentation.main_app.MainScreen
 import app.tinygiants.getalife.presentation.onboarding.OnboardingScreen
-import app.tinygiants.getalife.presentation.transaction.add_transaction.AddTransaction
-import app.tinygiants.getalife.presentation.transaction.transactions.TransactionScreen
-import com.superwall.sdk.Superwall
-import com.superwall.sdk.paywall.presentation.register
 
 @Composable
 fun GetALifeNavHost(
-    bottomBarNavController: NavHostController,
-    startDestination: String = NestedNavGraph.OnboardingNavGraph.route,
-    modifier: Modifier
+    getALifeNavController: NavHostController,
+    subscriptionStatus: SubscriptionStatus,
 ) {
+    val startDestination = when (subscriptionStatus) {
+        SubscriptionStatus.Active -> NestedNavGraph.BudgetNavGraph.route
+        else -> NestedNavGraph.OnboardingNavGraph.route
+    }
+
+    val onNavigateToMainAppGraph = {
+        getALifeNavController.navigate(NestedNavGraph.BudgetNavGraph.route) {
+            popUpTo(getALifeNavController.graph.findStartDestination().id) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
     NavHost(
-        navController = bottomBarNavController,
-        startDestination = startDestination,
-        modifier = modifier
+        navController = getALifeNavController,
+        startDestination = startDestination
     ) {
-        onboardingGraph(bottomBarNavController)
-        budgetGraph()
-        addTransactionGraph()
-        accountGraph()
+        onboardingGraph(onNavigateToMainAppGraph)
+        mainAppGraph()
+    }
+}
+
+fun NavGraphBuilder.onboardingGraph(onNavigateToMainAppGraph: () -> Unit) {
+    composable(route = NestedNavGraph.OnboardingNavGraph.route) {
+        OnboardingScreen(onNavigateToMainApp = onNavigateToMainAppGraph)
+    }
+}
+
+fun NavGraphBuilder.mainAppGraph() {
+    composable(route = NestedNavGraph.BudgetNavGraph.route) {
+        MainScreen()
     }
 }
 
@@ -52,96 +64,17 @@ sealed class NestedNavGraph(@StringRes val label: Int, val iconId: Int, val rout
         NestedNavGraph(label = R.string.account, iconId = R.drawable.ic_account, route = "accountNavGraph")
 }
 
-fun NavGraphBuilder.onboardingGraph(bottomNavController: NavHostController) {
-    composable(route = NestedNavGraph.OnboardingNavGraph.route) {
-
-        val onboardingNavController = rememberNavController()
-        NavHost(
-            navController = onboardingNavController,
-            startDestination = Screens.Onboarding.route
-        ) {
-            val onNavigateToPaywall = {
-                onboardingNavController.navigate(Screens.Paywall.route) {
-                    popUpTo(onboardingNavController.graph.findStartDestination().id) { inclusive = true }
-                }
-            }
-            val onNavigateToBudgetScreen = {
-                navigateToGraph(bottomBarNavController = bottomNavController, NestedNavGraph.BudgetNavGraph)
-            }
-            composable(Screens.Onboarding.route) {
-                OnboardingScreen(onNavigateToPaywall = onNavigateToPaywall)
-            }
-            composable(Screens.Paywall.route) {
-                Superwall.instance.register("ShowPaywall") { onNavigateToBudgetScreen() }
-            }
-        }
-    }
-}
-
-fun NavGraphBuilder.budgetGraph() {
-    composable(route = NestedNavGraph.BudgetNavGraph.route) {
-
-        val budgetNavController = rememberNavController()
-        NavHost(
-            navController = budgetNavController,
-            startDestination = Screens.Budget.route
-        ) {
-            composable(Screens.Budget.route) { BudgetScreen() }
-        }
-    }
-}
-
-fun NavGraphBuilder.addTransactionGraph() {
-    composable(route = NestedNavGraph.AddTransactionGraph.route) {
-
-        val addTransactionNavController = rememberNavController()
-        NavHost(
-            navController = addTransactionNavController,
-            startDestination = Screens.AddTransaction.route
-        ) {
-            composable(Screens.AddTransaction.route) { AddTransaction() }
-        }
-    }
-}
-
-fun NavGraphBuilder.accountGraph() {
-    composable(route = NestedNavGraph.AccountNavGraph.route) {
-
-        val accountNavController = rememberNavController()
-        NavHost(
-            navController = accountNavController,
-            startDestination = Screens.Account.route
-        ) {
-            composable(Screens.Account.route) {
-                AccountScreen(onNavigateToTransactionScreen = { accountId: Long ->
-                    accountNavController.navigate("transaction/$accountId")
-                })
-            }
-            composable(
-                route = Screens.Transactions.route,
-                arguments = listOf(navArgument("accountId") { type = NavType.LongType })
-            ) {
-                TransactionScreen(onNavigateUp = { accountNavController.navigateUp() })
-            }
-        }
-    }
-}
 
 sealed class Screens(val route: String) {
-    data object Onboarding : Screens(route = "onboarding")
-    data object Paywall : Screens(route = "paywall")
-    data object Budget : Screens(route = "budget")
-    data object AddTransaction : Screens(route = "add_transaction")
-    data object Transactions : Screens(route = "transaction/{accountId}")
-    data object Account : Screens(route = "account")
-}
 
-fun navigateToGraph(bottomBarNavController: NavHostController, graph: NestedNavGraph) {
-    bottomBarNavController.navigate(graph.route) {
-        popUpTo(bottomBarNavController.graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
+    sealed class Onboarding {
+        data object Step1 : Screens(route = "onboarding")
+        data object Paywall : Screens(route = "paywall")
+    }
+    sealed class Main {
+        data object Budget : Screens(route = "budget")
+        data object AddTransaction : Screens(route = "add_transaction")
+        data object Transactions : Screens(route = "transaction/{accountId}")
+        data object Account : Screens(route = "account")
     }
 }

@@ -10,6 +10,7 @@ chatgptVersion = "3.8.2"
 
 googleServicesVersion = "4.4.2"
 
+
 firebaseBomVersion = "33.7.0"
 firebaseCrashlytics = "3.0.2"
 firebase-perf-plugin = "1.4.2"
@@ -24,6 +25,7 @@ lifecycleRuntimeCompose = "2.8.7"
 navigationComposeVersion = "2.8.5"
 roomVersion = "2.6.1"
 appUpdateVersion = "2.1.0"
+inAppReviewVersion = "2.0.2"
 
 emojipickerVersion = "1.5.0"
 superwallVersion = "1.5.1"
@@ -57,6 +59,7 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreenVersion" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 app-update = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateVersion" }
+in-app-review = { module = "com.google.android.play:review-ktx", version.ref = "inAppReviewVersion"}
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -118,7 +121,7 @@ mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 [bundles]
 
 core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose",
-    "navigation-compose", "splashscreen", "kotlinx-datetime", "app-update"]
+    "navigation-compose", "splashscreen", "kotlinx-datetime", "app-update", "in-app-review"]
 hilt = ["hilt-android", "hilt-navigation-compose"]
 room = ["room-ktx", "room-runtime"]
 compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
