@@ -1,13 +1,14 @@
 package app.tinygiants.getalife.domain.usecase.emoji
 
-import android.util.Log
 import app.tinygiants.getalife.di.Vertex
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.repository.AiRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 class AddEmojiToCategoryNameUseCase @Inject constructor(
     @Vertex private val aiRepository: AiRepository,
@@ -15,13 +16,18 @@ class AddEmojiToCategoryNameUseCase @Inject constructor(
 
     suspend operator fun invoke(category: Category) {
 
-        val emojiResponse = aiRepository.generateEmojiBy(tag = category.name)
+        val emojiResponse = withTimeoutOrNull(timeout = 5.seconds) {
+            aiRepository.generateEmojiBy(tag = category.name)
+        }
+
+        if (emojiResponse == null) {
+            setDefaultEmoji(category = category)
+            return
+        }
 
         emojiResponse.onFailure { exception ->
             Firebase.crashlytics.recordException(exception)
-            Log.e("Emoji", "Emoji: ${exception.localizedMessage} ${exception.cause}")
-
-            repository.updateCategory(category.copy(emoji = "💸"))
+            setDefaultEmoji(category = category)
         }
 
         emojiResponse.onSuccess { emojis ->
@@ -30,4 +36,6 @@ class AddEmojiToCategoryNameUseCase @Inject constructor(
             repository.updateCategory(category.copy(emoji = emojis))
         }
     }
+
+    private suspend fun setDefaultEmoji(category: Category) = repository.updateCategory(category.copy(emoji = "💸"))
 }
