@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-sealed class OnboardingStep() {
+sealed class OnboardingStep {
     data object Quote : OnboardingStep()
 }
 

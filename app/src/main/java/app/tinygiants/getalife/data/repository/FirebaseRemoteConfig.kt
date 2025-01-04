@@ -7,9 +7,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class FirebaseRemoteConfigRepository @Inject constructor(
-    private val remoteConfig: FirebaseRemoteConfig
-) : RemoteConfigRepository {
+class FirebaseRemoteConfigRepository @Inject constructor(private val remoteConfig: FirebaseRemoteConfig) :
+    RemoteConfigRepository {
 
     init {
         remoteConfig.fetchAndActivate()

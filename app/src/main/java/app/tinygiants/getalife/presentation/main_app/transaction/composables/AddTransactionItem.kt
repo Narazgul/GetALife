@@ -58,10 +58,10 @@ fun AddTransactionItem(
     ) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current // nicht mehr benötigt im BottomSheet -> close via onDismissClicked
+    val focusManager = LocalFocusManager.current
 
-    var showCategoryDropdown by rememberSaveable { mutableStateOf(false) } // done
-    var showAccountDropdown by rememberSaveable { mutableStateOf(false) } // done
+    var showCategoryDropdown by rememberSaveable { mutableStateOf(false) }
+    var showAccountDropdown by rememberSaveable { mutableStateOf(false) }
 
     var amountMoney by remember { mutableStateOf(Money(value = 0.0)) }
     var amountUserInputText by rememberSaveable { mutableStateOf("") }

@@ -25,7 +25,6 @@
     <string name="distribute_money">จัดสรรเงิน</string>
     <string name="delete_transaction">ลบธุรกรรม</string>
     <string name="delete_account">ลบ %s</string>
-    <string name="delete_category">ลบหมวดหมู่</string>
     <string name="add_group">เพิ่มกลุ่ม</string>
     <string name="choose_account">เลือกบัญชี</string>
     <string name="add_account">เพิ่มบัญชี</string>
@@ -46,7 +45,6 @@
     <string name="transaction_saved">บันทึกธุรกรรมแล้ว</string>
     <string name="starting_balance">ยอดคงเหลือเริ่มต้น</string>
     <string name="starting_balance_description">ยอดคงเหลือเริ่มต้นสำหรับบัญชีนี้</string>
-    <string name="assigned">ได้รับมอบหมาย: %1$s</string>
     <string name="assign_more_or_remove_spending">Assign at least %1$s€ to category or remove spending!</string>
     <string name="all_spent">All spent</string>
     <string name="spent_more_than_available">Spent %1$s€ more than available</string>
