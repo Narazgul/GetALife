@@ -7,6 +7,8 @@ import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun RequestInAppReview(
@@ -19,7 +21,12 @@ fun RequestInAppReview(
         if (!isRequestingInAppReview) return@LaunchedEffect
 
         val reviewManager = ReviewManagerFactory.create(activity)
-        val requestFlow = reviewManager.requestReviewFlow()
+        val requestFlow = withTimeoutOrNull(timeout = 5.seconds) { reviewManager.requestReviewFlow() }
+
+        if (requestFlow == null) {
+            onInAppReviewRequestCompleted()
+            return@LaunchedEffect
+        }
 
         requestFlow
             .addOnSuccessListener { reviewInfo ->
@@ -27,7 +34,12 @@ fun RequestInAppReview(
                     .addOnCompleteListener { onInAppReviewRequestCompleted() }
             }
             .addOnFailureListener { exception ->
-                Firebase.crashlytics.recordException(exception as ReviewException)
+
+                when (exception) {
+                    is ReviewException -> Firebase.crashlytics.recordException(exception)
+                    else -> Firebase.crashlytics.recordException(exception)
+                }
+
                 onInAppReviewRequestCompleted()
             }
     }
