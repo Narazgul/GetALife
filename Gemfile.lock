@@ -5,6 +5,7 @@ GEM
       base64
       nkf
       rexml
+    abbrev (0.1.2)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     artifactory (3.0.17)
@@ -158,15 +159,18 @@ GEM
     json (2.9.0)
     jwt (2.9.3)
       base64
+    logger (1.6.4)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     multi_json (1.15.0)
     multipart-post (2.4.1)
+    mutex_m (0.3.0)
     nanaimo (0.4.0)
     naturally (2.2.1)
     nkf (0.2.0)
     optparse (0.6.0)
     os (1.1.4)
+    ostruct (0.6.1)
     plist (3.7.1)
     public_suffix (6.0.1)
     rake (13.2.1)
@@ -217,8 +221,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  abbrev
   fastlane
   fastlane-plugin-versioning_android
+  logger
+  mutex_m
+  ostruct
 
 BUNDLED WITH
    2.5.23
