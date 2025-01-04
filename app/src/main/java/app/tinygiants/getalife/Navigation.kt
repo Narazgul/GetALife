@@ -18,7 +18,7 @@ fun GetALifeNavHost(
 ) {
     val startDestination = when (subscriptionStatus) {
         SubscriptionStatus.Active -> NestedNavGraph.BudgetNavGraph.route
-        else -> NestedNavGraph.OnboardingNavGraph.route
+        else -> NestedNavGraph.BudgetNavGraph.route
     }
 
     val onNavigateToMainAppGraph = {
