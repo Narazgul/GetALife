@@ -294,18 +294,17 @@ fun EmojiPicker(
     hideEmojiPicker: () -> Unit,
     onUpdateEmojiClicked: (String) -> Unit
 ) {
-    val sheetSate = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     fun hideModalBottomSheetIfFullyExpanded() {
-        if (sheetSate.currentValue == SheetValue.Expanded) {
-            scope.launch { sheetSate.hide() }.invokeOnCompletion { hideEmojiPicker() }
+        if (sheetState.currentValue == SheetValue.Expanded) {
+            scope.launch { sheetState.hide() }.invokeOnCompletion { hideEmojiPicker() }
         }
     }
 
     ModalBottomSheet(
         onDismissRequest = { hideEmojiPicker() },
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        sheetState = sheetSate
+        sheetState = sheetState
     ) {
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
