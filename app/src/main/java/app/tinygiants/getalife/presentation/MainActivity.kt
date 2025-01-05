@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,10 +55,6 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
                     getALifeNavController = navController,
                     subscriptionStatus = mainState.subscriptionStatus
                 )
-
-                LaunchedEffect(Unit) {
-                    viewModel.triggerInAppReviewTest()
-                }
             }
         }
     }

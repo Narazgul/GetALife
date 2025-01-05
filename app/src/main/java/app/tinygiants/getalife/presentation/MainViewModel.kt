@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.domain.model.SubscriptionStatus
 import app.tinygiants.getalife.domain.usecase.appupdate.GetAppUpdateTypeUseCase
 import app.tinygiants.getalife.domain.usecase.inappreview.ObserveInAppReviewRequestsUseCase
-import app.tinygiants.getalife.domain.usecase.inappreview.RequestInAppReviewUseCase
 import app.tinygiants.getalife.domain.usecase.subscription.GetUserSubscriptionStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +24,7 @@ data class MainState(
 class MainViewModel @Inject constructor(
     private val getSubscription: GetUserSubscriptionStatusUseCase,
     private val getUpdateType: GetAppUpdateTypeUseCase,
-    private val observeInAppReview: ObserveInAppReviewRequestsUseCase,
-    private val requestInAppReview: RequestInAppReviewUseCase
+    private val observeInAppReview: ObserveInAppReviewRequestsUseCase
 ) : ViewModel() {
 
     private val _mainState = MutableStateFlow(
@@ -77,8 +75,6 @@ class MainViewModel @Inject constructor(
     // endregion
 
     // region Interaction from UI
-
-    suspend fun triggerInAppReviewTest() = requestInAppReview()
 
     fun onInAppReviewRequestCompleted() = _mainState.update { mainState -> mainState.copy(isRequestingInAppReview = false) }
 
