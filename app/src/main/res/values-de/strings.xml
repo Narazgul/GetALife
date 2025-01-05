@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="appName">Get A Life</string>
+    <string name="default_notification_channel_id">0</string>
     <string name="distribute_available_money">Verfügbares Geld auf Kategorien verteilen: %1$s</string>
     <string name="everything_distributed">Alles verteilt 👍🏼</string>
     <string name="more_distributed_than_available">Du hast mehr Geld verteilt als du hast. Entferne %1$s aus den Kategorien</string>

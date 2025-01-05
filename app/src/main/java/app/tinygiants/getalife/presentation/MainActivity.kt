@@ -14,8 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.GetALifeNavHost
 import app.tinygiants.getalife.theme.GetALifeTheme
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import com.superwall.sdk.delegate.SuperwallDelegate
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,10 +27,8 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Even tho we don't use the result, we need to register this for the AppUpdate mechanism
-        val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->
-            if (activityResult.resultCode != RESULT_OK) Firebase.crashlytics.log(activityResult.toString())
-        }
+        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+        val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
 
         setContent {
             GetALifeTheme {
@@ -43,12 +39,11 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
                     appUpdateType = mainState.appUpdateType,
                     activityResultLauncher = activityResultLauncher
                 )
-
                 RequestInAppReview(
-                    activity = this,
                     isRequestingInAppReview = mainState.isRequestingInAppReview,
                     onInAppReviewRequestCompleted = viewModel::onInAppReviewRequestCompleted
                 )
+                RequestNotificationPermission(requestPermissionLauncher = requestPermissionLauncher)
 
                 val navController = rememberNavController()
                 GetALifeNavHost(

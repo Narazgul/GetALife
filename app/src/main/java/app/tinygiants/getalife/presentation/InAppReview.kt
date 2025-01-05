@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.presentation
 
-import android.app.Activity
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.google.android.play.core.review.ReviewException
@@ -11,8 +11,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun RequestInAppReview(
-    activity: Activity,
+fun ComponentActivity.RequestInAppReview(
     isRequestingInAppReview: Boolean,
     onInAppReviewRequestCompleted: () -> Unit
 ) {
@@ -20,7 +19,7 @@ fun RequestInAppReview(
 
         if (!isRequestingInAppReview) return@LaunchedEffect
 
-        val reviewManager = ReviewManagerFactory.create(activity)
+        val reviewManager = ReviewManagerFactory.create(this@RequestInAppReview)
         val requestFlow = withTimeoutOrNull(timeout = 5.seconds) { reviewManager.requestReviewFlow() }
 
         if (requestFlow == null) {
@@ -30,7 +29,7 @@ fun RequestInAppReview(
 
         requestFlow
             .addOnSuccessListener { reviewInfo ->
-                reviewManager.launchReviewFlow(activity, reviewInfo)
+                reviewManager.launchReviewFlow(this@RequestInAppReview, reviewInfo)
                     .addOnCompleteListener { onInAppReviewRequestCompleted() }
             }
             .addOnFailureListener { exception ->

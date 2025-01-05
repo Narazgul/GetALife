@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="appName">Get A Life</string>
+    <string name="default_notification_channel_id">0</string>
     <string name="distribute_available_money">กระจายเงินที่มีอยู่ตามหมวดหมู่: %1$s</string>
     <string name="everything_distributed">ทุกอย่างมีการกระจาย 👍🏼</string>
     <string name="more_distributed_than_available">คุณได้แจกจ่ายเงินมากกว่าที่คุณเป็นเจ้าของ ลบ %1$s ออกจากหมวดหมู่</string>
