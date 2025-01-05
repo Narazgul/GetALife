@@ -14,8 +14,8 @@ import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.categ
 import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
 import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText.StringResource
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

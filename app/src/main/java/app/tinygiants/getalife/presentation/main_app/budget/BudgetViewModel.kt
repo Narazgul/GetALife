@@ -19,9 +19,6 @@ import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupStatus.GroupHasCategoriesException
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.UpdateGroupUseCase
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText.DynamicString
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText.StringResource
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AllAssigned
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AssignableMoneyAvailable
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.OverDistributed
@@ -33,8 +30,11 @@ import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.Delet
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.UpdateCategory
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.UpdateGroup
 import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
+import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText.DynamicString
+import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText.StringResource
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

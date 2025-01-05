@@ -15,8 +15,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.GetALifeNavHost
 import app.tinygiants.getalife.theme.GetALifeTheme
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.superwall.sdk.delegate.SuperwallDelegate
 import dagger.hilt.android.AndroidEntryPoint
 

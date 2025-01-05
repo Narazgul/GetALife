@@ -59,7 +59,7 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreenVersion" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 app-update = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateVersion" }
-in-app-review = { module = "com.google.android.play:review-ktx", version.ref = "inAppReviewVersion"}
+in-app-review = { module = "com.google.android.play:review-ktx", version.ref = "inAppReviewVersion" }
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -78,10 +78,12 @@ firebase-perf = { module = "com.google.firebase:firebase-perf" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-remote-config = { module = "com.google.firebase:firebase-config" }
+firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
+firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
 
 # AI
 firebase-vertex-ai = { module = "com.google.firebase:firebase-vertexai" }
-chatgpt-ai = { module = "com.aallam.openai:openai-client", version.ref = "chatgptVersion"}
+chatgpt-ai = { module = "com.aallam.openai:openai-client", version.ref = "chatgptVersion" }
 
 # Hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
@@ -95,10 +97,10 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVer
 room-test = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
 # Superwall
-superwall = { module = "com.superwall.sdk:superwall-android", version.ref = "superwallVersion"}
+superwall = { module = "com.superwall.sdk:superwall-android", version.ref = "superwallVersion" }
 
 # RevenueCat
-revenuecat = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecatVersion"}
+revenuecat = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecatVersion" }
 
 # Emoji
 emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emojipickerVersion" }
@@ -111,7 +113,7 @@ junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "ju
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5Version" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5Version" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutineTest" }
-flow-test = { module = "app.cash.turbine:turbine", version.ref = "flowTest"}
+flow-test = { module = "app.cash.turbine:turbine", version.ref = "flowTest" }
 assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
@@ -126,7 +128,8 @@ hilt = ["hilt-android", "hilt-navigation-compose"]
 room = ["room-ktx", "room-runtime"]
 compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
 compose-debug = ["debug-compose-ui-tooling", "debug-compose-ui-tooling-preview", "debug-compose-ui-test-manifest"]
-firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "firebase-auth", "firebase-firestore", "firebase-remote-config"]
+firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "firebase-auth", "firebase-firestore",
+    "firebase-remote-config", "firebase-appcheck-playintegrity", "firebase-appcheck-debug"]
 testing = ["junit4", "junit5-api", "junit5-params", "coroutines-test", "flow-test", "assertk", "mockk"]
 testing-android = ["junit4-androidx", "junit4-ui", "mockk-android"]
 
@@ -138,7 +141,7 @@ android-application = { id = "com.android.application", version.ref = "android-g
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinVersion" }
-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics"}
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-version" }
 junit5-plugin = { id = "de.mannodermaus.android-junit5", version.ref = "mannOderMausJunit5" }
