@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
 
         // Even tho we don't use the result, we need to register this for the AppUpdate mechanism
         val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->
-            Firebase.crashlytics.log(activityResult.toString())
+            if (activityResult.resultCode != RESULT_OK) Firebase.crashlytics.log(activityResult.toString())
         }
 
         setContent {
