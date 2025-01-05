@@ -18,8 +18,8 @@ android {
         applicationId = "app.tinygiants.getalife"
         minSdk = 28
         targetSdk = 35
-        versionCode = 10
-        versionName = "Hatching 0.0.10"
+        versionCode = 11
+        versionName = "Hatching 0.0.11"
         ndkVersion = "27.2.12479018"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
