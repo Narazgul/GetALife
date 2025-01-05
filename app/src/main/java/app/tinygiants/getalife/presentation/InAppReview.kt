@@ -34,12 +34,10 @@ fun RequestInAppReview(
                     .addOnCompleteListener { onInAppReviewRequestCompleted() }
             }
             .addOnFailureListener { exception ->
-
                 when (exception) {
                     is ReviewException -> Firebase.crashlytics.recordException(exception)
                     else -> Firebase.crashlytics.recordException(exception)
                 }
-
                 onInAppReviewRequestCompleted()
             }
     }
