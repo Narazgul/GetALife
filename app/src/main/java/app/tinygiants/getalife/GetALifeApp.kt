@@ -11,6 +11,7 @@ import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.superwall.sdk.Superwall
 import dagger.hilt.android.HiltAndroidApp
+import im.crisp.client.external.Crisp
 
 @HiltAndroidApp
 class GetALifeApp : Application() {
@@ -20,6 +21,7 @@ class GetALifeApp : Application() {
         configureAppCheck()
         configureSuperwall()
         configureRevenueCat()
+        configureCrispChat()
     }
 }
 
@@ -42,3 +44,5 @@ private fun Application.configureRevenueCat() {
     val configuration = PurchasesConfiguration.Builder(context = this, apiKey = BuildConfig.REVENUECAT_API_KEY).build()
     Purchases.configure(configuration)
 }
+
+private fun Application.configureCrispChat() = Crisp.configure(this, "ba78404f-e566-4e16-9f58-126802c0af11")

@@ -106,6 +106,7 @@ dependencies {
     implementation(libs.emoji2.emojipicker)
     implementation(libs.superwall)
     implementation(libs.revenuecat)
+    implementation(libs.crisp)
 
     // Testing
     testRuntimeOnly(libs.junit5.engine)

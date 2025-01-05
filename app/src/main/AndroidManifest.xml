@@ -23,8 +23,8 @@
 
         <activity
             android:name=".presentation.MainActivity"
-            android:launchMode="singleTop"
             android:exported="true"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,9 +38,8 @@
 
         <activity
             android:name="com.superwall.sdk.paywall.vc.SuperwallPaywallActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
-            android:configChanges="orientation|screenSize|keyboardHidden">
-        </activity>
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
         <activity android:name="com.superwall.sdk.debug.DebugViewActivity" />
         <activity android:name="com.superwall.sdk.debug.localizations.SWLocalizationActivity" />
         <activity android:name="com.superwall.sdk.debug.SWConsoleActivity" />
@@ -55,13 +54,27 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher" />
+            android:resource="@mipmap/ic_launcher"
+            tools:replace="android:resource" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/default_notification_color" />
+            android:resource="@color/default_notification_color"
+            tools:replace="android:resource" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider;${applicationId}.im.crisp.client.uploadfileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/crisp_chat_file_paths"
+                tools:replace="android:resource" />
+        </provider>
 
     </application>
 

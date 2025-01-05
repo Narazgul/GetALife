@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.presentation
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,6 +17,8 @@ import app.tinygiants.getalife.GetALifeNavHost
 import app.tinygiants.getalife.theme.GetALifeTheme
 import com.superwall.sdk.delegate.SuperwallDelegate
 import dagger.hilt.android.AndroidEntryPoint
+import im.crisp.client.external.notification.CrispNotificationClient
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), SuperwallDelegate {
@@ -26,6 +29,8 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        tryOpenCrispChatBox(intent)
 
         val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
         val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
@@ -44,6 +49,7 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
                     onInAppReviewRequestCompleted = viewModel::onInAppReviewRequestCompleted
                 )
                 RequestNotificationPermission(requestPermissionLauncher = requestPermissionLauncher)
+                CrispChat()
 
                 val navController = rememberNavController()
                 GetALifeNavHost(
@@ -53,4 +59,11 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        tryOpenCrispChatBox(intent)
+    }
+
+    private fun tryOpenCrispChatBox(intent: Intent): Boolean = CrispNotificationClient.openChatbox(this, intent)
 }
