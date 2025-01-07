@@ -49,7 +49,7 @@ class CalculateCategoryProgressUseCaseTest {
             createdAt = Instant.parse("2024-01-01T12:00:00Z")
         )
 
-        Locale.setDefault(Locale.GERMANY)
+        Locale.setDefault(Locale.US)
     }
 
     // region No Target Set
