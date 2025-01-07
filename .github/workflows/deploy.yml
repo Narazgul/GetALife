@@ -1,4 +1,4 @@
-name: CI Deploy
+name: Deploy to PlayStore Internal Track
 
 on:
   workflow_dispatch:
