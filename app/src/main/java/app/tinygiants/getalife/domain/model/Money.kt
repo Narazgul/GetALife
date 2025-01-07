@@ -68,8 +68,8 @@ data class Money(
     private fun formatMoney(amount: BigDecimal): String {
         val numberFormat = NumberFormat.getCurrencyInstance(locale)
         numberFormat.currency = currency
-        val formatted = numberFormat.format(amount)
-        val normaliseWhitespacesForAllLocales = formatted.replace('\u00A0', ' ')
-        return normaliseWhitespacesForAllLocales
+        return numberFormat.format(amount)
+        //val normaliseWhitespacesForAllLocales = formatted.replace('\u00A0', ' ')
+        //return normaliseWhitespacesForAllLocales
     }
 }

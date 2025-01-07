@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.util.Locale
 
 class UpdateCategoryUseCaseTest {
 
@@ -51,7 +50,6 @@ class UpdateCategoryUseCaseTest {
             addEmoji = addEmoji,
             defaultDispatcher = testDispatcherExtension.testDispatcher,
         )
-        Locale.setDefault(Locale.GERMANY)
     }
 
     @Test
