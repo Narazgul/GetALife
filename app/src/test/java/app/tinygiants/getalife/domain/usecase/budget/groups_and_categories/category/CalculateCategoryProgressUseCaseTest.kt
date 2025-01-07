@@ -16,6 +16,7 @@ import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.util.Locale
 
 class CalculateCategoryProgressUseCaseTest {
 
@@ -47,6 +48,8 @@ class CalculateCategoryProgressUseCaseTest {
             updatedAt = Instant.parse("2024-01-01T12:00:00Z"),
             createdAt = Instant.parse("2024-01-01T12:00:00Z")
         )
+
+        Locale.setDefault(Locale.GERMANY)
     }
 
     // region No Target Set
