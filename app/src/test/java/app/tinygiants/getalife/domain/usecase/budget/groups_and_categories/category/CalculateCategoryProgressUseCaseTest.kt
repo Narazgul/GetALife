@@ -384,6 +384,17 @@ class CalculateCategoryProgressUseCaseTest {
 
         val progress = calculateCategoryProgress(category = entity.toDomain())
 
+        println("Actual:")
+        progress.userHint.toString().forEach { char ->
+            println("Char '$char' -> ${char.code.toString(16)}")
+        }
+
+        val expected = "20,00 €"
+        println("Expected:")
+        expected.forEach { char ->
+            println("Char '$char' -> ${char.code.toString(16)}")
+        }
+
         assertThat(progress.bar1).isEqualTo(1f)
         assertThat(progress.bar1Lite).isEqualTo(0f)
         assertThat(progress.bar2).isEqualTo(0f)
@@ -393,7 +404,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = expected))
     }
 
     @Test
