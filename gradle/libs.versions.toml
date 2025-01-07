@@ -14,7 +14,7 @@ firebaseBomVersion = "33.7.0"
 firebaseCrashlytics = "3.0.2"
 firebase-perf-plugin = "1.4.2"
 
-hiltVersion = "2.53.1"
+hiltVersion = "2.54"
 hilt-navigation-compose = "1.2.0"
 
 composeBomVersion = "2024.12.01"
