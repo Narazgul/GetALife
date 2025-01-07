@@ -48,7 +48,6 @@ class CalculateCategoryProgressUseCaseTest {
             updatedAt = Instant.parse("2024-01-01T12:00:00Z"),
             createdAt = Instant.parse("2024-01-01T12:00:00Z")
         )
-
         Locale.setDefault(Locale.US)
     }
 
@@ -103,7 +102,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.Spent(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.Spent(amount = "$20.00"))
     }
 
     @Test
@@ -139,7 +138,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$20.00"))
     }
 
     @Test
@@ -157,7 +156,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.SpentMoreThanAvailable(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.SpentMoreThanAvailable(amount = "$20.00"))
     }
 
     // endregion
@@ -179,7 +178,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "100,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "$100.00"))
     }
 
     @Test
@@ -197,7 +196,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "70,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "$70.00"))
     }
 
     @Test
@@ -234,7 +233,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Primary)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isTrue()
-        assertThat(progress.userHint).isEqualTo(UserHint.ExtraMoney(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.ExtraMoney(amount = "$20.00"))
     }
 
     @Test
@@ -252,7 +251,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "40,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "$40.00"))
     }
 
     @Test
@@ -270,7 +269,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "40,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.MoreNeedForBudgetTarget(amount = "$40.00"))
     }
 
     @Test
@@ -324,7 +323,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Primary)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isTrue()
-        assertThat(progress.userHint).isEqualTo(UserHint.ExtraMoney(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.ExtraMoney(amount = "$20.00"))
     }
 
     @Test
@@ -342,7 +341,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Primary)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isTrue()
-        assertThat(progress.userHint).isEqualTo(UserHint.ExtraMoney(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.ExtraMoney(amount = "$20.00"))
     }
 
     @Test
@@ -387,17 +386,6 @@ class CalculateCategoryProgressUseCaseTest {
 
         val progress = calculateCategoryProgress(category = entity.toDomain())
 
-        println("Actual:")
-        progress.userHint.toString().forEach { char ->
-            println("Char '$char' -> ${char.code.toString(16)}")
-        }
-
-        val expected = "20,00 €"
-        println("Expected:")
-        expected.forEach { char ->
-            println("Char '$char' -> ${char.code.toString(16)}")
-        }
-
         assertThat(progress.bar1).isEqualTo(1f)
         assertThat(progress.bar1Lite).isEqualTo(0f)
         assertThat(progress.bar2).isEqualTo(0f)
@@ -407,7 +395,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = expected))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$20.00"))
     }
 
     @Test
@@ -432,7 +420,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isFalse()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$20.00"))
     }
 
     @Test
@@ -450,7 +438,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Red)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isTrue()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "80,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$80.00"))
     }
 
     @Test
@@ -468,7 +456,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.Red)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Unknown)
         assertThat(progress.showColorOnSecondBar).isTrue()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$20.00"))
     }
 
     @Test
@@ -496,7 +484,7 @@ class CalculateCategoryProgressUseCaseTest {
         assertThat(progress.bar2Color).isEqualTo(ProgressColor.PrimaryLite)
         assertThat(progress.bar2LiteColor).isEqualTo(ProgressColor.Red)
         assertThat(progress.showColorOnSecondBar).isTrue()
-        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "20,00 €"))
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$20.00"))
     }
 
     // endregion
