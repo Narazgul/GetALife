@@ -32,7 +32,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("/Users/hofi/StudioProjects/keystore")
+            storeFile = file(System.getenv("KEYSTORE_PATH"))
             storePassword = System.getenv("KEYSTORE_PW")
             keyAlias = System.getenv("KEY_ALIAS")
             keyPassword = System.getenv("KEY_PW")
