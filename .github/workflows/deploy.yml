@@ -26,9 +26,20 @@ jobs:
       - name: Create google-services.json
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
 
+      - name: Decode Keystore
+        run: |
+          mkdir -p $HOME/keystores
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > $HOME/keystores/keystore.jks
+        shell: bash
+
       - name: Deploy to Play Store (internal)
         run: bundle exec fastlane playstore_internal
         env:
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           SUPERWALL_PUBLIC_KEY: ${{ secrets.SUPERWALL_PUBLIC_KEY }}
           REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+          KEYSTORE_PATH: $HOME/keystores/keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
