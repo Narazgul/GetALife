@@ -75,10 +75,6 @@ android {
 tasks.withType<Test> {
     systemProperty("user.language", "en")
     systemProperty("user.country", "US")
-    testLogging {
-        events("failed", "skipped")
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-    }
 }
 
 kotlin {
