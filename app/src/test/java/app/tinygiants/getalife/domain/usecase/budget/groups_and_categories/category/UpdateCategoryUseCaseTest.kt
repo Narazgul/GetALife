@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category
 
-import androidx.compose.ui.text.intl.Locale
 import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
@@ -75,8 +74,6 @@ class UpdateCategoryUseCaseTest {
         categoryRepositoryFake.categories.value = categories
         val category = rentCategoryEntity().toDomain()
         val updatedCategory = category.copy(assignedMoney = Money(value = 120.0))
-
-        println(Locale.current)
 
         updateCategory(updatedCategory)
 
