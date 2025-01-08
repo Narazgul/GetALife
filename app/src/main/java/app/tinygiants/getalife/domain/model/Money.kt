@@ -16,8 +16,8 @@ data class Money(
 ) {
     private val currency: Currency = Currency.getInstance(locale)
 
-    val formattedMoney: String = formatMoney(value)
-    val formattedPositiveMoney: String = formatMoney(value.abs())
+    val formattedMoney: String get() = formatMoney(value)
+    val formattedPositiveMoney: String get() = formatMoney(value.abs())
 
     constructor(value: Double, locale: Locale = Locale.getDefault()) : this(
         value = BigDecimal(value.toString()),
@@ -31,22 +31,18 @@ data class Money(
     fun toFloat(): Float = value.toFloat()
 
     operator fun compareTo(other: Money): Int {
-        require(this.locale == other.locale) { "Locales must match for comparison" }
         return this.value.compareTo(other.value)
     }
 
     operator fun plus(other: Money): Money {
-        require(this.locale == other.locale) { "Locales must match for addition" }
         return Money(this.value.add(other.value), this.locale)
     }
 
     operator fun minus(other: Money): Money {
-        require(this.locale == other.locale) { "Locales must match for subtraction" }
         return Money(this.value.subtract(other.value), this.locale)
     }
 
     operator fun div(other: Money): Money {
-        require(this.locale == other.locale) { "Locales must match for division" }
         require(other.value.compareTo(BigDecimal.ZERO) != 0) { "Division by zero is not allowed" }
 
         val result = this.value.divide(other.value, 2, RoundingMode.HALF_EVEN)
@@ -69,7 +65,5 @@ data class Money(
         val numberFormat = NumberFormat.getCurrencyInstance(locale)
         numberFormat.currency = currency
         return numberFormat.format(amount)
-        //val normaliseWhitespacesForAllLocales = formatted.replace('\u00A0', ' ')
-        //return normaliseWhitespacesForAllLocales
     }
 }
