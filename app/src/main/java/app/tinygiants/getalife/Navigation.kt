@@ -18,7 +18,7 @@ fun GetALifeNavHost(
 ) {
     val startDestination = when (subscriptionStatus) {
         SubscriptionStatus.Active -> NestedNavGraph.BudgetNavGraph.route
-        else -> NestedNavGraph.BudgetNavGraph.route
+        else -> NestedNavGraph.OnboardingNavGraph.route
     }
 
     val onNavigateToMainAppGraph = {
@@ -32,18 +32,18 @@ fun GetALifeNavHost(
         navController = getALifeNavController,
         startDestination = startDestination
     ) {
-        onboardingGraph(onNavigateToMainAppGraph)
-        mainAppGraph()
+        onboardingPath(onNavigateToMainAppGraph)
+        mainPath()
     }
 }
 
-fun NavGraphBuilder.onboardingGraph(onNavigateToMainAppGraph: () -> Unit) {
+fun NavGraphBuilder.onboardingPath(onNavigateToMainAppGraph: () -> Unit) {
     composable(route = NestedNavGraph.OnboardingNavGraph.route) {
         OnboardingScreen(onNavigateToMainApp = onNavigateToMainAppGraph)
     }
 }
 
-fun NavGraphBuilder.mainAppGraph() {
+fun NavGraphBuilder.mainPath() {
     composable(route = NestedNavGraph.BudgetNavGraph.route) {
         MainScreen()
     }
