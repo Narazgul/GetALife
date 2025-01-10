@@ -7,18 +7,46 @@ lane :tests do
     gradle(task: "test")
 end
 
-desc "Deploy a new internal test version to Google Play"
-lane :playstore_internal do
+desc "Deploy versions to Firebase App Distribution"
+lane :firebase_distribution do
+
+    build_android_app(task: "assemble", build_type: "Debug")
+    build_android_app(task: "bundle", build_type: "Release")
 
     gradle(task: "test")
 
-    gradle(
-        task: "bundle",
-        build_type: "Release"
-      )
+    firebase_app_distribution(
+        app: "1:246096646860:android:a774a6b28b01f93d8ca869",
+        testers: "app.getalife@gmail.com",
+        service_credentials_file: "./google/google_firebase_credentials.json",
+        android_artifact_type: "APK")
+    firebase_app_distribution(
+        app: "1:246096646860:android:be6d8fc2a7b7b97e8ca869",
+        testers: "app.getalife@gmail.com",
+        service_credentials_file: "./google/google_firebase_credentials.json",
+        android_artifact_type: "AAB")
+end
 
+
+desc "Deploy a new internal test version to Google Play"
+lane :playstore_internal do
+
+    build_android_app(task: "bundle",build_type: "Release")
+    gradle(task: "test")
     upload_to_play_store(
         track: "internal",
+        skip_upload_apk: true,
+
+    )
+end
+
+desc "Deploy a new internal test version to Google Play"
+lane :playstore_alpha do
+
+    build_android_app(task: "bundle",build_type: "Release")
+    gradle(task: "test")
+    upload_to_play_store(
+        track: "alpha",
         skip_upload_apk: true
     )
 end
