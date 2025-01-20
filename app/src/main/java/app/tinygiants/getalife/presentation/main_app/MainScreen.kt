@@ -18,7 +18,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import app.tinygiants.getalife.NestedNavGraph
 
 @Composable
 fun MainScreen() {
@@ -29,7 +28,9 @@ fun MainScreen() {
     ) { innerPadding ->
         MainNavHost(
             bottomBarNavController = bottomBarNavController,
-            modifier = Modifier.padding(PaddingValues(bottom = innerPadding.calculateBottomPadding()))
+            modifier = Modifier.padding(
+                PaddingValues(bottom = innerPadding.calculateBottomPadding())
+            )
         )
     }
 }
@@ -66,12 +67,12 @@ fun BottomNavigation(bottomBarNavController: NavHostController) {
 }
 
 val bottomNavigationItems = listOf(
-    NestedNavGraph.BudgetNavGraph,
-    NestedNavGraph.AddTransactionGraph,
-    NestedNavGraph.AccountNavGraph
+    MainNavGraph.Budget,
+    MainNavGraph.AddTransaction,
+    MainNavGraph.Account
 )
 
-fun navigateToBottomNavigationGraph(bottomBarNavController: NavHostController, graph: NestedNavGraph) {
+fun navigateToBottomNavigationGraph(bottomBarNavController: NavHostController, graph: MainNavGraph) {
     bottomBarNavController.navigate(graph.route) {
         popUpTo(bottomBarNavController.graph.findStartDestination().id) {
             saveState = true

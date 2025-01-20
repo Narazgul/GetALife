@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation
+package app.tinygiants.getalife.presentation.app_initialisation
 
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -13,7 +13,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 
 @Composable
-fun EnableAppUpdate(
+fun InitAppUpdate(
     appUpdateType: Int?,
     activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
     onFlexibleUpdateDownloaded: () -> Unit = {}
