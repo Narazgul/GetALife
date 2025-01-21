@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class InAppReviewRepositoryImpl @Inject constructor() : InAppReviewRepository {
+class GoogleInAppReviewRepository @Inject constructor() : InAppReviewRepository {
 
     private val _inAppReviewRequests = MutableSharedFlow<Unit>()
 

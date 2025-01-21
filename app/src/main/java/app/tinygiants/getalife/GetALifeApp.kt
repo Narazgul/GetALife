@@ -2,6 +2,7 @@ package app.tinygiants.getalife
 
 import android.app.Application
 import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
@@ -12,6 +13,10 @@ import com.revenuecat.purchases.PurchasesConfiguration
 import com.superwall.sdk.Superwall
 import dagger.hilt.android.HiltAndroidApp
 import im.crisp.client.external.Crisp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 @HiltAndroidApp
 class GetALifeApp : Application() {
@@ -43,6 +48,11 @@ private fun Application.configureRevenueCat() {
     Purchases.logLevel = LogLevel.DEBUG
     val configuration = PurchasesConfiguration.Builder(context = this, apiKey = BuildConfig.REVENUECAT_API_KEY).build()
     Purchases.configure(configuration)
+
+    CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+        val appInstanceId = Firebase.analytics.firebaseInstanceId
+        Purchases.sharedInstance.setFirebaseAppInstanceID(firebaseAppInstanceID = appInstanceId)
+    }
 }
 
-private fun Application.configureCrispChat() = Crisp.configure(this, "ba78404f-e566-4e16-9f58-126802c0af11")
+private fun Application.configureCrispChat() = Crisp.configure(this, BuildConfig.CRISP_CHAT)

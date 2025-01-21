@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.data.remote
+package app.tinygiants.getalife.data.remote.firebase
 
 import android.content.Intent
 import android.util.Log

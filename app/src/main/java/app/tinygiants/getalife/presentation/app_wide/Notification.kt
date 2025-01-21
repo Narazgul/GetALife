@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.app_initialisation
+package app.tinygiants.getalife.presentation.app_wide
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 
 @Composable
-fun ComponentActivity.InitNotification(requestPermissionLauncher: ActivityResultLauncher<String>) {
+fun ComponentActivity.Notification(requestPermissionLauncher: ActivityResultLauncher<String>) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 

@@ -8,12 +8,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.GetALifeNavHost
+import app.tinygiants.getalife.presentation.app_wide.AppUpdate
+import app.tinygiants.getalife.presentation.app_wide.Authentication
+import app.tinygiants.getalife.presentation.app_wide.InAppReview
+import app.tinygiants.getalife.presentation.app_wide.Notification
+import app.tinygiants.getalife.presentation.app_wide.SupportChat
 import app.tinygiants.getalife.theme.GetALifeTheme
 import com.superwall.sdk.delegate.SuperwallDelegate
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,40 +31,25 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        tryOpenCrispChatBox(intent)
-
-        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
-        val activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
+        val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+        val appUpdateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
 
         setContent {
             GetALifeTheme {
-                val viewModel: MainViewModel = hiltViewModel()
-                val mainState by viewModel.mainState.collectAsStateWithLifecycle()
 
-                EnableAppUpdate(
-                    appUpdateType = mainState.appUpdateType,
-                    activityResultLauncher = activityResultLauncher
-                )
-                RequestInAppReview(
-                    isRequestingInAppReview = mainState.isRequestingInAppReview,
-                    onInAppReviewRequestCompleted = viewModel::onInAppReviewRequestCompleted
-                )
-                RequestNotificationPermission(requestPermissionLauncher = requestPermissionLauncher)
-                CrispChat()
+                Authentication()
+                InAppReview()
+                SupportChat()
+                Notification(requestPermissionLauncher = permissionLauncher)
+                AppUpdate(activityResultLauncher = appUpdateLauncher)
 
-                val navController = rememberNavController()
-                GetALifeNavHost(
-                    getALifeNavController = navController,
-                    subscriptionStatus = mainState.subscriptionStatus
-                )
+                GetALifeNavHost()
             }
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        tryOpenCrispChatBox(intent)
+        CrispNotificationClient.openChatbox(this, intent)
     }
-
-    private fun tryOpenCrispChatBox(intent: Intent): Boolean = CrispNotificationClient.openChatbox(this, intent)
 }

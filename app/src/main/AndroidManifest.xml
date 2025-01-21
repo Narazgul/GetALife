@@ -45,7 +45,7 @@
         <activity android:name="com.superwall.sdk.debug.SWConsoleActivity" />
 
         <service
-            android:name=".data.remote.MyFirebaseMessagingService"
+            android:name=".data.remote.firebase.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

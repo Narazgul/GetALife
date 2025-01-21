@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.onboarding.step1
+package app.tinygiants.getalife.presentation.onboarding.welcome
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,10 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class Step1ViewModel @Inject constructor(private val getOnboarding: GetOnboardingUseCase) : ViewModel() {
+class WelcomeViewModel @Inject constructor(private val getOnboarding: GetOnboardingUseCase) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        Step1UiState(
+        WelcomeUiState(
             quote = DynamicString(value = ""),
             appName = DynamicString(value = ""),
             isLoading = true,
