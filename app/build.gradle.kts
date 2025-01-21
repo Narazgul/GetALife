@@ -28,6 +28,7 @@ android {
         buildConfigField(type = "String", name = "CHATGPT_API_KEY", value = System.getenv("CHATGPT_API_KEY"))
         buildConfigField(type = "String", name = "SUPERWALL_PUBLIC_KEY", value = System.getenv("SUPERWALL_PUBLIC_KEY"))
         buildConfigField(type = "String", name = "REVENUECAT_API_KEY", value = System.getenv("REVENUECAT_API_KEY"))
+        buildConfigField(type = "String", name = "CRISP_CHAT", value = System.getenv("CRISP_CHAT"))
     }
 
     signingConfigs {

@@ -35,3 +35,4 @@ jobs:
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           SUPERWALL_PUBLIC_KEY: ${{ secrets.SUPERWALL_PUBLIC_KEY }}
           REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
+          CRISP_CHAT: ${{ secrets.CRISP_CHAT }}
