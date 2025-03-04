@@ -74,6 +74,8 @@ android {
     }
 }
 
+// Set Locale to en-US for unit tests
+// Ensure assertion and expectation use similar formatting
 tasks {
     withType<Test> {
         systemProperty("user.language", "en")
@@ -92,6 +94,7 @@ dependencies {
     // Jetpack Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.storage)
     debugImplementation(libs.bundles.compose.debug)
 
     // Room
