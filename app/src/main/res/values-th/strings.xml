@@ -2,6 +2,7 @@
 <resources>
     <string name="appName">Get A Life</string>
     <string name="default_notification_channel_id">0</string>
+    <string name="display_paywall_error">ตรวจสอบให้แน่ใจว่าคุณเชื่อมต่ออินเทอร์เน็ตและเข้าสู่ระบบ Google PlayStore แล้ว</string>
     <string name="distribute_available_money">กระจายเงินที่มีอยู่ตามหมวดหมู่: %1$s</string>
     <string name="everything_distributed">ทุกอย่างมีการกระจาย 👍🏼</string>
     <string name="more_distributed_than_available">คุณได้แจกจ่ายเงินมากกว่าที่คุณเป็นเจ้าของ ลบ %1$s ออกจากหมวดหมู่</string>
@@ -46,12 +47,29 @@
     <string name="transaction_saved">บันทึกธุรกรรมแล้ว</string>
     <string name="starting_balance">ยอดคงเหลือเริ่มต้น</string>
     <string name="starting_balance_description">ยอดคงเหลือเริ่มต้นสำหรับบัญชีนี้</string>
-    <string name="assign_more_or_remove_spending">Assign at least %1$s€ to category or remove spending!</string>
-    <string name="all_spent">All spent</string>
-    <string name="spent_more_than_available">Spent %1$s€ more than available</string>
-    <string name="amount_spent">%1$s spent</string>
-    <string name="more_needed_to_reach_budget_target">%1$s more needed to reach budget target</string>
-    <string name="fully_funded">Fully funded 👌</string>
-    <string name="enjoy_your_extra_money">Enjoy your %1$s extra</string>
-    <string name="quote">Finanzielle Freiheit ist kein Ziel, sondern eine Reise, die mit einem Budget beginnt.</string>
+    <!-- Budgeting-Strings -->
+    <string name="assign_more_or_remove_spending">กำหนดอย่างน้อย %1$s€ ให้กับหมวดหมู่ หรือยกเลิกรายจ่าย!</string>
+    <string name="all_spent">ใช้จ่ายทั้งหมดแล้ว</string>
+    <string name="spent_more_than_available">ใช้จ่ายมากกว่าที่มีอยู่ %1$s€</string>
+    <string name="amount_spent">ใช้ไป %1$s</string>
+    <string name="more_needed_to_reach_budget_target">ต้องการอีก %1$s เพื่อถึงเป้าหมายงบประมาณ</string>
+    <string name="fully_funded">ได้รับเงินครบถ้วนแล้ว 👌</string>
+    <string name="enjoy_your_extra_money">เพลิดเพลินกับเงินพิเศษ %1$s ของคุณ</string>
+    <string name="quote">อิสรภาพทางการเงินไม่ใช่จุดหมาย แต่เป็นการเดินทางที่เริ่มต้นด้วยงบประมาณ</string>
+    <!-- HowYouKnowUs-Strings -->
+    <string name="how_you_know_us_app_store">Google PlayStore</string>
+    <string name="how_you_know_us_instagram">Instagram</string>
+    <string name="how_you_know_us_facebook">Facebook</string>
+    <string name="how_you_know_us_tiktok">Tiktok</string>
+    <string name="how_you_know_us_news">ข่าว, บทความ, บล็อก</string>
+    <string name="how_you_know_us_friends_and_family">เพื่อนและครอบครัว</string>
+    <string name="how_you_know_us_google_search">ค้นหาผ่าน Google</string>
+    <string name="how_you_know_us_youtube">YouTube</string>
+    <string name="how_you_know_us_other">บนเส้นทางที่แตกต่างกัน</string>
+    <string name="transportation_auto">รถยนต์</string>
+    <string name="transportation_public">รถโดยสารสาธารณะ</string>
+    <string name="transportation_uber_taxis">Uber/แท็กซี่</string>
+    <string name="transportation_motorbike">มอเตอร์ไซค์/สกู๊ตเตอร์</string>
+    <string name="transportation_bike">จักรยาน</string>
+    <string name="transportation_foot">เดินสบาย!</string>
 </resources>

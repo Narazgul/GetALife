@@ -2,6 +2,7 @@
 <resources>
     <string name="appName">Get A Life</string>
     <string name="default_notification_channel_id">0</string>
+    <string name="display_paywall_error">Stelle sicher, dass du mit dem Internet verbunden bist und im Google PlayStore eingeloggt bist.</string>
     <string name="distribute_available_money">Verfügbares Geld auf Kategorien verteilen: %1$s</string>
     <string name="everything_distributed">Alles verteilt 👍🏼</string>
     <string name="more_distributed_than_available">Du hast mehr Geld verteilt als du hast. Entferne %1$s aus den Kategorien</string>
@@ -54,4 +55,19 @@
     <string name="fully_funded">Fully funded 👌</string>
     <string name="enjoy_your_extra_money">Enjoy your %1$s extra</string>
     <string name="quote">Finanzielle Freiheit ist kein Ziel, sondern eine Reise, die mit einem Budget beginnt.</string>
+    <string name="how_you_know_us_app_store">Google PlayStore</string>
+    <string name="how_you_know_us_instagram">Instagram</string>
+    <string name="how_you_know_us_facebook">Facebook</string>
+    <string name="how_you_know_us_tiktok">Tiktok</string>
+    <string name="how_you_know_us_news">Nachrichten, Artikel, Blog</string>
+    <string name="how_you_know_us_friends_and_family">Freunde und Familie</string>
+    <string name="how_you_know_us_google_search">Google Suche</string>
+    <string name="how_you_know_us_youtube">YouTube</string>
+    <string name="how_you_know_us_other">auf einem anderen Weg</string>
+    <string name="transportation_auto">Auto</string>
+    <string name="transportation_public">Öffis</string>
+    <string name="transportation_uber_taxis">Uber/Taxis</string>
+    <string name="transportation_motorbike">Motorrad/Roller</string>
+    <string name="transportation_bike">Fahrrad</string>
+    <string name="transportation_foot">Gut zu Fuß!</string>
 </resources>
