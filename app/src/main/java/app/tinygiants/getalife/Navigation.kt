@@ -14,7 +14,7 @@ import app.tinygiants.getalife.domain.model.SubscriptionStatus
 import app.tinygiants.getalife.domain.model.SubscriptionStatus.Active
 import app.tinygiants.getalife.domain.usecase.subscription.GetUserSubscriptionStatusUseCase
 import app.tinygiants.getalife.presentation.main_app.MainScreen
-import app.tinygiants.getalife.presentation.onboarding.OnboardingNavHost
+import app.tinygiants.getalife.presentation.onboarding.OnboardingScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,7 +48,7 @@ fun GetALifeNavHost() {
     ) {
 
         composable(route = Path.Onboarding.route) {
-            OnboardingNavHost(
+            OnboardingScreen(
                 subscriptionStatus = subscriptionStatus,
                 onNavigateToMainApp = onNavigateToMainAppGraph
             )

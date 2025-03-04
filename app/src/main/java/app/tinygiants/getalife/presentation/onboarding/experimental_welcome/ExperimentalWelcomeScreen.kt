@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.onboarding.welcome
+package app.tinygiants.getalife.presentation.onboarding.experimental_welcome
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -39,11 +39,11 @@ import app.tinygiants.getalife.theme.spacing
 import kotlinx.coroutines.delay
 
 @Composable
-fun WelcomeScreen(onNavigateToPaywall: () -> Unit) {
-    val viewModel: WelcomeViewModel = hiltViewModel()
+fun ExperimentalWelcomeScreen(onNavigateToPaywall: () -> Unit) {
+    val viewModel: ExperimentalWelcomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    WelcomeScreen(
+    ExperimentalWelcomeScreen(
         uiState = uiState,
         onNavigateToNextScreen = viewModel::onUserClickEvent,
         onNavigateToPaywall = onNavigateToPaywall
@@ -51,8 +51,8 @@ fun WelcomeScreen(onNavigateToPaywall: () -> Unit) {
 }
 
 @Composable
-fun WelcomeScreen(
-    uiState: WelcomeUiState,
+fun ExperimentalWelcomeScreen(
+    uiState: ExperimentalWelcomeUiState,
     onNavigateToNextScreen: (UserClickEvent) -> Unit = { },
     onNavigateToPaywall: () -> Unit = { }
 ) {
@@ -154,18 +154,18 @@ fun WelcomeText(
 
 @Preview
 @Composable
-private fun OnboardingScreenPreview(@PreviewParameter(OnboardingScreenPreviewProvider::class) uiState: WelcomeUiState) {
+private fun OnboardingScreenPreview(@PreviewParameter(OnboardingScreenPreviewProvider::class) uiState: ExperimentalWelcomeUiState) {
     GetALifeTheme {
         Surface {
-            WelcomeScreen(uiState = uiState)
+            ExperimentalWelcomeScreen(uiState = uiState)
         }
     }
 }
 
-class OnboardingScreenPreviewProvider : PreviewParameterProvider<WelcomeUiState> {
-    override val values: Sequence<WelcomeUiState>
+class OnboardingScreenPreviewProvider : PreviewParameterProvider<ExperimentalWelcomeUiState> {
+    override val values: Sequence<ExperimentalWelcomeUiState>
         get() = sequenceOf(
-            WelcomeUiState(
+            ExperimentalWelcomeUiState(
                 quote = UiText.DynamicString("Bewegendes Zitat hier"),
                 appName = UiText.StringResource(R.string.appName),
                 isLoading = false,

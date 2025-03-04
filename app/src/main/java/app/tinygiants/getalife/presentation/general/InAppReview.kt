@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.app_wide
+package app.tinygiants.getalife.presentation.general
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable

@@ -81,6 +81,6 @@ class UpdateTransactionUseCase @Inject constructor(
         when (direction) {
             TransactionDirection.Inflow -> amount.positiveMoney()
             TransactionDirection.Outflow -> amount.negativeMoney()
-            TransactionDirection.Unknown -> amount
+            else -> amount
         }
 }

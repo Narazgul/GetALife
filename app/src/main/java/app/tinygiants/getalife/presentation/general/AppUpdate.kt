@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.app_wide
+package app.tinygiants.getalife.presentation.general
 
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @Composable
-fun AppUpdate(activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>) {
+fun AppUpdate(appUpdateLauncher: ActivityResultLauncher<IntentSenderRequest>) {
 
     val viewModel: AppUpdateViewModel = hiltViewModel()
     val appUpdateType by viewModel.appUpdateType.collectAsStateWithLifecycle()
@@ -45,7 +45,7 @@ fun AppUpdate(activityResultLauncher: ActivityResultLauncher<IntentSenderRequest
             if (isUpdateAvailable && isUpdateAllowed) {
                 appUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,
-                    activityResultLauncher,
+                    appUpdateLauncher,
                     appUpdateOptions,
                 )
             }
@@ -60,7 +60,7 @@ fun AppUpdate(activityResultLauncher: ActivityResultLauncher<IntentSenderRequest
                 if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)
                     appUpdateManager.startUpdateFlowForResult(
                         appUpdateInfo,
-                        activityResultLauncher,
+                        appUpdateLauncher,
                         AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
                     )
 

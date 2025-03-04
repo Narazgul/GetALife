@@ -1,11 +1,11 @@
-package app.tinygiants.getalife.presentation.onboarding.welcome
+package app.tinygiants.getalife.presentation.onboarding.experimental_welcome
 
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
 
 @Immutable
-data class WelcomeUiState(
+data class ExperimentalWelcomeUiState(
     val quote: UiText,
     val appName: UiText,
     val isLoading: Boolean,

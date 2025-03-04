@@ -54,7 +54,8 @@ class AddTransactionUseCase @Inject constructor(
         val transformedValue = when (direction) {
             TransactionDirection.Inflow -> abs(amount.asDouble())
             TransactionDirection.Outflow -> -abs(amount.asDouble())
-            TransactionDirection.Unknown -> amount.asDouble()
+            else -> amount.asDouble()
+
         }
         return Money(value = transformedValue)
     }

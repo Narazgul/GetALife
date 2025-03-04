@@ -35,7 +35,7 @@ class DeleteTransactionUseCase @Inject constructor(
         when (direction) {
             TransactionDirection.Inflow -> amount.negativeMoney()
             TransactionDirection.Outflow -> amount.positiveMoney()
-            TransactionDirection.Unknown -> amount
+            else -> amount
         }
 
     private suspend fun deleteTransaction(transaction: Transaction) = transactionRepository.deleteTransaction(transaction)

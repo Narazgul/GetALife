@@ -5,9 +5,13 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import im.crisp.client.external.notification.CrispNotificationClient
+import javax.inject.Inject
 
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var remoteFirebaseUsers: RemoteFirebaseUsers
 
     override fun handleIntent(intent: Intent?) {
         intent?.let {
@@ -23,7 +27,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onNewToken(token)
 
         CrispNotificationClient.sendTokenToCrisp(this, token)
-        Log.d("FirebaseMessagingService", "Token: $token")
+        remoteFirebaseUsers.updateNotificationToken(firebaseMessagingToken = token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -32,5 +36,4 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (CrispNotificationClient.isCrispNotification(message)) CrispNotificationClient.handleNotification(this, message)
         else Log.d("FirebaseMessagingService", "Message received: ${message.data}")
     }
-
 }

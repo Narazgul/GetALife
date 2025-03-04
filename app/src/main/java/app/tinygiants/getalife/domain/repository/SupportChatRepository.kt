@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface SupportChatRepository {
 
     fun isSupportChatEnabled(): Flow<Boolean>
+    fun updateNotificationToken(token: String)
 }

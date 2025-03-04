@@ -109,7 +109,7 @@ fun AddTransaction(
                     waveColor = when (transactionDirection) {
                         TransactionDirection.Inflow -> inflowBackground
                         TransactionDirection.Outflow -> outflowBackground
-                        TransactionDirection.Unknown -> neutralBackground
+                        else -> neutralBackground
                     }
                 },
                 onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner ->

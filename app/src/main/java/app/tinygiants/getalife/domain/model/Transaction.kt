@@ -15,4 +15,4 @@ data class Transaction(
     val createdAt: Instant
 )
 
-enum class TransactionDirection { Unknown, Inflow, Outflow }
+enum class TransactionDirection { Unknown, Inflow, Outflow, AccountTransfer }

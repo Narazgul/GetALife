@@ -1,6 +1,5 @@
-package app.tinygiants.getalife.presentation.app_wide
+package app.tinygiants.getalife.presentation.general
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -17,10 +16,9 @@ fun Authentication() {
 
         if (currentUserUid == null)
             auth.signInAnonymously()
-                .addOnSuccessListener { Log.d("Firestore", "Anonymous login successful") }
                 .addOnFailureListener { exception ->
-                    Log.d("Firestore", "Failed to signIn: ${exception.message}")
-                    Firebase.crashlytics.recordException(exception) }
+                    Firebase.crashlytics.recordException(exception)
+                }
         else {
             Firebase.crashlytics.setUserId(currentUserUid)
             Superwall.instance.identify(currentUserUid)
