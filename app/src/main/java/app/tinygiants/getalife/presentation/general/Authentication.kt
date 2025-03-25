@@ -22,7 +22,7 @@ fun Authentication() {
         else {
             Firebase.crashlytics.setUserId(currentUserUid)
             Superwall.instance.identify(currentUserUid)
-            Purchases.sharedInstance.logIn(currentUserUid)
+            Purchases.sharedInstance.logIn(currentUserUid) // RevenueCat
         }
     }
 }

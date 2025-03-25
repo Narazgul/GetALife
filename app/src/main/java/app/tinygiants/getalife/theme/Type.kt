@@ -90,7 +90,7 @@ val Typography = Typography(
     )
 )
 
-@Preview(widthDp = 600, apiLevel = 35)
+@Preview(widthDp = 600, apiLevel = 36)
 @Composable
 fun TypographyPreview() {
     GetALifeTheme {

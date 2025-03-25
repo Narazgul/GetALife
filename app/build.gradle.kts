@@ -12,15 +12,15 @@ plugins {
 
 android {
     namespace = "app.tinygiants.getalife"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.tinygiants.getalife"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 13
         versionName = "Hatching 0.0.13"
-        ndkVersion = "27.2.12479018"
+        ndkVersion = "28.0.13004108"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
