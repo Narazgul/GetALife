@@ -1,8 +1,8 @@
 [versions]
 
-kotlinVersion = "2.1.0"
-ksp-version = "2.1.0-1.0.29"
-android-gradle-plugin = "8.8.2"
+kotlinVersion = "2.1.20"
+ksp-version = "2.1.20-1.0.31"
+android-gradle-plugin = "8.9.1"
 splashscreenVersion = "1.0.1"
 datetime = "0.6.1"
 
@@ -10,25 +10,25 @@ chatgptVersion = "3.8.2"
 
 googleServicesVersion = "4.4.2"
 
-firebaseBomVersion = "33.10.0"
+firebaseBomVersion = "33.11.0"
 firebaseCrashlytics = "3.0.3"
 firebase-perf-plugin = "1.4.2"
 
 hiltVersion = "2.54"
 hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2025.02.00"
+composeBomVersion = "2025.03.00"
 activityCompose = "1.10.1"
 core-ktx = "1.15.0"
 lifecycleRuntimeCompose = "2.8.7"
-navigationComposeVersion = "2.8.8"
+navigationComposeVersion = "2.8.9"
 roomVersion = "2.6.1"
 appUpdateVersion = "2.1.0"
 inAppReviewVersion = "2.0.2"
 
 emojipickerVersion = "1.5.0"
 superwallVersion = "1.5.1"
-revenuecatVersion = "8.11.0"
+revenuecatVersion = "8.14.2"
 crispVersion = "2.0.8"
 
 junit = "1.2.1"
