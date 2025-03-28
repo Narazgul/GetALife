@@ -1,7 +1,9 @@
 package app.tinygiants.getalife.presentation.onboarding
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -75,6 +77,8 @@ fun OnboardingScreen(
         else -> OnboardingScreens.Welcome.route
     }
 
+    val notImplementedToast = Toast.makeText(LocalContext.current, "Not implemented yet", Toast.LENGTH_SHORT)
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -84,7 +88,10 @@ fun OnboardingScreen(
         composable(OnboardingScreens.Welcome.route) {
             WelcomeScreen(
                 onStartClicked = { navController.navigate(OnboardingScreens.Step1.route) },
-                onLoginClicked = { navController.navigate(LoginScreens.LoginOrCreateAccount.route) }
+                onLoginClicked = {
+                    notImplementedToast.show()
+                    // navController.navigate(LoginScreens.LoginOrCreateAccount.route)
+                }
             )
         }
         composable(OnboardingScreens.Step1.route) {
@@ -154,7 +161,7 @@ fun OnboardingScreen(
             )
         }
         composable(CreateBudget.Creation.route) {
-            CreateBudget(onFinished = { navController.navigate(CreateBudget.Celebration.route)} )
+            CreateBudget(onFinished = { navController.navigate(CreateBudget.Celebration.route) })
         }
         composable(CreateBudget.Celebration.route) {
             BudgetPlanFinish(onNextClicked = { navController.navigate(Paywall.NeverSubscribed.route) })
