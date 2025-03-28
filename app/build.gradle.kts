@@ -20,7 +20,6 @@ android {
         targetSdk = 36
         versionCode = 13
         versionName = "Hatching 0.0.13"
-        ndkVersion = "28.0.13004108"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
