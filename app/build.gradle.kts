@@ -74,7 +74,7 @@ android {
 }
 
 // Set Locale to en-US for unit tests
-// Ensure assertion and expectation use similar formatting
+// Ensures assertion and expectation use similar formatting
 tasks {
     withType<Test> {
         systemProperty("user.language", "en")
@@ -115,7 +115,7 @@ dependencies {
 
     // Misc
     implementation(libs.emoji2.emojipicker)
-    implementation(libs.superwall)
+    implementation(libs.bundles.superwall)
     implementation(libs.revenuecat)
     implementation(libs.crisp)
 

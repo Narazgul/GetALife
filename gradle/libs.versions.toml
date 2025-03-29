@@ -4,9 +4,9 @@ kotlinVersion = "2.1.20"
 ksp-version = "2.1.20-1.0.31"
 android-gradle-plugin = "8.9.1"
 splashscreenVersion = "1.0.1"
-datetime = "0.6.1"
+datetime = "0.6.2"
 
-chatgptVersion = "3.8.2"
+chatgptVersion = "4.0.1"
 
 googleServicesVersion = "4.4.2"
 
@@ -14,10 +14,10 @@ firebaseBomVersion = "33.11.0"
 firebaseCrashlytics = "3.0.3"
 firebase-perf-plugin = "1.4.2"
 
-hiltVersion = "2.54"
+hiltVersion = "2.56.1"
 hilt-navigation-compose = "1.2.0"
 
-composeBomVersion = "2025.03.00"
+composeBomVersion = "2025.03.01"
 activityCompose = "1.10.1"
 core-ktx = "1.15.0"
 lifecycleRuntimeCompose = "2.8.7"
@@ -27,19 +27,19 @@ appUpdateVersion = "2.1.0"
 inAppReviewVersion = "2.0.2"
 
 emojipickerVersion = "1.5.0"
-superwallVersion = "1.5.1"
-revenuecatVersion = "8.14.2"
-crispVersion = "2.0.8"
+superwallVersion = "2.0.5"
+revenuecatVersion = "8.15.1"
+crispVersion = "2.0.11"
 
 junit = "1.2.1"
 jUnit4Version = "4.13.2"
 uiTestJunit4 = "1.7.8"
 mannOderMausJunit5 = "1.11.2.0"
-junit5Version = "5.11.4"
+junit5Version = "5.12.1"
 coroutineTest = "1.10.1"
 flowTest = "1.2.0"
 assertk = "0.28.1"
-mockk = "1.13.14"
+mockk = "1.13.17"
 storage = "1.5.0"
 
 ########################################################################################################################
@@ -100,6 +100,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVer
 room-test = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
 superwall = { module = "com.superwall.sdk:superwall-android", version.ref = "superwallVersion" }
+superwallcompose = { module = "com.superwall.sdk:superwall-compose", version.ref = "superwallVersion" }
 revenuecat = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecatVersion" }
 crisp = { module = "im.crisp:crisp-sdk", version.ref = "crispVersion"}
 emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emojipickerVersion" }
@@ -134,6 +135,7 @@ firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "fire
     "firebase-inappmessaging"]
 testing = ["junit4", "junit5-api", "junit5-params", "coroutines-test", "flow-test", "assertk", "mockk"]
 testing-android = ["junit4-androidx", "junit4-ui", "mockk-android"]
+superwall = ["superwall", "superwallcompose"]
 
 ########################################################################################################################
 
