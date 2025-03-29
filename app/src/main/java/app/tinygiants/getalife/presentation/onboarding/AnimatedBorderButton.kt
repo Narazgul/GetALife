@@ -91,6 +91,7 @@ fun AnimatedInfiniteBorderButton(
 @Composable
 fun AnimatedBorderButton(
     modifier: Modifier = Modifier,
+    repeatCount: Int = 2,
     shape: Shape = RoundedCornerShape(size = spacing.m),
     borderWidth: Dp = 1.dp,
     gradient: Brush = Brush.sweepGradient(listOf(Color.Magenta, Color.Cyan, Color.Magenta)),
@@ -104,7 +105,7 @@ fun AnimatedBorderButton(
     var animationFinished by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        repeat(2) {
+        repeat(repeatCount) {
             animatable.animateTo(
                 targetValue = 360f,
                 animationSpec = tween(durationMillis = animationDuration, easing = LinearEasing)
