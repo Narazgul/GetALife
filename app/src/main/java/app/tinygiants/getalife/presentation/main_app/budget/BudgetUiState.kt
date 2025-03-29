@@ -3,8 +3,8 @@ package app.tinygiants.getalife.presentation.main_app.budget
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
 import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
 
 @Immutable
 data class BudgetUiState(
@@ -15,6 +15,13 @@ data class BudgetUiState(
     val errorMessage: ErrorMessage?
 )
 
+sealed class BannerUiState(open val text: UiText) {
+    data class AllAssigned(override val text: UiText): BannerUiState(text)
+    data class AssignableMoneyAvailable(override val text: UiText): BannerUiState(text)
+    data class OverDistributed(override val text: UiText): BannerUiState(text)
+    data class Overspent(override val text: UiText): BannerUiState(text)
+}
+
 sealed class UserClickEvent {
     data class AddGroup(val name: String) : UserClickEvent()
     data class UpdateGroup(val group: Group) : UserClickEvent()
@@ -23,11 +30,4 @@ sealed class UserClickEvent {
     data class AddCategory(val groupId: Long, val categoryName: String) : UserClickEvent()
     data class UpdateCategory(val category: Category) : UserClickEvent()
     data class DeleteCategory(val category: Category) : UserClickEvent()
-}
-
-sealed class BannerUiState(open val text: UiText) {
-    data class AllAssigned(override val text: UiText): BannerUiState(text)
-    data class AssignableMoneyAvailable(override val text: UiText): BannerUiState(text)
-    data class OverDistributed(override val text: UiText): BannerUiState(text)
-    data class Overspent(override val text: UiText): BannerUiState(text)
 }
