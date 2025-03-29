@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.onboarding.experimental_welcome
+package app.tinygiants.getalife.presentation.experiments.welcome
 
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage

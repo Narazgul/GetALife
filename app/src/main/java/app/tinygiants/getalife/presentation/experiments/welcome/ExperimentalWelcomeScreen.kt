@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.onboarding.experimental_welcome
+package app.tinygiants.getalife.presentation.experiments.welcome
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

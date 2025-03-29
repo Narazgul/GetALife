@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.onboarding.experimental_welcome
+package app.tinygiants.getalife.presentation.experiments.welcome
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
