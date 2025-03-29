@@ -45,7 +45,6 @@ fun ExperimentalWelcomeScreen(onNavigateToPaywall: () -> Unit) {
 
     ExperimentalWelcomeScreen(
         uiState = uiState,
-        onNavigateToNextScreen = viewModel::onUserClickEvent,
         onNavigateToPaywall = onNavigateToPaywall
     )
 }
@@ -53,7 +52,6 @@ fun ExperimentalWelcomeScreen(onNavigateToPaywall: () -> Unit) {
 @Composable
 fun ExperimentalWelcomeScreen(
     uiState: ExperimentalWelcomeUiState,
-    onNavigateToNextScreen: (UserClickEvent) -> Unit = { },
     onNavigateToPaywall: () -> Unit = { }
 ) {
     var quoteAlphaTarget by remember { mutableFloatStateOf(0f) }
@@ -119,9 +117,9 @@ fun WelcomeText(
     alphaDuration: Int,
     scaleTarget: Float,
     scaleDuration: Int,
+    modifier: Modifier = Modifier,
     letterSpacingTarget: Float = 0f,
     letterSpacingDuration: Int = 0,
-    modifier: Modifier = Modifier,
 ) {
     val letterSpacing by animateFloatAsState(
         targetValue = letterSpacingTarget,
