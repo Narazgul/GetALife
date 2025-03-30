@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.shared_composables
+package app.tinygiants.getalife.presentation.main_app.transaction.composables
 
 import android.graphics.RuntimeShader
 import android.os.Build
@@ -18,6 +18,22 @@ import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.Language
+
+@Composable
+fun Modifier.waveAnimationBackground(color: Int): Modifier {
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this.then(AnimatedBackgroundElement(color))
+    } else {
+        drawWithCache {
+
+            val gradientBrush = Brush.verticalGradient(listOf(Yellow, Blue, White))
+            onDrawBehind {
+                drawRect(gradientBrush)
+            }
+        }
+    }
+}
 
 private data class AnimatedBackgroundElement(val color: Int) : ModifierNodeElement<AnimatedBackgroundNode>() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -60,22 +76,6 @@ private class AnimatedBackgroundNode(color: Int) : DrawModifierNode, Modifier.No
     }
 
     fun updateColor(newColor: Int) =shader.setColorUniform("color", newColor)
-}
-
-@Composable
-fun Modifier.waveAnimationBackground(color: Int): Modifier {
-
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this.then(AnimatedBackgroundElement(color))
-    } else {
-        drawWithCache {
-
-            val gradientBrush = Brush.verticalGradient(listOf(Yellow, Blue, White))
-            onDrawBehind {
-                drawRect(gradientBrush)
-            }
-        }
-    }
 }
 
 @Language("AGSL")

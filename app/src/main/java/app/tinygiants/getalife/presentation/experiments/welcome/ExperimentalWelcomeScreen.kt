@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.coroutines.delay

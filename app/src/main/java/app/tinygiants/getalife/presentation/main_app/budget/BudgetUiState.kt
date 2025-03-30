@@ -3,8 +3,8 @@ package app.tinygiants.getalife.presentation.main_app.budget
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
-import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 
 @Immutable
 data class BudgetUiState(

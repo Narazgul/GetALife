@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.onbaordinganswers.Debt
-import app.tinygiants.getalife.presentation.onboarding.AnimatedBorderButton
+import app.tinygiants.getalife.presentation.shared_composables.AnimatedBorderButton
 
 @Composable
 fun Step4Debts(
@@ -91,7 +91,16 @@ fun Step4Debts(
                         onDebtClicked(updatedList)
                     }
 
-                    if (debtOption == Debt.NoDebt) AnimatedBorderButton(onCardClick = onClick) { }
+                    if (debtOption == Debt.NoDebt) AnimatedBorderButton(
+                        repeatCount = 4,
+                        borderWidth = 2.dp,
+                        onCardClick = onClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(70.dp)
+                        ) {
+                        ButtonContent(debtOption = debtOption)
+                    }
                     else OutlinedButton(
                         onClick = onClick,
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -134,6 +143,7 @@ fun ButtonContent(debtOption: Debt) {
             contentDescription = "${debtOption.name} icon",
             modifier = Modifier.size(25.dp)
         )
+        
         Spacer(modifier = Modifier.width(8.dp))
 
         Text(

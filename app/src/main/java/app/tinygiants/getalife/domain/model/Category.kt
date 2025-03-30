@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.domain.model
 
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import kotlinx.datetime.Instant
 
 data class Category(

@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.shared_composables
+package app.tinygiants.getalife.presentation.shared_composables
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable

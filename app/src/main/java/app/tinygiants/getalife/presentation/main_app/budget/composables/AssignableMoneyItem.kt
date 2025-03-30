@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText.DynamicString
+import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AllAssigned
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AssignableMoneyAvailable

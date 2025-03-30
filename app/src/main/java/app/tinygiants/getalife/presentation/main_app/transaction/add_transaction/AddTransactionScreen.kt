@@ -30,7 +30,7 @@ import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.presentation.main_app.shared_composables.waveAnimationBackground
+import app.tinygiants.getalife.presentation.main_app.transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.AddTransactionItem
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.Description
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.TransactionPartner

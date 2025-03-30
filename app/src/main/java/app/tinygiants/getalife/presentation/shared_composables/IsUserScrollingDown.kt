@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.shared_composables
+package app.tinygiants.getalife.presentation.shared_composables
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable

@@ -31,8 +31,8 @@ import app.tinygiants.getalife.presentation.main_app.budget.composables.category
 import app.tinygiants.getalife.presentation.main_app.budget.composables.category.EmptyCategoryItem
 import app.tinygiants.getalife.presentation.main_app.budget.composables.group.Group
 import app.tinygiants.getalife.presentation.main_app.budget.fakeCategories
-import app.tinygiants.getalife.presentation.main_app.shared_composables.ErrorMessage
-import app.tinygiants.getalife.presentation.main_app.shared_composables.isScrollingDown
+import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.isScrollingDown
 import app.tinygiants.getalife.theme.ComponentPreview
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing

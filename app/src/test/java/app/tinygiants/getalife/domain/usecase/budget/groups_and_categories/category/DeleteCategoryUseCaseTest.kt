@@ -9,7 +9,7 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
-import app.tinygiants.getalife.presentation.main_app.shared_composables.UiText
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo

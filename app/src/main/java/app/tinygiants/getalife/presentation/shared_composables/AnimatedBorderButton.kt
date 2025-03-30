@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.onboarding
+package app.tinygiants.getalife.presentation.shared_composables
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
