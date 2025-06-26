@@ -1,6 +1,6 @@
 package app.tinygiants.getalife.domain.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Transaction(
     val id: Long,

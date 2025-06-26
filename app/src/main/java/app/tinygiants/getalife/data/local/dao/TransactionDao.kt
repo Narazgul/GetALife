@@ -8,7 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Dao
 interface TransactionDao {

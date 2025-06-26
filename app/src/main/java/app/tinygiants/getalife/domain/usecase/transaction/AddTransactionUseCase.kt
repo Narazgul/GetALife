@@ -11,10 +11,10 @@ import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.random.Random
+import kotlin.time.Clock
 
 class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,

@@ -1,10 +1,10 @@
 package app.tinygiants.getalife.data.remote.ai
 
 import app.tinygiants.getalife.domain.repository.AiRepository
-import com.google.firebase.vertexai.GenerativeModel
+import com.google.firebase.ai.GenerativeModel
 import javax.inject.Inject
 
-class FirebaseVertexAi @Inject constructor(private val generativeModel: GenerativeModel): AiRepository {
+class FirebaseAi @Inject constructor(private val generativeModel: GenerativeModel): AiRepository {
 
     override suspend fun generateEmojiBy(tag: String): Result<String?> {
 

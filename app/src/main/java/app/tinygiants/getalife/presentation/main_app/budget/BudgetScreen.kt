@@ -47,17 +47,17 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AssignableMoneyAvailable
 import app.tinygiants.getalife.presentation.main_app.budget.composables.AssignableMoney
 import app.tinygiants.getalife.presentation.main_app.budget.composables.BudgetList
 import app.tinygiants.getalife.presentation.main_app.budget.composables.group.AddGroupBottomSheet
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
+import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.ScreenPreview
 import app.tinygiants.getalife.theme.spacing
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 @Composable
 fun BudgetScreen() {

@@ -2,7 +2,7 @@ package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.domain.model.AccountType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 val accountEntities = listOf(
     cashAccount(),

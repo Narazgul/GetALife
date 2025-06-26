@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.domain.model
 
 import app.tinygiants.getalife.presentation.shared_composables.UiText
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Category(
     val id: Long,

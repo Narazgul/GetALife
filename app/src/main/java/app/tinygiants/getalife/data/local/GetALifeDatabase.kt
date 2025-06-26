@@ -15,7 +15,7 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Database(
     entities = [

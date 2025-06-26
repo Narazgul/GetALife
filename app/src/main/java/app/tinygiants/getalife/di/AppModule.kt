@@ -5,15 +5,16 @@ import app.tinygiants.getalife.BuildConfig
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
-import app.tinygiants.getalife.data.remote.ai.FirebaseVertexAi
+import app.tinygiants.getalife.data.remote.ai.FirebaseAi
 import app.tinygiants.getalife.domain.repository.AiRepository
 import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.firestore.firestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
-import com.google.firebase.vertexai.FirebaseVertexAI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,8 +62,8 @@ object AppModule {
 
     @Vertex
     @Provides
-    fun provideFirebaseVertexAi(): AiRepository = FirebaseVertexAi(
-        generativeModel = FirebaseVertexAI.instance.generativeModel(modelName = "gemini-1.5-flash")
+    fun provideFirebaseVertexAi(): AiRepository = FirebaseAi(
+        generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel("gemini-2.5-pro")
     )
 
     @ChatGPT

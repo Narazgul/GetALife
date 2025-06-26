@@ -11,9 +11,9 @@ import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlin.time.Clock
 
 class AddAccountUseCase @Inject constructor(
     private val accountRepository: AccountRepository,

@@ -9,8 +9,8 @@ import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import javax.inject.Inject
+import kotlin.time.Clock
 
 class ExchangeTransactionDirectionUseCase @Inject constructor(
     private val categoryRepository: CategoryRepository,

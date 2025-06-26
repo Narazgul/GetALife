@@ -7,7 +7,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "transactions")
 data class TransactionEntity(

@@ -7,8 +7,8 @@ import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import javax.inject.Inject
+import kotlin.time.Clock
 
 class UpdateCategoryUseCase @Inject constructor(
     private val categoryRepository: CategoryRepository,

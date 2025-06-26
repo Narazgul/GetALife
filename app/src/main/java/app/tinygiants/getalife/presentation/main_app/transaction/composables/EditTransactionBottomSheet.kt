@@ -45,7 +45,7 @@ import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

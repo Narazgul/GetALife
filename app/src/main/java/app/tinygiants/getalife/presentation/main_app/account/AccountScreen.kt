@@ -45,7 +45,7 @@ import app.tinygiants.getalife.presentation.main_app.account.composables.AddAcco
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 @Composable
 fun AccountScreen(onNavigateToTransactionScreen: (accountId: Long) -> Unit) {

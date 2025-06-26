@@ -1,7 +1,7 @@
 package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 const val FIXED_COST_GROUP = 1L
 const val DAILY_LIFE_GROUP = 2L

@@ -27,7 +27,7 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 @Composable
 fun SingleTransactionItem(

@@ -9,9 +9,9 @@ import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCas
 import app.tinygiants.getalife.presentation.shared_composables.UiText
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlin.time.Clock
 
 class AddCategoryUseCase @Inject constructor(
     private val repository: CategoryRepository,

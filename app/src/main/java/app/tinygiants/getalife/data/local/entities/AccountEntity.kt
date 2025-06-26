@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "accounts")
 data class AccountEntity(

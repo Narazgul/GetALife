@@ -2,7 +2,7 @@ package app.tinygiants.getalife.data.local.datagenerator
 
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 // Account IDs
 const val CASH_ACCOUNT: Long = 1L

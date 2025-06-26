@@ -6,7 +6,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.shared_composables.UiText
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "categories")
 data class CategoryEntity(

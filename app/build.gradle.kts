@@ -84,6 +84,9 @@ tasks {
 
 kotlin {
     jvmToolchain(17)
+    compilerOptions {
+        optIn.add("kotlin.time.ExperimentalTime")
+    }
 }
 
 dependencies {
@@ -110,7 +113,7 @@ dependencies {
     implementation(libs.bundles.firebase)
 
     // AI
-    implementation(libs.firebase.vertex.ai)
+    implementation(libs.firebase.ai)
     implementation(libs.chatgpt.ai)
 
     // Misc
