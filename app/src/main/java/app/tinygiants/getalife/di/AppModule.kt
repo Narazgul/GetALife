@@ -26,8 +26,6 @@ import javax.inject.Qualifier
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // region Data
-
     @Provides
     fun provideFirebaseFirestore() = Firebase.firestore
 
@@ -47,6 +45,9 @@ object AppModule {
     fun provideTransactionDao(database: GetALifeDatabase) = database.transactionDao()
 
     @Provides
+    fun provideCategoryMonthlyStatusDao(database: GetALifeDatabase) = database.categoryMonthlyStatusDao()
+
+    @Provides
     fun provideAppUpdateManager(@ApplicationContext appContext: Context) = AppUpdateManagerFactory.create(appContext)
 
     @Provides
@@ -56,27 +57,21 @@ object AppModule {
         return remoteConfig
     }
 
-    // endregion
-
-    // region AI
-
-    @Vertex
-    @Provides
-    fun provideFirebaseVertexAi(): AiRepository = FirebaseAi(
-        generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel("gemini-2.5-pro")
-    )
-
     @ChatGPT
     @Provides
     fun provideChatGPT(): AiRepository = ChatGptAi(openAi = OpenAI(BuildConfig.CHATGPT_API_KEY))
 
-    // endregion
+    @FirebaseGemini
+    @Provides
+    fun provideFirebaseAi(): AiRepository = FirebaseAi(
+        generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel("gemini-2.5-flash")
+    )
 }
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class Vertex
+annotation class ChatGPT
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class ChatGPT
+annotation class FirebaseGemini

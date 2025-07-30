@@ -16,8 +16,8 @@ data class CategoryEntity(
     val emoji: String,
     val name: String,
     val budgetTarget: Double,
-    val assignedMoney: Double,
-    val availableMoney: Double,
+    val monthlyTargetAmount: Double?, // Für Multi-Monats-Sparziele
+    val targetMonthsRemaining: Int?, // Für Multi-Monats-Sparziele
     val listPosition: Int,
     val isInitialCategory: Boolean,
     val updatedAt: Instant,
@@ -32,8 +32,8 @@ data class CategoryEntity(
                     emoji = emoji,
                     name = name,
                     budgetTarget = budgetTarget.asDouble(),
-                    assignedMoney = assignedMoney.asDouble(),
-                    availableMoney = availableMoney.asDouble(),
+                    monthlyTargetAmount = monthlyTargetAmount?.asDouble(),
+                    targetMonthsRemaining = targetMonthsRemaining,
                     listPosition = listPosition,
                     isInitialCategory = isInitialCategory,
                     updatedAt = updatedAt,
@@ -50,14 +50,14 @@ data class CategoryEntity(
             emoji = emoji,
             name = name,
             budgetTarget = Money(value = budgetTarget),
-            assignedMoney = Money(value = assignedMoney),
-            availableMoney = Money(value = availableMoney),
+            monthlyTargetAmount = monthlyTargetAmount?.let { Money(value = it) },
+            targetMonthsRemaining = targetMonthsRemaining,
             progress = EmptyProgress(),
             optionalText = UiText.DynamicString(value = ""),
             listPosition = listPosition,
             isInitialCategory = isInitialCategory,
             updatedAt = updatedAt,
-            createdAt = createdAt,
+            createdAt = createdAt
         )
     }
 }

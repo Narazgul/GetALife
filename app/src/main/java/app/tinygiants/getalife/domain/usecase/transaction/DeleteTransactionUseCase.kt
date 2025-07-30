@@ -1,6 +1,7 @@
 package app.tinygiants.getalife.domain.usecase.transaction
 
 import app.tinygiants.getalife.di.Default
+import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
@@ -54,18 +55,10 @@ class DeleteTransactionUseCase @Inject constructor(
     }
 
     private suspend fun updateCategory(transaction: Transaction) {
+        updateCategory(transaction.category, transaction.amount)
+    }
 
-        if (transaction.category == null) return
-        if (transaction.transactionDirection == TransactionDirection.Unknown) return
-
-        val category = transaction.category
-        val updatedAvailableMoney = category.availableMoney + transaction.amount
-
-        val updatedCategory = category.copy(
-            availableMoney = updatedAvailableMoney,
-            updatedAt = Clock.System.now()
-        )
-
-        categoryRepository.updateCategory(updatedCategory)
+    private suspend fun updateCategory(category: Category?, amount: Money) {
+        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
     }
 }

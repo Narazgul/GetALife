@@ -100,15 +100,7 @@ class AddTransactionUseCase @Inject constructor(
         category: Category?,
         amount: Money
     ) {
-        if (category == null) return
-
-        val updatedAvailableMoney = category.availableMoney + amount
-
-        val updatedCategory = category.copy(
-            availableMoney = updatedAvailableMoney,
-            updatedAt = Clock.System.now()
-        )
-
-        categoryRepository.updateCategory(category = updatedCategory)
+        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
+        // Aktuell wird die Kategorie nicht mehr direkt updated
     }
 }

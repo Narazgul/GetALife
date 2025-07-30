@@ -7,10 +7,11 @@ import javax.inject.Inject
 class FirebaseAi @Inject constructor(private val generativeModel: GenerativeModel): AiRepository {
 
     override suspend fun generateEmojiBy(tag: String): Result<String?> {
+        val prompt = "Return only one emoji (no text, no explanation) that best represents: $tag"
 
-        val prompt = "Return one Emoji for this tag: $tag"
         return runCatching {
-            generativeModel.generateContent(prompt).text
+            val response = generativeModel.generateContent(prompt)
+            response.text?.trim()
         }
     }
 }

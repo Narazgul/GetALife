@@ -2,6 +2,7 @@ package app.tinygiants.getalife.domain.usecase.budget
 
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.CategoryRepository
@@ -60,14 +61,16 @@ class GetBudgetUseCase @Inject constructor(
         )
 
     private fun groupWithSumOfAvailableMoney(group: Group, categories: List<Category>): Group {
-        val sumOfAvailableMoneyInCategory = categories.sumOf { category -> category.availableMoney.asBigDecimal() }
-        return group.copy(sumOfAvailableMoney = Money(value = sumOfAvailableMoneyInCategory))
+        // TODO: Summe muss aus MonthlyBudget berechnet werden
+        return group.copy(sumOfAvailableMoney = Money(value = 0.0))
     }
 
     private suspend fun categoriesWithProgressAndListPosition(categories: List<Category>): List<Category> {
         return categories.mapIndexed { index, category ->
-
-            val progress = calculateProgress(category = category)
+            // TODO: Für vollständige Integration müsste hier MonthlyBudget und spentThisMonth übergeben werden
+            // Vorerst verwenden wir EmptyProgress, da diese UseCase nicht direkt auf MonthlyBudget-Daten zugreift
+            // Die richtige Progress-Berechnung erfolgt in GetBudgetForMonthUseCase
+            val progress = EmptyProgress()
 
             category.copy(progress = progress, listPosition = index)
         }

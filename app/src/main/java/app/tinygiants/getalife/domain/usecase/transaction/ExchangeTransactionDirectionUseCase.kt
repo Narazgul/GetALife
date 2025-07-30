@@ -32,16 +32,7 @@ class ExchangeTransactionDirectionUseCase @Inject constructor(
     }
 
     private suspend fun updateCategory(transaction: Transaction) {
-        val category = transaction.category ?: return
-
-        val updatedAvailableMoney = category.availableMoney - transaction.amount
-
-        val updatedCategory = category.copy(
-            availableMoney = updatedAvailableMoney,
-            updatedAt = Clock.System.now()
-        )
-
-        categoryRepository.updateCategory(updatedCategory)
+        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
     }
 
     private suspend fun updateAccount(transaction: Transaction) {

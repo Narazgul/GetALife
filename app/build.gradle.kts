@@ -24,10 +24,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
-        buildConfigField(type = "String", name = "CHATGPT_API_KEY", value = System.getenv("CHATGPT_API_KEY"))
-        buildConfigField(type = "String", name = "SUPERWALL_PUBLIC_KEY", value = System.getenv("SUPERWALL_PUBLIC_KEY"))
-        buildConfigField(type = "String", name = "REVENUECAT_API_KEY", value = System.getenv("REVENUECAT_API_KEY"))
-        buildConfigField(type = "String", name = "CRISP_CHAT", value = System.getenv("CRISP_CHAT"))
+        buildConfigField(type = "String", name = "CHATGPT_API_KEY", value = System.getenv("CHATGPT_API_KEY") ?: "\"\"")
+        buildConfigField(type = "String", name = "GEMINI_API_KEY", value = System.getenv("GEMINI_API_KEY") ?: "\"\"")
+        buildConfigField(type = "String", name = "SUPERWALL_PUBLIC_KEY", value = System.getenv("SUPERWALL_PUBLIC_KEY") ?: "\"\"")
+        buildConfigField(type = "String", name = "REVENUECAT_API_KEY", value = System.getenv("REVENUECAT_API_KEY") ?: "\"\"")
+        buildConfigField(type = "String", name = "CRISP_CHAT", value = System.getenv("CRISP_CHAT") ?: "\"\"")
     }
 
     signingConfigs {
@@ -112,6 +113,8 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation("com.google.firebase:firebase-appcheck")
 
     // AI
     implementation(libs.firebase.ai)

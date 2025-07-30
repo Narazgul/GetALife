@@ -32,17 +32,30 @@ class GetALifeApp : Application() {
 
 private fun Application.configureAppCheck() {
     Firebase.initialize(context = this)
-    Firebase.appCheck.installAppCheckProviderFactory(
-        if (BuildConfig.DEBUG) DebugAppCheckProviderFactory.getInstance()
-        else PlayIntegrityAppCheckProviderFactory.getInstance(),
-    )
+
+    if (BuildConfig.DEBUG) {
+        val debugProvider = DebugAppCheckProviderFactory.getInstance()
+        Firebase.appCheck.installAppCheckProviderFactory(debugProvider)
+    } else {
+        Firebase.appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
+    }
 }
 
-private fun Application.configureSuperwall() =
-    Superwall.configure(
-        applicationContext = this,
-        apiKey = BuildConfig.SUPERWALL_PUBLIC_KEY
-    )
+private fun Application.configureSuperwall() {
+    try {
+        Superwall.configure(
+            applicationContext = this,
+            apiKey = BuildConfig.SUPERWALL_PUBLIC_KEY
+        )
+    } catch (e: Exception) {
+        // Log configuration error but don't crash the app
+        if (BuildConfig.DEBUG) {
+            e.printStackTrace()
+        }
+    }
+}
 
 private fun Application.configureRevenueCat() {
     Purchases.logLevel = LogLevel.DEBUG

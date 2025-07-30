@@ -50,19 +50,7 @@ class UpdateTransactionUseCase @Inject constructor(
     }
 
     private suspend fun updateCategory(transaction: Transaction) {
-
-        if (transaction.category == null) return
-
-        val updatedAvailableMoney = calculateUpdatedBalance(
-            transaction = transaction,
-            toBeUpdatedBalance = transaction.category.availableMoney
-        )
-        val updatedCategory = transaction.category.copy(
-            availableMoney = updatedAvailableMoney,
-            updatedAt = Clock.System.now()
-        )
-
-        categoryRepository.updateCategory(updatedCategory)
+        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
     }
 
     private suspend fun calculateUpdatedBalance(

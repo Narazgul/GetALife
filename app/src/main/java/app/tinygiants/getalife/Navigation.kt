@@ -31,7 +31,6 @@ sealed class Path(val route: String) {
 fun GetALifeNavHost() {
     val viewModel: GetALifeNavHostViewModel = hiltViewModel()
     val subscriptionStatus by viewModel.subscriptionStatus.collectAsStateWithLifecycle()
-    val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
 
@@ -44,7 +43,7 @@ fun GetALifeNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = Path.Main.route
     ) {
 
         composable(route = Path.Onboarding.route) {

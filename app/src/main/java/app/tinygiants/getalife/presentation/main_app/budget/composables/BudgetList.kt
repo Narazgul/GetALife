@@ -20,21 +20,17 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.main_app.budget.composables.category.Category
 import app.tinygiants.getalife.presentation.main_app.budget.composables.category.EmptyCategoryItem
 import app.tinygiants.getalife.presentation.main_app.budget.composables.group.Group
-import app.tinygiants.getalife.presentation.main_app.budget.fakeCategories
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.isScrollingDown
-import app.tinygiants.getalife.theme.ComponentPreview
-import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
 const val ANIMATION_TIME_1_SECOND = 1000
@@ -42,7 +38,7 @@ const val ANIMATION_TIME_300_MILLISECONDS = 300
 
 @Composable
 fun BudgetList(
-    groups: Map<Group, List<Category>>,
+    groups: Map<Group, List<CategoryMonthlyStatus>>,
     isLoading: Boolean,
     errorMessage: ErrorMessage?,
     onUserClickEvent: (UserClickEvent) -> Unit,
@@ -119,7 +115,7 @@ private fun LazyListScope.stickyGroups(
 
 private fun LazyListScope.categories(
     group: Group,
-    categories: List<Category>,
+    categories: List<CategoryMonthlyStatus>,
     onUserClickEvent: (UserClickEvent) -> Unit
 ) {
 
@@ -128,21 +124,26 @@ private fun LazyListScope.categories(
 
     items(
         items = categories,
-        key = { category -> category.id }
+        key = { category -> category.category.id }
     ) { category ->
         val onUpdateEmojiClicked = { emoji: String ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(emoji = emoji)))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.category.copy(emoji = emoji)))
         }
         val onUpdateName = { categoryName: String ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(name = categoryName)))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.category.copy(name = categoryName)))
         }
         val onUpdateBudgetTargetClicked = { newBudgetTarget: Money ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(budgetTarget = newBudgetTarget)))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.category.copy(budgetTarget = newBudgetTarget)))
         }
         val onUpdateAssignedMoneyClicked = { newAssignedMoney: Money ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.copy(assignedMoney = newAssignedMoney)))
+            onUserClickEvent(
+                UserClickEvent.UpdateCategoryAssignment(
+                    categoryId = category.category.id,
+                    newAmount = newAssignedMoney
+                )
+            )
         }
-        val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category)) }
+        val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category.category)) }
 
         AnimatedVisibility(
             visible = group.isExpanded,
@@ -154,18 +155,18 @@ private fun LazyListScope.categories(
                 bottom = if (category == lastCategoryItem) spacing.xxs else spacing.halfDp
             )
         ) {
-            if (category.isInitialCategory) {
+            if (category.category.isInitialCategory) {
                 EmptyCategoryItem(onUpdateNameClicked = onUpdateName)
             } else
                 Column {
                     Category(
-                        emoji = category.emoji,
-                        categoryName = category.name,
-                        budgetTarget = category.budgetTarget,
-                        assignedMoney = category.assignedMoney,
-                        availableMoney = category.availableMoney,
-                        progress = category.progress,
-                        optionalText = category.optionalText,
+                        emoji = category.category.emoji,
+                        categoryName = category.category.name,
+                        budgetTarget = category.category.budgetTarget,
+                        assignedMoney = category.assignedAmount,
+                        availableMoney = category.availableAmount,
+                        progress = category.category.progress,
+                        optionalText = category.category.optionalText,
                         onUpdateEmojiClicked = onUpdateEmojiClicked,
                         onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
@@ -184,34 +185,35 @@ private fun LazyListScope.categories(
     }
 }
 
-@ComponentPreview
-@Composable
-fun BudgetListPreview() {
-    GetALifeTheme {
-        Surface {
-            BudgetList(
-                groups = fakeCategories(),
-                isLoading = false,
-                errorMessage = null,
-                onUserScrolling = { },
-                onUserClickEvent = { }
-            )
-        }
-    }
-}
+// Temporarily disabled previews due to data structure change
+// @ComponentPreview
+// @Composable
+// fun BudgetListPreview() {
+//     GetALifeTheme {
+//         Surface {
+//             BudgetList(
+//                 groups = fakeCategories(),
+//                 isLoading = false,
+//                 errorMessage = null,
+//                 onUserScrolling = { },
+//                 onUserClickEvent = { }
+//             )
+//         }
+//     }
+// }
 
-@ComponentPreview
-@Composable
-fun BudgetListEmptyGroupsPreview() {
-    GetALifeTheme {
-        Surface {
-            BudgetList(
-                groups = emptyMap(),
-                isLoading = false,
-                errorMessage = null,
-                onUserScrolling = { },
-                onUserClickEvent = { }
-            )
-        }
-    }
-}
+// @ComponentPreview
+// @Composable
+// fun BudgetListEmptyGroupsPreview() {
+//     GetALifeTheme {
+//         Surface {
+//             BudgetList(
+//                 groups = emptyMap(),
+//                 isLoading = false,
+//                 errorMessage = null,
+//                 onUserScrolling = { },
+//                 onUserClickEvent = { }
+//             )
+//         }
+//     }
+// }

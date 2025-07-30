@@ -21,8 +21,24 @@ fun Authentication() {
                 }
         else {
             Firebase.crashlytics.setUserId(currentUserUid)
-            Superwall.instance.identify(currentUserUid)
+
+            // Safely identify with Superwall
+            identifyWithSuperwall(currentUserUid)
+
             Purchases.sharedInstance.logIn(currentUserUid) // RevenueCat
         }
+    }
+}
+
+private fun identifyWithSuperwall(userId: String) {
+    try {
+        // Attempt to identify with Superwall
+        Superwall.instance.identify(userId)
+    } catch (e: UninitializedPropertyAccessException) {
+        // Superwall not yet initialized - this is not critical for app functionality
+        Firebase.crashlytics.recordException(e)
+    } catch (e: Exception) {
+        // Other potential errors with Superwall
+        Firebase.crashlytics.recordException(e)
     }
 }

@@ -1,7 +1,9 @@
 package app.tinygiants.getalife.domain.repository
 
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.YearMonth
 
 interface TransactionRepository {
 
@@ -12,5 +14,6 @@ interface TransactionRepository {
     suspend fun addTransaction(transaction: Transaction)
     suspend fun updateTransaction(transaction: Transaction)
     suspend fun deleteTransaction(transaction: Transaction)
+    suspend fun getSpentAmountByCategoryAndMonth(categoryId: Long, yearMonth: YearMonth): Money
 
 }

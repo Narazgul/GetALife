@@ -1,10 +1,8 @@
 package app.tinygiants.getalife.domain.usecase.budget
 
-import app.tinygiants.getalife.R
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
@@ -82,35 +80,17 @@ class GetAssignableMoneyUseCase @Inject constructor(
     }
 
     private fun getAssignedMoneyInCategoriesSum(categories: List<Category>): Money {
-        val assignedInCategorySum = categories.sumOf { category -> category.assignedMoney.asBigDecimal() }
-        return Money(value = assignedInCategorySum)
+        // Zukünftig: Summe aus MonthlyBudget beziehen!
+        return Money(0.0)
     }
 
     private fun getOverspentMoneyInCategoriesSum(categories: List<Category>): Money {
-        val overspentInCategorySum = categories
-            .filter { category -> category.availableMoney < EmptyMoney() }
-            .sumOf { category -> category.availableMoney.positiveMoney().asBigDecimal()  }
-            .toDouble()
-        return Money(value = overspentInCategorySum)
+        // Zukünftig: Summe aus MonthlyBudget beziehen!
+        return Money(0.0)
     }
 
     private fun getOverspentCategoriesText(assignableMoney: Money, categories: List<Category>): StringResource? {
-        if (assignableMoney != EmptyMoney()) return null
-
-        val overspentCategories = categories.filter { categoryEntity -> categoryEntity.availableMoney < EmptyMoney() }
-        if (overspentCategories.isEmpty()) return null
-
-        val overspentSum = overspentCategories.sumOf { categoryEntity -> categoryEntity.availableMoney.asBigDecimal() }
-        val amountOfOverspentCategories = overspentCategories.count()
-
-        val singularOrPluralCategoryText = if (amountOfOverspentCategories == 1) StringResource(R.string.category)
-        else StringResource(R.string.categories)
-
-        return StringResource(
-            R.string.overspent_category,
-            amountOfOverspentCategories,
-            singularOrPluralCategoryText,
-            Money(value = overspentSum).formattedPositiveMoney
-        )
+        // Zukünftig: Überschuldete Kategorien-Hinweise aus MonthlyBudget ableiten!
+        return null
     }
 }

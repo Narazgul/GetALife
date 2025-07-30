@@ -37,8 +37,8 @@ class AddCategoryUseCase @Inject constructor(
                 emoji = "",
                 name = trimmedCategoryName,
                 budgetTarget = EmptyMoney(),
-                assignedMoney = EmptyMoney(),
-                availableMoney = EmptyMoney(),
+                monthlyTargetAmount = null,
+                targetMonthsRemaining = null,
                 progress = EmptyProgress(),
                 optionalText = UiText.DynamicString(value = ""),
                 listPosition = endOfListPosition,
@@ -47,7 +47,6 @@ class AddCategoryUseCase @Inject constructor(
                 createdAt = timeOfCreation
             )
         }
-
         repository.addCategory(category = category)
 
         if (!isInitialCategory) addEmoji(category = category)

@@ -4,10 +4,11 @@ import android.content.Intent
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import im.crisp.client.external.notification.CrispNotificationClient
 import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     @Inject
@@ -27,7 +28,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onNewToken(token)
 
         CrispNotificationClient.sendTokenToCrisp(this, token)
-        remoteFirebaseUsers.updateNotificationToken(firebaseMessagingToken = token)
+
+        if (::remoteFirebaseUsers.isInitialized) {
+            remoteFirebaseUsers.updateNotificationToken(firebaseMessagingToken = token)
+        } else {
+            Log.w("FirebaseMessagingService", "RemoteFirebaseUsers not initialized, skipping token update")
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
