@@ -8,10 +8,12 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import app.tinygiants.getalife.data.local.dao.AccountDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
+import app.tinygiants.getalife.data.local.dao.CategoryMonthlyStatusDao
 import app.tinygiants.getalife.data.local.dao.GroupDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
+import app.tinygiants.getalife.data.local.entities.CategoryMonthlyStatusEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
@@ -22,9 +24,10 @@ import kotlin.time.Instant
         GroupEntity::class,
         CategoryEntity::class,
         AccountEntity::class,
-        TransactionEntity::class
+        TransactionEntity::class,
+        CategoryMonthlyStatusEntity::class
     ],
-    version = 1,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -34,6 +37,7 @@ abstract class GetALifeDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun accountsDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
+    abstract fun categoryMonthlyStatusDao(): CategoryMonthlyStatusDao
 
     companion object {
         @Volatile
@@ -45,7 +49,9 @@ abstract class GetALifeDatabase : RoomDatabase() {
                     context.applicationContext,
                     GetALifeDatabase::class.java,
                     "budget_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

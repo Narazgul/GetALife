@@ -1,6 +1,7 @@
 package app.tinygiants.getalife.di
 
 import app.tinygiants.getalife.data.repository.AccountsRepositoryImpl
+import app.tinygiants.getalife.data.repository.CategoryMonthlyStatusRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
 import app.tinygiants.getalife.data.repository.CrispChatRepository
 import app.tinygiants.getalife.data.repository.FirebaseRemoteConfigRepository
@@ -9,6 +10,7 @@ import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.RevenueCatRepository
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
 import app.tinygiants.getalife.domain.repository.AccountRepository
+import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.repository.InAppReviewRepository
@@ -50,4 +52,7 @@ abstract class RepositoryModule {
     abstract fun provideSupportChatRepository(crispChatRepository: CrispChatRepository): SupportChatRepository
 
     // endregion
+
+    @Binds
+    abstract fun provideCategoryMonthlyStatusRepository(impl: CategoryMonthlyStatusRepositoryImpl): CategoryMonthlyStatusRepository
 }
