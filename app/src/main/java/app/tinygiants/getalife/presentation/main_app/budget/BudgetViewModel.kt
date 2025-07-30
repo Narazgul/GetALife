@@ -3,50 +3,52 @@ package app.tinygiants.getalife.presentation.main_app.budget
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.EmptyMoney
-import app.tinygiants.getalife.domain.model.Group
+import app.tinygiants.getalife.domain.model.BudgetMonth
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.UserHint
 import app.tinygiants.getalife.domain.usecase.budget.AssignableMoneyException
-import app.tinygiants.getalife.domain.usecase.budget.GetAssignableMoneyUseCase
-import app.tinygiants.getalife.domain.usecase.budget.GetBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.CarryOverToNextMonthUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetBudgetForMonthUseCase
+import app.tinygiants.getalife.domain.usecase.budget.UpdateCategoryMonthlyStatusUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.AddCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryStatus.CategoryHasTransactionsException
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryStatus
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.UpdateCategoryUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.AddGroupUseCase
-import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupStatus.GroupHasCategoriesException
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupStatus
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.DeleteGroupUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.group.UpdateGroupUseCase
 import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AllAssigned
-import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.AssignableMoneyAvailable
-import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.OverDistributed
-import app.tinygiants.getalife.presentation.main_app.budget.BannerUiState.Overspent
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.AddCategory
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.AddGroup
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.DeleteCategory
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.DeleteGroup
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.UpdateCategory
+import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.UpdateCategoryAssignment
 import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent.UpdateGroup
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.presentation.shared_composables.UiText.DynamicString
 import app.tinygiants.getalife.presentation.shared_composables.UiText.StringResource
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Clock
 
 @HiltViewModel
 class BudgetViewModel @Inject constructor(
-    private val getBudget: GetBudgetUseCase,
-    private val getAssignableMoney: GetAssignableMoneyUseCase,
+    private val getBudgetForMonth: GetBudgetForMonthUseCase,
+    private val updateCategoryMonthlyStatus: UpdateCategoryMonthlyStatusUseCase,
+    private val carryOverToNextMonth: CarryOverToNextMonthUseCase,
     private val addGroup: AddGroupUseCase,
     private val updateGroup: UpdateGroupUseCase,
     private val deleteGroup: DeleteGroupUseCase,
@@ -55,7 +57,16 @@ class BudgetViewModel @Inject constructor(
     private val deleteCategory: DeleteCategoryUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
+    private val currentMonthFlow = MutableStateFlow(
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).let {
+            YearMonth(it.year, it.month) 
+        }
+    )
+    val currentMonth = currentMonthFlow.asStateFlow()
+
+    private val groupExpandStates = MutableStateFlow<Map<Long, Boolean>>(emptyMap())
+
+    private val uiStateFlow = MutableStateFlow(
         BudgetUiState(
             bannerState = AllAssigned(text = DynamicString("")),
             groups = emptyMap(),
@@ -64,42 +75,23 @@ class BudgetViewModel @Inject constructor(
             errorMessage = null
         )
     )
-    val uiState = _uiState.asStateFlow()
-
-    // region Init
+    val uiState = uiStateFlow.asStateFlow()
 
     init {
-        loadBudget()
+        loadBudgetForMonth(currentMonthFlow.value)
     }
 
-    private fun loadBudget() {
+    private fun loadBudgetForMonth(yearMonth: YearMonth) {
         viewModelScope.launch {
 
             launch {
-                getBudget()
+                getBudgetForMonth(yearMonth)
                     .catch { throwable ->
                         Firebase.crashlytics.recordException(throwable)
                         displayError(throwable)
                     }
                     .collect { result ->
-                        result.onSuccess { budgetListElements -> displayBudgetList(budgetListElements) }
-                        result.onFailure { throwable ->
-                            Firebase.crashlytics.recordException(throwable)
-                            displayError(throwable)
-                        }
-                    }
-            }
-
-            launch {
-                getAssignableMoney()
-                    .catch { throwable ->
-                        Firebase.crashlytics.recordException(throwable)
-                        displayError(throwable as AssignableMoneyException)
-                    }
-                    .collect { result ->
-                        result.onSuccess { (assignableMoney, overspentCategoryText) ->
-                            displayAssignableMoney(assignableMoney, overspentCategoryText)
-                        }
+                        result.onSuccess { budgetMonth -> displayBudgetMonth(budgetMonth) }
                         result.onFailure { throwable ->
                             Firebase.crashlytics.recordException(throwable)
                             displayError(throwable)
@@ -108,66 +100,139 @@ class BudgetViewModel @Inject constructor(
             }
         }
     }
-
-    // endregion
-
-    // region Interaction from UI
 
     fun onUserClickEvent(clickEvent: UserClickEvent) {
         viewModelScope.launch {
             when (clickEvent) {
+                is AddGroup -> runSuspendCatching({
+                    addGroup(clickEvent.name)
+                    loadBudgetForMonth(currentMonth.value)
+                }, ::displayUserMessage)
 
-                is AddGroup -> addGroup(groupName = clickEvent.name)
-                is UpdateGroup -> updateGroup(group = clickEvent.group)
-                is DeleteGroup -> deleteGroup(group = clickEvent.group)
-                    .onFailure { throwable -> displayUserMessage(throwable) }
+                is UpdateGroup -> runSuspendCatching({
+                    updateGroup(clickEvent.group)
+                    updateGroupExpandCollapseState(clickEvent.group.id, clickEvent.group.isExpanded)
+                    loadBudgetForMonth(currentMonth.value)
+                }, ::displayUserMessage)
+                is DeleteGroup -> {
+                    deleteGroup(clickEvent.group)
+                        .onSuccess { loadBudgetForMonth(currentMonth.value) }
+                        .onFailure { displayUserMessage(it) }
+                }
+                is AddCategory -> runSuspendCatching({
+                    addCategory(clickEvent.groupId, clickEvent.categoryName)
+                    loadBudgetForMonth(currentMonth.value)
+                }, ::displayUserMessage)
 
-                is AddCategory -> addCategory(groupId = clickEvent.groupId, categoryName = clickEvent.categoryName)
-                is UpdateCategory -> updateCategory(updatedCategory = clickEvent.category)
-                is DeleteCategory -> deleteCategory(category = clickEvent.category)
-                    .onFailure { throwable -> displayUserMessage(throwable) }
+                is UpdateCategory -> runSuspendCatching({
+                    updateCategory(clickEvent.category)
+                    loadBudgetForMonth(currentMonth.value)
+                }, ::displayUserMessage)
+                is UpdateCategoryAssignment -> runSuspendCatching({
+                    updateCategoryMonthlyStatus(clickEvent.categoryId, currentMonth.value, clickEvent.newAmount)
+                    loadBudgetForMonth(currentMonth.value)
+                }, ::displayUserMessage)
+                is DeleteCategory -> {
+                    deleteCategory(clickEvent.category)
+                        .onSuccess { loadBudgetForMonth(currentMonth.value) }
+                        .onFailure { displayUserMessage(it) }
+                }
             }
         }
     }
 
-    fun onUserMessageShown() = _uiState.update { budgetUiState ->
+    fun onUserMessageShown() = uiStateFlow.update { budgetUiState ->
         budgetUiState.copy(userMessage = null)
     }
 
-    // endregion
+    fun navigateToMonth(yearMonth: YearMonth) {
+        currentMonthFlow.value = yearMonth
+        loadBudgetForMonth(yearMonth)
+    }
 
-    // region Private Helper functions
+    private fun updateGroupExpandCollapseState(groupId: Long, isExpanded: Boolean) {
+        groupExpandStates.update { currentExpandStates ->
+            currentExpandStates.toMutableMap().apply {
+                put(groupId, isExpanded)
+            }
+        }
+    }
 
-    private fun displayBudgetList(groups: Map<Group, List<Category>>) {
-        _uiState.update { budgetUiState ->
-            val groupsWithOptionalText = addOptionalString(groups)
+    private fun displayBudgetMonth(budgetMonth: BudgetMonth) {
+        uiStateFlow.update { budgetUiState ->
+            val currentExpandStates = groupExpandStates.value
+
+            val groupsWithCategoryBudgets = budgetMonth.groups.mapValues { (_, categoryBudgets) ->
+                categoryBudgets.map { categoryBudget ->
+                    categoryBudget.copy(
+                        category = categoryBudget.category.copy(
+                            optionalText = createOptionalTextStringResource(userHint = categoryBudget.progress.userHint)
+                        )
+                    )
+                }
+            }.mapKeys { (group, _) ->
+                val groupExpandedState = currentExpandStates[group.id] ?: group.isExpanded
+                group.copy(isExpanded = groupExpandedState)
+            }
+
+            val totalSpentMoney = budgetMonth.groups.values
+                .flatten()
+                .fold(Money()) { acc, categoryBudget -> acc + categoryBudget.spentAmount }
+
+            val bannerState = createBannerState(
+                assignableMoney = budgetMonth.totalAssignableMoney,
+                assignedMoney = budgetMonth.totalAssignedMoney,
+                spentMoney = totalSpentMoney
+            )
+            
             budgetUiState.copy(
-                groups = groupsWithOptionalText,
+                bannerState = bannerState,
+                groups = groupsWithCategoryBudgets,
                 isLoading = false
             )
         }
     }
 
-    private fun displayAssignableMoney(assignableMoney: Money, overspentCategory: UiText?) {
-        _uiState.update { budgetUiState ->
-            budgetUiState.copy(
-                bannerState = getBannerState(
-                    assignableMoney = assignableMoney,
-                    overspentCategoryText = overspentCategory
+    private fun createBannerState(assignableMoney: Money, assignedMoney: Money, spentMoney: Money): BannerUiState {
+        return when {
+            spentMoney > assignedMoney -> {
+                val overspentAmount = spentMoney - assignedMoney
+                BannerUiState.Overspent(
+                    StringResource(resId = R.string.spent_more_than_available, overspentAmount.formattedPositiveMoney)
                 )
-            )
+            }
+
+            assignableMoney.asDouble() == 0.0 -> {
+                AllAssigned(StringResource(resId = R.string.everything_distributed))
+            }
+
+            assignableMoney.asDouble() > 0.0 -> {
+                BannerUiState.AssignableMoneyAvailable(
+                    StringResource(resId = R.string.distribute_available_money, assignableMoney.formattedPositiveMoney)
+                )
+            }
+
+            assignableMoney.asDouble() < 0.0 -> {
+                BannerUiState.OverDistributed(
+                    StringResource(resId = R.string.more_distributed_than_available, assignableMoney.formattedPositiveMoney)
+                )
+            }
+
+            else -> {
+                AllAssigned(StringResource(resId = R.string.everything_distributed))
+            }
         }
     }
 
     private fun displayUserMessage(throwable: Throwable) {
 
         val userMessage = when (throwable) {
-            is CategoryHasTransactionsException -> StringResource(R.string.error_transactions_in_category)
-            is GroupHasCategoriesException -> StringResource(R.string.error_categories_in_group)
+            is DeleteCategoryStatus.CategoryHasTransactionsException -> StringResource(R.string.error_transactions_in_category)
+            is DeleteGroupStatus.GroupHasCategoriesException -> StringResource(R.string.error_categories_in_group)
             else -> DynamicString(value = "")
         }
 
-        _uiState.update { budgetUiState ->
+        uiStateFlow.update { budgetUiState ->
             budgetUiState.copy(userMessage = userMessage)
         }
     }
@@ -182,14 +247,14 @@ class BudgetViewModel @Inject constructor(
 
         when (throwable) {
 
-            is AssignableMoneyException -> _uiState.update { budgetUiState ->
+            is AssignableMoneyException -> uiStateFlow.update { budgetUiState ->
                 budgetUiState.copy(
                     bannerState = AllAssigned(text = DynamicString("")),
                     errorMessage = errorMessage
                 )
             }
 
-            else -> _uiState.update { budgetUiState ->
+            else -> uiStateFlow.update { budgetUiState ->
                 budgetUiState.copy(
                     isLoading = false,
                     errorMessage = errorMessage
@@ -198,13 +263,7 @@ class BudgetViewModel @Inject constructor(
         }
     }
 
-    private fun addOptionalString(groups: Map<Group, List<Category>>) = groups.mapValues { group ->
-        group.value.map { category ->
-            category.copy(optionalText = getOptionalTextStringResource(userHint = category.progress.userHint))
-        }
-    }
-
-    private fun getOptionalTextStringResource(userHint: UserHint) = when (userHint) {
+    private fun createOptionalTextStringResource(userHint: UserHint) = when (userHint) {
         UserHint.NoHint -> DynamicString(value = "")
         UserHint.AllSpent -> StringResource(R.string.all_spent)
         UserHint.FullyFunded -> StringResource(R.string.fully_funded)
@@ -214,29 +273,18 @@ class BudgetViewModel @Inject constructor(
         is UserHint.Spent -> StringResource(R.string.amount_spent, userHint.amount)
         is UserHint.SpentMoreThanAvailable -> StringResource(R.string.spent_more_than_available, userHint.amount)
     }
-
-    private fun getBannerState(assignableMoney: Money, overspentCategoryText: UiText?): BannerUiState {
-
-        if (assignableMoney == EmptyMoney() && overspentCategoryText != null) return Overspent(overspentCategoryText)
-
-        return when {
-            assignableMoney == EmptyMoney() -> AllAssigned(StringResource(resId = R.string.everything_distributed))
-            assignableMoney > EmptyMoney() -> AssignableMoneyAvailable(
-                StringResource(
-                    resId = R.string.distribute_available_money,
-                    assignableMoney.formattedPositiveMoney
-                )
-            )
-
-            else -> OverDistributed(
-                StringResource(
-                    resId = R.string.more_distributed_than_available,
-                    assignableMoney.formattedPositiveMoney
-                )
-            )
+    
+    private suspend inline fun <T> runSuspendCatching(
+        block: suspend () -> T,
+        onFailure: (Throwable) -> Unit
+    ) {
+        try {
+            block()
+        } catch (c: CancellationException) {
+            throw c
+        } catch (e: Exception) {
+            onFailure(e)
         }
     }
-
-// endregion
 
 }

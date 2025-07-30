@@ -2,14 +2,16 @@ package app.tinygiants.getalife.presentation.main_app.budget
 
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.Group
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.UiText
 
 @Immutable
 data class BudgetUiState(
     val bannerState: BannerUiState,
-    val groups: Map<Group, List<Category>>,
+    val groups: Map<Group, List<CategoryMonthlyStatus>>,
     val isLoading: Boolean,
     val userMessage: UiText?,
     val errorMessage: ErrorMessage?
@@ -30,4 +32,6 @@ sealed class UserClickEvent {
     data class AddCategory(val groupId: Long, val categoryName: String) : UserClickEvent()
     data class UpdateCategory(val category: Category) : UserClickEvent()
     data class DeleteCategory(val category: Category) : UserClickEvent()
+
+    data class UpdateCategoryAssignment(val categoryId: Long, val newAmount: Money) : UserClickEvent()
 }
