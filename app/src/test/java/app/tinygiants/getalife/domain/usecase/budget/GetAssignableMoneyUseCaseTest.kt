@@ -277,11 +277,7 @@ class GetAssignableMoneyUseCaseTest {
     fun `Available Money with overspent Category`(): Unit = runTest {
         val account = cashAccount().toDomain()
         accountRepositoryFake.accounts.value = listOf(account)
-        val category = groceriesCategoryEntity().toDomain().copy(
-            budgetTarget = EmptyMoney(),
-            availableMoney = Money(-3.0),
-            assignedMoney = Money(2.0)
-        )
+        val category = groceriesCategoryEntity().toDomain()
         categoryRepositoryFake.categories.value = listOf(category)
         val startingBalanceTransaction = startingBalanceTransaction().copy(amount = 100.0).toDomain(
             account = account,

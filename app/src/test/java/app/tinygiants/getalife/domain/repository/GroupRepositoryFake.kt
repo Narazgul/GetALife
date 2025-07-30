@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.domain.repository
 
+import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,5 +22,9 @@ class GroupRepositoryFake : GroupRepository {
 
     override suspend fun deleteGroup(group: Group) {
         groupFlow.value = groupFlow.value.filterNot { it.id == group.id }
+    }
+
+    override suspend fun getGroupsWithCategories(): Map<Group, List<Category>> {
+        return groupFlow.value.associateWith { emptyList<Category>() }
     }
 }

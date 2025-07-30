@@ -1,9 +1,11 @@
 package app.tinygiants.getalife.domain.repository
 
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.YearMonth
 
 class TransactionRepositoryFake(
     private val accountRepository: AccountRepositoryFake,
@@ -13,23 +15,23 @@ class TransactionRepositoryFake(
     val transactions = MutableStateFlow<List<Transaction>>(emptyList())
 
     override fun getTransactionsFlow() = transactions.map { list ->
-            list.map { transaction ->
+        list.map { transaction ->
+            transaction.copy(
+                account = accountRepository.getAccount(transaction.account.id),
+                category = transaction.category?.let { categoryRepository.getCategory(it.id) }
+            )
+        }
+    }
+
+    override fun getTransactionsByAccountFlow(accountId: Long) = transactions.map { list ->
+        list.filter { it.account.id == accountId }
+            .map { transaction ->
                 transaction.copy(
                     account = accountRepository.getAccount(transaction.account.id),
                     category = transaction.category?.let { categoryRepository.getCategory(it.id) }
                 )
             }
-        }
-
-    override fun getTransactionsByAccountFlow(accountId: Long) = transactions.map { list ->
-            list.filter { it.account.id == accountId }
-                .map { transaction ->
-                    transaction.copy(
-                        account = accountRepository.getAccount(transaction.account.id),
-                        category = transaction.category?.let { categoryRepository.getCategory(it.id) }
-                    )
-                }
-        }
+    }
 
     override fun getTransactionsByCategoryFlow(categoryId: Long) =
         transactions.map { list ->
@@ -59,4 +61,9 @@ class TransactionRepositoryFake(
 
     override suspend fun deleteTransaction(transaction: Transaction) =
         transactions.update { it.filterNot { entity -> entity.id == transaction.id } }
+
+    override suspend fun getSpentAmountByCategoryAndMonth(categoryId: Long, yearMonth: YearMonth): Money {
+        // Simple implementation for tests - return empty money
+        return Money(0.0)
+    }
 }

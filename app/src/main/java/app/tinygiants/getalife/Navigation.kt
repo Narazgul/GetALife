@@ -71,7 +71,6 @@ class GetALifeNavHostViewModel @Inject constructor(
             initialValue = SubscriptionStatus.Unknown
         )
 
-    // This can be used later when dynamic start destination is needed
     val dynamicStartDestination: StateFlow<String> = subscriptionStatus.map { status ->
         when (status) {
             Active -> Path.Main.route
