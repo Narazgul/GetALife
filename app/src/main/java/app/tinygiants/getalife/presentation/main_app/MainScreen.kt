@@ -54,12 +54,11 @@ fun BottomNavigation(bottomBarNavController: NavHostController) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                 },
-                selected = currentDestination?.hierarchy?.any { navDestination -> navDestination.route == nestedGraph.route } == true,
+                selected = currentDestination?.hierarchy?.any { navDestination ->
+                    navDestination.route == nestedGraph.route
+                } == true,
                 onClick = {
-                    navigateToBottomNavigationGraph(
-                        bottomBarNavController = bottomBarNavController,
-                        graph = nestedGraph
-                    )
+                    bottomBarNavController.navigateToBottomNavigationGraph(nestedGraph)
                 }
             )
         }
@@ -72,9 +71,10 @@ val bottomNavigationItems = listOf(
     MainNavGraph.Account
 )
 
-fun navigateToBottomNavigationGraph(bottomBarNavController: NavHostController, graph: MainNavGraph) {
-    bottomBarNavController.navigate(graph.route) {
-        popUpTo(bottomBarNavController.graph.findStartDestination().id) {
+// Navigation Extensions
+fun NavHostController.navigateToBottomNavigationGraph(graph: MainNavGraph) {
+    navigate(graph.route) {
+        popUpTo(this@navigateToBottomNavigationGraph.graph.findStartDestination().id) {
             saveState = true
         }
         launchSingleTop = true

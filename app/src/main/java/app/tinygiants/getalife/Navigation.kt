@@ -43,9 +43,9 @@ fun GetALifeNavHost() {
 
     NavHost(
         navController = navController,
+        // Hardcoded for testing purposes - keep as requested
         startDestination = Path.Main.route
     ) {
-
         composable(route = Path.Onboarding.route) {
             OnboardingScreen(
                 subscriptionStatus = subscriptionStatus,
@@ -71,7 +71,8 @@ class GetALifeNavHostViewModel @Inject constructor(
             initialValue = SubscriptionStatus.Unknown
         )
 
-    val startDestination: StateFlow<String> = subscriptionStatus.map { status ->
+    // This can be used later when dynamic start destination is needed
+    val dynamicStartDestination: StateFlow<String> = subscriptionStatus.map { status ->
         when (status) {
             Active -> Path.Main.route
             else -> Path.Onboarding.route

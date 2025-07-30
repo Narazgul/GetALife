@@ -30,10 +30,10 @@ import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.presentation.main_app.transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.AddTransactionItem
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.Description
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.TransactionPartner
+import app.tinygiants.getalife.presentation.main_app.transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
@@ -62,7 +62,7 @@ fun AddTransaction() {
             )
         }
 
-    AddTransaction(
+    AddTransactionContent(
         categories = uiState.categories,
         accounts = uiState.accounts,
         onAddTransactionClicked = onAddTransactionClicked
@@ -70,7 +70,7 @@ fun AddTransaction() {
 }
 
 @Composable
-fun AddTransaction(
+fun AddTransactionContent(
     categories: List<Category>,
     accounts: List<Account>,
     onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner) -> Unit
@@ -129,7 +129,7 @@ fun AddTransaction(
 private fun AddTransactionPreview() {
     GetALifeTheme {
         Surface {
-            AddTransaction(
+            AddTransactionContent(
                 categories = emptyList(),
                 accounts = emptyList(),
                 onAddTransactionClicked = { _, _, _, _, _, _ -> }
