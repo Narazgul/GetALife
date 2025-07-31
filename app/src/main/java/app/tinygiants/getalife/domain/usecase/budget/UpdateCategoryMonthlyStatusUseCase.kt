@@ -25,6 +25,7 @@ class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
         val status = if (existingStatus != null) {
             existingStatus.copy(
                 assignedAmount = newAssignedAmount
+                // availableAmount and spentAmount will be calculated reactively by GetBudgetForMonthUseCase
             )
         } else {
             // Create new status - we need to get the category
@@ -35,9 +36,9 @@ class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
                 category = category,
                 assignedAmount = newAssignedAmount,
                 isCarryOverEnabled = true,
-                spentAmount = EmptyMoney(),
-                availableAmount = newAssignedAmount, // Initial available = assigned
-                progress = EmptyProgress(),
+                spentAmount = EmptyMoney(), // Will be calculated reactively
+                availableAmount = EmptyMoney(), // Will be calculated reactively
+                progress = EmptyProgress(), // Will be calculated reactively
                 suggestedAmount = null
             )
         }

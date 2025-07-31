@@ -1,12 +1,12 @@
 package app.tinygiants.getalife.domain.usecase.budget
 
+import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.BudgetMonth
-import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.EmptyMoney
-import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
@@ -14,6 +14,8 @@ import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.CalculateCategoryProgressUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
@@ -27,9 +29,9 @@ class GetBudgetForMonthUseCase @Inject constructor(
 ) {
     operator fun invoke(yearMonth: YearMonth): Flow<Result<BudgetMonth>> {
         return combine(
-            statusRepository.getStatusForMonthFlow(yearMonth),
-            transactionRepository.getTransactionsFlow(),
-            accountRepository.getAccountsFlow()
+            statusRepository.getStatusForMonthFlow(yearMonth).distinctUntilChanged(),
+            transactionRepository.getTransactionsFlow().distinctUntilChanged(),
+            accountRepository.getAccountsFlow().distinctUntilChanged()
         ) { statusForMonth, allTransactions, accounts ->
             try {
                 calculateBudgetMonth(yearMonth, statusForMonth, allTransactions, accounts)
@@ -42,56 +44,39 @@ class GetBudgetForMonthUseCase @Inject constructor(
     private suspend fun calculateBudgetMonth(
         yearMonth: YearMonth,
         statusForMonth: List<CategoryMonthlyStatus>,
-        allTransactions: List<app.tinygiants.getalife.domain.model.Transaction>,
-        accounts: List<app.tinygiants.getalife.domain.model.Account>
+        allTransactions: List<Transaction>,
+        accounts: List<Account>
     ): Result<BudgetMonth> {
-        // 1. Load raw data from repositories
-        val groupsWithCategories = groupRepository.getGroupsWithCategories()
-        val statusLookup = statusForMonth.associateBy { it.category.id }
+        // 1. Load groups for ordering and expansion state
+        val groups = groupRepository.getGroupsFlow().first()
 
-        val groupsWithCategoryStatus = mutableMapOf<Group, List<CategoryMonthlyStatus>>()
-        var totalAssignedMoney = EmptyMoney()
+        // 2. Prepare map Group -> List<CategoryMonthlyStatus>
+        val statusGrouped = statusForMonth.groupBy { it.category.groupId }
 
-        // 2. Calculate status for each category
-        groupsWithCategories.forEach { (group: Group, categories: List<Category>) ->
-            val categoryStatuses = categories.map { category ->
-                val existingStatus = statusLookup[category.id]
+        val groupsWithCategoryStatus: Map<Group, List<CategoryMonthlyStatus>> = groups.associateWith { group ->
+            val statusesOfGroup = statusGrouped[group.id].orEmpty()
+                .sortedBy { it.category.listPosition }
 
-                // Calculate spent amount from all transactions reactively
-                val spentAmount = calculateSpentAmountFromTransactions(category.id, yearMonth, allTransactions)
-                val assignedAmount = existingStatus?.assignedAmount ?: EmptyMoney()
-                val availableAmount = assignedAmount - spentAmount
-                val suggestedAmount = getSuggestedAmountForCategory(category)
+            statusesOfGroup.map { status ->
+                val spentAmount = calculateSpentAmountFromTransactions(status.category.id, yearMonth, allTransactions)
+                val availableAmount = status.assignedAmount - spentAmount
 
-                // Create or update the status object BEFORE calculating progress
-                val currentStatus = existingStatus?.copy(
+                val updatedStatus = status.copy(
                     spentAmount = spentAmount,
-                    availableAmount = availableAmount,
-                    suggestedAmount = suggestedAmount
+                    availableAmount = availableAmount
                 )
-                    ?: // Create new status for category without assignment
-                    CategoryMonthlyStatus(
-                        category = category,
-                        assignedAmount = EmptyMoney(),
-                        isCarryOverEnabled = true,
-                        spentAmount = spentAmount,
-                        availableAmount = availableAmount,
-                        progress = EmptyProgress(),
-                        suggestedAmount = suggestedAmount
-                    )
 
-                // Now calculate progress with the guaranteed non-null status
-                val progress = calculateCategoryProgress(currentStatus)
-
-                totalAssignedMoney = totalAssignedMoney + assignedAmount
-
-                // Return the final status with calculated progress
-                currentStatus.copy(progress = progress)
+                val progress = calculateCategoryProgress(updatedStatus)
+                updatedStatus.copy(progress = progress)
             }
-            groupsWithCategoryStatus[group] = categoryStatuses
         }
 
-        // 3. Calculate total available money to assign
+        // 3. Calculate total assigned money for this month only
+        val totalAssignedMoney = statusForMonth.fold(EmptyMoney()) { acc, st ->
+            acc + st.assignedAmount
+        }
+
+        // 4. Calculate total available money to assign (cross month)
         val totalAvailableMoneyToAssign = calculateTotalAvailableMoneyToAssign(accounts)
 
         val budgetMonth = BudgetMonth(
@@ -107,7 +92,7 @@ class GetBudgetForMonthUseCase @Inject constructor(
     private fun calculateSpentAmountFromTransactions(
         categoryId: Long,
         yearMonth: YearMonth,
-        allTransactions: List<app.tinygiants.getalife.domain.model.Transaction>
+        allTransactions: List<Transaction>
     ): Money {
         val totalSpent = allTransactions
             .filter { transaction ->
@@ -125,16 +110,11 @@ class GetBudgetForMonthUseCase @Inject constructor(
         return localDateTime.year == yearMonth.year && localDateTime.month == yearMonth.month
     }
 
-    private fun getSuggestedAmountForCategory(category: Category): Money? {
-        return category.monthlyTargetAmount
-    }
-
-    private suspend fun calculateTotalAvailableMoneyToAssign(accounts: List<app.tinygiants.getalife.domain.model.Account>): Money {
+    private suspend fun calculateTotalAvailableMoneyToAssign(accounts: List<Account>): Money {
         val totalAccountBalance = accounts.fold(EmptyMoney()) { acc, account ->
             acc + account.balance
         }
 
-        // Get all assigned money across ALL months, not just the current month
         val allMonthlyStatuses = statusRepository.getAllStatuses()
         val totalAssignedMoneyAllMonths = allMonthlyStatuses.fold(EmptyMoney()) { acc: Money, status: CategoryMonthlyStatus ->
             acc + status.assignedAmount
