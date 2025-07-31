@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.presentation.main_app.budget.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,15 +21,21 @@ import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 @Composable
 fun MonthNavigator(
     currentMonth: YearMonth,
     onMonthChanged: (YearMonth) -> Unit
 ) {
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentRealMonth = YearMonth(today.year, today.month)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,7 +58,13 @@ fun MonthNavigator(
         Text(
             text = "${currentMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${currentMonth.year}",
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .clickable {
+                    if (currentMonth != currentRealMonth) {
+                        onMonthChanged(currentRealMonth)
+                    }
+                }
         )
 
         IconButton(
