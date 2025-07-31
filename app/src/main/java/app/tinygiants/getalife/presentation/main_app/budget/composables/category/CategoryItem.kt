@@ -37,19 +37,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.emoji2.emojipicker.EmojiPickerView
+import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Progress
 import app.tinygiants.getalife.domain.model.ProgressColor
 import app.tinygiants.getalife.domain.model.UserHint
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.onWarning
@@ -67,7 +68,6 @@ fun Category(
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Progress = EmptyProgress(),
-    optionalText: UiText = UiText.DynamicString(value = ""),
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money) -> Unit = { },
@@ -110,7 +110,7 @@ fun Category(
         Spacer(modifier = Modifier.height(spacing.xs))
         CategoryProgress(progress = progress)
         Spacer(modifier = Modifier.height(spacing.m))
-        OptionalText(optionalText = optionalText)
+        OptionalText(userHint = progress.userHint)
     }
 
     if (showGeneralEditBottomSheet) EditCategoryBottomSheet(
@@ -279,14 +279,66 @@ fun CategoryProgress(progress: Progress) {
 }
 
 @Composable
-fun OptionalText(optionalText: UiText) {
-    if (optionalText.asString().isNotBlank()) {
-        Text(
-            text = optionalText.asString(),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Start
-        )
+fun OptionalText(userHint: UserHint) {
+    when (userHint) {
+        is UserHint.NoHint -> {}
+        is UserHint.AllSpent -> {
+            Text(
+                text = LocalContext.current.getString(R.string.all_spent),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+        is UserHint.FullyFunded -> {
+            Text(
+                text = LocalContext.current.getString(R.string.fully_funded),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+        is UserHint.Spent -> {
+            Text(
+                text = LocalContext.current.getString(R.string.amount_spent, userHint.amount),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+        is UserHint.AssignMoreOrRemoveSpending -> {
+            Text(
+                text = LocalContext.current.getString(R.string.assign_more_or_remove_spending, userHint.amount),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+        is UserHint.MoreNeedForBudgetTarget -> {
+            Text(
+                text = LocalContext.current.getString(R.string.more_needed_to_reach_budget_target, userHint.amount),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+        is UserHint.ExtraMoney -> {
+            Text(
+                text = LocalContext.current.getString(R.string.enjoy_your_extra_money, userHint.amount),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+
+        is UserHint.SpentMoreThanAvailable -> {
+            Text(
+                text = LocalContext.current.getString(R.string.spent_more_than_available, userHint.amount),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
     }
 }
 
@@ -309,9 +361,11 @@ fun EmojiPicker(
         sheetState = sheetState
     ) {
         AndroidView(
-            modifier = Modifier.fillMaxWidth().verticalScroll(
-                state = rememberScrollState()
-            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(
+                    state = rememberScrollState()
+                ),
             factory = { context ->
                 EmojiPickerView(context).apply {
                     setOnEmojiPickedListener { emojiViewItem ->

@@ -3,9 +3,7 @@ package app.tinygiants.getalife.data.local.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import kotlin.time.Instant
 
 @Entity(tableName = "categories")
@@ -52,8 +50,6 @@ data class CategoryEntity(
             budgetTarget = Money(value = budgetTarget),
             monthlyTargetAmount = monthlyTargetAmount?.let { Money(value = it) },
             targetMonthsRemaining = targetMonthsRemaining,
-            progress = EmptyProgress(),
-            optionalText = UiText.DynamicString(value = ""),
             listPosition = listPosition,
             isInitialCategory = isInitialCategory,
             updatedAt = updatedAt,

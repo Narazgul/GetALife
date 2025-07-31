@@ -3,10 +3,8 @@ package app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.cate
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyMoney
-import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.emoji.AddEmojiToCategoryNameUseCase
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -39,8 +37,6 @@ class AddCategoryUseCase @Inject constructor(
                 budgetTarget = EmptyMoney(),
                 monthlyTargetAmount = null,
                 targetMonthsRemaining = null,
-                progress = EmptyProgress(),
-                optionalText = UiText.DynamicString(value = ""),
                 listPosition = endOfListPosition,
                 isInitialCategory = isInitialCategory,
                 updatedAt = timeOfCreation,

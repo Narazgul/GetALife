@@ -23,7 +23,6 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlin.time.Clock
@@ -103,8 +102,6 @@ fun CategoryBudgetItemPreview() {
                 budgetTarget = Money(100.0),
                 monthlyTargetAmount = null,
                 targetMonthsRemaining = null,
-                progress = EmptyProgress(),
-                optionalText = UiText.DynamicString(""),
                 listPosition = 0,
                 isInitialCategory = false,
                 updatedAt = Clock.System.now(),

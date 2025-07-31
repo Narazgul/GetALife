@@ -125,25 +125,25 @@ private fun LazyListScope.categories(
     items(
         items = categories,
         key = { category -> category.category.id }
-    ) { category ->
+    ) { monthlyStatus ->
         val onUpdateEmojiClicked = { emoji: String ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.category.copy(emoji = emoji)))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = monthlyStatus.category.copy(emoji = emoji)))
         }
         val onUpdateName = { categoryName: String ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.category.copy(name = categoryName)))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = monthlyStatus.category.copy(name = categoryName)))
         }
         val onUpdateBudgetTargetClicked = { newBudgetTarget: Money ->
-            onUserClickEvent(UserClickEvent.UpdateCategory(category = category.category.copy(budgetTarget = newBudgetTarget)))
+            onUserClickEvent(UserClickEvent.UpdateCategory(category = monthlyStatus.category.copy(budgetTarget = newBudgetTarget)))
         }
         val onUpdateAssignedMoneyClicked = { newAssignedMoney: Money ->
             onUserClickEvent(
                 UserClickEvent.UpdateCategoryAssignment(
-                    categoryId = category.category.id,
+                    categoryId = monthlyStatus.category.id,
                     newAmount = newAssignedMoney
                 )
             )
         }
-        val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = category.category)) }
+        val onDeleteCategoryClicked = { onUserClickEvent(UserClickEvent.DeleteCategory(category = monthlyStatus.category)) }
 
         AnimatedVisibility(
             visible = group.isExpanded,
@@ -151,29 +151,28 @@ private fun LazyListScope.categories(
                     expandVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             exit = shrinkVertically(animationSpec = tween(ANIMATION_TIME_300_MILLISECONDS)),
             modifier = Modifier.padding(
-                top = if (category == firstCategoryItem) spacing.xxs else spacing.halfDp,
-                bottom = if (category == lastCategoryItem) spacing.xxs else spacing.halfDp
+                top = if (monthlyStatus == firstCategoryItem) spacing.xxs else spacing.halfDp,
+                bottom = if (monthlyStatus == lastCategoryItem) spacing.xxs else spacing.halfDp
             )
         ) {
-            if (category.category.isInitialCategory) {
+            if (monthlyStatus.category.isInitialCategory) {
                 EmptyCategoryItem(onUpdateNameClicked = onUpdateName)
             } else
                 Column {
                     Category(
-                        emoji = category.category.emoji,
-                        categoryName = category.category.name,
-                        budgetTarget = category.category.budgetTarget,
-                        assignedMoney = category.assignedAmount,
-                        availableMoney = category.availableAmount,
-                        progress = category.category.progress,
-                        optionalText = category.category.optionalText,
+                        emoji = monthlyStatus.category.emoji,
+                        categoryName = monthlyStatus.category.name,
+                        budgetTarget = monthlyStatus.category.budgetTarget,
+                        assignedMoney = monthlyStatus.assignedAmount,
+                        availableMoney = monthlyStatus.availableAmount,
+                        progress = monthlyStatus.progress,
                         onUpdateEmojiClicked = onUpdateEmojiClicked,
                         onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
                         onUpdateAssignedMoneyClicked = onUpdateAssignedMoneyClicked,
                         onDeleteCategoryClicked = onDeleteCategoryClicked
                     )
-                    if (category != lastCategoryItem)
+                    if (monthlyStatus != lastCategoryItem)
                         Spacer(
                             modifier = Modifier
                                 .height(spacing.xxs)

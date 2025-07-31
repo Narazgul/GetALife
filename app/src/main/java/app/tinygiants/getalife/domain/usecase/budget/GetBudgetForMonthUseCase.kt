@@ -4,6 +4,7 @@ import app.tinygiants.getalife.domain.model.BudgetMonth
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.EmptyMoney
+import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepository
@@ -43,31 +44,32 @@ class GetBudgetForMonthUseCase @Inject constructor(
                     val spentAmount = transactionRepository.getSpentAmountByCategoryAndMonth(category.id, yearMonth)
                     val assignedAmount = existingStatus?.assignedAmount ?: EmptyMoney()
                     val availableAmount = assignedAmount - spentAmount
-                    val progress = calculateCategoryProgress(category, existingStatus, spentAmount)
                     val suggestedAmount = getSuggestedAmountForCategory(category)
 
-                    totalAssignedMoney = totalAssignedMoney + assignedAmount
-
-                    if (existingStatus != null) {
-                        // Update existing status with calculated values
-                        existingStatus.copy(
-                            spentAmount = spentAmount,
-                            availableAmount = availableAmount,
-                            progress = progress,
-                            suggestedAmount = suggestedAmount
-                        )
-                    } else {
-                        // Create new status for category without assignment
+                    // Create or update the status object BEFORE calculating progress
+                    val currentStatus = existingStatus?.copy(
+                        spentAmount = spentAmount,
+                        availableAmount = availableAmount,
+                        suggestedAmount = suggestedAmount
+                    )
+                        ?: // Create new status for category without assignment
                         CategoryMonthlyStatus(
                             category = category,
                             assignedAmount = EmptyMoney(),
                             isCarryOverEnabled = true,
                             spentAmount = spentAmount,
                             availableAmount = availableAmount,
-                            progress = progress,
+                            progress = EmptyProgress(),
                             suggestedAmount = suggestedAmount
                         )
-                    }
+
+                    // Now calculate progress with the guaranteed non-null status
+                    val progress = calculateCategoryProgress(currentStatus)
+
+                    totalAssignedMoney = totalAssignedMoney + assignedAmount
+
+                    // Return the final status with calculated progress
+                    currentStatus.copy(progress = progress)
                 }
                 groupsWithCategoryStatus[group] = categoryStatuses
             }

@@ -162,15 +162,7 @@ class BudgetViewModel @Inject constructor(
         uiStateFlow.update { budgetUiState ->
             val currentExpandStates = groupExpandStates.value
 
-            val groupsWithCategoryBudgets = budgetMonth.groups.mapValues { (_, categoryBudgets) ->
-                categoryBudgets.map { categoryBudget ->
-                    categoryBudget.copy(
-                        category = categoryBudget.category.copy(
-                            optionalText = createOptionalTextStringResource(userHint = categoryBudget.progress.userHint)
-                        )
-                    )
-                }
-            }.mapKeys { (group, _) ->
+            val groupsWithCategoryBudgets = budgetMonth.groups.mapKeys { (group, _) ->
                 val groupExpandedState = currentExpandStates[group.id] ?: group.isExpanded
                 group.copy(isExpanded = groupExpandedState)
             }

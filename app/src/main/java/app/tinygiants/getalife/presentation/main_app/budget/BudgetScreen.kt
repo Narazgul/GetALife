@@ -219,8 +219,6 @@ fun fakeCategoryBudgets() = mapOf(
                 budgetTarget = Money(value = 1000.00),
                 monthlyTargetAmount = null,
                 targetMonthsRemaining = null,
-                progress = EmptyProgress(),
-                optionalText = DynamicString(value = ""),
                 listPosition = 0,
                 isInitialCategory = false,
                 updatedAt = Clock.System.now(),
