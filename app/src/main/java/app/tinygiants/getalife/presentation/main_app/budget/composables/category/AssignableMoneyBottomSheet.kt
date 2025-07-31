@@ -48,10 +48,16 @@ fun AssignableMoneyBottomSheet(
             value = assignedMoneyUserInput,
             onValueChange = { userInput ->
                 assignedMoneyUserInput = userInput.replace(oldChar = ',', newChar = '.')
-                val positiveOrNegativeValue = assignedMoneyUserInput.toDoubleOrNull() ?: return@TextField
-                val positiveValue = abs(positiveOrNegativeValue)
-                assignedMoneyInCategory = Money(value = positiveValue)
-                onAssignedMoneyChanged(assignedMoneyInCategory)
+
+                if (assignedMoneyUserInput.isEmpty()) {
+                    assignedMoneyInCategory = Money(value = 0.0)
+                    onAssignedMoneyChanged(assignedMoneyInCategory)
+                } else {
+                    val positiveOrNegativeValue = assignedMoneyUserInput.toDoubleOrNull() ?: return@TextField
+                    val positiveValue = abs(positiveOrNegativeValue)
+                    assignedMoneyInCategory = Money(value = positiveValue)
+                    onAssignedMoneyChanged(assignedMoneyInCategory)
+                }
             },
             label = { Text(stringResource(R.string.distribute_money)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
