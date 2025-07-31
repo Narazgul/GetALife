@@ -15,6 +15,7 @@ import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.categ
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 class GetBudgetForMonthUseCase @Inject constructor(
@@ -29,9 +30,9 @@ class GetBudgetForMonthUseCase @Inject constructor(
             statusRepository.getStatusForMonthFlow(yearMonth),
             transactionRepository.getTransactionsFlow(),
             accountRepository.getAccountsFlow()
-        ) { statusForMonth, _, accounts ->
+        ) { statusForMonth, allTransactions, accounts ->
             try {
-                calculateBudgetMonth(yearMonth, statusForMonth, accounts)
+                calculateBudgetMonth(yearMonth, statusForMonth, allTransactions, accounts)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -41,6 +42,7 @@ class GetBudgetForMonthUseCase @Inject constructor(
     private suspend fun calculateBudgetMonth(
         yearMonth: YearMonth,
         statusForMonth: List<CategoryMonthlyStatus>,
+        allTransactions: List<app.tinygiants.getalife.domain.model.Transaction>,
         accounts: List<app.tinygiants.getalife.domain.model.Account>
     ): Result<BudgetMonth> {
         // 1. Load raw data from repositories
@@ -55,8 +57,8 @@ class GetBudgetForMonthUseCase @Inject constructor(
             val categoryStatuses = categories.map { category ->
                 val existingStatus = statusLookup[category.id]
 
-                // All calculations happen here in the use case
-                val spentAmount = transactionRepository.getSpentAmountByCategoryAndMonth(category.id, yearMonth)
+                // Calculate spent amount from all transactions reactively
+                val spentAmount = calculateSpentAmountFromTransactions(category.id, yearMonth, allTransactions)
                 val assignedAmount = existingStatus?.assignedAmount ?: EmptyMoney()
                 val availableAmount = assignedAmount - spentAmount
                 val suggestedAmount = getSuggestedAmountForCategory(category)
@@ -100,6 +102,27 @@ class GetBudgetForMonthUseCase @Inject constructor(
         )
 
         return Result.success(budgetMonth)
+    }
+
+    private fun calculateSpentAmountFromTransactions(
+        categoryId: Long,
+        yearMonth: YearMonth,
+        allTransactions: List<app.tinygiants.getalife.domain.model.Transaction>
+    ): Money {
+        val totalSpent = allTransactions
+            .filter { transaction ->
+                transaction.category?.id == categoryId &&
+                        transaction.transactionDirection.name == "Outflow" &&
+                        isTransactionInMonth(transaction.dateOfTransaction, yearMonth)
+            }
+            .sumOf { transaction -> transaction.amount.asDouble() }
+
+        return Money(totalSpent)
+    }
+
+    private fun isTransactionInMonth(instant: kotlin.time.Instant, yearMonth: YearMonth): Boolean {
+        val localDateTime = instant.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+        return localDateTime.year == yearMonth.year && localDateTime.month == yearMonth.month
     }
 
     private fun getSuggestedAmountForCategory(category: Category): Money? {

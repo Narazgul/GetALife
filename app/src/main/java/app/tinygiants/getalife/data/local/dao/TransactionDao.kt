@@ -25,6 +25,10 @@ interface TransactionDao {
     fun getCategoryTransactionsFlow(categoryId: Long): Flow<List<TransactionEntity>>
 
     @Transaction
+    @Query("SELECT * FROM transactions WHERE categoryId == :categoryId AND strftime('%Y-%m', datetime(dateOfTransaction / 1000, 'unixepoch')) = :yearMonth")
+    suspend fun getCategoryTransactionsForMonth(categoryId: Long, yearMonth: String): List<TransactionEntity>
+
+    @Transaction
     @Query("SELECT * FROM transactions WHERE categoryId == :categoryId  AND createdAt >= :startTime AND createdAt <= :endTime")
     suspend fun getCategoryTransactions(categoryId: Long, startTime: Instant, endTime: Instant): List<TransactionEntity>
 

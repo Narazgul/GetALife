@@ -2,7 +2,6 @@ package app.tinygiants.getalife.data.repository
 
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
-import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.AccountRepository
@@ -62,23 +61,35 @@ class TransactionRepositoryImpl @Inject constructor(
     override suspend fun deleteTransaction(transaction: Transaction) =
         transactionDao.deleteTransaction(TransactionEntity.fromDomain(transaction))
 
-    override suspend fun getSpentAmountByCategoryAndMonth(categoryId: Long, yearMonth: YearMonth): Money {
-        // Return sample spending data for demonstration
-        // In a real app, this would query the database for actual transactions
-        return when (categoryId) {
-            101L -> Money(800.0)  // Rent - partially paid
-            102L -> Money(120.0)  // Utilities - mostly paid
-            103L -> Money(280.0)  // Groceries - in progress
-            201L -> Money(250.0)  // Dining Out - over budget
-            202L -> Money(45.0)   // Entertainment - under budget
-            203L -> Money(85.0)   // Transportation - close to budget
-            301L -> Money(0.0)    // Vacation Fund - saving, no spending
-            302L -> Money(0.0)    // Emergency Fund - saving, no spending
-            else -> EmptyMoney() // Other categories - no spending
+    override fun getSpentAmountByCategoryAndMonthFlow(
+        categoryId: Long,
+        yearMonth: YearMonth
+    ): kotlinx.coroutines.flow.Flow<Money> {
+        return getTransactionsByCategoryFlow(categoryId).map { transactions ->
+            val totalSpent = transactions
+                .filter { transaction ->
+                    transaction.transactionDirection.name == "Outflow" &&
+                            isTransactionInMonth(transaction.dateOfTransaction, yearMonth)
+                }
+                .sumOf { transaction -> transaction.amount.asDouble() }
+
+            Money(totalSpent)
         }
     }
 
-    private fun isInMonth(instant: kotlin.time.Instant, yearMonth: YearMonth): Boolean {
+    override suspend fun getSpentAmountByCategoryAndMonth(categoryId: Long, yearMonth: YearMonth): Money {
+        val monthNumber = (yearMonth.month.ordinal + 1).toString().padStart(2, '0')
+        val yearMonthString = "${yearMonth.year}-$monthNumber"
+        val transactionEntities = transactionDao.getCategoryTransactionsForMonth(categoryId, yearMonthString)
+
+        val totalSpent = transactionEntities
+            .filter { entity -> entity.transactionDirection.name == "Outflow" }
+            .sumOf { entity -> entity.amount }
+
+        return Money(totalSpent)
+    }
+
+    private fun isTransactionInMonth(instant: kotlin.time.Instant, yearMonth: YearMonth): Boolean {
         // Convert instant to LocalDateTime and check if it's in the target month
         val localDateTime = instant.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
         return localDateTime.year == yearMonth.year && localDateTime.month == yearMonth.month
