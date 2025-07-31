@@ -79,4 +79,21 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun getAllStatuses(): List<CategoryMonthlyStatus> {
+        val entities = statusDao.getAllStatusData()
+        val categories = categoryRepository.getCategoriesFlow().first().associateBy { it.id }
+
+        return entities.mapNotNull { entity ->
+            val category = categories[entity.categoryId] ?: return@mapNotNull null
+
+            entity.toDomain(
+                category = category,
+                spentAmount = EmptyMoney(), // Will be calculated in use case
+                availableAmount = EmptyMoney(), // Will be calculated in use case
+                progress = EmptyProgress(), // Will be calculated in use case
+                suggestedAmount = null // Will be calculated in use case
+            )
+        }
+    }
 }

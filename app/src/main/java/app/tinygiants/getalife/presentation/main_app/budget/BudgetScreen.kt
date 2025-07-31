@@ -142,8 +142,6 @@ fun BudgetScreen(
 
                     AnimatedVisibility(
                         visible = uiState.bannerState !is BannerUiState.AllAssigned,
-                        enter = fadeIn(tween(1500)),
-                        exit = fadeOut(tween(3000)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(spacing.m)

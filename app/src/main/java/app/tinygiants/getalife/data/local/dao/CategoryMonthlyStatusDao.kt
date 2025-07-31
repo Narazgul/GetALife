@@ -19,6 +19,9 @@ interface CategoryMonthlyStatusDao {
     @Query("SELECT * FROM category_monthly_status WHERE yearMonth = :yearMonth")
     fun getStatusDataForMonthFlow(yearMonth: String): Flow<List<CategoryMonthlyStatusEntity>>
 
+    @Query("SELECT * FROM category_monthly_status")
+    suspend fun getAllStatusData(): List<CategoryMonthlyStatusEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(entity: CategoryMonthlyStatusEntity)
 

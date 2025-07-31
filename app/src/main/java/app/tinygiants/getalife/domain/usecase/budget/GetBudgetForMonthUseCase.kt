@@ -13,8 +13,7 @@ import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.CalculateCategoryProgressUseCase
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.YearMonth
 import javax.inject.Inject
 
@@ -25,81 +24,99 @@ class GetBudgetForMonthUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val calculateCategoryProgress: CalculateCategoryProgressUseCase
 ) {
-    operator fun invoke(yearMonth: YearMonth): Flow<Result<BudgetMonth>> = flow {
-        try {
-            // 1. Load raw data from repositories
-            val groupsWithCategories = groupRepository.getGroupsWithCategories()
-            val existingStatusForMonth = statusRepository.getStatusForMonth(yearMonth)
-            val statusLookup = existingStatusForMonth.associateBy { it.category.id }
+    operator fun invoke(yearMonth: YearMonth): Flow<Result<BudgetMonth>> {
+        return combine(
+            statusRepository.getStatusForMonthFlow(yearMonth),
+            transactionRepository.getTransactionsFlow(),
+            accountRepository.getAccountsFlow()
+        ) { statusForMonth, _, accounts ->
+            try {
+                calculateBudgetMonth(yearMonth, statusForMonth, accounts)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 
-            val groupsWithCategoryStatus = mutableMapOf<Group, List<CategoryMonthlyStatus>>()
-            var totalAssignedMoney = EmptyMoney()
+    private suspend fun calculateBudgetMonth(
+        yearMonth: YearMonth,
+        statusForMonth: List<CategoryMonthlyStatus>,
+        accounts: List<app.tinygiants.getalife.domain.model.Account>
+    ): Result<BudgetMonth> {
+        // 1. Load raw data from repositories
+        val groupsWithCategories = groupRepository.getGroupsWithCategories()
+        val statusLookup = statusForMonth.associateBy { it.category.id }
 
-            // 2. Calculate status for each category
-            groupsWithCategories.forEach { (group: Group, categories: List<Category>) ->
-                val categoryStatuses = categories.map { category ->
-                    val existingStatus = statusLookup[category.id]
+        val groupsWithCategoryStatus = mutableMapOf<Group, List<CategoryMonthlyStatus>>()
+        var totalAssignedMoney = EmptyMoney()
 
-                    // All calculations happen here in the use case
-                    val spentAmount = transactionRepository.getSpentAmountByCategoryAndMonth(category.id, yearMonth)
-                    val assignedAmount = existingStatus?.assignedAmount ?: EmptyMoney()
-                    val availableAmount = assignedAmount - spentAmount
-                    val suggestedAmount = getSuggestedAmountForCategory(category)
+        // 2. Calculate status for each category
+        groupsWithCategories.forEach { (group: Group, categories: List<Category>) ->
+            val categoryStatuses = categories.map { category ->
+                val existingStatus = statusLookup[category.id]
 
-                    // Create or update the status object BEFORE calculating progress
-                    val currentStatus = existingStatus?.copy(
+                // All calculations happen here in the use case
+                val spentAmount = transactionRepository.getSpentAmountByCategoryAndMonth(category.id, yearMonth)
+                val assignedAmount = existingStatus?.assignedAmount ?: EmptyMoney()
+                val availableAmount = assignedAmount - spentAmount
+                val suggestedAmount = getSuggestedAmountForCategory(category)
+
+                // Create or update the status object BEFORE calculating progress
+                val currentStatus = existingStatus?.copy(
+                    spentAmount = spentAmount,
+                    availableAmount = availableAmount,
+                    suggestedAmount = suggestedAmount
+                )
+                    ?: // Create new status for category without assignment
+                    CategoryMonthlyStatus(
+                        category = category,
+                        assignedAmount = EmptyMoney(),
+                        isCarryOverEnabled = true,
                         spentAmount = spentAmount,
                         availableAmount = availableAmount,
+                        progress = EmptyProgress(),
                         suggestedAmount = suggestedAmount
                     )
-                        ?: // Create new status for category without assignment
-                        CategoryMonthlyStatus(
-                            category = category,
-                            assignedAmount = EmptyMoney(),
-                            isCarryOverEnabled = true,
-                            spentAmount = spentAmount,
-                            availableAmount = availableAmount,
-                            progress = EmptyProgress(),
-                            suggestedAmount = suggestedAmount
-                        )
 
-                    // Now calculate progress with the guaranteed non-null status
-                    val progress = calculateCategoryProgress(currentStatus)
+                // Now calculate progress with the guaranteed non-null status
+                val progress = calculateCategoryProgress(currentStatus)
 
-                    totalAssignedMoney = totalAssignedMoney + assignedAmount
+                totalAssignedMoney = totalAssignedMoney + assignedAmount
 
-                    // Return the final status with calculated progress
-                    currentStatus.copy(progress = progress)
-                }
-                groupsWithCategoryStatus[group] = categoryStatuses
+                // Return the final status with calculated progress
+                currentStatus.copy(progress = progress)
             }
-
-            // 3. Calculate total available money to assign
-            val totalAvailableMoneyToAssign = calculateTotalAvailableMoneyToAssign(totalAssignedMoney)
-
-            val budgetMonth = BudgetMonth(
-                yearMonth = yearMonth,
-                totalAssignableMoney = totalAvailableMoneyToAssign,
-                totalAssignedMoney = totalAssignedMoney,
-                groups = groupsWithCategoryStatus
-            )
-
-            emit(Result.success(budgetMonth))
-        } catch (e: Exception) {
-            emit(Result.failure(e))
+            groupsWithCategoryStatus[group] = categoryStatuses
         }
+
+        // 3. Calculate total available money to assign
+        val totalAvailableMoneyToAssign = calculateTotalAvailableMoneyToAssign(accounts)
+
+        val budgetMonth = BudgetMonth(
+            yearMonth = yearMonth,
+            totalAssignableMoney = totalAvailableMoneyToAssign,
+            totalAssignedMoney = totalAssignedMoney,
+            groups = groupsWithCategoryStatus
+        )
+
+        return Result.success(budgetMonth)
     }
 
     private fun getSuggestedAmountForCategory(category: Category): Money? {
         return category.monthlyTargetAmount
     }
 
-    private suspend fun calculateTotalAvailableMoneyToAssign(totalAssignedMoney: Money): Money {
-        val allAccounts = accountRepository.getAccountsFlow().first()
-        val totalAccountBalance = allAccounts.fold(EmptyMoney()) { acc, account ->
+    private suspend fun calculateTotalAvailableMoneyToAssign(accounts: List<app.tinygiants.getalife.domain.model.Account>): Money {
+        val totalAccountBalance = accounts.fold(EmptyMoney()) { acc, account ->
             acc + account.balance
         }
 
-        return totalAccountBalance - totalAssignedMoney
+        // Get all assigned money across ALL months, not just the current month
+        val allMonthlyStatuses = statusRepository.getAllStatuses()
+        val totalAssignedMoneyAllMonths = allMonthlyStatuses.fold(EmptyMoney()) { acc: Money, status: CategoryMonthlyStatus ->
+            acc + status.assignedAmount
+        }
+
+        return totalAccountBalance - totalAssignedMoneyAllMonths
     }
 }
