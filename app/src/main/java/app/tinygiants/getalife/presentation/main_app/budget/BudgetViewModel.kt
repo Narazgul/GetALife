@@ -1,11 +1,11 @@
 package app.tinygiants.getalife.presentation.main_app.budget
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.BudgetMonth
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.model.UserHint
 import app.tinygiants.getalife.domain.usecase.budget.AssignableMoneyException
 import app.tinygiants.getalife.domain.usecase.budget.CarryOverToNextMonthUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetBudgetForMonthUseCase
@@ -54,13 +54,15 @@ class BudgetViewModel @Inject constructor(
     private val deleteGroup: DeleteGroupUseCase,
     private val addCategory: AddCategoryUseCase,
     private val updateCategory: UpdateCategoryUseCase,
-    private val deleteCategory: DeleteCategoryUseCase
+    private val deleteCategory: DeleteCategoryUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val currentMonthFlow = MutableStateFlow(
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).let {
-            YearMonth(it.year, it.month) 
-        }
+        savedStateHandle.get<String>("selectedMonth")?.let { YearMonth.parse(it) }
+            ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).let {
+                YearMonth(it.year, it.month)
+            }
     )
     val currentMonth = currentMonthFlow.asStateFlow()
 
@@ -147,6 +149,7 @@ class BudgetViewModel @Inject constructor(
 
     fun navigateToMonth(yearMonth: YearMonth) {
         currentMonthFlow.value = yearMonth
+        savedStateHandle["selectedMonth"] = yearMonth.toString()
         loadBudgetForMonth(yearMonth)
     }
 
@@ -253,17 +256,6 @@ class BudgetViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun createOptionalTextStringResource(userHint: UserHint) = when (userHint) {
-        UserHint.NoHint -> DynamicString(value = "")
-        UserHint.AllSpent -> StringResource(R.string.all_spent)
-        UserHint.FullyFunded -> StringResource(R.string.fully_funded)
-        is UserHint.AssignMoreOrRemoveSpending -> StringResource(R.string.assign_more_or_remove_spending, userHint.amount)
-        is UserHint.ExtraMoney -> StringResource(R.string.enjoy_your_extra_money, userHint.amount)
-        is UserHint.MoreNeedForBudgetTarget -> StringResource(R.string.more_needed_to_reach_budget_target, userHint.amount)
-        is UserHint.Spent -> StringResource(R.string.amount_spent, userHint.amount)
-        is UserHint.SpentMoreThanAvailable -> StringResource(R.string.spent_more_than_available, userHint.amount)
     }
     
     private suspend inline fun <T> runSuspendCatching(

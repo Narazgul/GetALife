@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
@@ -69,7 +71,8 @@ class AddTransactionViewModel @Inject constructor(
         accountId: Long,
         category: Category?,
         transactionPartner: String,
-        description: String
+        description: String,
+        dateOfTransaction: Instant = Clock.System.now()
     ) {
         viewModelScope.launch {
             addTransaction(
@@ -78,7 +81,8 @@ class AddTransactionViewModel @Inject constructor(
                 amount = amount,
                 direction = direction,
                 transactionPartner = transactionPartner,
-                description = description
+                description = description,
+                dateOfTransaction = dateOfTransaction
             )
         }
     }

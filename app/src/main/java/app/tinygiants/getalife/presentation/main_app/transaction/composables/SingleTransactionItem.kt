@@ -1,12 +1,25 @@
 package app.tinygiants.getalife.presentation.main_app.transaction.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,7 +30,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
@@ -27,6 +44,9 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.time.Clock
 
 @Composable
@@ -39,30 +59,130 @@ fun SingleTransactionItem(
 ) {
     var isUpdateTransactionBottomSheetVisible by remember { mutableStateOf(false) }
 
-    Row(
+    Card(
         modifier = Modifier
-            .padding(spacing.m)
+            .fillMaxWidth()
+            .padding(horizontal = spacing.m, vertical = spacing.s)
             .clickable { isUpdateTransactionBottomSheetVisible = true },
-        verticalAlignment = Alignment.CenterVertically
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(spacing.l)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = transaction.transactionPartner,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(spacing.s))
-            Text(
-                text = transaction.category?.name ?: "Ready to assign",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.fillMaxWidth()
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.l),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left side with icon and transaction info
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.m)
+            ) {
+                // Transaction direction icon in circular background
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (transaction.transactionDirection == TransactionDirection.Inflow)
+                                success.copy(alpha = 0.1f)
+                            else
+                                MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (transaction.transactionDirection == TransactionDirection.Inflow)
+                            Icons.Default.KeyboardArrowUp
+                        else
+                            Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = if (transaction.transactionDirection == TransactionDirection.Inflow)
+                            success
+                        else
+                            MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                // Transaction details
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // Transaction partner (main text)
+                    Text(
+                        text = transaction.transactionPartner.ifEmpty { "Unknown" },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(spacing.xs))
+
+                    // Category
+                    Text(
+                        text = transaction.category?.name ?: "Nicht zugeordnet",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(spacing.xs))
+
+                    // Date
+                    Text(
+                        text = formatTransactionDate(transaction.dateOfTransaction),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Description (if available)
+                    if (transaction.description.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(spacing.xs))
+                        Text(
+                            text = transaction.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(spacing.m))
+
+            // Right side with amount
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = transaction.amount.formattedPositiveMoney,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (transaction.transactionDirection == TransactionDirection.Inflow)
+                        success
+                    else
+                        MaterialTheme.colorScheme.error
+                )
+
+                Text(
+                    text = if (transaction.transactionDirection == TransactionDirection.Inflow) "Eingang" else "Ausgang",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (transaction.transactionDirection == TransactionDirection.Inflow)
+                        success
+                    else
+                        MaterialTheme.colorScheme.error
+                )
+            }
         }
-        Text(
-            text = transaction.amount.formattedMoney,
-            style = MaterialTheme.typography.bodyLarge,
-            color = if (transaction.transactionDirection == TransactionDirection.Inflow) success else MaterialTheme.colorScheme.error
-        )
     }
 
     val onSaveClicked =
@@ -71,7 +191,8 @@ fun SingleTransactionItem(
           updatedCategory: Category?,
           updatedTransactionDirection: TransactionDirection,
           updatedDescription: Description,
-          updatedTransactionPartner: TransactionPartner ->
+          updatedTransactionPartner: TransactionPartner,
+          updatedDateOfTransaction: kotlinx.datetime.Instant ->
 
             val updatedTransaction = transaction.copy(
                 amount = updatedAmount,
@@ -79,7 +200,8 @@ fun SingleTransactionItem(
                 category = updatedCategory,
                 transactionDirection = updatedTransactionDirection,
                 description = updatedDescription,
-                transactionPartner = updatedTransactionPartner
+                transactionPartner = updatedTransactionPartner,
+                dateOfTransaction = updatedDateOfTransaction
             )
 
             onSaveTransactionClicked(updatedTransaction)
@@ -95,6 +217,11 @@ fun SingleTransactionItem(
             onDeleteTransactionClicked = onDeleteTransactionClicked,
         )
     }
+}
+
+private fun formatTransactionDate(instant: kotlinx.datetime.Instant): String {
+    val date = Date(instant.toEpochMilliseconds())
+    return SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN).format(date)
 }
 
 @Preview

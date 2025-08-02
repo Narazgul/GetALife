@@ -50,7 +50,8 @@ fun AddTransaction() {
           category: Category?,
           direction: TransactionDirection,
           description: Description,
-          transactionPartner: TransactionPartner ->
+          transactionPartner: TransactionPartner,
+          dateOfTransaction: kotlin.time.Instant ->
 
             viewModel.onSaveTransactionClicked(
                 amount = amount,
@@ -58,7 +59,8 @@ fun AddTransaction() {
                 accountId = account.id,
                 description = description,
                 transactionPartner = transactionPartner,
-                category = category
+                category = category,
+                dateOfTransaction = dateOfTransaction
             )
         }
 
@@ -73,7 +75,7 @@ fun AddTransaction() {
 fun AddTransactionContent(
     categories: List<Category>,
     accounts: List<Account>,
-    onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner) -> Unit
+    onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner, dateOfTransaction: kotlin.time.Instant) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -112,8 +114,16 @@ fun AddTransactionContent(
                         else -> neutralBackground
                     }
                 },
-                onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner ->
-                    onAddTransactionClicked(amount, account, category, direction, description, transactionPartner)
+                onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner, dateOfTransaction ->
+                    onAddTransactionClicked(
+                        amount,
+                        account,
+                        category,
+                        direction,
+                        description,
+                        transactionPartner,
+                        dateOfTransaction
+                    )
                     showTransactionAddedSnackbar()
                 },
                 modifier = Modifier
@@ -132,7 +142,7 @@ private fun AddTransactionPreview() {
             AddTransactionContent(
                 categories = emptyList(),
                 accounts = emptyList(),
-                onAddTransactionClicked = { _, _, _, _, _, _ -> }
+                onAddTransactionClicked = { _, _, _, _, _, _, _ -> }
             )
         }
     }

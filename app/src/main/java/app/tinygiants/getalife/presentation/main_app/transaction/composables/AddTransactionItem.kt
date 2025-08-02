@@ -3,23 +3,42 @@ package app.tinygiants.getalife.presentation.main_app.transaction.composables
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,8 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.R
@@ -39,10 +60,18 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.time.Clock
 
 typealias Description = String
 typealias TransactionPartner = String
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionItem(
     categories: List<Category>,
@@ -54,7 +83,8 @@ fun AddTransactionItem(
         category: Category?,
         direction: TransactionDirection,
         description: Description,
-        transactionPartner: TransactionPartner
+        transactionPartner: TransactionPartner,
+        dateOfTransaction: Instant
     ) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -62,6 +92,7 @@ fun AddTransactionItem(
 
     var showCategoryDropdown by rememberSaveable { mutableStateOf(false) }
     var showAccountDropdown by rememberSaveable { mutableStateOf(false) }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
 
     var amountMoney by remember { mutableStateOf(Money(value = 0.0)) }
     var amountUserInputText by rememberSaveable { mutableStateOf("") }
@@ -70,11 +101,17 @@ fun AddTransactionItem(
     var directionUserInput by rememberSaveable { mutableStateOf(TransactionDirection.Unknown) }
     var categoryUserInput by remember { mutableStateOf(categories.firstOrNull()) }
     var accountUserInput by remember { mutableStateOf(accounts.firstOrNull()) }
+    var selectedDate by remember { mutableStateOf(Clock.System.now()) }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = selectedDate.toEpochMilliseconds()
+    )
+    val confirmEnabled = remember { derivedStateOf { datePickerState.selectedDateMillis != null } }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         MultiChoiceSegmentedButtonRow {
             SegmentedButton(
@@ -102,96 +139,189 @@ fun AddTransactionItem(
                 Text(text = stringResource(R.string.outflow))
             }
         }
-        Spacer(modifier = Modifier.height(spacing.s))
-        AnimatedVisibility(visible = directionUserInput != TransactionDirection.Inflow) {
+
+        Spacer(modifier = Modifier.height(spacing.l))
+
+        // 2x2 Grid for Category, Account, Date, Amount
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(spacing.m)
             ) {
-                Text(
-                    text = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
-                    modifier = Modifier
-                        .clickable { showCategoryDropdown = true }
-                        .padding(spacing.s)
-                )
-                DropdownMenu(
-                    expanded = showCategoryDropdown,
-                    onDismissRequest = { showCategoryDropdown = false },
-                    modifier = Modifier
-                        .width(200.dp)
+                // Category (only visible for Outflow)
+                AnimatedVisibility(
+                    visible = directionUserInput != TransactionDirection.Inflow,
+                    modifier = Modifier.weight(1f)
                 ) {
-                    categories.forEach { category ->
-                        DropdownMenuItem(
-                            text = { Text(text = category.name) },
-                            onClick = {
-                                categoryUserInput = category
-                                showCategoryDropdown = false
-                            }
+                    Box {
+                        SelectionCard(
+                            label = stringResource(id = R.string.chose_category),
+                            selectedText = categoryUserInput?.name ?: stringResource(id = R.string.chose_category),
+                            onClick = { showCategoryDropdown = true },
+                            isCompact = true
                         )
+                        DropdownMenu(
+                            expanded = showCategoryDropdown,
+                            onDismissRequest = { showCategoryDropdown = false },
+                            modifier = Modifier.width(200.dp)
+                        ) {
+                            categories.forEach { category ->
+                                DropdownMenuItem(
+                                    text = { Text(text = category.name) },
+                                    onClick = {
+                                        categoryUserInput = category
+                                        showCategoryDropdown = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Account Selection
+                Box(modifier = Modifier.weight(1f)) {
+                    SelectionCard(
+                        label = stringResource(id = R.string.choose_account),
+                        selectedText = accountUserInput?.name ?: stringResource(id = R.string.choose_account),
+                        onClick = { showAccountDropdown = true },
+                        isCompact = true
+                    )
+                    DropdownMenu(
+                        expanded = showAccountDropdown,
+                        onDismissRequest = { showAccountDropdown = false },
+                        modifier = Modifier.width(200.dp)
+                    ) {
+                        accounts.forEach { account ->
+                            DropdownMenuItem(
+                                text = { Text(text = account.name) },
+                                onClick = {
+                                    accountUserInput = account
+                                    showAccountDropdown = false
+                                }
+                            )
+                        }
                     }
                 }
             }
+
             Spacer(modifier = Modifier.height(spacing.m))
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = accountUserInput?.name ?: stringResource(id = R.string.choose_account),
-                modifier = Modifier
-                    .clickable { showAccountDropdown = true }
-                    .padding(spacing.s)
-            )
-            DropdownMenu(
-                expanded = showAccountDropdown,
-                onDismissRequest = { showAccountDropdown = false },
-                modifier = Modifier
-                    .width(200.dp)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.m)
             ) {
-                accounts.forEach { account ->
-                    DropdownMenuItem(
-                        text = { Text(text = account.name) },
-                        onClick = {
-                            accountUserInput = account
-                            showAccountDropdown = false
-                        }
+                // Date Selection
+                SelectionCard(
+                    label = "Datum",
+                    selectedText = formatDate(selectedDate),
+                    onClick = { showDatePicker = true },
+                    icon = Icons.Default.DateRange,
+                    isCompact = true,
+                    modifier = Modifier.weight(1f)
+                )
+
+                // Amount Input
+                Card(
+                    modifier = Modifier.weight(1f),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(spacing.l)
+                ) {
+                    TextField(
+                        value = amountUserInputText,
+                        onValueChange = { userInput ->
+                            amountUserInputText = userInput.replace(oldChar = ',', newChar = '.')
+                            amountMoney = Money(value = amountUserInputText.toDoubleOrNull() ?: amountMoney.asDouble())
+                        },
+                        label = {
+                            Text(
+                                stringResource(R.string.amount),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged {
+                                amountUserInputText = if (it.isFocused.not()) amountMoney.formattedMoney
+                                else ""
+                            },
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                        colors = TextFieldDefaults.colors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(spacing.m)
                     )
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(spacing.l))
-        TextField(
-            value = amountUserInputText,
-            onValueChange = { userInput ->
-                amountUserInputText = userInput.replace(oldChar = ',', newChar = '.')
-                amountMoney = Money(value = amountUserInputText.toDoubleOrNull() ?: amountMoney.asDouble())
-            },
-            label = { Text(stringResource(R.string.amount)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged {
-                    amountUserInputText = if (it.isFocused.not()) amountMoney.formattedMoney
-                    else ""
-                }
-        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(spacing.l)
+        ) {
+            TextField(
+                value = transactionPartnerUserInput,
+                onValueChange = { userInput -> transactionPartnerUserInput = userInput },
+                label = {
+                    Text(
+                        stringResource(R.string.transaction_partner),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(spacing.m)
+            )
+        }
+
         Spacer(modifier = Modifier.height(spacing.l))
-        TextField(
-            value = transactionPartnerUserInput,
-            onValueChange = { userInput -> transactionPartnerUserInput = userInput },
-            label = { Text(stringResource(R.string.transaction_partner)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(spacing.l))
-        TextField(
-            value = descriptionUserInput,
-            onValueChange = { userInput -> descriptionUserInput = userInput },
-            label = { Text(stringResource(R.string.description)) },
-            modifier = Modifier.fillMaxWidth()
-        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(spacing.l)
+        ) {
+            TextField(
+                value = descriptionUserInput,
+                onValueChange = { userInput -> descriptionUserInput = userInput },
+                label = {
+                    Text(
+                        stringResource(R.string.description),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge,
+                maxLines = 3,
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(spacing.m)
+            )
+        }
+
         Spacer(modifier = Modifier.height(spacing.xl))
+
         Button(
             onClick = {
                 onAddTransactionClicked(
@@ -201,17 +331,133 @@ fun AddTransactionItem(
                     directionUserInput,
                     descriptionUserInput,
                     transactionPartnerUserInput,
+                    selectedDate
                 )
+
+                amountMoney = Money(value = 0.0)
+                amountUserInputText = ""
+                descriptionUserInput = ""
+                transactionPartnerUserInput = ""
+                directionUserInput = TransactionDirection.Unknown
+                categoryUserInput = categories.firstOrNull()
+                accountUserInput = accounts.firstOrNull()
+                selectedDate = Clock.System.now()
 
                 focusManager.clearFocus()
             },
             enabled = accountUserInput != null &&
                     directionUserInput != TransactionDirection.Unknown &&
-                    (categoryUserInput != null || directionUserInput == TransactionDirection.Inflow)
+                    (categoryUserInput != null || directionUserInput == TransactionDirection.Inflow),
+            modifier = Modifier
+                .fillMaxWidth(0.8f) // reduced width of the save button
+                .height(56.dp),
+            shape = RoundedCornerShape(spacing.l),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
         ) {
-            Text(text = stringResource(id = R.string.save))
+            Text(
+                text = stringResource(id = R.string.save),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            selectedDate = Instant.fromEpochMilliseconds(millis)
+                        }
+                        showDatePicker = false
+                    },
+                    enabled = confirmEnabled.value
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Abbrechen")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+}
+
+@Composable
+private fun SelectionCard(
+    label: String,
+    selectedText: String,
+    onClick: () -> Unit,
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    isCompact: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .then(if (!isCompact) Modifier.fillMaxWidth() else Modifier)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(spacing.l)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(if (isCompact) spacing.m else spacing.l)
+        ) {
+            Column {
+                Text(
+                    text = label,
+                    style = if (isCompact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(spacing.xs))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedText,
+                        style = if (isCompact) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1
+                    )
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(if (isCompact) 16.dp else 20.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(if (isCompact) 20.dp else 24.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun formatDate(instant: Instant): String {
+    instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    val date = Date(instant.toEpochMilliseconds())
+    return SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN).format(date)
 }
 
 @Preview
@@ -223,7 +469,7 @@ private fun EnterTransactionPreview() {
                 categories = emptyList(),
                 accounts = emptyList(),
                 onTransactionDirectionClicked = { _ -> },
-                onAddTransactionClicked = { _, _, _, _, _, _ -> })
+                onAddTransactionClicked = { _, _, _, _, _, _, _ -> })
         }
     }
 }
