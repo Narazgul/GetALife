@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.R
@@ -42,6 +45,7 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.main_app.account.composables.AccountsList
 import app.tinygiants.getalife.presentation.main_app.account.composables.AddAccountBottomSheet
+import app.tinygiants.getalife.presentation.main_app.account.composables.TransferBetweenAccountsBottomSheet
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.LoadingIndicator
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -70,6 +74,7 @@ fun AccountScreen(
 
     var areFabButtonsVisible by rememberSaveable { mutableStateOf(true) }
     var isAddAccountBottomSheetVisible by remember { mutableStateOf(false) }
+    var isTransferBottomSheetVisible by remember { mutableStateOf(false) }
 
     val startingBalanceString = stringResource(R.string.starting_balance)
     val startingBalanceDescription = stringResource(R.string.starting_balance_description)
@@ -105,15 +110,25 @@ fun AccountScreen(
                     enter = fadeIn(tween(500)),
                     exit = fadeOut(tween(500))
                 ) {
-                    ExtendedFloatingActionButton(
-                        onClick = { isAddAccountBottomSheetVisible = true },
-                        icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
-                        text = { Text(text = stringResource(id = R.string.add_account)) }
-                    )
+                    Column {
+                        if (uiState.accounts.size >= 2) {
+                            ExtendedFloatingActionButton(
+                                onClick = { isTransferBottomSheetVisible = true },
+                                icon = { Icon(Icons.Filled.Send, contentDescription = null) },
+                                text = { Text(text = "Transfer") }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                        ExtendedFloatingActionButton(
+                            onClick = { isAddAccountBottomSheetVisible = true },
+                            icon = { Icon(Icons.Filled.Add, "Add Account FloatingActionButton") },
+                            text = { Text(text = stringResource(id = R.string.add_account)) }
+                        )
+                    }
                 }
             },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-            ) { innerPadding ->
+        ) { innerPadding ->
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
 
             Box(
@@ -150,6 +165,23 @@ fun AccountScreen(
                 onConfirmClicked = onAddAccountClicked,
                 onDismissRequest = { isAddAccountBottomSheetVisible = false }
             )
+            if (isTransferBottomSheetVisible) {
+                TransferBetweenAccountsBottomSheet(
+                    accounts = uiState.accounts,
+                    onTransferClicked = { fromAccount, toAccount, amount, description ->
+                        onUserClickEvent(
+                            UserClickEvent.TransferBetweenAccounts(
+                                fromAccount = fromAccount,
+                                toAccount = toAccount,
+                                amount = amount,
+                                description = description
+                            )
+                        )
+                        isTransferBottomSheetVisible = false
+                    },
+                    onDismissRequest = { isTransferBottomSheetVisible = false }
+                )
+            }
         }
     }
 }

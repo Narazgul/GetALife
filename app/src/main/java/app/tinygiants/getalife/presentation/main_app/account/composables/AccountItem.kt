@@ -14,8 +14,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -91,10 +92,14 @@ fun AccountItem(
             ) {
                 Icon(
                     imageVector = when (type) {
-                        AccountType.CreditCard -> Icons.Default.AccountBox
-                        AccountType.Depot -> Icons.Default.AccountCircle
-                        AccountType.Checking -> Icons.Default.Star
-                        else -> Icons.Default.AccountBox
+                        AccountType.Cash -> Icons.Filled.Star
+                        AccountType.Checking -> Icons.Filled.AccountCircle
+                        AccountType.Savings -> Icons.Filled.Star
+                        AccountType.CreditCard -> Icons.Filled.Info
+                        AccountType.Depot -> Icons.Filled.AccountCircle
+                        AccountType.Loan -> Icons.Filled.Info
+                        AccountType.Mortgage -> Icons.Filled.Home
+                        AccountType.Unknown -> Icons.Filled.Info
                     },
                     contentDescription = null,
                     modifier = Modifier

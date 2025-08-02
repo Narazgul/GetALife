@@ -4,8 +4,8 @@ import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
+import app.tinygiants.getalife.presentation.shared_composables.UiText
 
 data class AccountUiState(
     val accounts: List<Account>,
@@ -26,4 +26,11 @@ sealed class UserClickEvent {
 
     data class UpdateAccount(val account: Account) : UserClickEvent()
     data class DeleteAccount(val account: Account) : UserClickEvent()
+
+    data class TransferBetweenAccounts(
+        val fromAccount: Account,
+        val toAccount: Account,
+        val amount: Money,
+        val description: String
+    ) : UserClickEvent()
 }

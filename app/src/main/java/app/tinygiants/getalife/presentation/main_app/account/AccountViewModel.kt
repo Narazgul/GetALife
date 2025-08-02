@@ -11,6 +11,7 @@ import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.TransferBetweenAccountsUseCase
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
 import app.tinygiants.getalife.presentation.shared_composables.UiText
 import app.tinygiants.getalife.presentation.shared_composables.UiText.StringResource
@@ -30,7 +31,8 @@ class AccountViewModel @Inject constructor(
     private val getCategories: GetCategoriesUseCase,
     private val addAccount: AddAccountUseCase,
     private val updateAccount: UpdateAccountUseCase,
-    private val deleteAccount: DeleteAccountUseCase
+    private val deleteAccount: DeleteAccountUseCase,
+    private val transferBetweenAccounts: TransferBetweenAccountsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -104,6 +106,22 @@ class AccountViewModel @Inject constructor(
                     .onFailure { throwable ->
                         displayUserMessage(throwable)
                     }
+                is UserClickEvent.TransferBetweenAccounts -> {
+                    try {
+                        transferBetweenAccounts(
+                            fromAccount = clickEvent.fromAccount,
+                            toAccount = clickEvent.toAccount,
+                            amount = clickEvent.amount,
+                            description = clickEvent.description
+                        )
+                        _uiState.update { state ->
+                            state.copy(userMessage = UiText.DynamicString("Transfer successful"))
+                        }
+                    } catch (throwable: Throwable) {
+                        Firebase.crashlytics.recordException(throwable)
+                        displayUserMessage(throwable)
+                    }
+                }
             }
         }
     }
