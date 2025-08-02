@@ -3,8 +3,8 @@ package app.tinygiants.getalife.data.repository
 import app.tinygiants.getalife.data.local.dao.CategoryMonthlyStatusDao
 import app.tinygiants.getalife.data.local.entities.CategoryMonthlyStatusEntity
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
-import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.EmptyProgress
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
@@ -30,8 +30,6 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
 
             entity.toDomain(
                 category = category,
-                spentAmount = EmptyMoney(), // Will be calculated in use case
-                availableAmount = EmptyMoney(), // Will be calculated in use case  
                 progress = EmptyProgress(), // Will be calculated in use case
                 suggestedAmount = null // Will be calculated in use case
             )
@@ -47,8 +45,6 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
 
             entity.toDomain(
                 category = category,
-                spentAmount = EmptyMoney(), // Will be calculated in use case
-                availableAmount = EmptyMoney(), // Will be calculated in use case
                 progress = EmptyProgress(), // Will be calculated in use case
                 suggestedAmount = null // Will be calculated in use case
             )
@@ -57,6 +53,10 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
 
     override suspend fun saveStatus(status: CategoryMonthlyStatus, yearMonth: YearMonth) {
         statusDao.insertOrUpdate(CategoryMonthlyStatusEntity.fromDomain(status, yearMonth))
+    }
+
+    override suspend fun saveStatus(status: CategoryMonthlyStatus, yearMonth: YearMonth, carryOverFromPrevious: Money) {
+        statusDao.insertOrUpdate(CategoryMonthlyStatusEntity.fromDomain(status, yearMonth, carryOverFromPrevious))
     }
 
     override suspend fun deleteStatus(categoryId: Long, yearMonth: YearMonth) {
@@ -72,8 +72,6 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
 
                 entity.toDomain(
                     category = category,
-                    spentAmount = EmptyMoney(), // Will be calculated in use case
-                    availableAmount = EmptyMoney(), // Will be calculated in use case
                     progress = EmptyProgress(), // Will be calculated in use case
                     suggestedAmount = null // Will be calculated in use case
                 )
@@ -89,8 +87,6 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
 
             entity.toDomain(
                 category = category,
-                spentAmount = EmptyMoney(), // Will be calculated in use case
-                availableAmount = EmptyMoney(), // Will be calculated in use case
                 progress = EmptyProgress(), // Will be calculated in use case
                 suggestedAmount = null // Will be calculated in use case
             )

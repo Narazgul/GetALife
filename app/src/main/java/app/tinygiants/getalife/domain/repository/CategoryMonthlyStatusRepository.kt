@@ -1,6 +1,7 @@
 package app.tinygiants.getalife.domain.repository
 
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
+import app.tinygiants.getalife.domain.model.Money
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.YearMonth
 
@@ -13,6 +14,7 @@ interface CategoryMonthlyStatusRepository {
     suspend fun getStatusForMonth(yearMonth: YearMonth): List<CategoryMonthlyStatus>
     suspend fun getAllStatuses(): List<CategoryMonthlyStatus>
     suspend fun saveStatus(status: CategoryMonthlyStatus, yearMonth: YearMonth)
+    suspend fun saveStatus(status: CategoryMonthlyStatus, yearMonth: YearMonth, carryOverFromPrevious: Money)
     suspend fun deleteStatus(categoryId: Long, yearMonth: YearMonth)
     fun getStatusForMonthFlow(yearMonth: YearMonth): Flow<List<CategoryMonthlyStatus>>
 }

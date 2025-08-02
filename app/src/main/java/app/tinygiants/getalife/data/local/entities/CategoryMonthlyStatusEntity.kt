@@ -16,16 +16,18 @@ data class CategoryMonthlyStatusEntity(
     val categoryId: Long,
     val yearMonth: String, // Format: "2024-01"
     val assignedAmount: Double,
-    val isCarryOverEnabled: Boolean = true
+    val isCarryOverEnabled: Boolean = true,
+    // New pre-calculated fields for performance
+    val spentAmount: Double = 0.0,
+    val carryOverFromPrevious: Double = 0.0,
+    val availableAmount: Double = 0.0,
+    val updatedAt: Long = 0L // Timestamp when last calculated
 ) {
     /**
-     * Converts to domain model with calculated fields provided by use case.
-     * Only persistent fields are stored in entity.
+     * Converts to domain model using pre-calculated fields from database.
      */
     fun toDomain(
         category: app.tinygiants.getalife.domain.model.Category,
-        spentAmount: Money,
-        availableAmount: Money,
         progress: app.tinygiants.getalife.domain.model.Progress,
         suggestedAmount: Money?
     ): CategoryMonthlyStatus {
@@ -33,8 +35,8 @@ data class CategoryMonthlyStatusEntity(
             category = category,
             assignedAmount = Money(value = assignedAmount),
             isCarryOverEnabled = isCarryOverEnabled,
-            spentAmount = spentAmount,
-            availableAmount = availableAmount,
+            spentAmount = Money(value = spentAmount),
+            availableAmount = Money(value = availableAmount),
             progress = progress,
             suggestedAmount = suggestedAmount
         )
@@ -42,15 +44,22 @@ data class CategoryMonthlyStatusEntity(
 
     companion object {
         /**
-         * Creates entity from domain model - only stores persistent fields.
-         * Calculated fields (spent, available, progress) are ignored.
+         * Creates entity from domain model - stores all calculated fields for performance.
          */
-        fun fromDomain(status: CategoryMonthlyStatus, yearMonth: YearMonth): CategoryMonthlyStatusEntity {
+        fun fromDomain(
+            status: CategoryMonthlyStatus,
+            yearMonth: YearMonth,
+            carryOverFromPrevious: Money = Money(0.0)
+        ): CategoryMonthlyStatusEntity {
             return CategoryMonthlyStatusEntity(
                 categoryId = status.category.id,
                 yearMonth = yearMonth.toString(),
                 assignedAmount = status.assignedAmount.asDouble(),
-                isCarryOverEnabled = status.isCarryOverEnabled
+                isCarryOverEnabled = status.isCarryOverEnabled,
+                spentAmount = status.spentAmount.asDouble(),
+                carryOverFromPrevious = carryOverFromPrevious.asDouble(),
+                availableAmount = status.availableAmount.asDouble(),
+                updatedAt = System.currentTimeMillis()
             )
         }
     }

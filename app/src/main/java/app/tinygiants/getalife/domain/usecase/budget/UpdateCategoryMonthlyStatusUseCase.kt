@@ -12,7 +12,8 @@ import kotlin.time.Clock
 
 class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
     private val statusRepository: CategoryMonthlyStatusRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val recalculateCategoryMonthlyStatusUseCase: RecalculateCategoryMonthlyStatusUseCase
 ) {
     suspend operator fun invoke(
         categoryId: Long,
@@ -44,5 +45,6 @@ class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
         }
 
         statusRepository.saveStatus(status, yearMonth)
+        recalculateCategoryMonthlyStatusUseCase(categoryId, yearMonth)
     }
 }
