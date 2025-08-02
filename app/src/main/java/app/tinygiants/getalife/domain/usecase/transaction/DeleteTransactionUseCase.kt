@@ -8,8 +8,11 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.budget.RecalculateCategoryMonthlyStatusUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.time.Clock
 
@@ -17,18 +20,33 @@ class DeleteTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
+    private val recalculateCategoryMonthlyStatus: RecalculateCategoryMonthlyStatusUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
     suspend operator fun invoke(transaction: Transaction) {
 
-        val transformedAmount = transformAmount(direction = transaction.transactionDirection, amount = transaction.amount)
-        val transactionWithTransformedAmount = transaction.copy(amount = transformedAmount)
-
         withContext(defaultDispatcher) {
-            deleteTransaction(transaction = transactionWithTransformedAmount)
-            updateAccount(transaction = transactionWithTransformedAmount)
-            updateCategory(transaction = transactionWithTransformedAmount)
+            deleteTransaction(transaction = transaction)
+
+            if (transaction.transactionDirection == TransactionDirection.AccountTransfer) {
+                // Special handling for account transfers - need to revert both accounts
+                handleAccountTransferDeletion(transaction)
+            } else {
+                // Regular transaction handling
+                val transformedAmount = transformAmount(direction = transaction.transactionDirection, amount = transaction.amount)
+                val transactionWithTransformedAmount = transaction.copy(amount = transformedAmount)
+                updateAccount(transaction = transactionWithTransformedAmount)
+                updateCategory(transaction = transactionWithTransformedAmount)
+            }
+
+            // Trigger recalculation for the affected category and month
+            transaction.category?.let { category ->
+                val transactionMonth =
+                    transaction.dateOfTransaction.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                val yearMonth = kotlinx.datetime.YearMonth(transactionMonth.year, transactionMonth.month)
+                recalculateCategoryMonthlyStatus(category.id, yearMonth)
+            }
         }
     }
 
@@ -60,5 +78,33 @@ class DeleteTransactionUseCase @Inject constructor(
 
     private suspend fun updateCategory(category: Category?, amount: Money) {
         // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
+    }
+
+    private suspend fun handleAccountTransferDeletion(transaction: Transaction) {
+        // For AccountTransfer: transaction.account is the "from" account, we need to find the "to" account
+        val fromAccount = transaction.account
+        val transferAmount = transaction.amount
+
+        // Find the "to" account from the transaction partner description
+        // Format: "Transfer to {AccountName}"
+        val toAccountName = transaction.transactionPartner.removePrefix("Transfer to ")
+        val allAccounts = accountRepository.getAccountsFlow().first()
+        val toAccount = allAccounts.find { it.name == toAccountName }
+
+        toAccount?.let { targetAccount ->
+            // Revert fromAccount: add money back (it was subtracted during transfer)
+            val updatedFromAccount = fromAccount.copy(
+                balance = fromAccount.balance + transferAmount,
+                updatedAt = Clock.System.now()
+            )
+            accountRepository.updateAccount(updatedFromAccount)
+
+            // Revert toAccount: subtract money back (it was added during transfer)
+            val updatedToAccount = targetAccount.copy(
+                balance = targetAccount.balance - transferAmount,
+                updatedAt = Clock.System.now()
+            )
+            accountRepository.updateAccount(updatedToAccount)
+        }
     }
 }

@@ -7,10 +7,11 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
-import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.budget.RecalculateCategoryMonthlyStatusUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.random.Random
@@ -19,7 +20,7 @@ import kotlin.time.Clock
 class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
-    private val categoryRepository: CategoryRepository,
+    private val recalculateCategoryMonthlyStatus: RecalculateCategoryMonthlyStatusUseCase,
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
@@ -29,7 +30,8 @@ class AddTransactionUseCase @Inject constructor(
         amount: Money,
         direction: TransactionDirection,
         transactionPartner: String,
-        description: String
+        description: String,
+        dateOfTransaction: kotlin.time.Instant = Clock.System.now()
     ) {
         val account = accountRepository.getAccount(accountId) ?: return
         if (direction == TransactionDirection.Unknown) return
@@ -43,10 +45,17 @@ class AddTransactionUseCase @Inject constructor(
                 amount = transformedAmount,
                 direction = direction,
                 transactionPartner = transactionPartner,
-                description = description
+                description = description,
+                dateOfTransaction = dateOfTransaction
             )
             updateAccount(account = account, amount = transformedAmount)
-            updateCategory(category = category, amount = transformedAmount)
+
+            // Trigger recalculation for the affected category and month
+            category?.let { cat ->
+                val transactionMonth = dateOfTransaction.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                val yearMonth = kotlinx.datetime.YearMonth(transactionMonth.year, transactionMonth.month)
+                recalculateCategoryMonthlyStatus(cat.id, yearMonth)
+            }
         }
     }
 
@@ -54,8 +63,8 @@ class AddTransactionUseCase @Inject constructor(
         val transformedValue = when (direction) {
             TransactionDirection.Inflow -> abs(amount.asDouble())
             TransactionDirection.Outflow -> -abs(amount.asDouble())
+            TransactionDirection.AccountTransfer -> amount.asDouble() // Keep original amount for transfers
             else -> amount.asDouble()
-
         }
         return Money(value = transformedValue)
     }
@@ -66,20 +75,20 @@ class AddTransactionUseCase @Inject constructor(
         amount: Money,
         direction: TransactionDirection,
         transactionPartner: String,
-        description: String
+        description: String,
+        dateOfTransaction: kotlin.time.Instant
     ) {
-        val currentTime = Clock.System.now()
         val transaction = Transaction(
-            id = Random.nextLong(),
+            id = abs(Random.nextLong()),
             amount = amount,
             account = account,
             category = category,
             transactionPartner = transactionPartner,
             transactionDirection = direction,
             description = description,
-            dateOfTransaction = currentTime,
-            updatedAt = currentTime,
-            createdAt = currentTime
+            dateOfTransaction = dateOfTransaction,
+            updatedAt = Clock.System.now(),
+            createdAt = Clock.System.now()
         )
 
         transactionRepository.addTransaction(transaction = transaction)
@@ -94,13 +103,5 @@ class AddTransactionUseCase @Inject constructor(
         )
 
         accountRepository.updateAccount(account = updatedAccount)
-    }
-
-    private suspend fun updateCategory(
-        category: Category?,
-        amount: Money
-    ) {
-        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
-        // Aktuell wird die Kategorie nicht mehr direkt updated
     }
 }

@@ -7,8 +7,10 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.budget.RecalculateCategoryMonthlyStatusUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.time.Clock
 
@@ -16,7 +18,8 @@ class UpdateTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
-    @Default private val defaultDispatcher: CoroutineDispatcher
+    @Default private val defaultDispatcher: CoroutineDispatcher,
+    private val recalculateCategoryMonthlyStatusUseCase: RecalculateCategoryMonthlyStatusUseCase
 ) {
 
     suspend operator fun invoke(transaction: Transaction) {
@@ -24,11 +27,22 @@ class UpdateTransactionUseCase @Inject constructor(
         withContext(defaultDispatcher) {
 
             val transformedAmount = transformAmount(direction = transaction.transactionDirection, amount = transaction.amount)
-            val transformedTransaction = transaction.copy(amount = transformedAmount)
+            val transformedTransaction = transaction.copy(
+                amount = transformedAmount,
+                updatedAt = Clock.System.now()
+            )
 
             updateAccount(transaction = transformedTransaction)
             updateCategory(transaction = transformedTransaction)
             updateTransaction(transaction = transformedTransaction)
+
+            // Trigger recalculation for the affected category and month
+            transformedTransaction.category?.let { category ->
+                val transactionMonth =
+                    transformedTransaction.dateOfTransaction.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+                val yearMonth = kotlinx.datetime.YearMonth(transactionMonth.year, transactionMonth.month)
+                recalculateCategoryMonthlyStatusUseCase(category.id, yearMonth)
+            }
         }
     }
 
@@ -36,12 +50,13 @@ class UpdateTransactionUseCase @Inject constructor(
 
     private suspend fun updateAccount(transaction: Transaction) {
 
+        val currentAccount = accountRepository.getAccount(transaction.account.id) ?: return
         val updatedBalance = calculateUpdatedBalance(
             transaction = transaction,
-            toBeUpdatedBalance = transaction.account.balance
+            toBeUpdatedBalance = currentAccount.balance
         )
 
-        val updatedAccount = transaction.account.copy(
+        val updatedAccount = currentAccount.copy(
             balance = updatedBalance,
             updatedAt = Clock.System.now()
         )
