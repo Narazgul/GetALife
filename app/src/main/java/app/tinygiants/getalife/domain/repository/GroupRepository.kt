@@ -11,5 +11,6 @@ interface GroupRepository {
     suspend fun updateGroup(group: Group)
     suspend fun deleteGroup(group: Group)
     suspend fun getGroupsWithCategories(): Map<Group, List<Category>>
+    suspend fun getGroupByName(name: String): Group?
 
 }

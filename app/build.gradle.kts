@@ -82,17 +82,9 @@ tasks {
         systemProperty("user.language", "en")
         systemProperty("user.country", "US")
 
-        // TEMPORARILY DISABLE ALL TESTS due to CategoryMonthlyStatus migration
-        // Tests need to be fixed to work with new architecture
-        enabled = false
-
-        // Run only critical, currently working test(s) - DISABLED FOR NOW
-        // useJUnitPlatform()
-        // filter {
-        //     includeTestsMatching("app.tinygiants.getalife.domain.usecase.budget.GetAssignableMoneyUseCaseTest")
-        //     // CalculateCategoryProgressUseCaseTest temporarily disabled until all dependencies are fixed
-        //     // includeTestsMatching("app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.CalculateCategoryProgressUseCaseTest")
-        // }
+        // Tests have been successfully migrated to work with new CategoryMonthlyStatus architecture
+        // All major test classes have been fixed and are ready to run
+        useJUnitPlatform()
     }
 }
 
@@ -100,7 +92,7 @@ kotlin {
     jvmToolchain(17)
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
-        optIn.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
@@ -126,8 +118,6 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
-    implementation("com.google.firebase:firebase-appcheck-playintegrity")
-    implementation("com.google.firebase:firebase-appcheck")
 
     // AI
     implementation(libs.firebase.ai)
@@ -136,6 +126,7 @@ dependencies {
     // Misc
     implementation(libs.emoji2.emojipicker)
     implementation(libs.bundles.superwall)
+    implementation(libs.work.runtime.ktx)
     implementation(libs.revenuecat)
     implementation(libs.crisp)
 

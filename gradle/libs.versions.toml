@@ -41,6 +41,7 @@ flowTest = "1.2.1"
 assertk = "0.28.1"
 mockk = "1.14.5"
 storage = "1.6.0"
+work = "2.10.3"
 
 ########################################################################################################################
 
@@ -61,6 +62,7 @@ splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "spla
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 app-update = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateVersion" }
 in-app-review = { module = "com.google.android.play:review-ktx", version.ref = "inAppReviewVersion" }
+work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }

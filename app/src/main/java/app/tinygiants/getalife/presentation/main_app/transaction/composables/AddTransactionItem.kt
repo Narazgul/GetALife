@@ -57,16 +57,16 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 typealias Description = String
 typealias TransactionPartner = String
@@ -84,7 +84,8 @@ fun AddTransactionItem(
         direction: TransactionDirection,
         description: Description,
         transactionPartner: TransactionPartner,
-        dateOfTransaction: Instant
+        dateOfTransaction: Instant,
+        recurrenceFrequency: RecurrenceFrequency?
     ) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -102,6 +103,8 @@ fun AddTransactionItem(
     var categoryUserInput by remember { mutableStateOf(categories.firstOrNull()) }
     var accountUserInput by remember { mutableStateOf(accounts.firstOrNull()) }
     var selectedDate by remember { mutableStateOf(Clock.System.now()) }
+    var recurrenceFrequency by rememberSaveable { mutableStateOf(RecurrenceFrequency.NEVER) }
+    var showRecurrenceDropdown by rememberSaveable { mutableStateOf(false) }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDate.toEpochMilliseconds()
@@ -258,7 +261,6 @@ fun AddTransactionItem(
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(spacing.l))
 
         Card(
@@ -320,6 +322,63 @@ fun AddTransactionItem(
             )
         }
 
+        Spacer(modifier = Modifier.height(spacing.l))
+
+        // Recurrence frequency selection
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(spacing.l)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showRecurrenceDropdown = true }
+                    .padding(spacing.l)
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.recurrence_frequency_label),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Spacer(modifier = Modifier.height(spacing.xs))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(recurrenceFrequency.asStringRes()),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+            DropdownMenu(
+                expanded = showRecurrenceDropdown,
+                onDismissRequest = { showRecurrenceDropdown = false },
+                modifier = Modifier.width(250.dp)
+            ) {
+                RecurrenceFrequency.entries.forEach { frequency ->
+                    DropdownMenuItem(
+                        text = { Text(stringResource(frequency.asStringRes())) },
+                        onClick = {
+                            recurrenceFrequency = frequency
+                            showRecurrenceDropdown = false
+                        }
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(spacing.xl))
 
         Button(
@@ -331,7 +390,8 @@ fun AddTransactionItem(
                     directionUserInput,
                     descriptionUserInput,
                     transactionPartnerUserInput,
-                    selectedDate
+                    selectedDate,
+                    if (recurrenceFrequency != RecurrenceFrequency.NEVER) recurrenceFrequency else null
                 )
 
                 amountMoney = Money(value = 0.0)
@@ -342,6 +402,7 @@ fun AddTransactionItem(
                 categoryUserInput = categories.firstOrNull()
                 accountUserInput = accounts.firstOrNull()
                 selectedDate = Clock.System.now()
+                recurrenceFrequency = RecurrenceFrequency.NEVER
 
                 focusManager.clearFocus()
             },
@@ -455,9 +516,10 @@ private fun SelectionCard(
 }
 
 private fun formatDate(instant: Instant): String {
-    instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    val date = Date(instant.toEpochMilliseconds())
-    return SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN).format(date)
+    val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return "${localDate.day.toString().padStart(2, '0')}.${
+        localDate.month.number.toString().padStart(2, '0')
+    }.${localDate.year}"
 }
 
 @Preview
@@ -469,7 +531,7 @@ private fun EnterTransactionPreview() {
                 categories = emptyList(),
                 accounts = emptyList(),
                 onTransactionDirectionClicked = { _ -> },
-                onAddTransactionClicked = { _, _, _, _, _, _, _ -> })
+                onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> })
         }
     }
 }

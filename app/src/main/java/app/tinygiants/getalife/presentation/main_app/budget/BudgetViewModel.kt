@@ -36,6 +36,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -55,6 +56,7 @@ class BudgetViewModel @Inject constructor(
     private val addCategory: AddCategoryUseCase,
     private val updateCategory: UpdateCategoryUseCase,
     private val deleteCategory: DeleteCategoryUseCase,
+    private val getAccounts: app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -72,6 +74,7 @@ class BudgetViewModel @Inject constructor(
         BudgetUiState(
             bannerState = AllAssigned(text = DynamicString("")),
             groups = emptyMap(),
+            creditCardAccountBalances = emptyMap(),
             isLoading = true,
             userMessage = null,
             errorMessage = null
@@ -162,6 +165,44 @@ class BudgetViewModel @Inject constructor(
     }
 
     private fun displayBudgetMonth(budgetMonth: BudgetMonth) {
+        viewModelScope.launch {
+            // Load account balances for credit card categories
+            getAccounts().first().onSuccess { accounts ->
+                val creditCardAccountBalances = extractCreditCardAccountBalances(budgetMonth, accounts)
+
+                uiStateFlow.update { budgetUiState ->
+                    val currentExpandStates = groupExpandStates.value
+
+                    val groupsWithCategoryBudgets = budgetMonth.groups.mapKeys { (group, _) ->
+                        val groupExpandedState = currentExpandStates[group.id] ?: group.isExpanded
+                        group.copy(isExpanded = groupExpandedState)
+                    }
+
+                    val totalSpentMoney = budgetMonth.groups.values
+                        .flatten()
+                        .fold(Money()) { acc, categoryBudget -> acc + categoryBudget.spentAmount }
+
+                    val bannerState = createBannerState(
+                        assignableMoney = budgetMonth.totalAssignableMoney,
+                        assignedMoney = budgetMonth.totalAssignedMoney,
+                        spentMoney = totalSpentMoney
+                    )
+
+                    budgetUiState.copy(
+                        bannerState = bannerState,
+                        groups = groupsWithCategoryBudgets,
+                        creditCardAccountBalances = creditCardAccountBalances,
+                        isLoading = false
+                    )
+                }
+            }.onFailure { throwable ->
+                // Fallback: Continue without credit card account balances
+                displayBudgetMonthFallback(budgetMonth)
+            }
+        }
+    }
+
+    private fun displayBudgetMonthFallback(budgetMonth: BudgetMonth) {
         uiStateFlow.update { budgetUiState ->
             val currentExpandStates = groupExpandStates.value
 
@@ -179,12 +220,38 @@ class BudgetViewModel @Inject constructor(
                 assignedMoney = budgetMonth.totalAssignedMoney,
                 spentMoney = totalSpentMoney
             )
-            
+
             budgetUiState.copy(
                 bannerState = bannerState,
                 groups = groupsWithCategoryBudgets,
+                creditCardAccountBalances = emptyMap(),
                 isLoading = false
             )
+        }
+    }
+
+    /**
+     * Extracts account balances for all credit card categories from the provided accounts.
+     * Returns a map of linkedAccountId to account balance.
+     */
+    private fun extractCreditCardAccountBalances(
+        budgetMonth: BudgetMonth,
+        accounts: List<app.tinygiants.getalife.domain.model.Account>
+    ): Map<Long, Money> {
+        // Get all credit card categories with linkedAccountId
+        val creditCardCategories = budgetMonth.groups.values
+            .flatten()
+            .filter { it.category.linkedAccountId != null }
+
+        // Create lookup map from account ID to account balance
+        val accountBalanceLookup = accounts.associate { account ->
+            account.id to account.balance
+        }
+
+        // Map linkedAccountId to account balance for credit card categories
+        return creditCardCategories.associate { categoryStatus ->
+            val linkedAccountId = categoryStatus.category.linkedAccountId!!
+            linkedAccountId to (accountBalanceLookup[linkedAccountId] ?: Money(0.0))
         }
     }
 
@@ -223,6 +290,7 @@ class BudgetViewModel @Inject constructor(
 
         val userMessage = when (throwable) {
             is DeleteCategoryStatus.CategoryHasTransactionsException -> StringResource(R.string.error_transactions_in_category)
+            is DeleteCategoryStatus.CreditCardCategoryCannotBeDeleted -> StringResource(R.string.credit_card_category_cannot_be_deleted)
             is DeleteGroupStatus.GroupHasCategoriesException -> StringResource(R.string.error_categories_in_group)
             else -> DynamicString(value = "")
         }

@@ -53,10 +53,20 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addTransaction(transaction: Transaction) =
-        transactionDao.addTransaction(transaction = TransactionEntity.fromDomain(transaction))
+        transactionDao.addTransaction(transaction = TransactionEntity.fromDomain(transaction.also {
+            // Validate recurring payment data integrity at repository level
+            if (it.isRecurring && it.recurrenceFrequency == null) {
+                throw IllegalStateException("Cannot save recurring transaction without frequency")
+            }
+        }))
 
     override suspend fun updateTransaction(transaction: Transaction) =
-        transactionDao.updateTransaction(TransactionEntity.fromDomain(transaction))
+        transactionDao.updateTransaction(TransactionEntity.fromDomain(transaction.also {
+            // Validate recurring payment data integrity at repository level
+            if (it.isRecurring && it.recurrenceFrequency == null) {
+                throw IllegalStateException("Cannot update recurring transaction without frequency")
+            }
+        }))
 
     override suspend fun deleteTransaction(transaction: Transaction) =
         transactionDao.deleteTransaction(TransactionEntity.fromDomain(transaction))
@@ -94,4 +104,27 @@ class TransactionRepositoryImpl @Inject constructor(
         val localDateTime = instant.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
         return localDateTime.year == yearMonth.year && localDateTime.month == yearMonth.month
     }
+
+    override fun getActiveRecurringTransactions() = transactionDao.getActiveRecurringTransactions().map { list ->
+        list.mapNotNull { entity ->
+            val account = accountRepository.getAccount(entity.accountId) ?: return@mapNotNull null
+            val category = entity.categoryId?.let { categoryRepository.getCategory(it) }
+            entity.toDomain(account = account, category = category)
+        }
+    }
+
+    override suspend fun getDueRecurringTransactions(currentDate: kotlin.time.Instant): List<Transaction> {
+        val entities = transactionDao.getDueRecurringTransactions(currentDate)
+        return entities.mapNotNull { entity ->
+            val account = accountRepository.getAccount(entity.accountId) ?: return@mapNotNull null
+            val category = entity.categoryId?.let { categoryRepository.getCategory(it) }
+            entity.toDomain(account = account, category = category)
+        }
+    }
+
+    override suspend fun updateRecurrenceStatus(transactionId: Long, isActive: Boolean) =
+        transactionDao.updateRecurrenceStatus(transactionId, isActive)
+
+    override suspend fun updateNextPaymentDate(transactionId: Long, nextDate: kotlin.time.Instant) =
+        transactionDao.updateNextPaymentDate(transactionId, nextDate)
 }

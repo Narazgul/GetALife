@@ -27,4 +27,8 @@ class GroupRepositoryFake : GroupRepository {
     override suspend fun getGroupsWithCategories(): Map<Group, List<Category>> {
         return groupFlow.value.associateWith { emptyList<Category>() }
     }
+
+    override suspend fun getGroupByName(name: String): Group? {
+        return groupFlow.value.firstOrNull { it.name == name }
+    }
 }

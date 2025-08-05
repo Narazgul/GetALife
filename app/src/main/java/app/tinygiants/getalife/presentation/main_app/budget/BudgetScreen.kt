@@ -149,6 +149,7 @@ fun BudgetScreen(
 
                     BudgetList(
                         groups = uiState.groups,
+                        creditCardAccountBalances = uiState.creditCardAccountBalances,
                         isLoading = uiState.isLoading,
                         errorMessage = uiState.errorMessage,
                         onUserScrolling = { isUserScrollingDown -> isAddGroupFabVisible = isUserScrollingDown },
@@ -193,6 +194,7 @@ class BudgetScreenPreviewProvider : PreviewParameterProvider<BudgetUiState> {
             BudgetUiState(
                 bannerState = AssignableMoneyAvailable(text = DynamicString("Distribute available money to categories: 100,-€")),
                 groups = fakeCategoryBudgets(),
+                creditCardAccountBalances = emptyMap(),
                 isLoading = false,
                 userMessage = null,
                 errorMessage = null

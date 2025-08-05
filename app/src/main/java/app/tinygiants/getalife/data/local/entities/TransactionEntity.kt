@@ -1,15 +1,24 @@
 package app.tinygiants.getalife.data.local.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import kotlin.time.Instant
 
-@Entity(tableName = "transactions")
+@Entity(
+    tableName = "transactions",
+    indices = [
+        Index(value = ["isRecurring"]),
+        Index(value = ["nextPaymentDate"]),
+        Index(value = ["isRecurring", "nextPaymentDate", "isRecurrenceActive"], name = "idx_recurring_payments")
+    ]
+)
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
@@ -21,7 +30,14 @@ data class TransactionEntity(
     val description: String,
     val dateOfTransaction: Instant,
     val updatedAt: Instant,
-    val createdAt: Instant
+    val createdAt: Instant,
+    // Recurring payment fields
+    val isRecurring: Boolean = false,
+    val recurrenceFrequency: String? = null, // Store enum name as string
+    val nextPaymentDate: Instant? = null,
+    val recurrenceEndDate: Instant? = null,
+    val isRecurrenceActive: Boolean = true,
+    val parentRecurringTransactionId: Long? = null
 ) {
     companion object {
         fun fromDomain(transaction: Transaction): TransactionEntity {
@@ -36,7 +52,13 @@ data class TransactionEntity(
                     description = description,
                     dateOfTransaction = dateOfTransaction,
                     updatedAt = updatedAt,
-                    createdAt = createdAt
+                    createdAt = createdAt,
+                    isRecurring = isRecurring,
+                    recurrenceFrequency = recurrenceFrequency?.name,
+                    nextPaymentDate = nextPaymentDate,
+                    recurrenceEndDate = recurrenceEndDate,
+                    isRecurrenceActive = isRecurrenceActive,
+                    parentRecurringTransactionId = parentRecurringTransactionId
                 )
             }
         }
@@ -53,7 +75,13 @@ data class TransactionEntity(
             description = description,
             dateOfTransaction = dateOfTransaction,
             updatedAt = updatedAt,
-            createdAt = createdAt
+            createdAt = createdAt,
+            isRecurring = isRecurring,
+            recurrenceFrequency = recurrenceFrequency?.let { RecurrenceFrequency.valueOf(it) },
+            nextPaymentDate = nextPaymentDate,
+            recurrenceEndDate = recurrenceEndDate,
+            isRecurrenceActive = isRecurrenceActive,
+            parentRecurringTransactionId = parentRecurringTransactionId
         )
     }
 }

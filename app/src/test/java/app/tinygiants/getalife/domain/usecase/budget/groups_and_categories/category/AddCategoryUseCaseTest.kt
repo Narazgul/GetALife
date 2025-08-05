@@ -55,8 +55,6 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().emoji).isEqualTo("")
         assertThat(categories.first().isInitialCategory).isTrue()
         assertThat(categories.first().budgetTarget).isEqualTo(EmptyMoney())
-        assertThat(categories.first().assignedMoney).isEqualTo(EmptyMoney())
-        assertThat(categories.first().availableMoney).isEqualTo(EmptyMoney())
         assertThat(categories.first().listPosition).isEqualTo(0)
     }
 
@@ -71,8 +69,6 @@ class AddCategoryUseCaseTest {
         assertThat(categories.first().emoji).isEqualTo("✅")
         assertThat(categories.first().isInitialCategory).isFalse()
         assertThat(categories.first().budgetTarget).isEqualTo(EmptyMoney())
-        assertThat(categories.first().assignedMoney).isEqualTo(EmptyMoney())
-        assertThat(categories.first().availableMoney).isEqualTo(EmptyMoney())
         assertThat(categories.first().listPosition).isEqualTo(0)
     }
 

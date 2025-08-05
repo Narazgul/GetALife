@@ -4,8 +4,11 @@ import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
+import app.tinygiants.getalife.domain.repository.GroupRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
+import app.tinygiants.getalife.domain.usecase.budget.RecalculateCategoryMonthlyStatusUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -28,6 +31,9 @@ class AddAccountUseCaseTest {
     private lateinit var accountRepositoryFake: AccountRepositoryFake
     private lateinit var categoryRepositoryFake: CategoryRepositoryFake
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
+    private lateinit var groupRepositoryFake: GroupRepositoryFake
+    private lateinit var categoryMonthlyStatusRepositoryFake: CategoryMonthlyStatusRepositoryFake
+    private lateinit var recalculateCategoryMonthlyStatusUseCase: RecalculateCategoryMonthlyStatusUseCase
 
     companion object {
         @JvmField
@@ -39,15 +45,26 @@ class AddAccountUseCaseTest {
     fun setUp() {
         accountRepositoryFake = AccountRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
+        groupRepositoryFake = GroupRepositoryFake()
+        categoryMonthlyStatusRepositoryFake = CategoryMonthlyStatusRepositoryFake()
         transactionRepositoryFake = TransactionRepositoryFake(
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake
         )
+        recalculateCategoryMonthlyStatusUseCase = RecalculateCategoryMonthlyStatusUseCase(
+            statusRepository = categoryMonthlyStatusRepositoryFake,
+            transactionRepository = transactionRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
+
         addTransaction = AddTransactionUseCase(
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
-            defaultDispatcher = testDispatcherExtension.testDispatcher
+            groupRepository = groupRepositoryFake,
+            recalculateCategoryMonthlyStatus = recalculateCategoryMonthlyStatusUseCase,
+            defaultDispatcher = testDispatcherExtension.testDispatcher,
+            categoryMonthlyStatusRepository = categoryMonthlyStatusRepositoryFake
         )
 
         addAccount = AddAccountUseCase(

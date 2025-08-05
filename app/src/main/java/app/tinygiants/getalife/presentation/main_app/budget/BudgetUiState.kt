@@ -12,6 +12,7 @@ import app.tinygiants.getalife.presentation.shared_composables.UiText
 data class BudgetUiState(
     val bannerState: BannerUiState,
     val groups: Map<Group, List<CategoryMonthlyStatus>>,
+    val creditCardAccountBalances: Map<Long, Money>, // Maps linkedAccountId to account balance
     val isLoading: Boolean,
     val userMessage: UiText?,
     val errorMessage: ErrorMessage?

@@ -71,11 +71,17 @@ class CalculateCategoryProgressUseCaseTest {
     @Test
     fun `Get empty values for untouched Category`(): Unit = runTest {
         val category = transportCategoryEntity().toDomain()
-        val progress = calculateCategoryProgress(
+        val categoryMonthlyStatus = CategoryMonthlyStatus(
             category = category,
-            status = null,
-            spentAmount = EmptyMoney()
+            assignedAmount = EmptyMoney(),
+            isCarryOverEnabled = false,
+            spentAmount = EmptyMoney(),
+            availableAmount = EmptyMoney(),
+            progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
+            suggestedAmount = null
         )
+
+        val progress = calculateCategoryProgress(categoryMonthlyStatus)
 
         assertThat(progress.bar1).isEqualTo(0f)
         assertThat(progress.bar1Color).isEqualTo(ProgressColor.Grey)
@@ -84,81 +90,65 @@ class CalculateCategoryProgressUseCaseTest {
 
     @Test
     fun `No target some assigned & nothing spent`(): Unit = runTest {
-        val category = entity.toDomain()
         val status = createCategoryMonthlyStatus(entity, assignedAmount = 100.0, availableAmount = 100.0)
 
-        val progress = calculateCategoryProgress(
-            category = category,
-            status = status,
-            spentAmount = EmptyMoney()
-        )
+        val progress = calculateCategoryProgress(status)
 
-        assertThat(progress.bar1).isEqualTo(0f)
-        assertThat(progress.bar1Color).isEqualTo(ProgressColor.Grey)
+        assertThat(progress.bar1).isEqualTo(1f)
+        assertThat(progress.bar1Color).isEqualTo(ProgressColor.Green)
         assertThat(progress.userHint).isEqualTo(UserHint.FullyFunded)
     }
 
     @Test
     fun `No target, some assigned, little spent`(): Unit = runTest {
-        val category = entity.toDomain()
         val status = createCategoryMonthlyStatus(entity, assignedAmount = 100.0, availableAmount = 80.0)
-        val spentAmount = Money(20.0)
 
-        val progress = calculateCategoryProgress(
-            category = category,
-            status = status,
-            spentAmount = spentAmount
-        )
+        val progress = calculateCategoryProgress(status)
 
-        assertThat(progress.bar1).isEqualTo(0.2f)
+        assertThat(progress.bar1).isEqualTo(1f)
+        assertThat(progress.bar1Lite).isEqualTo(0.2f)
         assertThat(progress.bar1Color).isEqualTo(ProgressColor.Green)
         assertThat(progress.userHint).isEqualTo(UserHint.Spent(amount = "$20.00"))
     }
 
     @Test
     fun `No target, some assigned, fully spent`(): Unit = runTest {
-        val category = entity.toDomain()
         val status = createCategoryMonthlyStatus(entity, assignedAmount = 100.0, availableAmount = 0.0)
-        val spentAmount = Money(100.0)
 
-        val progress = calculateCategoryProgress(
-            category = category,
-            status = status,
-            spentAmount = spentAmount
-        )
+        val progress = calculateCategoryProgress(status)
 
         assertThat(progress.bar1).isEqualTo(1f)
         assertThat(progress.bar1Color).isEqualTo(ProgressColor.Green)
-        assertThat(progress.userHint).isEqualTo(UserHint.Spent(amount = "$100.00"))
+        assertThat(progress.bar1Lite).isEqualTo(1f)
+        assertThat(progress.bar1LiteColor).isEqualTo(ProgressColor.GreenLite)
+        assertThat(progress.userHint).isEqualTo(UserHint.AllSpent)
     }
 
     @Test
     fun `No target, nothing assigned, overspent`(): Unit = runTest {
         val category = entity.toDomain()
-        val spentAmount = Money(20.0)
-
-        val progress = calculateCategoryProgress(
+        val categoryMonthlyStatus = CategoryMonthlyStatus(
             category = category,
-            status = null,
-            spentAmount = spentAmount
+            assignedAmount = EmptyMoney(),
+            isCarryOverEnabled = false,
+            spentAmount = Money(20.0),
+            availableAmount = Money(-20.0),
+            progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
+            suggestedAmount = null
         )
 
-        assertThat(progress.bar1).isEqualTo(0f)
-        assertThat(progress.bar1Color).isEqualTo(ProgressColor.Grey)
-        assertThat(progress.userHint).isEqualTo(UserHint.NoHint)
+        val progress = calculateCategoryProgress(categoryMonthlyStatus)
+
+        assertThat(progress.bar1).isEqualTo(1f)
+        assertThat(progress.bar1Color).isEqualTo(ProgressColor.Red)
+        assertThat(progress.userHint).isEqualTo(UserHint.AssignMoreOrRemoveSpending(amount = "$20.00"))
     }
 
     @Test
     fun `No target, something assigned, overspent`(): Unit = runTest {
-        val category = entity.toDomain()
         val status = createCategoryMonthlyStatus(entity, assignedAmount = 100.0, availableAmount = -20.0)
-        val spentAmount = Money(120.0)
 
-        val progress = calculateCategoryProgress(
-            category = category,
-            status = status,
-            spentAmount = spentAmount
-        )
+        val progress = calculateCategoryProgress(status)
 
         assertThat(progress.bar1).isEqualTo(1f)
         assertThat(progress.bar1Color).isEqualTo(ProgressColor.Red)
@@ -171,34 +161,23 @@ class CalculateCategoryProgressUseCaseTest {
 
     @Test
     fun `Basic spending within budget`(): Unit = runTest {
-        val category = entity.toDomain()
         val status = createCategoryMonthlyStatus(entity, assignedAmount = 200.0, availableAmount = 150.0)
-        val spentAmount = Money(50.0)
 
-        val progress = calculateCategoryProgress(
-            category = category,
-            status = status,
-            spentAmount = spentAmount
-        )
+        val progress = calculateCategoryProgress(status)
 
-        assertThat(progress.bar1).isEqualTo(0.25f) // 50/200
+        assertThat(progress.bar1).isEqualTo(1f)
+        assertThat(progress.bar1Lite).isEqualTo(0.25f)
         assertThat(progress.bar1Color).isEqualTo(ProgressColor.Green)
         assertThat(progress.userHint).isEqualTo(UserHint.Spent(amount = "$50.00"))
     }
 
     @Test
     fun `Overspending scenario`(): Unit = runTest {
-        val category = entity.toDomain()
         val status = createCategoryMonthlyStatus(entity, assignedAmount = 100.0, availableAmount = -50.0)
-        val spentAmount = Money(150.0)
 
-        val progress = calculateCategoryProgress(
-            category = category,
-            status = status,
-            spentAmount = spentAmount
-        )
+        val progress = calculateCategoryProgress(status)
 
-        assertThat(progress.bar1).isEqualTo(1f) // Capped at 1.0
+        assertThat(progress.bar1).isEqualTo(1f)
         assertThat(progress.bar1Color).isEqualTo(ProgressColor.Red)
         assertThat(progress.userHint).isEqualTo(UserHint.SpentMoreThanAvailable(amount = "$50.00"))
     }

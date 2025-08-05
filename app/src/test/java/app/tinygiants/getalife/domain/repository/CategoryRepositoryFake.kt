@@ -27,4 +27,7 @@ class CategoryRepositoryFake : CategoryRepository {
 
     override suspend fun deleteCategory(category: Category) =
         categories.update { it.filterNot { entity -> entity.id == category.id } }
+
+    override suspend fun getCreditCardPaymentCategory(accountId: Long): Category? =
+        categories.value.find { it.linkedAccountId == accountId }
 }

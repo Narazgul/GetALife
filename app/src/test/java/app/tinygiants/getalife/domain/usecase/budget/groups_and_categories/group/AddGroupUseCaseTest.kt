@@ -2,7 +2,6 @@ package app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.grou
 
 import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.remote.ai.AiRepositoryFake
-import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.GroupRepositoryFake
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.AddCategoryUseCase
@@ -84,9 +83,8 @@ class AddGroupUseCaseTest {
 
         assertThat(categories).hasSize(1)
         assertThat(categories.first().name).isEqualTo("")
-        assertThat(categories.first().availableMoney).isEqualTo(EmptyMoney())
         assertThat(categories.first().groupId).isEqualTo(createdGroup.id)
-        assertThat(categories.first().assignedMoney).isEqualTo(EmptyMoney())
         assertThat(categories.first().listPosition).isEqualTo(0)
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
     }
 }

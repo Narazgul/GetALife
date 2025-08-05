@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,12 +43,13 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 @Composable
@@ -143,6 +146,55 @@ fun SingleTransactionItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
+                    // Recurring payment indicator
+                    if (transaction.isRecurringTemplate) {
+                        Spacer(modifier = Modifier.height(spacing.xs))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(spacing.xs)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Text(
+                                text = transaction.recurrenceFrequency?.let {
+                                    stringResource(it.asStringRes())
+                                } ?: "",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        // Next payment date for recurring templates
+                        transaction.nextPaymentDate?.let { nextDate ->
+                            Spacer(modifier = Modifier.height(spacing.xs))
+                            Text(
+                                text = "${stringResource(app.tinygiants.getalife.R.string.next_execution)}: ${
+                                    formatTransactionDate(
+                                        nextDate
+                                    )
+                                }",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                            )
+                        }
+                    }
+
+                    // Generated from recurring indicator
+                    if (transaction.isGeneratedFromRecurring) {
+                        Spacer(modifier = Modifier.height(spacing.xs))
+                        Text(
+                            text = stringResource(app.tinygiants.getalife.R.string.automatically_created),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        )
+                    }
+
                     // Description (if available)
                     if (transaction.description.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(spacing.xs))
@@ -190,9 +242,9 @@ fun SingleTransactionItem(
           updatedAccount: Account,
           updatedCategory: Category?,
           updatedTransactionDirection: TransactionDirection,
-          updatedDescription: Description,
-          updatedTransactionPartner: TransactionPartner,
-          updatedDateOfTransaction: kotlinx.datetime.Instant ->
+          updatedDescription: String,
+          updatedTransactionPartner: String,
+          updatedDateOfTransaction: kotlin.time.Instant ->
 
             val updatedTransaction = transaction.copy(
                 amount = updatedAmount,
@@ -219,9 +271,11 @@ fun SingleTransactionItem(
     }
 }
 
-private fun formatTransactionDate(instant: kotlinx.datetime.Instant): String {
-    val date = Date(instant.toEpochMilliseconds())
-    return SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN).format(date)
+private fun formatTransactionDate(instant: kotlin.time.Instant): String {
+    val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return "${localDate.day.toString().padStart(2, '0')}.${
+        localDate.month.number.toString().padStart(2, '0')
+    }.${localDate.year}"
 }
 
 @Preview
@@ -233,7 +287,7 @@ private fun TransactionItemPreview() {
                 transaction = Transaction(
                     id = 0,
                     amount = Money(value = -3.20),
-                    account = Account(-1, "", Money(0.00), AccountType.Unknown, 0, Clock.System.now(), Clock.System.now()),
+                    account = Account(-1, "", Money(0.00), AccountType.Unknown, 0, false, Clock.System.now(), Clock.System.now()),
                     category = null,
                     transactionPartner = "Telekom",
                     transactionDirection = TransactionDirection.Outflow,

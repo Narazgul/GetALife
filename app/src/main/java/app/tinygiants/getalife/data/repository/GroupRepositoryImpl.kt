@@ -40,4 +40,9 @@ class GroupRepositoryImpl @Inject constructor(
 
         return groupsWithCategories
     }
+
+    override suspend fun getGroupByName(name: String): Group? {
+        val groups = getGroupsFlow().first()
+        return groups.firstOrNull { it.name == name }
+    }
 }

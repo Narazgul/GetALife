@@ -22,6 +22,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import app.tinygiants.getalife.R
+import app.tinygiants.getalife.domain.model.CategoryBehaviorType
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
@@ -39,10 +42,11 @@ const val ANIMATION_TIME_300_MILLISECONDS = 300
 @Composable
 fun BudgetList(
     groups: Map<Group, List<CategoryMonthlyStatus>>,
+    creditCardAccountBalances: Map<Long, Money>,
     isLoading: Boolean,
     errorMessage: ErrorMessage?,
-    onUserClickEvent: (UserClickEvent) -> Unit,
     onUserScrolling: (Boolean) -> Unit,
+    onUserClickEvent: (UserClickEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
@@ -53,12 +57,40 @@ fun BudgetList(
     ) {
         val listState = rememberLazyListState()
 
+        // Separate credit card groups from regular groups
+        val creditCardsGroupName = stringResource(R.string.credit_cards)
+        val (creditCardGroups, regularGroups) = groups.toList().partition { (group, _) ->
+            group.name == creditCardsGroupName || group.name == "Kreditkarten" ||
+                    group.name == "Credit Card Payments" || group.name == "บัตรเครดิต"
+        }
+
+        // Extract all credit card categories
+        val creditCardCategories = creditCardGroups.flatMap { (_, categories) ->
+            categories.filter { it.category.behaviorType == CategoryBehaviorType.CreditCardPayment }
+        }
+
         LazyColumn(
             state = listState,
             contentPadding = PaddingValues(spacing.xs)
         ) {
-            groups.forEach { (group, items) ->
+            // Show credit card section if there are credit card categories
+            if (creditCardCategories.isNotEmpty()) {
+                item(key = "credit_cards_section") {
+                    CreditCardSection(
+                        creditCardCategories = creditCardCategories,
+                        creditCardAccountBalances = creditCardAccountBalances,
+                        onUserClickEvent = onUserClickEvent
+                    )
+                }
 
+                // Add extra spacing between credit cards and regular groups
+                item(key = "credit_cards_spacer") {
+                    Spacer(modifier = Modifier.height(spacing.m))
+                }
+            }
+
+            // Show regular groups
+            regularGroups.forEach { (group, items) ->
                 stickyGroups(
                     group = group,
                     onUserClickEvent = onUserClickEvent

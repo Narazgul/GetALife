@@ -29,6 +29,7 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.AddTransactionItem
 import app.tinygiants.getalife.presentation.main_app.transaction.composables.Description
@@ -51,7 +52,8 @@ fun AddTransaction() {
           direction: TransactionDirection,
           description: Description,
           transactionPartner: TransactionPartner,
-          dateOfTransaction: kotlin.time.Instant ->
+          dateOfTransaction: kotlin.time.Instant,
+          recurrenceFrequency: RecurrenceFrequency? ->
 
             viewModel.onSaveTransactionClicked(
                 amount = amount,
@@ -60,7 +62,8 @@ fun AddTransaction() {
                 description = description,
                 transactionPartner = transactionPartner,
                 category = category,
-                dateOfTransaction = dateOfTransaction
+                dateOfTransaction = dateOfTransaction,
+                recurrenceFrequency = recurrenceFrequency
             )
         }
 
@@ -75,7 +78,7 @@ fun AddTransaction() {
 fun AddTransactionContent(
     categories: List<Category>,
     accounts: List<Account>,
-    onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner, dateOfTransaction: kotlin.time.Instant) -> Unit
+    onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner, dateOfTransaction: kotlin.time.Instant, recurrenceFrequency: RecurrenceFrequency?) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -114,7 +117,7 @@ fun AddTransactionContent(
                         else -> neutralBackground
                     }
                 },
-                onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner, dateOfTransaction ->
+                onAddTransactionClicked = { amount, account, category, direction, description, transactionPartner, dateOfTransaction, recurrenceFrequency ->
                     onAddTransactionClicked(
                         amount,
                         account,
@@ -122,7 +125,8 @@ fun AddTransactionContent(
                         direction,
                         description,
                         transactionPartner,
-                        dateOfTransaction
+                        dateOfTransaction,
+                        recurrenceFrequency
                     )
                     showTransactionAddedSnackbar()
                 },
@@ -142,7 +146,7 @@ private fun AddTransactionPreview() {
             AddTransactionContent(
                 categories = emptyList(),
                 accounts = emptyList(),
-                onAddTransactionClicked = { _, _, _, _, _, _, _ -> }
+                onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> }
             )
         }
     }

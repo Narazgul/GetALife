@@ -11,11 +11,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
@@ -33,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.R
@@ -41,10 +47,19 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +86,10 @@ fun EditTransactionBottomSheet(
     var directionUserInput by rememberSaveable { mutableStateOf(transaction.transactionDirection) }
     var categoryUserInput by remember { mutableStateOf(transaction.category) }
     var accountUserInput by remember { mutableStateOf(transaction.account) }
+    var recurrenceFrequency by rememberSaveable {
+        mutableStateOf(transaction.recurrenceFrequency ?: RecurrenceFrequency.NEVER)
+    }
+    var showRecurrenceDropdown by rememberSaveable { mutableStateOf(false) }
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
@@ -152,8 +171,7 @@ fun EditTransactionBottomSheet(
                 DropdownMenu(
                     expanded = showAccountDropdown,
                     onDismissRequest = { showAccountDropdown = false },
-                    modifier = Modifier
-                        .width(200.dp)
+                    modifier = Modifier.width(200.dp)
                 ) {
                     accounts.forEach { account ->
                         DropdownMenuItem(
@@ -203,6 +221,49 @@ fun EditTransactionBottomSheet(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(spacing.l))
+
+            // Recurrence frequency selection
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(spacing.l)
+            ) {
+                SelectionCard(
+                    label = stringResource(R.string.recurrence_frequency_label),
+                    selectedText = stringResource(recurrenceFrequency.asStringRes()),
+                    onClick = { showRecurrenceDropdown = true }
+                )
+                DropdownMenu(
+                    expanded = showRecurrenceDropdown,
+                    onDismissRequest = { showRecurrenceDropdown = false },
+                    modifier = Modifier.width(250.dp)
+                ) {
+                    RecurrenceFrequency.entries.forEach { frequency ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(frequency.asStringRes())) },
+                            onClick = {
+                                recurrenceFrequency = frequency
+                                showRecurrenceDropdown = false
+
+                                // Update transaction with new frequency
+                                val updatedTransaction = transaction.copy(
+                                    isRecurring = frequency != RecurrenceFrequency.NEVER,
+                                    recurrenceFrequency = if (frequency != RecurrenceFrequency.NEVER) frequency else null,
+                                    nextPaymentDate = if (frequency != RecurrenceFrequency.NEVER) {
+                                        calculateNextPaymentDate(transaction.dateOfTransaction, frequency)
+                                    } else null
+                                )
+                                onUpdateTransactionClicked(updatedTransaction)
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.l))
             Button(
                 onClick = { onDeleteTransactionClicked() },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
@@ -210,6 +271,88 @@ fun EditTransactionBottomSheet(
                 Text(
                     text = stringResource(id = R.string.delete_transaction),
                     color = MaterialTheme.colorScheme.onError
+                )
+            }
+        }
+    }
+}
+
+private fun calculateNextPaymentDate(currentDate: kotlin.time.Instant, frequency: RecurrenceFrequency): kotlin.time.Instant {
+    val timeZone = TimeZone.currentSystemDefault()
+    val localDateTime = currentDate.toLocalDateTime(timeZone)
+    val localDate = localDateTime.date
+    val time = localDateTime.time
+
+    val nextLocalDate = when (frequency) {
+        RecurrenceFrequency.NEVER -> localDate // Should not be called for NEVER, but return same date as fallback
+        // Day-based frequencies
+        RecurrenceFrequency.DAILY -> localDate.plus(DatePeriod(days = 1))
+        RecurrenceFrequency.WEEKLY -> localDate.plus(DatePeriod(days = 7))
+        RecurrenceFrequency.EVERY_OTHER_WEEK -> localDate.plus(DatePeriod(days = 14))
+        RecurrenceFrequency.EVERY_4_WEEKS -> localDate.plus(DatePeriod(days = 28))
+
+        // Month-based frequencies (calendar-aware)
+        RecurrenceFrequency.MONTHLY -> localDate.plus(DatePeriod(months = 1))
+        RecurrenceFrequency.EVERY_OTHER_MONTH -> localDate.plus(DatePeriod(months = 2))
+        RecurrenceFrequency.EVERY_3_MONTHS -> localDate.plus(DatePeriod(months = 3))
+        RecurrenceFrequency.EVERY_4_MONTHS -> localDate.plus(DatePeriod(months = 4))
+        RecurrenceFrequency.TWICE_A_YEAR -> localDate.plus(DatePeriod(months = 6))
+        RecurrenceFrequency.YEARLY -> localDate.plus(DatePeriod(years = 1))
+
+        // Special case: twice a month
+        RecurrenceFrequency.TWICE_A_MONTH -> {
+            val dayOfMonth = localDate.day
+            if (dayOfMonth <= 15) {
+                // Move to 15th of same month
+                LocalDate(localDate.year, localDate.month, 15)
+            } else {
+                // Move to 1st of next month
+                LocalDate(localDate.year, localDate.month, 1).plus(DatePeriod(months = 1))
+            }
+        }
+    }
+
+    // Convert back to Instant with same time
+    return nextLocalDate.atTime(time).toInstant(timeZone)
+}
+
+@Composable
+fun SelectionCard(
+    label: String,
+    selectedText: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(spacing.l)
+    ) {
+        Column(modifier = Modifier.padding(spacing.l)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(spacing.xs))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = selectedText,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

@@ -4,6 +4,8 @@ import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 class TransactionDaoFake : TransactionDao {
@@ -21,6 +23,16 @@ class TransactionDaoFake : TransactionDao {
         transactions.map { transactions ->
             transactions.filter { it.categoryId == categoryId }
         }
+
+    override suspend fun getCategoryTransactionsForMonth(categoryId: Long, yearMonth: String): List<TransactionEntity> {
+        return transactions.value.filter { transaction ->
+            if (transaction.categoryId != categoryId) return@filter false
+
+            val dateTime = transaction.dateOfTransaction.toLocalDateTime(TimeZone.UTC)
+            val transactionYearMonth = "${dateTime.year}-${dateTime.monthNumber.toString().padStart(2, '0')}"
+            transactionYearMonth == yearMonth
+        }
+    }
 
     override suspend fun getCategoryTransactions(
         categoryId: Long,

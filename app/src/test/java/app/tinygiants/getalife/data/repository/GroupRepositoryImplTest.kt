@@ -7,6 +7,7 @@ import app.tinygiants.getalife.data.local.datagenerator.dreams
 import app.tinygiants.getalife.data.local.datagenerator.fixedCosts
 import app.tinygiants.getalife.data.local.datagenerator.groupEntities
 import app.tinygiants.getalife.data.local.datagenerator.savings
+import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
@@ -20,12 +21,14 @@ import org.junit.jupiter.api.Test
 class GroupRepositoryImplTest {
 
     private lateinit var fakeDao: GroupDaoFake
+    private lateinit var categoryRepositoryFake: CategoryRepositoryFake
     private lateinit var repository: GroupRepositoryImpl
 
     @BeforeEach
     fun setUp() {
         fakeDao = GroupDaoFake()
-        repository = GroupRepositoryImpl(fakeDao)
+        categoryRepositoryFake = CategoryRepositoryFake()
+        repository = GroupRepositoryImpl(fakeDao, categoryRepositoryFake)
     }
 
     @Test

@@ -5,6 +5,7 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -30,4 +31,9 @@ class CategoryRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCategory(category: Category) =
         categoryDao.deleteCategory(CategoryEntity.fromDomain(category))
+
+    override suspend fun getCreditCardPaymentCategory(accountId: Long): Category? {
+        val categories = getCategoriesFlow().first()
+        return categories.firstOrNull { it.linkedAccountId == accountId }
+    }
 }

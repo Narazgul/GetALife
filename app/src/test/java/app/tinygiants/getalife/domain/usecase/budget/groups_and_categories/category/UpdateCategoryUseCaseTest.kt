@@ -57,84 +57,83 @@ class UpdateCategoryUseCaseTest {
         categoryRepositoryFake.categories.value = categories
 
         val category = rentCategoryEntity().toDomain()
-        val updatedCategory = category.copy(assignedMoney = Money(100.0))
-
+        val updatedCategory = category.copy(budgetTarget = Money(100.0))
 
         updateCategory(updatedCategory)
 
         val categories = categoryRepositoryFake.categories.value
         assertThat(categories).hasSize(20)
         assertThat(categories.first().name).isEqualTo(rentCategoryEntity().name)
-        assertThat(categories.first().assignedMoney).isEqualTo(Money(100.0))
-        assertThat(categories.first().availableMoney).isEqualTo(Money(200.0))
+        assertThat(categories.first().budgetTarget).isEqualTo(Money(100.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
     }
 
     @Test
     fun `Reduce assigned money twice`(): Unit = runTest {
         categoryRepositoryFake.categories.value = categories
         val category = rentCategoryEntity().toDomain()
-        val updatedCategory = category.copy(assignedMoney = Money(value = 120.0))
+        val updatedCategory = category.copy(budgetTarget = Money(value = 120.0))
 
         updateCategory(updatedCategory)
 
         val categoryAfterFirstUpdate = categoryRepositoryFake.categories.value.find { it.id == rentCategoryEntity().id }!!
-        assertThat(categoryAfterFirstUpdate.assignedMoney).isEqualTo(Money(120.0))
-        assertThat(categoryAfterFirstUpdate.availableMoney).isEqualTo(Money(220.0))
+        assertThat(categoryAfterFirstUpdate.budgetTarget).isEqualTo(Money(120.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
 
-        val updatedCategory2 = updatedCategory.copy(assignedMoney = Money(12.0))
+        val updatedCategory2 = updatedCategory.copy(budgetTarget = Money(12.0))
         updateCategory(updatedCategory2)
 
         val categoryAfterSecondUpdate = categoryRepositoryFake.categories.value.find { it.id == rentCategoryEntity().id }!!
-        assertThat(categoryAfterSecondUpdate.assignedMoney).isEqualTo(Money(12.0))
-        assertThat(categoryAfterSecondUpdate.availableMoney).isEqualTo(Money(112.0))
+        assertThat(categoryAfterSecondUpdate.budgetTarget).isEqualTo(Money(12.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
     }
 
     @Test
     fun `Keep assigned money in rent category`(): Unit = runTest {
         categoryRepositoryFake.categories.value = categories
         val category = rentCategoryEntity().toDomain()
-        val updatedCategory = category.copy(assignedMoney = category.assignedMoney)
+        val updatedCategory = category.copy(budgetTarget = category.budgetTarget)
         updateCategory(updatedCategory)
 
         val categories = categoryRepositoryFake.categories.value
         assertThat(categories).hasSize(20)
         assertThat(categories.first().name).isEqualTo(rentCategoryEntity().name)
-        assertThat(categories.first().assignedMoney).isEqualTo(Money(1200.0))
-        assertThat(categories.first().availableMoney).isEqualTo(Money(1300.0))
+        assertThat(categories.first().budgetTarget).isEqualTo(Money(1200.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
     }
 
     @Test
     fun `Raise assigned money in rent category`(): Unit = runTest {
         categoryRepositoryFake.categories.value = categories
         val category = rentCategoryEntity().toDomain()
-        val updatedCategory = category.copy(assignedMoney = Money(value = 1500.0))
+        val updatedCategory = category.copy(budgetTarget = Money(value = 1500.0))
 
         updateCategory(updatedCategory)
 
         val categories = categoryRepositoryFake.categories.value
         assertThat(categories).hasSize(20)
         assertThat(categories.first().name).isEqualTo(rentCategoryEntity().name)
-        assertThat(categories.first().assignedMoney).isEqualTo(Money(1500.0))
-        assertThat(categories.first().availableMoney).isEqualTo(Money(1600.0))
+        assertThat(categories.first().budgetTarget).isEqualTo(Money(1500.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
     }
 
     @Test
     fun `Raise assigned money twice`(): Unit = runTest {
         categoryRepositoryFake.categories.value = categories
         val category = transportCategoryEntity().toDomain()
-        val updatedCategory = category.copy(assignedMoney = Money(value = 1.0))
+        val updatedCategory = category.copy(budgetTarget = Money(value = 1.0))
 
         updateCategory(updatedCategory)
 
         val categoryAfterFirstUpdate = categoryRepositoryFake.categories.value.find { it.id == transportCategoryEntity().id }!!
-        assertThat(categoryAfterFirstUpdate.assignedMoney).isEqualTo(Money(1.0))
-        assertThat(categoryAfterFirstUpdate.availableMoney).isEqualTo(Money(1.0))
+        assertThat(categoryAfterFirstUpdate.budgetTarget).isEqualTo(Money(1.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
 
-        val updatedCategory2 = updatedCategory.copy(assignedMoney = Money(10.0))
+        val updatedCategory2 = updatedCategory.copy(budgetTarget = Money(10.0))
         updateCategory(updatedCategory2)
 
         val categoryAfterSecondUpdate = categoryRepositoryFake.categories.value.find { it.id == transportCategoryEntity().id }!!
-        assertThat(categoryAfterSecondUpdate.assignedMoney).isEqualTo(Money(10.0))
-        assertThat(categoryAfterSecondUpdate.availableMoney).isEqualTo(Money(10.0))
+        assertThat(categoryAfterSecondUpdate.budgetTarget).isEqualTo(Money(10.0))
+        // assignedMoney/availableMoney now handled via CategoryMonthlyStatus
     }
 }

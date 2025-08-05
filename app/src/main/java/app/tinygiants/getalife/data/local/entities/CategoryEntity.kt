@@ -18,6 +18,7 @@ data class CategoryEntity(
     val targetMonthsRemaining: Int?, // Für Multi-Monats-Sparziele
     val listPosition: Int,
     val isInitialCategory: Boolean,
+    val linkedAccountId: Long? = null,
     val updatedAt: Instant,
     val createdAt: Instant
 ) {
@@ -34,6 +35,7 @@ data class CategoryEntity(
                     targetMonthsRemaining = targetMonthsRemaining,
                     listPosition = listPosition,
                     isInitialCategory = isInitialCategory,
+                    linkedAccountId = linkedAccountId,
                     updatedAt = updatedAt,
                     createdAt = createdAt
                 )
@@ -52,6 +54,7 @@ data class CategoryEntity(
             targetMonthsRemaining = targetMonthsRemaining,
             listPosition = listPosition,
             isInitialCategory = isInitialCategory,
+            linkedAccountId = linkedAccountId,
             updatedAt = updatedAt,
             createdAt = createdAt
         )

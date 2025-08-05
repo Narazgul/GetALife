@@ -4,12 +4,10 @@ import app.tinygiants.getalife.TestDispatcherExtension
 import app.tinygiants.getalife.data.local.datagenerator.categories
 import app.tinygiants.getalife.data.local.datagenerator.rentCategoryEntity
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
-import app.tinygiants.getalife.presentation.shared_composables.UiText
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
@@ -60,12 +58,11 @@ class DeleteCategoryUseCaseTest {
                 emoji = emoji,
                 name = name,
                 budgetTarget = Money(budgetTarget),
-                assignedMoney = Money(assignedMoney),
-                availableMoney = Money(availableMoney),
-                progress = EmptyProgress(),
-                optionalText = UiText.DynamicString(value = ""),
+                monthlyTargetAmount = monthlyTargetAmount?.let { Money(it) },
+                targetMonthsRemaining = targetMonthsRemaining,
                 listPosition = listPosition,
                 isInitialCategory = isInitialCategory,
+                linkedAccountId = null,
                 updatedAt = updatedAt,
                 createdAt = createdAt,
             )

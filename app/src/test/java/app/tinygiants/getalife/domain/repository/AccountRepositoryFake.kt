@@ -10,7 +10,7 @@ class AccountRepositoryFake : AccountRepository {
 
     override fun getAccountsFlow(): Flow<List<Account>> = accounts
 
-    override suspend fun getAccount(accountId: Long): Account = accounts.value.first { it.id == accountId }
+    override suspend fun getAccount(accountId: Long): Account? = accounts.value.firstOrNull { it.id == accountId }
 
     override suspend fun addAccount(account: Account) {
         accounts.value = accounts.value.toMutableList().apply { add(account) }

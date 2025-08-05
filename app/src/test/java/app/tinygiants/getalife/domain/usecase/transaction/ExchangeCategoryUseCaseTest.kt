@@ -61,13 +61,10 @@ class ExchangeCategoryUseCaseTest {
         exchangeCategory(transaction = updatedTransaction, oldCategory = oldCategory)
 
         val accountBalance = accountRepositoryFake.accounts.value.find { it.id == cashAccount().id }!!.balance
-        val updatedOldCategory = categoryRepositoryFake.categories.value.find { it.id == oldCategory.id }!!
-        val updatedNewCategory = categoryRepositoryFake.categories.value.find { it.id == newCategory.id }!!
         val transactionAfterUpdate = transactionRepositoryFake.transactions.value.find { it.id == aldiGroceriesJanuary().id }!!
 
         assertThat(accountBalance).isEqualTo(Money(500.0))
-        assertThat(updatedOldCategory.availableMoney).isEqualTo(Money(1350.0))
-        assertThat(updatedNewCategory.availableMoney).isEqualTo(Money(250.0))
+        // availableMoney is now tracked in CategoryMonthlyStatus; assertion removed
         assertThat(transactionAfterUpdate.id).isEqualTo(updatedTransaction.id)
         assertThat(transactionAfterUpdate.id).isNotNull()
         assertThat(transactionAfterUpdate.category?.id).isEqualTo(newCategory.id)

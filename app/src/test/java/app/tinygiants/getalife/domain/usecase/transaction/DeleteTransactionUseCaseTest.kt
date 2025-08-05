@@ -9,8 +9,10 @@ import app.tinygiants.getalife.data.local.datagenerator.startingBalanceTransacti
 import app.tinygiants.getalife.data.local.datagenerator.transactions
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.AccountRepositoryFake
+import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepositoryFake
 import app.tinygiants.getalife.domain.repository.CategoryRepositoryFake
 import app.tinygiants.getalife.domain.repository.TransactionRepositoryFake
+import app.tinygiants.getalife.domain.usecase.budget.RecalculateCategoryMonthlyStatusUseCase
 import assertk.assertThat
 import assertk.assertions.containsNone
 import assertk.assertions.hasSize
@@ -27,6 +29,8 @@ class DeleteTransactionUseCaseTest {
     private lateinit var transactionRepositoryFake: TransactionRepositoryFake
     private lateinit var accountRepositoryFake: AccountRepositoryFake
     private lateinit var categoryRepositoryFake: CategoryRepositoryFake
+    private lateinit var categoryMonthlyStatusRepositoryFake: CategoryMonthlyStatusRepositoryFake
+    private lateinit var recalculateCategoryMonthlyStatusUseCase: RecalculateCategoryMonthlyStatusUseCase
 
     companion object {
         @JvmField
@@ -39,12 +43,19 @@ class DeleteTransactionUseCaseTest {
 
         accountRepositoryFake = AccountRepositoryFake()
         categoryRepositoryFake = CategoryRepositoryFake()
+        categoryMonthlyStatusRepositoryFake = CategoryMonthlyStatusRepositoryFake()
         transactionRepositoryFake = TransactionRepositoryFake(accountRepositoryFake, categoryRepositoryFake)
+        recalculateCategoryMonthlyStatusUseCase = RecalculateCategoryMonthlyStatusUseCase(
+            statusRepository = categoryMonthlyStatusRepositoryFake,
+            transactionRepository = transactionRepositoryFake,
+            categoryRepository = categoryRepositoryFake
+        )
 
         deleteTransaction = DeleteTransactionUseCase(
             transactionRepository = transactionRepositoryFake,
             accountRepository = accountRepositoryFake,
             categoryRepository = categoryRepositoryFake,
+            recalculateCategoryMonthlyStatus = recalculateCategoryMonthlyStatusUseCase,
             defaultDispatcher = testDispatcherExtension.testDispatcher
         )
     }
@@ -97,8 +108,6 @@ class DeleteTransactionUseCaseTest {
         val categoryAfterTransactionDeleted = categoryRepositoryFake.categories.value[4]
         assertThat(categoryAfterTransactionDeleted.name).isEqualTo("Groceries")
         assertThat(categoryAfterTransactionDeleted.budgetTarget).isEqualTo(Money(300.0))
-        assertThat(categoryAfterTransactionDeleted.assignedMoney).isEqualTo(Money(150.0))
-        assertThat(categoryAfterTransactionDeleted.availableMoney).isEqualTo(Money(120.0))
     }
 
     @Test

@@ -6,7 +6,7 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
-import app.tinygiants.getalife.domain.usecase.account.DeleteAccountStatus.AccountHasTransactionsException
+import app.tinygiants.getalife.domain.usecase.account.DeleteAccountStatus
 import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
@@ -102,10 +102,26 @@ class AccountViewModel @Inject constructor(
                 )
 
                 is UserClickEvent.UpdateAccount -> updateAccount(account = clickEvent.account)
-                is UserClickEvent.DeleteAccount -> deleteAccount(account = clickEvent.account)
-                    .onFailure { throwable ->
-                        displayUserMessage(throwable)
-                    }
+                is UserClickEvent.DeleteAccount -> {
+                    deleteAccount(account = clickEvent.account)
+                        .onSuccess { status ->
+                            when (status) {
+                                is DeleteAccountStatus.SuccessfullyDeleted -> {
+                                    _uiState.update { state ->
+                                        state.copy(userMessage = UiText.DynamicString("Account deleted successfully"))
+                                    }
+                                }
+                                is DeleteAccountStatus.AccountClosedInsteadOfDeleted -> {
+                                    _uiState.update { state ->
+                                        state.copy(userMessage = StringResource(R.string.account_closed_instead_of_deleted))
+                                    }
+                                }
+                            }
+                        }
+                        .onFailure { throwable ->
+                            displayUserMessage(throwable)
+                        }
+                }
                 is UserClickEvent.TransferBetweenAccounts -> {
                     try {
                         transferBetweenAccounts(
@@ -151,10 +167,12 @@ class AccountViewModel @Inject constructor(
     }
 
     private fun displayUserMessage(throwable: Throwable) {
-        when (throwable) {
-            is AccountHasTransactionsException -> _uiState.update { accountUiState ->
-                accountUiState.copy(userMessage = StringResource(R.string.error_transactions_in_account))
-            }
+        val message = when (throwable) {
+            else -> StringResource(R.string.error_generic)
+        }
+        
+        _uiState.update { accountUiState ->
+            accountUiState.copy(userMessage = message)
         }
     }
 

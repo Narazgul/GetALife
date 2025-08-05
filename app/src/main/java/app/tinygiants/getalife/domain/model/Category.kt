@@ -12,6 +12,16 @@ data class Category(
     val targetMonthsRemaining: Int?,
     val listPosition: Int,
     val isInitialCategory: Boolean,
+    val linkedAccountId: Long? = null, // For credit card payment categories
     val updatedAt: Instant,
     val createdAt: Instant
-)
+) {
+    val behaviorType: CategoryBehaviorType
+        get() = if (linkedAccountId != null) CategoryBehaviorType.CreditCardPayment
+        else CategoryBehaviorType.Normal
+}
+
+enum class CategoryBehaviorType {
+    Normal,
+    CreditCardPayment
+}

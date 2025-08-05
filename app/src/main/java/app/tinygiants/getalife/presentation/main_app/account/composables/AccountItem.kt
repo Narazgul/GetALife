@@ -56,6 +56,9 @@ fun AccountItem(
     var isAccountDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     val moneyColor = when {
+        // Special handling for credit cards: negative balance (debt) should be red
+        type == AccountType.CreditCard && balance < EmptyMoney() -> warning
+        type == AccountType.CreditCard && balance >= EmptyMoney() -> success // Positive balance on credit card is good
         balance > EmptyMoney() -> success
         balance == EmptyMoney() -> MaterialTheme.colorScheme.outline
         else -> warning
@@ -118,14 +121,21 @@ fun AccountItem(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = type.name,
+                    text = when (type) {
+                        AccountType.CreditCard -> if (balance < EmptyMoney()) "${type.name} (Debt)" else type.name
+                        else -> type.name
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Text(
-                text = balance.formattedMoney,
+                text = if (type == AccountType.CreditCard && balance < EmptyMoney()) {
+                    "€${String.format("%.2f", kotlin.math.abs(balance.asDouble()))} debt"
+                } else {
+                    balance.formattedMoney
+                },
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 color = moneyColor
             )

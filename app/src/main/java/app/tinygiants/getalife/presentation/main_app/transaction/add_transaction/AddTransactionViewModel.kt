@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
@@ -72,7 +73,8 @@ class AddTransactionViewModel @Inject constructor(
         category: Category?,
         transactionPartner: String,
         description: String,
-        dateOfTransaction: Instant = Clock.System.now()
+        dateOfTransaction: Instant = Clock.System.now(),
+        recurrenceFrequency: RecurrenceFrequency? = null
     ) {
         viewModelScope.launch {
             addTransaction(
@@ -82,7 +84,8 @@ class AddTransactionViewModel @Inject constructor(
                 direction = direction,
                 transactionPartner = transactionPartner,
                 description = description,
-                dateOfTransaction = dateOfTransaction
+                dateOfTransaction = dateOfTransaction,
+                recurrenceFrequency = recurrenceFrequency
             )
         }
     }

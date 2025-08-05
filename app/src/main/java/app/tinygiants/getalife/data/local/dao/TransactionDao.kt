@@ -43,4 +43,20 @@ interface TransactionDao {
 
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)
+
+    // Recurring payment queries
+    @Query("SELECT * FROM transactions WHERE isRecurring = 1 AND parentRecurringTransactionId IS NULL AND isRecurrenceActive = 1")
+    fun getActiveRecurringTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transactions WHERE isRecurring = 1 AND nextPaymentDate <= :currentDate AND isRecurrenceActive = 1 AND parentRecurringTransactionId IS NULL")
+    suspend fun getDueRecurringTransactions(currentDate: Instant): List<TransactionEntity>
+
+    @Query("SELECT * FROM transactions WHERE parentRecurringTransactionId = :recurringTransactionId ORDER BY dateOfTransaction DESC")
+    suspend fun getGeneratedTransactions(recurringTransactionId: Long): List<TransactionEntity>
+
+    @Query("UPDATE transactions SET isRecurrenceActive = :isActive WHERE id = :transactionId")
+    suspend fun updateRecurrenceStatus(transactionId: Long, isActive: Boolean)
+
+    @Query("UPDATE transactions SET nextPaymentDate = :nextDate WHERE id = :transactionId")
+    suspend fun updateNextPaymentDate(transactionId: Long, nextDate: Instant)
 }

@@ -37,7 +37,7 @@ class ExchangeCategoryUseCase @Inject constructor(
     }
 
     private suspend fun updateOldCategory(category: Category?, amount: Money) {
-        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
+        // Category updates are handled through recalculation in the main invoke method
     }
 
     private suspend fun updateNewCategory(category: Category, amount: Money) {

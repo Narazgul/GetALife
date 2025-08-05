@@ -27,6 +27,8 @@ class GetALifeApp : Application() {
         configureSuperwall()
         configureRevenueCat()
         configureCrispChat()
+        // Schedule recurring payments worker
+        app.tinygiants.getalife.data.worker.ProcessRecurringPaymentsWorker.enqueue(this)
     }
 }
 
