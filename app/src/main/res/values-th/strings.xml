@@ -27,6 +27,10 @@
     <string name="distribute_money">จัดสรรเงิน</string>
     <string name="delete_transaction">ลบธุรกรรม</string>
     <string name="delete_account">ลบ %s</string>
+    <string name="error_generic">เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</string>
+    <string name="account_closed_instead_of_deleted">บัญชีถูกปิดแทนการลบเนื่องจากมีรายการธุรกรรม</string>
+    <string name="credit_card_category_cannot_be_deleted">หมวดหมู่การชำระบัตรเครดิตไม่สามารถลบได้โดยตรง จะถูกลบอัตโนมัติเมื่อลบบัญชีบัตรเครดิต</string>
+    <string name="credit_cards">บัตรเครดิต</string>
     <string name="add_group">เพิ่มกลุ่ม</string>
     <string name="choose_account">เลือกบัญชี</string>
     <string name="add_account">เพิ่มบัญชี</string>
@@ -72,4 +76,22 @@
     <string name="transportation_motorbike">มอเตอร์ไซค์/สกู๊ตเตอร์</string>
     <string name="transportation_bike">จักรยาน</string>
     <string name="transportation_foot">เดินสบาย!</string>
+
+    <!-- Recurring payment frequencies -->
+    <string name="recurrence_never">ไม่เคย</string>
+    <string name="recurrence_daily">รายวัน</string>
+    <string name="recurrence_weekly">รายสัปดาห์</string>
+    <string name="recurrence_every_other_week">ทุกสองสัปดาห์</string>
+    <string name="recurrence_monthly">รายเดือน</string>
+    <string name="recurrence_twice_a_month">สองครั้งต่อเดือน</string>
+    <string name="recurrence_every_other_month">ทุกสองเดือน</string>
+    <string name="recurrence_every_4_weeks">ทุก 4 สัปดาห์</string>
+    <string name="recurrence_every_3_months">ทุก 3 เดือน</string>
+    <string name="recurrence_every_4_months">ทุก 4 เดือน</string>
+    <string name="recurrence_twice_a_year">สองครั้งต่อปี</string>
+    <string name="recurrence_yearly">รายปี</string>
+    <string name="recurrence_label">การชำระซ้ำ</string>
+    <string name="recurrence_frequency_label">ความถี่</string>
+    <string name="next_execution">การดำเนินการครั้งถัดไป</string>
+    <string name="automatically_created">สร้างโดยอัตโนมัติ</string>
 </resources>

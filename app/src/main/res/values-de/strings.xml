@@ -27,6 +27,10 @@
     <string name="distribute_money">Geld zuweisen</string>
     <string name="delete_transaction">Transaktion löschen</string>
     <string name="delete_account">%s löschen</string>
+    <string name="account_closed_instead_of_deleted">Das Konto wurde geschlossen anstatt gelöscht, da es Transaktionen enthält</string>
+    <string name="credit_card_category_cannot_be_deleted">Kreditkarten-Zahlungskategorien können nicht direkt gelöscht werden. Sie werden automatisch entfernt, wenn das Kreditkartenkonto gelöscht wird.</string>
+    <string name="error_generic">Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="credit_cards">Kreditkarten</string>
     <string name="add_group">Gruppe hinzufügen</string>
     <string name="choose_account">Konto wählen</string>
     <string name="add_account">Konto hinzufügen</string>
@@ -70,4 +74,22 @@
     <string name="transportation_motorbike">Motorrad/Roller</string>
     <string name="transportation_bike">Fahrrad</string>
     <string name="transportation_foot">Gut zu Fuß!</string>
+
+    <!-- Recurring payment frequencies -->
+    <string name="recurrence_never">Nie</string>
+    <string name="recurrence_daily">Täglich</string>
+    <string name="recurrence_weekly">Wöchentlich</string>
+    <string name="recurrence_every_other_week">Alle zwei Wochen</string>
+    <string name="recurrence_monthly">Monatlich</string>
+    <string name="recurrence_twice_a_month">Zweimal im Monat</string>
+    <string name="recurrence_every_other_month">Alle zwei Monate</string>
+    <string name="recurrence_every_4_weeks">Alle 4 Wochen</string>
+    <string name="recurrence_every_3_months">Alle 3 Monate</string>
+    <string name="recurrence_every_4_months">Alle 4 Monate</string>
+    <string name="recurrence_twice_a_year">Zweimal im Jahr</string>
+    <string name="recurrence_yearly">Jährlich</string>
+    <string name="recurrence_label">Wiederkehrende Zahlung</string>
+    <string name="recurrence_frequency_label">Häufigkeit</string>
+    <string name="next_execution">Nächste Ausführung</string>
+    <string name="automatically_created">Automatisch erstellt</string>
 </resources>

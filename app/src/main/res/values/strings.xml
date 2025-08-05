@@ -26,6 +26,10 @@
     <string name="distribute_money">Allocate money</string>
     <string name="delete_transaction">Delete Transaction</string>
     <string name="delete_account">Delete %s</string>
+    <string name="account_closed_instead_of_deleted">Account has been closed instead of deleted because it contains transactions</string>
+    <string name="credit_card_category_cannot_be_deleted">Credit card payment categories cannot be deleted directly. They are removed automatically when the credit card account is deleted.</string>
+    <string name="error_generic">An error occurred. Please try again.</string>
+    <string name="credit_cards">Credit Cards</string>
     <string name="add_group">Add group</string>
     <string name="choose_account">Choose Account</string>
     <string name="add_account">Add account</string>
@@ -69,4 +73,22 @@
     <string name="transportation_motorbike">Motorbike/Scooter</string>
     <string name="transportation_bike">Bicycle</string>
     <string name="transportation_foot">Good on foot!</string>
+
+    <!-- Recurring payment frequencies -->
+    <string name="recurrence_never">Never</string>
+    <string name="recurrence_daily">Daily</string>
+    <string name="recurrence_weekly">Weekly</string>
+    <string name="recurrence_every_other_week">Every other week</string>
+    <string name="recurrence_monthly">Monthly</string>
+    <string name="recurrence_twice_a_month">Twice a month</string>
+    <string name="recurrence_every_other_month">Every other month</string>
+    <string name="recurrence_every_4_weeks">Every 4 weeks</string>
+    <string name="recurrence_every_3_months">Every 3 months</string>
+    <string name="recurrence_every_4_months">Every 4 months</string>
+    <string name="recurrence_twice_a_year">Twice a year</string>
+    <string name="recurrence_yearly">Yearly</string>
+    <string name="recurrence_label">Recurring payment</string>
+    <string name="recurrence_frequency_label">Frequency</string>
+    <string name="next_execution">Next execution</string>
+    <string name="automatically_created">Automatically created</string>
 </resources>
