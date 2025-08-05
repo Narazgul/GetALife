@@ -1,9 +1,11 @@
 package app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category
 
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.CategoryBehaviorType
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryStatus.CategoryHasTransactionsException
+import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryStatus.CreditCardCategoryCannotBeDeleted
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.DeleteCategoryStatus.SuccessfullyDeleted
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -11,6 +13,7 @@ import javax.inject.Inject
 sealed class DeleteCategoryStatus {
     data object SuccessfullyDeleted : DeleteCategoryStatus()
     data class CategoryHasTransactionsException(override val message: String) : Exception(message)
+    data class CreditCardCategoryCannotBeDeleted(override val message: String) : Exception(message)
 }
 
 class DeleteCategoryUseCase @Inject constructor(
@@ -19,6 +22,15 @@ class DeleteCategoryUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(category: Category): Result<DeleteCategoryStatus> {
+        // Credit card payment categories cannot be deleted directly by users
+        if (category.behaviorType == CategoryBehaviorType.CreditCardPayment) {
+            return Result.failure(
+                CreditCardCategoryCannotBeDeleted(
+                    message = "Credit card payment categories are managed automatically and cannot be deleted directly. " +
+                            "They are removed when the associated credit card account is deleted."
+                )
+            )
+        }
 
         val transactions = transactionRepository.getTransactionsByCategoryFlow(categoryId = category.id).first()
         if (transactions.isNotEmpty())

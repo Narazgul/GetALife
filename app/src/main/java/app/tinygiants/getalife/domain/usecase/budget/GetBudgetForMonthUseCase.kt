@@ -1,11 +1,13 @@
 package app.tinygiants.getalife.domain.usecase.budget
 
 import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.BudgetMonth
 import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.includeInBudget
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
@@ -94,15 +96,33 @@ class GetBudgetForMonthUseCase @Inject constructor(
     }
 
     private suspend fun calculateTotalAvailableMoneyToAssign(accounts: List<Account>): Money {
-        val totalAccountBalance = accounts.fold(EmptyMoney()) { acc, account ->
-            acc + account.balance
-        }
+        // Only include accounts that are in budget and not closed
+        val totalAccountBalance = accounts
+            .filter { it.type.includeInBudget && !it.isClosed }
+            .sumOf { account ->
+                when (account.type) {
+                    AccountType.CreditCard -> {
+                        // For credit cards: only include positive balances (credit/overpayment)
+                        // Negative balances (debt) should not reduce assignable money
+                        if (account.balance.asDouble() > 0) {
+                            account.balance.asDouble()
+                        } else {
+                            0.0 // Don't count debt against assignable money
+                        }
+                    }
+
+                    else -> {
+                        // For all other account types, include the full balance
+                        account.balance.asDouble()
+                    }
+                }
+            }
 
         val allMonthlyStatuses = statusRepository.getAllStatuses()
         val totalAssignedMoneyAllMonths = allMonthlyStatuses.fold(EmptyMoney()) { acc: Money, status: CategoryMonthlyStatus ->
             acc + status.assignedAmount
         }
 
-        return totalAccountBalance - totalAssignedMoneyAllMonths
+        return Money(totalAccountBalance) - totalAssignedMoneyAllMonths
     }
 }
