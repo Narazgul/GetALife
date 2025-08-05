@@ -15,6 +15,7 @@ data class AccountEntity(
     val balance: Double,
     val type: AccountType,
     val listPosition: Int,
+    val isClosed: Boolean = false,
     val updatedAt: Instant,
     val createdAt: Instant
 ) {
@@ -27,6 +28,7 @@ data class AccountEntity(
                     balance = balance.asDouble(),
                     type = type,
                     listPosition = listPosition,
+                    isClosed = isClosed,
                     updatedAt = updatedAt,
                     createdAt = createdAt
                 )
@@ -41,6 +43,7 @@ data class AccountEntity(
             balance = Money(value = balance),
             type = type,
             listPosition = listPosition,
+            isClosed = isClosed,
             updatedAt = updatedAt,
             createdAt = createdAt
         )

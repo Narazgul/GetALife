@@ -13,8 +13,12 @@ import kotlinx.coroutines.flow.Flow
 interface AccountDao {
 
     @Transaction
-    @Query("SELECT * FROM accounts")
+    @Query("SELECT * FROM accounts WHERE isClosed = 0")
     fun getAccountsFlow(): Flow<List<AccountEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM accounts")
+    fun getAllAccountsFlow(): Flow<List<AccountEntity>>
 
     @Query("SELECT * FROM accounts WHERE id == :accountId")
     suspend fun getAccount(accountId: Long): AccountEntity?
