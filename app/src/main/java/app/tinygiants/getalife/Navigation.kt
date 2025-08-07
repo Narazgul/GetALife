@@ -12,13 +12,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.domain.model.SubscriptionStatus
 import app.tinygiants.getalife.domain.model.SubscriptionStatus.Active
+import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
 import app.tinygiants.getalife.domain.usecase.subscription.GetUserSubscriptionStatusUseCase
 import app.tinygiants.getalife.presentation.main_app.MainScreen
-import app.tinygiants.getalife.presentation.onboarding.OnboardingScreen
+import app.tinygiants.getalife.presentation.onboarding.OnboardingNavGraph
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -30,7 +32,7 @@ sealed class Path(val route: String) {
 @Composable
 fun GetALifeNavHost() {
     val viewModel: GetALifeNavHostViewModel = hiltViewModel()
-    val subscriptionStatus by viewModel.subscriptionStatus.collectAsStateWithLifecycle()
+    val startDestination by viewModel.dynamicStartDestination.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
 
@@ -43,12 +45,10 @@ fun GetALifeNavHost() {
 
     NavHost(
         navController = navController,
-        // Hardcoded for testing purposes - keep as requested
-        startDestination = Path.Main.route
+        startDestination = startDestination
     ) {
         composable(route = Path.Onboarding.route) {
-            OnboardingScreen(
-                subscriptionStatus = subscriptionStatus,
+            OnboardingNavGraph(
                 onNavigateToMainApp = onNavigateToMainAppGraph
             )
         }
@@ -61,9 +61,12 @@ fun GetALifeNavHost() {
 
 @HiltViewModel
 class GetALifeNavHostViewModel @Inject constructor(
-    getSubscription: GetUserSubscriptionStatusUseCase
+    getSubscription: GetUserSubscriptionStatusUseCase,
+    getCurrentBudget: GetCurrentBudgetUseCase,
+    onboardingPrefsUseCase: OnboardingPrefsUseCase
 ) : ViewModel() {
 
+    // Keep live subscription status running in background for updates
     val subscriptionStatus: StateFlow<SubscriptionStatus> = getSubscription()
         .stateIn(
             scope = viewModelScope,
@@ -71,14 +74,25 @@ class GetALifeNavHostViewModel @Inject constructor(
             initialValue = SubscriptionStatus.Unknown
         )
 
-    val dynamicStartDestination: StateFlow<String> = subscriptionStatus.map { status ->
-        when (status) {
-            Active -> Path.Main.route
+    // Use cached status for instant startup navigation
+    val dynamicStartDestination: StateFlow<String> = combine(
+        getSubscription.getCachedStatus(), // Use cached status for instant startup
+        getCurrentBudget.currentBudgetIdOrDefaultFlow,
+        onboardingPrefsUseCase.isOnboardingCompletedFlow
+    ) { subscription, budgetId, onboardingCompleted ->
+        when {
+            // If user has active subscription and budget exists, go to main app
+            subscription == Active && budgetId != null -> Path.Main.route
+
+            // If onboarding was completed and budget exists, go to main app  
+            onboardingCompleted && budgetId != null -> Path.Main.route
+
+            // Otherwise, show onboarding (no more loading state needed)
             else -> Path.Onboarding.route
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = Path.Onboarding.route
+        initialValue = Path.Onboarding.route // Back to onboarding as initial - will be updated instantly
     )
 }
