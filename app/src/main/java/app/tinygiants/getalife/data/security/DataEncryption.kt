@@ -24,14 +24,12 @@ class DataEncryption @Inject constructor() {
         private const val TAG_LENGTH = 16 // GCM authentication tag length
     }
 
-    private val keyStore: KeyStore by lazy {
-        KeyStore.getInstance(ANDROID_KEYSTORE).apply {
-            load(null)
-        }
+    private val platformEncryption: PlatformEncryption by lazy {
+        EncryptionFactory.createPlatformEncryption()
     }
 
     init {
-        generateOrGetKey()
+        platformEncryption.initialize()
         // Log security configuration in debug builds
         if (BuildConfig.DEBUG) {
             BuildConfigFields.logSecurityConfig()
@@ -50,20 +48,7 @@ class DataEncryption @Inject constructor() {
             return plainText
         }
 
-        return try {
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
-
-            val iv = cipher.iv
-            val encryptedData = cipher.doFinal(plainText.toByteArray())
-
-            // Combine IV + encrypted data
-            val combined = iv + encryptedData
-            android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
-        } catch (e: Exception) {
-            // If encryption fails, don't expose raw data
-            "[ENCRYPTION_ERROR]"
-        }
+        return platformEncryption.encryptSensitiveData(plainText)
     }
 
     /**
@@ -80,13 +65,7 @@ class DataEncryption @Inject constructor() {
             }
         }
 
-        return try {
-            val hash = java.security.MessageDigest.getInstance("SHA-256")
-                .digest(sensitiveData.toByteArray())
-            "HASH_${android.util.Base64.encodeToString(hash.take(8).toByteArray(), android.util.Base64.NO_WRAP)}"
-        } catch (e: Exception) {
-            "[SENSITIVE_DATA]"
-        }
+        return platformEncryption.hashForLogging(sensitiveData)
     }
 
     /**
@@ -97,51 +76,61 @@ class DataEncryption @Inject constructor() {
             return encryptedData
         }
 
-        return try {
-            val combined = android.util.Base64.decode(encryptedData, android.util.Base64.NO_WRAP)
-            val iv = combined.take(IV_LENGTH).toByteArray()
-            val encrypted = combined.drop(IV_LENGTH).toByteArray()
-
-            val cipher = Cipher.getInstance(TRANSFORMATION)
-            val spec = GCMParameterSpec(TAG_LENGTH * 8, iv)
-            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
-
-            String(cipher.doFinal(encrypted))
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun generateOrGetKey(): SecretKey {
-        return if (keyStore.containsAlias(KEY_ALIAS)) {
-            getSecretKey()
-        } else {
-            generateNewKey()
-        }
-    }
-
-    private fun generateNewKey(): SecretKey {
-        val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
-        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
-            KEY_ALIAS,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-        )
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-            .setKeySize(256)
-            .setUserAuthenticationRequired(false) // No biometric for logging
-            .build()
-
-        keyGenerator.init(keyGenParameterSpec)
-        return keyGenerator.generateKey()
-    }
-
-    private fun getSecretKey(): SecretKey {
-        return keyStore.getKey(KEY_ALIAS, null) as SecretKey
+        return platformEncryption.decryptData(encryptedData)
     }
 
     /**
      * Check if encryption is currently disabled (for debug purposes)
      */
-    fun isEncryptionDisabled(): Boolean = ENCRYPTION_DISABLED_FOR_DEBUG
+    fun isEncryptionDisabled(): Boolean = platformEncryption.isEncryptionDisabled()
+
+    /**
+     * Create a consistent hash for the same input
+     * Useful for creating stable identifiers that don't expose sensitive data
+     */
+    fun createStableHash(input: String, salt: String = "GetALife2024"): String {
+        val encryption = platformEncryption
+        return if (encryption is KmpEncryption) {
+            encryption.createConsistentHash(input, salt)
+        } else {
+            // Fallback for other implementations
+            hashForLogging("$salt$input$salt")
+        }
+    }
+
+    /**
+     * Sanitize sensitive data for logging
+     * Replaces sensitive content with safe placeholders
+     */
+    fun sanitizeForLogging(data: String, maxLength: Int = 100): String {
+        if (BuildConfigFields.ENCRYPTION_DISABLED_FOR_DEBUG) {
+            return if (data.length > maxLength) {
+                "${data.take(maxLength)}... [TRUNCATED]"
+            } else {
+                data
+            }
+        }
+
+        return when {
+            data.isBlank() -> "[EMPTY]"
+            data.length <= 6 -> "[SENSITIVE]"
+            else -> hashForLogging(data)
+        }
+    }
+}
+
+/**
+ * Extension functions for easy encryption of common data types
+ */
+fun String.encryptForLogging(): String {
+    val encryption = EncryptionFactory.createPlatformEncryption()
+    encryption.initialize()
+    return encryption.hashForLogging(this)
+}
+
+fun String.isEncryptionHash(): Boolean {
+    return this.startsWith("HASH_") ||
+            this.startsWith("ID_") ||
+            this.startsWith("[SENSITIVE") ||
+            this.startsWith("[ENCRYPTED")
 }
