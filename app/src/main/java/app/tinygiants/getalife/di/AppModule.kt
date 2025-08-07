@@ -5,6 +5,7 @@ import app.tinygiants.getalife.BuildConfig
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseAi
+import app.tinygiants.getalife.data.security.DataEncryption
 import app.tinygiants.getalife.domain.repository.AiRepository
 import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -34,6 +35,10 @@ object AppModule {
     fun provideFirebaseCrashlytics(): FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     @Provides
+    @Singleton
+    fun provideDataEncryption(): DataEncryption = DataEncryption()
+
+    @Provides
     fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
         val remoteConfig = Firebase.remoteConfig
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
@@ -46,9 +51,13 @@ object AppModule {
 
     @FirebaseGemini
     @Provides
-    fun provideFirebaseAi(crashlytics: FirebaseCrashlytics): AiRepository = FirebaseAi(
+    fun provideFirebaseAi(
+        crashlytics: FirebaseCrashlytics,
+        dataEncryption: DataEncryption
+    ): AiRepository = FirebaseAi(
         generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash"),
-        crashlytics = crashlytics
+        crashlytics = crashlytics,
+        dataEncryption = dataEncryption
     )
 }
 
