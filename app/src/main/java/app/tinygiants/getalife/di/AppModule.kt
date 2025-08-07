@@ -11,6 +11,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import dagger.Module
@@ -19,6 +20,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,6 +28,10 @@ object AppModule {
 
     @Provides
     fun provideAppUpdateManager(@ApplicationContext appContext: Context) = AppUpdateManagerFactory.create(appContext)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseCrashlytics(): FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     @Provides
     fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
@@ -40,8 +46,9 @@ object AppModule {
 
     @FirebaseGemini
     @Provides
-    fun provideFirebaseAi(): AiRepository = FirebaseAi(
-        generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash")
+    fun provideFirebaseAi(crashlytics: FirebaseCrashlytics): AiRepository = FirebaseAi(
+        generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash"),
+        crashlytics = crashlytics
     )
 }
 
