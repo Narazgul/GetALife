@@ -9,11 +9,13 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import app.tinygiants.getalife.data.local.dao.AccountDao
+import app.tinygiants.getalife.data.local.dao.BudgetDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.dao.CategoryMonthlyStatusDao
 import app.tinygiants.getalife.data.local.dao.GroupDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.local.entities.AccountEntity
+import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.CategoryMonthlyStatusEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
@@ -27,9 +29,10 @@ import kotlin.time.Instant
         CategoryEntity::class,
         AccountEntity::class,
         TransactionEntity::class,
-        CategoryMonthlyStatusEntity::class
+        CategoryMonthlyStatusEntity::class,
+        BudgetEntity::class
     ],
-    version = 8,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -40,6 +43,7 @@ abstract class GetALifeDatabase : RoomDatabase() {
     abstract fun accountsDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryMonthlyStatusDao(): CategoryMonthlyStatusDao
+    abstract fun budgetDao(): BudgetDao
 
     companion object {
         @Volatile
@@ -90,6 +94,69 @@ abstract class GetALifeDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // 1. Create new budgets table
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS budgets (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        firebaseUserId TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        lastSyncAt INTEGER
+                    )
+                    """.trimIndent()
+                )
+
+                // 2. Create a default local budget and remember its id for later updates
+                val localBudgetId = "local-default-budget"
+                val now = System.currentTimeMillis()
+                db.execSQL(
+                    "INSERT OR IGNORE INTO budgets (id, name, firebaseUserId, createdAt) VALUES ('$localBudgetId', 'Lokales Budget', '', $now)"
+                )
+
+                // 3. Add budgetId columns to existing tables where missing
+                val tables = listOf("accounts", "categories", "groups", "transactions", "categoryMonthlyStatus")
+                tables.forEach { table ->
+                    db.execSQL("ALTER TABLE $table ADD COLUMN budgetId TEXT")
+                    db.execSQL("UPDATE $table SET budgetId = '$localBudgetId' WHERE budgetId IS NULL")
+                }
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Add sync tracking fields for offline-first architecture
+
+                // Update budgets table
+                db.execSQL("ALTER TABLE budgets ADD COLUMN lastModifiedAt INTEGER")
+                db.execSQL("ALTER TABLE budgets ADD COLUMN isSynced INTEGER NOT NULL DEFAULT 0")
+                val now = System.currentTimeMillis()
+                db.execSQL("UPDATE budgets SET lastModifiedAt = $now WHERE lastModifiedAt IS NULL")
+
+                // Add isSynced columns to all data tables
+                val dataTables = listOf("accounts", "categories", "groups", "transactions", "categoryMonthlyStatus")
+                dataTables.forEach { table ->
+                    db.execSQL("ALTER TABLE $table ADD COLUMN isSynced INTEGER NOT NULL DEFAULT 0")
+                }
+                
+                // Add indices for budgetId columns for better query performance
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_accounts_budgetId ON accounts(budgetId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_categories_budgetId ON categories(budgetId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_groups_budgetId ON `groups`(budgetId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_transactions_budgetId ON transactions(budgetId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_categoryMonthlyStatus_budgetId ON categoryMonthlyStatus(budgetId)")
+                
+                // Add indices for sync queries
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_accounts_sync ON accounts(isSynced)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_categories_sync ON categories(isSynced)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_groups_sync ON `groups`(isSynced)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_transactions_sync ON transactions(isSynced)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_categoryMonthlyStatus_sync ON categoryMonthlyStatus(isSynced)")
+            }
+        }
+
         fun getDatabase(context: Context): GetALifeDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -97,7 +164,7 @@ abstract class GetALifeDatabase : RoomDatabase() {
                     GetALifeDatabase::class.java,
                     "budget_database"
                 )
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                     .build()
                 INSTANCE = instance
                 instance
@@ -144,10 +211,10 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromInstant(value: Instant) = value.toEpochMilliseconds()
+    fun fromInstant(value: Instant): Long = value.toEpochMilliseconds()
 
     @TypeConverter
-    fun toInstant(value: Long) = Instant.fromEpochMilliseconds(value)
+    fun toInstant(value: Long): Instant = Instant.fromEpochMilliseconds(value)
 
     // endregion
 }

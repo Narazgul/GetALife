@@ -13,14 +13,14 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryDao {
 
     @Transaction
-    @Query("SELECT * FROM categories")
-    fun getCategoriesFlow(): Flow<List<CategoryEntity>>
+    @Query("SELECT * FROM categories WHERE budgetId = :budgetId")
+    fun getCategoriesFlow(budgetId: String): Flow<List<CategoryEntity>>
 
-    @Query("SELECT * FROM categories WHERE groupId == :groupId")
-    suspend fun getCategoriesInGroup(groupId: Long): List<CategoryEntity>
+    @Query("SELECT * FROM categories WHERE groupId == :groupId AND budgetId = :budgetId")
+    suspend fun getCategoriesInGroup(groupId: Long, budgetId: String): List<CategoryEntity>
 
-    @Query("SELECT * FROM categories WHERE id == :categoryId")
-    suspend fun getCategory(categoryId: Long): CategoryEntity?
+    @Query("SELECT * FROM categories WHERE id == :categoryId AND budgetId = :budgetId")
+    suspend fun getCategory(categoryId: Long, budgetId: String): CategoryEntity?
 
     @Insert
     suspend fun addCategory(categoryEntity: CategoryEntity)

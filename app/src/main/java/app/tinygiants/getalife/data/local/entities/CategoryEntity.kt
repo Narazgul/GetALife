@@ -10,6 +10,7 @@ import kotlin.time.Instant
 data class CategoryEntity(
     @PrimaryKey
     val id: Long,
+    val budgetId: String,
     val groupId: Long,
     val emoji: String,
     val name: String,
@@ -20,13 +21,15 @@ data class CategoryEntity(
     val isInitialCategory: Boolean,
     val linkedAccountId: Long? = null,
     val updatedAt: Instant,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val isSynced: Boolean = false // tracks if this category has been synced to Firestore
 ) {
     companion object {
-        fun fromDomain(category: Category): CategoryEntity {
+        fun fromDomain(category: Category, budgetId: String): CategoryEntity {
             return category.run {
                 CategoryEntity(
                     id = id,
+                    budgetId = budgetId,
                     groupId = groupId,
                     emoji = emoji,
                     name = name,
@@ -37,7 +40,8 @@ data class CategoryEntity(
                     isInitialCategory = isInitialCategory,
                     linkedAccountId = linkedAccountId,
                     updatedAt = updatedAt,
-                    createdAt = createdAt
+                    createdAt = createdAt,
+                    isSynced = false // new categories are not synced initially
                 )
             }
         }

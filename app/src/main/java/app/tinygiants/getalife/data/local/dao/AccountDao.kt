@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.Flow
 interface AccountDao {
 
     @Transaction
-    @Query("SELECT * FROM accounts WHERE isClosed = 0")
-    fun getAccountsFlow(): Flow<List<AccountEntity>>
+    @Query("SELECT * FROM accounts WHERE isClosed = 0 AND budgetId = :budgetId")
+    fun getAccountsFlow(budgetId: String): Flow<List<AccountEntity>>
 
     @Transaction
-    @Query("SELECT * FROM accounts")
-    fun getAllAccountsFlow(): Flow<List<AccountEntity>>
+    @Query("SELECT * FROM accounts WHERE budgetId = :budgetId")
+    fun getAllAccountsFlow(budgetId: String): Flow<List<AccountEntity>>
 
-    @Query("SELECT * FROM accounts WHERE id == :accountId")
-    suspend fun getAccount(accountId: Long): AccountEntity?
+    @Query("SELECT * FROM accounts WHERE id == :accountId AND budgetId = :budgetId")
+    suspend fun getAccount(accountId: Long, budgetId: String): AccountEntity?
 
     @Insert
     suspend fun addAccount(accountEntity: AccountEntity)
@@ -31,4 +31,11 @@ interface AccountDao {
 
     @Delete
     suspend fun deleteAccount(accountEntity: AccountEntity)
+
+    // Offline-first sync queries
+    @Query("SELECT * FROM accounts WHERE isSynced = 0 AND budgetId = :budgetId")
+    suspend fun getUnsyncedAccounts(budgetId: String): List<AccountEntity>
+
+    @Query("UPDATE accounts SET isSynced = 1 WHERE id = :accountId AND budgetId = :budgetId")
+    suspend fun markAccountAsSynced(accountId: Long, budgetId: String)
 }

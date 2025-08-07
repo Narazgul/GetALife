@@ -1,6 +1,12 @@
 package app.tinygiants.getalife.di
 
-import app.tinygiants.getalife.data.repository.AccountsRepositoryImpl
+import app.tinygiants.getalife.data.local.dao.AccountDao
+import app.tinygiants.getalife.data.local.dao.CategoryDao
+import app.tinygiants.getalife.data.local.dao.CategoryMonthlyStatusDao
+import app.tinygiants.getalife.data.local.dao.GroupDao
+import app.tinygiants.getalife.data.local.dao.TransactionDao
+import app.tinygiants.getalife.data.remote.FirestoreDataSource
+import app.tinygiants.getalife.data.repository.AccountRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryMonthlyStatusRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
 import app.tinygiants.getalife.data.repository.CrispChatRepository
@@ -9,6 +15,7 @@ import app.tinygiants.getalife.data.repository.GoogleInAppReviewRepository
 import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.RevenueCatRepository
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
+import app.tinygiants.getalife.di.ApplicationScope
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
@@ -18,41 +25,89 @@ import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
 import app.tinygiants.getalife.domain.repository.SubscriptionRepository
 import app.tinygiants.getalife.domain.repository.SupportChatRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
+object RepositoryModule {
 
-    @Binds
-    abstract fun provideGroupRepository(groupRepositoryImpl: GroupRepositoryImpl): GroupRepository
+    @Provides
+    @Singleton
+    fun provideGroupRepository(
+        groupDao: GroupDao,
+        getCurrentBudget: GetCurrentBudgetUseCase,
+        categoryRepository: CategoryRepository,
+        firestore: FirestoreDataSource,
+        @ApplicationScope externalScope: CoroutineScope
+    ): GroupRepository = GroupRepositoryImpl(groupDao, getCurrentBudget, categoryRepository, firestore, externalScope)
 
-    @Binds
-    abstract fun provideCategoryRepository(categoryRepositoryImpl: CategoryRepositoryImpl): CategoryRepository
+    @Provides
+    @Singleton
+    fun provideCategoryRepository(
+        categoryDao: CategoryDao,
+        getCurrentBudget: GetCurrentBudgetUseCase,
+        firestore: FirestoreDataSource,
+        @ApplicationScope externalScope: CoroutineScope
+    ): CategoryRepository = CategoryRepositoryImpl(categoryDao, getCurrentBudget, firestore, externalScope)
 
-    @Binds
-    abstract fun provideAccountRepository(accountsRepositoryImpl: AccountsRepositoryImpl): AccountRepository
+    @Provides
+    @Singleton
+    fun provideAccountRepository(
+        accountDao: AccountDao,
+        getCurrentBudget: GetCurrentBudgetUseCase,
+        firestore: FirestoreDataSource,
+        @ApplicationScope externalScope: CoroutineScope
+    ): AccountRepository = AccountRepositoryImpl(accountDao, getCurrentBudget, firestore, externalScope)
 
-    @Binds
-    abstract fun provideTransactionRepository(transactionRepositoryImpl: TransactionRepositoryImpl): TransactionRepository
+    @Provides
+    @Singleton
+    fun provideTransactionRepository(
+        transactionDao: TransactionDao,
+        accountRepository: AccountRepository,
+        categoryRepository: CategoryRepository,
+        getCurrentBudget: GetCurrentBudgetUseCase,
+        firestore: FirestoreDataSource,
+        @ApplicationScope externalScope: CoroutineScope
+    ): TransactionRepository = TransactionRepositoryImpl(
+        transactionDao,
+        accountRepository,
+        categoryRepository,
+        getCurrentBudget,
+        firestore,
+        externalScope
+    )
 
-    @Binds
-    abstract fun provideSubscriptionRepository(revenueCatRepository: RevenueCatRepository): SubscriptionRepository
+    @Provides
+    @Singleton
+    fun provideSubscriptionRepository(revenueCatRepository: RevenueCatRepository): SubscriptionRepository = revenueCatRepository
 
-    @Binds
-    abstract fun provideRemoteConfigRepository(firebaseRemoteConfigRepository: FirebaseRemoteConfigRepository): RemoteConfigRepository
+    @Provides
+    @Singleton
+    fun provideRemoteConfigRepository(firebaseRemoteConfigRepository: FirebaseRemoteConfigRepository): RemoteConfigRepository =
+        firebaseRemoteConfigRepository
 
-    @Binds
-    abstract fun provideInAppReviewRepository(googleInAppReviewRepository: GoogleInAppReviewRepository): InAppReviewRepository
+    @Provides
+    @Singleton
+    fun provideInAppReviewRepository(googleInAppReviewRepository: GoogleInAppReviewRepository): InAppReviewRepository =
+        googleInAppReviewRepository
 
-    @Binds
-    abstract fun provideSupportChatRepository(crispChatRepository: CrispChatRepository): SupportChatRepository
+    @Provides
+    @Singleton
+    fun provideSupportChatRepository(crispChatRepository: CrispChatRepository): SupportChatRepository = crispChatRepository
 
-    // endregion
-
-    @Binds
-    abstract fun provideCategoryMonthlyStatusRepository(impl: CategoryMonthlyStatusRepositoryImpl): CategoryMonthlyStatusRepository
+    @Provides
+    @Singleton
+    fun provideCategoryMonthlyStatusRepository(
+        categoryMonthlyStatusDao: CategoryMonthlyStatusDao,
+        categoryRepository: CategoryRepository,
+        getCurrentBudget: GetCurrentBudgetUseCase
+    ): CategoryMonthlyStatusRepository =
+        CategoryMonthlyStatusRepositoryImpl(categoryMonthlyStatusDao, categoryRepository, getCurrentBudget)
 }

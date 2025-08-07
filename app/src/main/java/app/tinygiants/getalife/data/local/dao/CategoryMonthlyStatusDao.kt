@@ -10,17 +10,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoryMonthlyStatusDao {
 
-    @Query("SELECT * FROM category_monthly_status WHERE categoryId = :categoryId AND yearMonth = :yearMonth")
-    suspend fun getStatusData(categoryId: Long, yearMonth: String): CategoryMonthlyStatusEntity?
+    @Query("SELECT * FROM category_monthly_status WHERE categoryId = :categoryId AND yearMonth = :yearMonth AND budgetId = :budgetId")
+    suspend fun getStatusData(categoryId: Long, yearMonth: String, budgetId: String): CategoryMonthlyStatusEntity?
 
-    @Query("SELECT * FROM category_monthly_status WHERE yearMonth = :yearMonth")
-    suspend fun getStatusDataForMonth(yearMonth: String): List<CategoryMonthlyStatusEntity>
+    @Query("SELECT * FROM category_monthly_status WHERE yearMonth = :yearMonth AND budgetId = :budgetId")
+    suspend fun getStatusDataForMonth(yearMonth: String, budgetId: String): List<CategoryMonthlyStatusEntity>
 
-    @Query("SELECT * FROM category_monthly_status WHERE yearMonth = :yearMonth")
-    fun getStatusDataForMonthFlow(yearMonth: String): Flow<List<CategoryMonthlyStatusEntity>>
+    @Query("SELECT * FROM category_monthly_status WHERE yearMonth = :yearMonth AND budgetId = :budgetId")
+    fun getStatusDataForMonthFlow(yearMonth: String, budgetId: String): Flow<List<CategoryMonthlyStatusEntity>>
 
-    @Query("SELECT * FROM category_monthly_status")
-    suspend fun getAllStatusData(): List<CategoryMonthlyStatusEntity>
+    @Query("SELECT * FROM category_monthly_status WHERE budgetId = :budgetId")
+    suspend fun getAllStatusData(budgetId: String): List<CategoryMonthlyStatusEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(entity: CategoryMonthlyStatusEntity)

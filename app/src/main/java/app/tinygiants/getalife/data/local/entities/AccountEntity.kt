@@ -17,10 +17,12 @@ data class AccountEntity(
     val listPosition: Int,
     val isClosed: Boolean = false,
     val updatedAt: Instant,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val budgetId: String,
+    val isSynced: Boolean = false // tracks if this account has been synced to Firestore
 ) {
     companion object {
-        fun fromDomain(account: Account): AccountEntity {
+        fun fromDomain(account: Account, budgetId: String): AccountEntity {
             return account.run {
                 AccountEntity(
                     id = id,
@@ -30,7 +32,9 @@ data class AccountEntity(
                     listPosition = listPosition,
                     isClosed = isClosed,
                     updatedAt = updatedAt,
-                    createdAt = createdAt
+                    createdAt = createdAt,
+                    budgetId = budgetId,
+                    isSynced = false // new accounts are not synced initially
                 )
             }
         }

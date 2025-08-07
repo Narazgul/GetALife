@@ -9,10 +9,11 @@ import kotlinx.datetime.YearMonth
 
 @Entity(
     tableName = "category_monthly_status",
-    indices = [Index(value = ["categoryId", "yearMonth"], unique = true)]
+    indices = [Index(value = ["categoryId", "yearMonth", "budgetId"], unique = true)]
 )
 data class CategoryMonthlyStatusEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val budgetId: String,
     val categoryId: Long,
     val yearMonth: String, // Format: "2024-01"
     val assignedAmount: Double,
@@ -21,7 +22,8 @@ data class CategoryMonthlyStatusEntity(
     val spentAmount: Double = 0.0,
     val carryOverFromPrevious: Double = 0.0,
     val availableAmount: Double = 0.0,
-    val updatedAt: Long = 0L // Timestamp when last calculated
+    val updatedAt: Long = 0L, // Timestamp when last calculated
+    val isSynced: Boolean = false // tracks if this monthly status has been synced to Firestore
 ) {
     /**
      * Converts to domain model using pre-calculated fields from database.
@@ -49,9 +51,11 @@ data class CategoryMonthlyStatusEntity(
         fun fromDomain(
             status: CategoryMonthlyStatus,
             yearMonth: YearMonth,
+            budgetId: String,
             carryOverFromPrevious: Money = Money(0.0)
         ): CategoryMonthlyStatusEntity {
             return CategoryMonthlyStatusEntity(
+                budgetId = budgetId,
                 categoryId = status.category.id,
                 yearMonth = yearMonth.toString(),
                 assignedAmount = status.assignedAmount.asDouble(),
@@ -59,7 +63,8 @@ data class CategoryMonthlyStatusEntity(
                 spentAmount = status.spentAmount.asDouble(),
                 carryOverFromPrevious = carryOverFromPrevious.asDouble(),
                 availableAmount = status.availableAmount.asDouble(),
-                updatedAt = System.currentTimeMillis()
+                updatedAt = System.currentTimeMillis(),
+                isSynced = false
             )
         }
     }

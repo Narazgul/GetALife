@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GroupDao {
 
-    @Query("SELECT * FROM groups")
-    fun getGroupsFlow(): Flow<List<GroupEntity>>
+    @Query("SELECT * FROM `groups` WHERE budgetId = :budgetId")
+    fun getGroupsFlow(budgetId: String): Flow<List<GroupEntity>>
 
     @Insert
     suspend fun addGroup(groupEntity: GroupEntity)

@@ -9,18 +9,22 @@ import app.tinygiants.getalife.domain.model.Group
 data class GroupEntity(
     @PrimaryKey
     val id: Long,
+    val budgetId: String,
     val name: String,
     val listPosition: Int,
-    val isExpanded: Boolean
+    val isExpanded: Boolean,
+    val isSynced: Boolean = false // tracks if this group has been synced to Firestore
 ) {
     companion object {
-        fun fromDomain(group: Group): GroupEntity {
+        fun fromDomain(group: Group, budgetId: String): GroupEntity {
             return group.run {
                 GroupEntity(
                     id = id,
+                    budgetId = budgetId,
                     name = name,
                     listPosition = listPosition,
-                    isExpanded = isExpanded
+                    isExpanded = isExpanded,
+                    isSynced = false // new groups are not synced initially
                 )
             }
         }

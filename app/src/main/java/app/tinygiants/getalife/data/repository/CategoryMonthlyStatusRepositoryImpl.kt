@@ -7,8 +7,11 @@ import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.YearMonth
 import javax.inject.Inject
@@ -19,11 +22,13 @@ import javax.inject.Inject
  */
 class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
     private val statusDao: CategoryMonthlyStatusDao,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val getCurrentBudget: GetCurrentBudgetUseCase
 ) : CategoryMonthlyStatusRepository {
 
     override suspend fun getStatus(categoryId: Long, yearMonth: YearMonth): CategoryMonthlyStatus? {
-        val entity = statusDao.getStatusData(categoryId, yearMonth.toString())
+        val budgetId = getCurrentBudget.requireCurrentBudgetId()
+        val entity = statusDao.getStatusData(categoryId, yearMonth.toString(), budgetId)
         return if (entity != null) {
             val category = categoryRepository.getCategory(categoryId)
                 ?: return null // Category doesn't exist
@@ -37,7 +42,8 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getStatusForMonth(yearMonth: YearMonth): List<CategoryMonthlyStatus> {
-        val entities = statusDao.getStatusDataForMonth(yearMonth.toString())
+        val budgetId = getCurrentBudget.requireCurrentBudgetId()
+        val entities = statusDao.getStatusDataForMonth(yearMonth.toString(), budgetId)
         val categories = categoryRepository.getCategoriesFlow().first().associateBy { it.id }
 
         return entities.mapNotNull { entity ->
@@ -52,34 +58,47 @@ class CategoryMonthlyStatusRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveStatus(status: CategoryMonthlyStatus, yearMonth: YearMonth) {
-        statusDao.insertOrUpdate(CategoryMonthlyStatusEntity.fromDomain(status, yearMonth))
+        val budgetId = getCurrentBudget.requireCurrentBudgetId()
+        statusDao.insertOrUpdate(CategoryMonthlyStatusEntity.fromDomain(status, yearMonth, budgetId = budgetId))
     }
 
     override suspend fun saveStatus(status: CategoryMonthlyStatus, yearMonth: YearMonth, carryOverFromPrevious: Money) {
-        statusDao.insertOrUpdate(CategoryMonthlyStatusEntity.fromDomain(status, yearMonth, carryOverFromPrevious))
+        val budgetId = getCurrentBudget.requireCurrentBudgetId()
+        statusDao.insertOrUpdate(
+            CategoryMonthlyStatusEntity.fromDomain(
+                status,
+                yearMonth,
+                budgetId,
+                carryOverFromPrevious
+            )
+        )
     }
 
     override suspend fun deleteStatus(categoryId: Long, yearMonth: YearMonth) {
         statusDao.delete(categoryId, yearMonth.toString())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getStatusForMonthFlow(yearMonth: YearMonth): Flow<List<CategoryMonthlyStatus>> =
-        statusDao.getStatusDataForMonthFlow(yearMonth.toString()).map { entities ->
-            val categories = categoryRepository.getCategoriesFlow().first().associateBy { it.id }
+        getCurrentBudget.currentBudgetIdOrDefaultFlow.flatMapLatest { budgetId ->
+            statusDao.getStatusDataForMonthFlow(yearMonth.toString(), budgetId).map { entities ->
+                val categories = categoryRepository.getCategoriesFlow().first().associateBy { it.id }
 
-            entities.mapNotNull { entity ->
-                val category = categories[entity.categoryId] ?: return@mapNotNull null
+                entities.mapNotNull { entity ->
+                    val category = categories[entity.categoryId] ?: return@mapNotNull null
 
-                entity.toDomain(
-                    category = category,
-                    progress = EmptyProgress(), // Will be calculated in use case
-                    suggestedAmount = null // Will be calculated in use case
-                )
+                    entity.toDomain(
+                        category = category,
+                        progress = EmptyProgress(), // Will be calculated in use case
+                        suggestedAmount = null // Will be calculated in use case
+                    )
+                }
             }
         }
 
     override suspend fun getAllStatuses(): List<CategoryMonthlyStatus> {
-        val entities = statusDao.getAllStatusData()
+        val budgetId = getCurrentBudget.requireCurrentBudgetId()
+        val entities = statusDao.getAllStatusData(budgetId)
         val categories = categoryRepository.getCategoriesFlow().first().associateBy { it.id }
 
         return entities.mapNotNull { entity ->

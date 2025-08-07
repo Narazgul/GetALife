@@ -3,7 +3,6 @@ package app.tinygiants.getalife.di
 import android.content.Context
 import app.tinygiants.getalife.BuildConfig
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseAi
 import app.tinygiants.getalife.domain.repository.AiRepository
@@ -12,7 +11,6 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
-import com.google.firebase.firestore.firestore
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import dagger.Module
@@ -25,27 +23,6 @@ import javax.inject.Qualifier
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    fun provideFirebaseFirestore() = Firebase.firestore
-
-    @Provides
-    fun provideDatabase(@ApplicationContext appContext: Context) = GetALifeDatabase.getDatabase(appContext)
-
-    @Provides
-    fun provideGroupDao(database: GetALifeDatabase) = database.groupDao()
-
-    @Provides
-    fun provideCategoryDao(database: GetALifeDatabase) = database.categoryDao()
-
-    @Provides
-    fun provideAccountDao(database: GetALifeDatabase) = database.accountsDao()
-
-    @Provides
-    fun provideTransactionDao(database: GetALifeDatabase) = database.transactionDao()
-
-    @Provides
-    fun provideCategoryMonthlyStatusDao(database: GetALifeDatabase) = database.categoryMonthlyStatusDao()
 
     @Provides
     fun provideAppUpdateManager(@ApplicationContext appContext: Context) = AppUpdateManagerFactory.create(appContext)
@@ -64,7 +41,7 @@ object AppModule {
     @FirebaseGemini
     @Provides
     fun provideFirebaseAi(): AiRepository = FirebaseAi(
-        generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel("gemini-2.5-flash")
+        generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash")
     )
 }
 

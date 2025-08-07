@@ -22,6 +22,7 @@ import kotlin.time.Instant
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val budgetId: String,
     val accountId: Long,
     val categoryId: Long?,
     val amount: Double,
@@ -37,13 +38,15 @@ data class TransactionEntity(
     val nextPaymentDate: Instant? = null,
     val recurrenceEndDate: Instant? = null,
     val isRecurrenceActive: Boolean = true,
-    val parentRecurringTransactionId: Long? = null
+    val parentRecurringTransactionId: Long? = null,
+    val isSynced: Boolean = false // tracks if this transaction has been synced to Firestore
 ) {
     companion object {
-        fun fromDomain(transaction: Transaction): TransactionEntity {
+        fun fromDomain(transaction: Transaction, budgetId: String): TransactionEntity {
             return transaction.run {
                 TransactionEntity(
                     id = id,
+                    budgetId = budgetId,
                     accountId = account.id,
                     categoryId = category?.id,
                     amount = amount.asDouble(),
@@ -58,7 +61,8 @@ data class TransactionEntity(
                     nextPaymentDate = nextPaymentDate,
                     recurrenceEndDate = recurrenceEndDate,
                     isRecurrenceActive = isRecurrenceActive,
-                    parentRecurringTransactionId = parentRecurringTransactionId
+                    parentRecurringTransactionId = parentRecurringTransactionId,
+                    isSynced = false // new transactions are not synced initially
                 )
             }
         }
