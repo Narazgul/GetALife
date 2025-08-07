@@ -9,6 +9,7 @@ import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Month
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
@@ -151,9 +152,9 @@ class RecalculateCategoryMonthlyStatusUseCase @Inject constructor(
 
     private suspend fun calculateCarryOverFromPrevious(categoryId: Long, yearMonth: YearMonth): Money {
         val previousMonth = if (yearMonth.month.ordinal == 0) {
-            YearMonth(yearMonth.year - 1, kotlinx.datetime.Month.DECEMBER)
+            YearMonth(yearMonth.year - 1, Month.DECEMBER)
         } else {
-            YearMonth(yearMonth.year, kotlinx.datetime.Month.entries[yearMonth.month.ordinal - 1])
+            YearMonth(yearMonth.year, Month.entries[yearMonth.month.ordinal - 1])
         }
 
         val previousStatus = statusRepository.getStatus(categoryId, previousMonth)

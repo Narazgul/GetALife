@@ -15,7 +15,7 @@ class AddEmojiToCategoryNameUseCase @Inject constructor(
     private val repository: CategoryRepository) {
 
     suspend operator fun invoke(category: Category) {
-        val emojiResponse = withTimeoutOrNull(timeout = 10.seconds) {
+        val emojiResponse = withTimeoutOrNull(timeout = 5.seconds) {
             try {
                 aiRepository.generateEmojiBy(tag = category.name)
             } catch (e: Exception) {

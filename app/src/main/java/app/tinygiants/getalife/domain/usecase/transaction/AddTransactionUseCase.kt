@@ -24,12 +24,12 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.plus
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.time.Clock
+import kotlinx.datetime.toInstant
 
 class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
@@ -89,7 +89,7 @@ class AddTransactionUseCase @Inject constructor(
 
         // Trigger recalculation for the affected category and month
         categoryFromDb?.let { cat ->
-            val transactionMonth = dateOfTransaction.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+            val transactionMonth = dateOfTransaction.toLocalDateTime(TimeZone.currentSystemDefault())
             val yearMonth = kotlinx.datetime.YearMonth(transactionMonth.year, transactionMonth.month)
             recalculateCategoryMonthlyStatus(cat.id, yearMonth)
         }
@@ -127,7 +127,7 @@ class AddTransactionUseCase @Inject constructor(
         categoryRepository.addCategory(category)
 
         // Create initial monthly status so it shows up in the budget immediately
-        val currentMonth = Clock.System.now().toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+        val currentMonth = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val yearMonth = kotlinx.datetime.YearMonth(currentMonth.year, currentMonth.month)
 
         val initialStatus = app.tinygiants.getalife.domain.model.CategoryMonthlyStatus(
@@ -178,7 +178,7 @@ class AddTransactionUseCase @Inject constructor(
         delay(100)
 
         // Verify the group was created
-        val verifyGroup = groupRepository.getGroupByName(groupName)
+        groupRepository.getGroupByName(groupName)
 
         return groupId
     }
