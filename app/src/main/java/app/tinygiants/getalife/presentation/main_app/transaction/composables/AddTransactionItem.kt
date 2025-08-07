@@ -63,10 +63,10 @@ import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
+import kotlinx.datetime.number
 
 typealias Description = String
 typealias TransactionPartner = String

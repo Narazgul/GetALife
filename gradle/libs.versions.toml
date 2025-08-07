@@ -25,6 +25,7 @@ navigationComposeVersion = "2.9.3"
 roomVersion = "2.7.2"
 appUpdateVersion = "2.1.0"
 inAppReviewVersion = "2.0.2"
+datastoreVersion = "1.1.7"
 
 emojipickerVersion = "1.5.0"
 superwallVersion = "2.4.0"
@@ -63,6 +64,8 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 app-update = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateVersion" }
 in-app-review = { module = "com.google.android.play:review-ktx", version.ref = "inAppReviewVersion" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+datastore = { module= "androidx.datastore:datastore-preferences", version.ref = "datastoreVersion" }
+datastore-proto = { module= "androidx.datastore:datastore", version.ref = "datastoreVersion" }
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -127,7 +130,7 @@ storage = { group = "androidx.test.services", name = "storage", version.ref = "s
 [bundles]
 
 core = ["core-ktx", "lifecycle-runtime-compose", "activity-compose", "lifecycle-viewmodel-compose",
-    "navigation-compose", "splashscreen", "kotlinx-datetime", "app-update", "in-app-review"]
+    "navigation-compose", "splashscreen", "kotlinx-datetime", "app-update", "in-app-review", "datastore", "datastore-proto"]
 hilt = ["hilt-android", "hilt-navigation-compose"]
 room = ["room-ktx", "room-runtime"]
 compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
