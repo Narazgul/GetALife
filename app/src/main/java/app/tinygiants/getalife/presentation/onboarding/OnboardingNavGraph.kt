@@ -1,11 +1,9 @@
 package app.tinygiants.getalife.presentation.onboarding
 
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.presentation.analytics.TrackScreenView
+import app.tinygiants.getalife.presentation.onboarding.auth.ForgotPasswordScreen
+import app.tinygiants.getalife.presentation.onboarding.auth.LoginScreen
+import app.tinygiants.getalife.presentation.onboarding.auth.SignUpScreen
 import app.tinygiants.getalife.presentation.onboarding.screens.PaywallNeverSubscribed
 import app.tinygiants.getalife.presentation.onboarding.screens.PlanGenerationScreen
 import app.tinygiants.getalife.presentation.onboarding.screens.Step1EmotionalCheck
@@ -16,6 +14,11 @@ import app.tinygiants.getalife.presentation.onboarding.screens.Step5Commitments
 import app.tinygiants.getalife.presentation.onboarding.screens.Step6DailyAndLeisure
 import app.tinygiants.getalife.presentation.onboarding.screens.Step7LifeGoals
 import app.tinygiants.getalife.presentation.onboarding.screens.WelcomeScreen
+import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun OnboardingNavGraph(
@@ -29,13 +32,44 @@ fun OnboardingNavGraph(
             TrackScreenView("Onboarding_Welcome")
             WelcomeScreen(
                 onStartClicked = { navController.navigate(OnboardingScreen.Step1.route) },
-                onLoginClicked = {
-                    // TODO: Navigate to login screen or handle existing user login
-                    onNavigateToMainApp?.invoke()
-                },
+                onLoginClicked = { navController.navigate(OnboardingScreen.Login.route) },
                 onDebugSkipClicked = onNavigateToMainApp
             )
         }
+
+        composable(OnboardingScreen.ForgotPassword.route) {
+            TrackScreenView("Onboarding_ForgotPassword")
+            ForgotPasswordScreen(
+                onBackClicked = { navController.popBackStack() },
+                onResetEmailSent = {
+                navController.popBackStack()
+                    // Could show a success message or navigate to login
+                }
+            )
+        }
+
+        composable(OnboardingScreen.Login.route) {
+            TrackScreenView("Onboarding_Login")
+            LoginScreen(
+                onBackClicked = { navController.popBackStack() },
+                onLoginSuccess = { onNavigateToMainApp?.invoke() },
+                onSignUpClicked = { navController.navigate(OnboardingScreen.SignUp.route) },
+                onForgotPasswordClicked = { navController.navigate(OnboardingScreen.ForgotPassword.route) }
+            )
+        }
+
+        composable(OnboardingScreen.SignUp.route) {
+            TrackScreenView("Onboarding_SignUp")
+            SignUpScreen(
+                onBackClicked = { navController.popBackStack() },
+                onSignUpSuccess = { onNavigateToMainApp?.invoke() },
+                onLoginClicked = {
+                    navController.popBackStack()
+                    navController.navigate(OnboardingScreen.Login.route)
+                }
+            )
+        }
+
         composable(OnboardingScreen.Step1.route) {
             TrackScreenView("Onboarding_Step1_EmotionalCheck")
             Step1EmotionalCheck(
@@ -113,7 +147,7 @@ fun OnboardingNavGraph(
             TrackScreenView("Onboarding_Paywall")
             PaywallNeverSubscribed(
                 onNavigateToMainApp = {
-                    // After successful purchase and login, navigate to main app
+                    // After successful purchase, navigate to main app
                     onNavigateToMainApp?.invoke()
                 }
             )
@@ -123,6 +157,9 @@ fun OnboardingNavGraph(
 
 sealed class OnboardingScreen(val route: String) {
     object Welcome : OnboardingScreen("welcome")
+    object Login : OnboardingScreen("login")
+    object SignUp : OnboardingScreen("signup")
+    object ForgotPassword : OnboardingScreen("forgot_password")
     object Step1 : OnboardingScreen("step1_emotional_check")
     object Step2 : OnboardingScreen("step2_challenges")
     object Step3 : OnboardingScreen("step3_goals")

@@ -9,6 +9,8 @@ datetime = "0.7.1"
 chatgptVersion = "4.0.1"
 
 googleServicesVersion = "4.4.3"
+playServicesAuthVersion = "21.3.0"
+facebookSdkVersion = "17.0.2"
 
 firebaseBomVersion = "34.0.0"
 firebaseCrashlytics = "3.0.5"
@@ -88,6 +90,8 @@ firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appch
 firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 firebase-inappmessaging = { module = "com.google.firebase:firebase-inappmessaging-display" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
+facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookSdkVersion" }
 
 # AI
 firebase-ai = { module = "com.google.firebase:firebase-ai" }
@@ -124,6 +128,7 @@ assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assert
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 storage = { group = "androidx.test.services", name = "storage", version.ref = "storage" }
+androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version = "2.2.0" }
 
 ########################################################################################################################
 
@@ -137,8 +142,8 @@ compose = ["compose-ui", "compose-ui-preview", "compose-material3"]
 compose-debug = ["debug-compose-ui-tooling", "debug-compose-ui-tooling-preview", "debug-compose-ui-test-manifest"]
 firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-perf", "firebase-auth", "firebase-firestore",
     "firebase-remote-config", "firebase-appcheck-playintegrity", "firebase-appcheck-debug", "firebase-messaging",
-    "firebase-inappmessaging"]
-testing = ["junit4", "junit5-api", "junit5-params", "coroutines-test", "flow-test", "assertk", "mockk"]
+    "firebase-inappmessaging", "play-services-auth", "facebook-login"]
+testing = ["junit4", "junit5-api", "junit5-params", "coroutines-test", "flow-test", "assertk", "mockk", "androidx-arch-core-testing"]
 testing-android = ["junit4-androidx", "junit4-ui", "mockk-android"]
 superwall = ["superwall", "superwallcompose"]
 
