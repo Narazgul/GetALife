@@ -9,12 +9,12 @@ datetime = "0.7.1"
 chatgptVersion = "4.0.1"
 
 googleServicesVersion = "4.4.3"
-playServicesAuthVersion = "21.3.0"
-facebookSdkVersion = "17.0.2"
+playServicesAuthVersion = "21.4.0"
+facebookSdkVersion = "18.1.3"
 
-firebaseBomVersion = "34.0.0"
-firebaseCrashlytics = "3.0.5"
-firebase-perf-plugin = "2.0.0"
+firebaseBomVersion = "34.1.0"
+firebaseCrashlytics = "3.0.6"
+firebase-perf-plugin = "2.0.1"
 
 hiltVersion = "2.57"
 hilt-navigation-compose = "1.2.0"
@@ -30,8 +30,8 @@ inAppReviewVersion = "2.0.2"
 datastoreVersion = "1.1.7"
 
 emojipickerVersion = "1.5.0"
-superwallVersion = "2.4.0"
-revenuecatVersion = "9.1.2"
+superwallVersion = "2.5.1"
+revenuecatVersion = "9.2.0"
 crispVersion = "2.0.13"
 
 junit = "1.3.0"
@@ -113,7 +113,6 @@ superwallcompose = { module = "com.superwall.sdk:superwall-compose", version.ref
 revenuecat = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecatVersion" }
 crisp = { module = "im.crisp:crisp-sdk", version.ref = "crispVersion"}
 emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emojipickerVersion" }
-
 
 # Testing
 junit4 = { module = "junit:junit", version.ref = "jUnit4Version" }
