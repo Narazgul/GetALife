@@ -1,5 +1,7 @@
 package app.tinygiants.getalife.domain.model.onboarding
 
+import app.tinygiants.getalife.domain.model.onboarding.onbaordinganswers.Debt
+
 data class OnboardingAnswers(
     val financialFeeling: FinancialFeeling? = null,
     val challenges: List<FinancialChallenge> = emptyList(),
@@ -9,7 +11,7 @@ data class OnboardingAnswers(
     val pets: List<Pet> = emptyList(),
     val dependants: List<FinancialDependant> = emptyList(),
     val insurances: List<InsuranceType> = emptyList(),
-    val debts: List<app.tinygiants.getalife.domain.model.onbaordinganswers.Debt> = emptyList(),
+    val debts: List<Debt> = emptyList(),
     val dailyExpenses: List<DailyExpense> = emptyList(),
     val healthExpenses: List<HealthExpense> = emptyList(),
     val shoppingExpenses: List<ShoppingExpense> = emptyList(),

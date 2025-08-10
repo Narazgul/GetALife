@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.domain.model.onbaordinganswers
+package app.tinygiants.getalife.domain.model.onboarding.onbaordinganswers
 
 data class OnboardingAnswers(
     val name: String,

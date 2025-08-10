@@ -47,6 +47,7 @@ class TransactionRepositoryImpl @Inject constructor(
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getTransactionsByAccountFlow(accountId: Long): Flow<List<Transaction>> =
         getCurrentBudget.currentBudgetIdOrDefaultFlow.flatMapLatest { budgetId ->
             transactionDao.getAccountTransactionsFlow(accountId, budgetId).map { transactionEntities ->

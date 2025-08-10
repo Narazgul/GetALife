@@ -1,6 +1,11 @@
 package app.tinygiants.getalife.presentation.onboarding
 
-import app.tinygiants.getalife.presentation.analytics.TrackScreenView
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.presentation.onboarding.auth.ForgotPasswordScreen
 import app.tinygiants.getalife.presentation.onboarding.auth.LoginScreen
 import app.tinygiants.getalife.presentation.onboarding.auth.SignUpScreen
@@ -14,11 +19,6 @@ import app.tinygiants.getalife.presentation.onboarding.screens.Step5Commitments
 import app.tinygiants.getalife.presentation.onboarding.screens.Step6DailyAndLeisure
 import app.tinygiants.getalife.presentation.onboarding.screens.Step7LifeGoals
 import app.tinygiants.getalife.presentation.onboarding.screens.WelcomeScreen
-import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun OnboardingNavGraph(
@@ -29,7 +29,7 @@ fun OnboardingNavGraph(
 
     NavHost(navController = navController, startDestination = OnboardingScreen.Welcome.route) {
         composable(OnboardingScreen.Welcome.route) {
-            TrackScreenView("Onboarding_Welcome")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Welcome") }
             WelcomeScreen(
                 onStartClicked = { navController.navigate(OnboardingScreen.Step1.route) },
                 onLoginClicked = { navController.navigate(OnboardingScreen.Login.route) },
@@ -38,7 +38,7 @@ fun OnboardingNavGraph(
         }
 
         composable(OnboardingScreen.ForgotPassword.route) {
-            TrackScreenView("Onboarding_ForgotPassword")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_ForgotPassword") }
             ForgotPasswordScreen(
                 onBackClicked = { navController.popBackStack() },
                 onResetEmailSent = {
@@ -49,7 +49,7 @@ fun OnboardingNavGraph(
         }
 
         composable(OnboardingScreen.Login.route) {
-            TrackScreenView("Onboarding_Login")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Login") }
             LoginScreen(
                 onBackClicked = { navController.popBackStack() },
                 onLoginSuccess = { onNavigateToMainApp?.invoke() },
@@ -59,7 +59,7 @@ fun OnboardingNavGraph(
         }
 
         composable(OnboardingScreen.SignUp.route) {
-            TrackScreenView("Onboarding_SignUp")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_SignUp") }
             SignUpScreen(
                 onBackClicked = { navController.popBackStack() },
                 onSignUpSuccess = { onNavigateToMainApp?.invoke() },
@@ -71,7 +71,7 @@ fun OnboardingNavGraph(
         }
 
         composable(OnboardingScreen.Step1.route) {
-            TrackScreenView("Onboarding_Step1_EmotionalCheck")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step1_EmotionalCheck") }
             Step1EmotionalCheck(
                 navController = navController,
                 onFeelingSelected = {
@@ -81,7 +81,7 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.Step2.route) {
-            TrackScreenView("Onboarding_Step2_Challenges")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step2_Challenges") }
             Step2Challenges(
                 navController = navController,
                 onChallengesSelected = { viewModel.setChallenges(it) },
@@ -89,7 +89,7 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.Step3.route) {
-            TrackScreenView("Onboarding_Step3_Goals")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step3_Goals") }
             Step3Goals(
                 navController = navController,
                 onGoalsSelected = { viewModel.setTopGoals(it) },
@@ -97,7 +97,7 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.Step4.route) {
-            TrackScreenView("Onboarding_Step4_LifeBasics")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step4_LifeBasics") }
             Step4LifeBasics(
                 navController = navController,
                 onNextClicked = { housing, transport, pets ->
@@ -107,7 +107,7 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.Step5.route) {
-            TrackScreenView("Onboarding_Step5_Commitments")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step5_Commitments") }
             Step5Commitments(
                 navController = navController,
                 onNextClicked = { dependants, insurances, debts ->
@@ -117,7 +117,7 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.Step6.route) {
-            TrackScreenView("Onboarding_Step6_DailyAndLeisure")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step6_DailyAndLeisure") }
             Step6DailyAndLeisure(
                 navController = navController,
                 onNextClicked = { daily, health, shopping, leisure ->
@@ -127,7 +127,7 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.Step7.route) {
-            TrackScreenView("Onboarding_Step7_LifeGoals")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Step7_LifeGoals") }
             Step7LifeGoals(
                 navController = navController,
                 onNextClicked = { goals ->
@@ -137,14 +137,14 @@ fun OnboardingNavGraph(
             )
         }
         composable(OnboardingScreen.PlanGeneration.route) {
-            TrackScreenView("Onboarding_PlanGeneration")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_PlanGeneration") }
             PlanGenerationScreen(
                 viewModel = viewModel,
                 onPlanGenerated = { navController.navigate(OnboardingScreen.Paywall.route) }
             )
         }
         composable(OnboardingScreen.Paywall.route) {
-            TrackScreenView("Onboarding_Paywall")
+            LaunchedEffect(Unit) { viewModel.trackScreen("Onboarding_Paywall") }
             PaywallNeverSubscribed(
                 onNavigateToMainApp = {
                     // After successful purchase, navigate to main app

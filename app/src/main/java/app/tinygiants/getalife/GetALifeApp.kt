@@ -18,9 +18,6 @@ import com.revenuecat.purchases.LogLevel
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.superwall.sdk.Superwall
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.HiltAndroidApp
 import im.crisp.client.external.Crisp
 import kotlinx.coroutines.CoroutineScope
@@ -28,17 +25,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @HiltAndroidApp
 class GetALifeApp : Application() {
+
+    @Inject
+    lateinit var workerDependencies: WorkerDependencies
+
     override fun onCreate() {
         super.onCreate()
+
+        // Set static reference for Worker access
+        WorkerDependencies.instance = workerDependencies
 
         configureAppCheck()
         configureSuperwall()
         configureRevenueCat()
         configureCrispChat()
         configureRecurringPayments()
+    }
+}
+
+@Singleton
+class WorkerDependencies @Inject constructor(
+    val processRecurringPaymentsUseCase: ProcessRecurringPaymentsUseCase
+) {
+    companion object {
+        @Volatile
+        var instance: WorkerDependencies? = null
     }
 }
 
@@ -105,21 +121,18 @@ private fun Application.configureRecurringPayments() {
     )
 }
 
-class ProcessRecurringPaymentsWorker @AssistedInject constructor(
-    @Assisted private val context: Context,
-    @Assisted params: WorkerParameters,
-    private val processRecurringPaymentsUseCase: ProcessRecurringPaymentsUseCase
+class ProcessRecurringPaymentsWorker(
+    context: Context,
+    params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = try {
-        processRecurringPaymentsUseCase()
+        val dependencies = WorkerDependencies.instance
+            ?: return Result.failure()
+
+        dependencies.processRecurringPaymentsUseCase()
         Result.success()
     } catch (e: Exception) {
         Result.retry()
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(context: Context, params: WorkerParameters): ProcessRecurringPaymentsWorker
     }
 }

@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.domain.usecase.emoji
 
+import app.tinygiants.getalife.di.ChatGPT
 import app.tinygiants.getalife.di.FirebaseGemini
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.repository.AiRepository
@@ -11,15 +12,25 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 class AddEmojiToCategoryNameUseCase @Inject constructor(
-    @FirebaseGemini private val aiRepository: AiRepository,
-    private val repository: CategoryRepository) {
+    @FirebaseGemini private val firebaseAi: AiRepository,
+    @ChatGPT private val chatGptAi: AiRepository,
+    private val repository: CategoryRepository
+) {
 
     suspend operator fun invoke(category: Category) {
+        // Try Firebase AI first
         val emojiResponse = withTimeoutOrNull(timeout = 5.seconds) {
             try {
-                aiRepository.generateEmojiBy(tag = category.name)
+                firebaseAi.generateEmojiBy(tag = category.name)
             } catch (e: Exception) {
-                Result.failure(e)
+                // If Firebase AI fails, try ChatGPT
+                try {
+                    chatGptAi.generateEmojiBy(tag = category.name)
+                } catch (chatGptException: Exception) {
+                    Firebase.crashlytics.recordException(e) // Log original Firebase error
+                    Firebase.crashlytics.recordException(chatGptException) // Log ChatGPT error
+                    Result.failure(chatGptException)
+                }
             }
         }
 

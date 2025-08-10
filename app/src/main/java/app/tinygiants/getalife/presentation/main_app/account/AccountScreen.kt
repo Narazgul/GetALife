@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
@@ -44,7 +43,6 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.presentation.components.BudgetSelector
 import app.tinygiants.getalife.presentation.main_app.account.composables.AccountsList
 import app.tinygiants.getalife.presentation.main_app.account.composables.AddAccountBottomSheet
 import app.tinygiants.getalife.presentation.main_app.account.composables.TransferBetweenAccountsBottomSheet
@@ -145,19 +143,6 @@ fun AccountScreen(
                         modifier = Modifier.fillMaxSize(),
                         alignment = Alignment.BottomCenter
                     )
-
-                BudgetSelector(
-                    selectedBudget = uiState.selectedBudget,
-                    budgets = uiState.availableBudgets,
-                    onBudgetSelected = { budget ->
-                        onUserClickEvent(UserClickEvent.BudgetSelected(budget))
-                    },
-                    onSyncRequested = {
-                        onUserClickEvent(UserClickEvent.SyncRequested)
-                    },
-                    isLoading = uiState.isSyncLoading,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
 
                 AccountsList(
                     accounts = uiState.accounts,

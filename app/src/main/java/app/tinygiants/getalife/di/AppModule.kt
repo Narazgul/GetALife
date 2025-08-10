@@ -7,7 +7,6 @@ import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseAi
-import app.tinygiants.getalife.data.security.DataEncryption
 import app.tinygiants.getalife.domain.repository.AiRepository
 import app.tinygiants.getalife.domain.usecase.BudgetSelectionUseCase
 import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
@@ -16,6 +15,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
@@ -46,15 +46,16 @@ object AppModule {
     fun provideFirebaseCrashlytics(): FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     @Provides
-    @Singleton
-    fun provideDataEncryption(): DataEncryption = DataEncryption()
-
-    @Provides
     fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
         val remoteConfig = Firebase.remoteConfig
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
         return remoteConfig
     }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAnalytics(@ApplicationContext context: Context): FirebaseAnalytics =
+        FirebaseAnalytics.getInstance(context)
 
     @ChatGPT
     @Provides
@@ -63,12 +64,10 @@ object AppModule {
     @FirebaseGemini
     @Provides
     fun provideFirebaseAi(
-        crashlytics: FirebaseCrashlytics,
-        dataEncryption: DataEncryption
+        crashlytics: FirebaseCrashlytics
     ): AiRepository = FirebaseAi(
         generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash"),
-        crashlytics = crashlytics,
-        dataEncryption = dataEncryption
+        crashlytics = crashlytics
     )
 
     @Provides

@@ -7,6 +7,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -25,6 +26,7 @@ class CategoryRepositoryImpl @Inject constructor(
     private val externalScope: CoroutineScope
 ) : CategoryRepository {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getCategoriesFlow(): Flow<List<Category>> =
         getCurrentBudget.currentBudgetIdOrDefaultFlow.flatMapLatest { budgetId ->
             categoryDao.getCategoriesFlow(budgetId).map { entities ->

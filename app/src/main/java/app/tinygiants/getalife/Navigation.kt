@@ -82,10 +82,10 @@ class GetALifeNavHostViewModel @Inject constructor(
     ) { subscription, budgetId, onboardingCompleted ->
         when {
             // If user has active subscription and budget exists, go to main app
-            subscription == Active && budgetId != null -> Path.Main.route
+            subscription == Active -> Path.Main.route
 
             // If onboarding was completed and budget exists, go to main app  
-            onboardingCompleted && budgetId != null -> Path.Main.route
+            onboardingCompleted -> Path.Main.route
 
             // Otherwise, show onboarding (no more loading state needed)
             else -> Path.Onboarding.route
