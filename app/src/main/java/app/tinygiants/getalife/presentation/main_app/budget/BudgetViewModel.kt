@@ -33,6 +33,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -81,6 +83,9 @@ class BudgetViewModel @Inject constructor(
         )
     )
     val uiState = uiStateFlow.asStateFlow()
+
+    private val pendingCategoryUpdates = mutableMapOf<Long, Job>()
+    private val optimisticUpdates = MutableStateFlow<Map<Long, Money>>(emptyMap())
 
     init {
         loadBudgetForMonth(currentMonthFlow.value)
@@ -133,15 +138,57 @@ class BudgetViewModel @Inject constructor(
                     updateCategory(clickEvent.category)
                     loadBudgetForMonth(currentMonth.value)
                 }, ::displayUserMessage)
-                is UpdateCategoryAssignment -> runSuspendCatching({
-                    updateCategoryMonthlyStatus(clickEvent.categoryId, currentMonth.value, clickEvent.newAmount)
-                    loadBudgetForMonth(currentMonth.value)
-                }, ::displayUserMessage)
+                is UpdateCategoryAssignment -> debouncedUpdateCategoryAssignment(
+                    clickEvent.categoryId,
+                    clickEvent.newAmount
+                )
                 is DeleteCategory -> {
                     deleteCategory(clickEvent.category)
                         .onSuccess { loadBudgetForMonth(currentMonth.value) }
                         .onFailure { displayUserMessage(it) }
                 }
+            }
+        }
+    }
+
+    private fun debouncedUpdateCategoryAssignment(categoryId: Long, newAmount: Money) {
+        // Immediately update UI optimistically 
+        optimisticUpdates.update { currentUpdates ->
+            currentUpdates + (categoryId to newAmount)
+        }
+
+        // Cancel previous update for this category if it exists
+        pendingCategoryUpdates[categoryId]?.cancel()
+
+        // Schedule new update with debouncing
+        pendingCategoryUpdates[categoryId] = viewModelScope.launch {
+            try {
+                // Wait for 300ms to see if more updates come
+                delay(300)
+
+                // Perform the actual update
+                updateCategoryMonthlyStatus(categoryId, currentMonth.value, newAmount)
+
+                // Remove optimistic update since real data will come from DB
+                optimisticUpdates.update { currentUpdates ->
+                    currentUpdates - categoryId
+                }
+
+                loadBudgetForMonth(currentMonth.value)
+
+                // Remove from pending updates
+                pendingCategoryUpdates.remove(categoryId)
+            } catch (e: CancellationException) {
+                // This update was cancelled by a newer one, which is expected
+                pendingCategoryUpdates.remove(categoryId)
+            } catch (e: Exception) {
+                // On error, remove optimistic update and show real data
+                optimisticUpdates.update { currentUpdates ->
+                    currentUpdates - categoryId
+                }
+                pendingCategoryUpdates.remove(categoryId)
+                displayUserMessage(e)
+                loadBudgetForMonth(currentMonth.value)
             }
         }
     }
@@ -172,10 +219,21 @@ class BudgetViewModel @Inject constructor(
 
                 uiStateFlow.update { budgetUiState ->
                     val currentExpandStates = groupExpandStates.value
+                    val currentOptimisticUpdates = optimisticUpdates.value
 
                     val groupsWithCategoryBudgets = budgetMonth.groups.mapKeys { (group, _) ->
                         val groupExpandedState = currentExpandStates[group.id] ?: group.isExpanded
                         group.copy(isExpanded = groupExpandedState)
+                    }.mapValues { (_, categoryStatuses) ->
+                        // Apply optimistic updates to category statuses
+                        categoryStatuses.map { categoryStatus ->
+                            val optimisticAmount = currentOptimisticUpdates[categoryStatus.category.id]
+                            if (optimisticAmount != null) {
+                                categoryStatus.copy(assignedAmount = optimisticAmount)
+                            } else {
+                                categoryStatus
+                            }
+                        }
                     }
 
                     val totalSpentMoney = budgetMonth.groups.values
@@ -325,7 +383,7 @@ class BudgetViewModel @Inject constructor(
             }
         }
     }
-    
+
     private suspend inline fun <T> runSuspendCatching(
         block: suspend () -> T,
         onFailure: (Throwable) -> Unit

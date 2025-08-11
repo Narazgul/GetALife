@@ -8,7 +8,7 @@ import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
-import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async

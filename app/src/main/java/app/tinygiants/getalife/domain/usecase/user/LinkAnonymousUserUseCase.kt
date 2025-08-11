@@ -11,11 +11,9 @@ class LinkAnonymousUserUseCase @Inject constructor(
     suspend operator fun invoke(newUserId: String) {
         val currentUser = firebaseAuth.currentUser ?: return
 
-        // Get the original anonymous user ID before linking
         val anonymousUserId = currentUser.uid.takeIf { currentUser.isAnonymous } ?: return
 
         if (anonymousUserId != newUserId) {
-            // User has just signed in, link their anonymous budget
             val userName = currentUser.displayName ?: "My Budget"
             budgetRepository.linkAnonymousAccount(
                 anonymousUserId = anonymousUserId,

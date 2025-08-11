@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -57,6 +59,13 @@ import app.tinygiants.getalife.theme.onWarning
 import app.tinygiants.getalife.theme.spacing
 import kotlin.time.Clock
 
+sealed class CoverageStatus {
+    data class Underfunded(val shortfall: Money) : CoverageStatus()
+    object ExactlyCovered : CoverageStatus()
+    data class Overfunded(val surplus: Money) : CoverageStatus()
+    data class NoDebt(val available: Money) : CoverageStatus()
+}
+
 @Composable
 fun CreditCardSection(
     creditCardCategories: List<CategoryMonthlyStatus>,
@@ -80,7 +89,39 @@ fun CreditCardSection(
         monthlyStatus.category.id to accountBalance
     }
 
-    val totalAvailable = accountBalanceLookup.values.sumOf { it.asDouble() }
+    // Calculate total effective available amount (considering debt coverage)
+    val totalEffectiveAvailable = creditCardCategories.sumOf { monthlyStatus ->
+        val linkedAccountId = monthlyStatus.category.linkedAccountId
+        val accountBalance = if (linkedAccountId != null) {
+            creditCardAccountBalances[linkedAccountId] ?: Money(0.0)
+        } else {
+            Money(0.0)
+        }
+
+        // Use the same logic as in CreditCardItem for consistency
+        val manuallyAssignedAmount = monthlyStatus.assignedAmount
+        val creditCardDebt = if (accountBalance.asDouble() < 0) {
+            Money(kotlin.math.abs(accountBalance.asDouble()))
+        } else {
+            Money(0.0)
+        }
+
+        // Calculate effective available amount (assigned - debt)
+        val effectiveAvailable = when {
+            creditCardDebt.asDouble() == 0.0 -> manuallyAssignedAmount.asDouble()
+            manuallyAssignedAmount.asDouble() < creditCardDebt.asDouble() -> {
+                // Negative value indicates shortfall
+                -(creditCardDebt.asDouble() - manuallyAssignedAmount.asDouble())
+            }
+
+            else -> {
+                // Positive value indicates surplus 
+                manuallyAssignedAmount.asDouble() - creditCardDebt.asDouble()
+            }
+        }
+
+        effectiveAvailable
+    }
 
     Column(
         modifier = modifier
@@ -122,12 +163,12 @@ fun CreditCardSection(
                 )
 
                 Text(
-                    text = Money(totalAvailable).formattedMoney,
+                    text = Money(totalEffectiveAvailable).formattedMoney,
                     style = MaterialTheme.typography.titleMedium,
                     color = if (!isExpanded) {
-                        if (totalAvailable < 0) {
+                        if (totalEffectiveAvailable < 0) {
                             MaterialTheme.colorScheme.error
-                        } else if (totalAvailable > 0) {
+                        } else if (totalEffectiveAvailable > 0) {
                             MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.onSurface
@@ -212,23 +253,6 @@ fun CreditCardSection(
     }
 }
 
-/**
- * Temporary function to create mock account balances based on linkedAccountId.
- * In a real implementation, this would be replaced with actual account data from the repository.
- */
-//private fun createMockAccountBalanceLookup(creditCardCategories: List<CategoryMonthlyStatus>): Map<Long, Money> {
-//    return creditCardCategories.associate { monthlyStatus ->
-//        val linkedAccountId = monthlyStatus.category.linkedAccountId
-//        val mockBalance = when {
-//            linkedAccountId == null -> Money(0.0)
-//            linkedAccountId % 3 == 0L -> Money(250.00) // Positive balance (credit)
-//            linkedAccountId % 3 == 1L -> Money(-125.50) // Negative balance (debt)  
-//            else -> Money(0.0) // Zero balance
-//        }
-//        monthlyStatus.category.id to mockBalance
-//    }
-//}
-
 @Composable
 private fun CreditCardItem(
     monthlyStatus: CategoryMonthlyStatus,
@@ -239,17 +263,68 @@ private fun CreditCardItem(
     var showAssignMoneyBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showGeneralEditBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    // Gradient colors for credit card look
+    // Credit card debt coverage calculation
+    // Use assignedAmount (manually assigned money) instead of availableAmount 
+    // (which includes invisible inflow from credit card spending)
+    val manuallyAssignedAmount = monthlyStatus.assignedAmount
+    val creditCardDebt = if (accountBalance.asDouble() < 0) {
+        Money(kotlin.math.abs(accountBalance.asDouble())) // Convert negative balance to positive debt amount
+    } else {
+        Money(0.0) // No debt
+    }
+
+    // Calculate coverage status based on manually assigned money only
+    val debtCoverage = when {
+        creditCardDebt.asDouble() == 0.0 -> {
+            // No debt - show assigned amount normally
+            if (manuallyAssignedAmount.asDouble() > 0) {
+                CoverageStatus.Overfunded(manuallyAssignedAmount)
+            } else {
+                CoverageStatus.NoDebt(manuallyAssignedAmount)
+            }
+        }
+
+        manuallyAssignedAmount.asDouble() < creditCardDebt.asDouble() -> {
+            // Not enough money manually assigned to cover debt
+            val shortfall = creditCardDebt - manuallyAssignedAmount
+            CoverageStatus.Underfunded(shortfall)
+        }
+
+        manuallyAssignedAmount.asDouble() == creditCardDebt.asDouble() -> {
+            // Exactly covered by manual assignment
+            CoverageStatus.ExactlyCovered
+        }
+
+        else -> {
+            // More than enough money manually assigned
+            val surplus = manuallyAssignedAmount - creditCardDebt
+            CoverageStatus.Overfunded(surplus)
+        }
+    }
+
+    // Text colors based on coverage status (instead of card gradient)
+    val amountColor = when (debtCoverage) {
+        is CoverageStatus.Underfunded -> Color(0xFFFFC107) // Yellow/Orange for needs more money
+        CoverageStatus.ExactlyCovered -> Color(0xFF2196F3) // Blue for exactly covered
+        is CoverageStatus.Overfunded -> Color(0xFF4CAF50) // Green for overfunded
+        is CoverageStatus.NoDebt -> if (debtCoverage.available.asDouble() > 0) {
+            Color(0xFF4CAF50) // Green for available money
+        } else {
+            Color.White.copy(alpha = 0.7f) // Gray for no money
+        }
+    }
+
+    // Neutral gradient with subtle depth for card-like appearance
     val cardGradient = Brush.linearGradient(
         colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+            MaterialTheme.colorScheme.surfaceVariant,
+            MaterialTheme.colorScheme.surface
         )
     )
 
     Card(
         modifier = modifier
-            .aspectRatio(1.8f) // Wider aspect ratio to reduce height
+            .aspectRatio(1.6f) // More credit card-like ratio
             .combinedClickable(
                 onClick = { showAssignMoneyBottomSheet = true },
                 onLongClick = { showGeneralEditBottomSheet = true }
@@ -257,8 +332,8 @@ private fun CreditCardItem(
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(12.dp) // More rounded corners
     ) {
         Box(
             modifier = Modifier
@@ -266,92 +341,114 @@ private fun CreditCardItem(
                 .fillMaxHeight()
                 .background(
                     brush = cardGradient,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 )
                 .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(8.dp)
+                    width = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(12.dp)
                 )
-                .padding(spacing.s)
+                .padding(spacing.m)
         ) {
-            // Compact Credit Card Layout
+            // Credit card layout
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Card Name at top left
-                Text(
-                    text = monthlyStatus.category.name.replace(" Payment", ""),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 11.sp
-                )
-
-                // Empty space in the middle - handled by Arrangement.SpaceBetween
-
-                // Bottom left: Available Amount
-                Column {
-                    // Dynamic label based on account balance
+                // Top section - Card name and type indicator
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
                     Text(
-                        text = if (accountBalance.asDouble() < 0) {
-                            "Benötigt"
-                        } else {
-                            "Available"
-                        },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 9.sp
+                        text = monthlyStatus.category.name.replace(" Payment", ""),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(modifier = Modifier.height(1.dp))
-
-                    // Amount with background color for negative values
-                    val amountText = if (accountBalance.asDouble() < 0) {
-                        Money(kotlin.math.abs(accountBalance.asDouble())).formattedMoney
-                    } else {
-                        accountBalance.formattedMoney
-                    }
-
-                    if (accountBalance.asDouble() < 0) {
-                        // Yellow background for negative amounts (debt) - using theme color
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = onWarning,
-                                    shape = RoundedCornerShape(3.dp)
-                                )
-                                .padding(horizontal = 3.dp, vertical = 1.dp)
-                        ) {
-                            Text(
-                                text = amountText,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                fontSize = 10.sp
+                    // Card type indicator (could be replaced with brand logos later)
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                RoundedCornerShape(4.dp)
                             )
-                        }
-                    } else {
-                        // Green text for positive, gray for zero
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
                         Text(
-                            text = amountText,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp,
-                            color = if (accountBalance.asDouble() > 0) {
-                                Color.Green.copy(alpha = 0.9f)
-                            } else {
-                                Color.White.copy(alpha = 0.7f) // Gray for zero
-                            }
+                            text = "💳",
+                            fontSize = 12.sp
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(spacing.s))
+
+                // Middle section - Assigned amount with better styling
+                Column {
+                    Text(
+                        text = "ZUGEWIESEN",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = manuallyAssignedAmount.formattedMoney,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(spacing.xs))
+
+                // Bottom section - Status with improved hierarchy
+                Column {
+                    val (label, amount) = when (debtCoverage) {
+                        is CoverageStatus.Underfunded -> "BENÖTIGT" to debtCoverage.shortfall.formattedMoney
+                        CoverageStatus.ExactlyCovered -> "STATUS" to "Gedeckt"
+                        is CoverageStatus.Overfunded -> "VERFÜGBAR" to debtCoverage.surplus.formattedMoney
+                        is CoverageStatus.NoDebt -> if (debtCoverage.available.asDouble() > 0) {
+                            "VERFÜGBAR" to debtCoverage.available.formattedMoney
+                        } else {
+                            "STATUS" to "Schuldenfrei"
+                        }
+                    }
+
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Text(
+                        text = amount,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = amountColor
+                    )
+                }
             }
+
+            // Subtle highlight effect on the right edge for visual interest
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .width(2.dp)
+                    .fillMaxHeight(0.6f)
+                    .background(
+                        amountColor.copy(alpha = 0.3f),
+                        RoundedCornerShape(1.dp)
+                    )
+            )
         }
     }
 

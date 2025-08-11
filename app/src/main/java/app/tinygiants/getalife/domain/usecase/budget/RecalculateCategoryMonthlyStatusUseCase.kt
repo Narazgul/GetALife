@@ -62,6 +62,7 @@ class RecalculateCategoryMonthlyStatusUseCase @Inject constructor(
                     EmptyMoney()
                 }
 
+                // YNAB-style calculation:
                 // Available = CarryOver + Assigned + Invisible inflow from credit card spending - Spent on payments
                 val availableAmount = carryOverFromPrevious + currentStatus.assignedAmount +
                         invisibleInflowFromCreditCardSpending - spentAmount

@@ -15,7 +15,8 @@ data class BudgetUiState(
     val creditCardAccountBalances: Map<Long, Money>, // Maps linkedAccountId to account balance
     val isLoading: Boolean,
     val userMessage: UiText?,
-    val errorMessage: ErrorMessage?
+    val errorMessage: ErrorMessage?,
+    val optimisticUpdates: Map<Long, Money> = emptyMap() // Maps categoryId to pending assigned amount
 )
 
 sealed class BannerUiState(open val text: UiText) {

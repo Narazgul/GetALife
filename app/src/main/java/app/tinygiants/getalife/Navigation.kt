@@ -12,8 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.tinygiants.getalife.domain.model.SubscriptionStatus
 import app.tinygiants.getalife.domain.model.SubscriptionStatus.Active
-import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import app.tinygiants.getalife.domain.usecase.subscription.GetUserSubscriptionStatusUseCase
 import app.tinygiants.getalife.presentation.main_app.MainScreen
 import app.tinygiants.getalife.presentation.onboarding.OnboardingNavGraph
@@ -76,23 +76,23 @@ class GetALifeNavHostViewModel @Inject constructor(
 
     // Use cached status for instant startup navigation
     val dynamicStartDestination: StateFlow<String> = combine(
-        getSubscription.getCachedStatus(), // Use cached status for instant startup
+        getSubscription.getCachedStatus(),
         getCurrentBudget.currentBudgetIdOrDefaultFlow,
         onboardingPrefsUseCase.isOnboardingCompletedFlow
     ) { subscription, budgetId, onboardingCompleted ->
         when {
-            // If user has active subscription and budget exists, go to main app
-            subscription == Active -> Path.Main.route
+            // Wait for subscription status to be loaded before making decisions
+            subscription == SubscriptionStatus.Unknown -> Path.Onboarding.route
 
-            // If onboarding was completed and budget exists, go to main app  
-            onboardingCompleted -> Path.Main.route
+            // If user has active subscription AND onboarding completed, go to main app
+            subscription == Active && onboardingCompleted -> Path.Main.route
 
-            // Otherwise, show onboarding (no more loading state needed)
+            // Otherwise, show onboarding
             else -> Path.Onboarding.route
         }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = Path.Onboarding.route // Back to onboarding as initial - will be updated instantly
+        initialValue = Path.Onboarding.route
     )
 }

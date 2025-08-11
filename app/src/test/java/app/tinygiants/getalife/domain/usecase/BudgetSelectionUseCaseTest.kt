@@ -3,6 +3,7 @@ package app.tinygiants.getalife.domain.usecase
 import android.content.Context
 import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.data.repository.BudgetRepository
+import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.mockk.coEvery
@@ -12,7 +13,9 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.time.Instant

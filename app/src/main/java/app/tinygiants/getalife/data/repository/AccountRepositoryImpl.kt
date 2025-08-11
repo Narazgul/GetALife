@@ -5,7 +5,7 @@ import app.tinygiants.getalife.data.local.entities.AccountEntity
 import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.repository.AccountRepository
-import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async

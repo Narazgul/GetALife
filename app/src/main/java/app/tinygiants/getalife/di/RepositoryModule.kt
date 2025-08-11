@@ -15,7 +15,6 @@ import app.tinygiants.getalife.data.repository.GoogleInAppReviewRepository
 import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.RevenueCatRepository
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
-import app.tinygiants.getalife.di.ApplicationScope
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
@@ -25,8 +24,7 @@ import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
 import app.tinygiants.getalife.domain.repository.SubscriptionRepository
 import app.tinygiants.getalife.domain.repository.SupportChatRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
-import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
-import dagger.Binds
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

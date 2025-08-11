@@ -15,14 +15,14 @@ data class CategoryEntity(
     val emoji: String,
     val name: String,
     val budgetTarget: Double,
-    val monthlyTargetAmount: Double?, // Für Multi-Monats-Sparziele
-    val targetMonthsRemaining: Int?, // Für Multi-Monats-Sparziele
+    val monthlyTargetAmount: Double?,
+    val targetMonthsRemaining: Int?,
     val listPosition: Int,
     val isInitialCategory: Boolean,
     val linkedAccountId: Long? = null,
     val updatedAt: Instant,
     val createdAt: Instant,
-    val isSynced: Boolean = false // tracks if this category has been synced to Firestore
+    val isSynced: Boolean = false
 ) {
     companion object {
         fun fromDomain(category: Category, budgetId: String): CategoryEntity {
@@ -41,7 +41,7 @@ data class CategoryEntity(
                     linkedAccountId = linkedAccountId,
                     updatedAt = updatedAt,
                     createdAt = createdAt,
-                    isSynced = false // new categories are not synced initially
+                    isSynced = false
                 )
             }
         }

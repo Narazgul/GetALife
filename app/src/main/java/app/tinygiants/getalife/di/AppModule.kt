@@ -8,8 +8,8 @@ import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseAi
 import app.tinygiants.getalife.domain.repository.AiRepository
-import app.tinygiants.getalife.domain.usecase.BudgetSelectionUseCase
-import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase

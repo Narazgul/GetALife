@@ -3,15 +3,14 @@ package app.tinygiants.getalife.presentation.main_app.account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.R
-import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.usecase.BudgetSelectionUseCase
 import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.DeleteAccountStatus
 import app.tinygiants.getalife.domain.usecase.account.DeleteAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.UpdateAccountUseCase
+import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.TransferBetweenAccountsUseCase
 import app.tinygiants.getalife.presentation.shared_composables.ErrorMessage
@@ -191,7 +190,7 @@ class AccountViewModel @Inject constructor(
             _uiState.update { it.copy(isSyncLoading = true) }
             try {
                 // Sync is automatic with Firestore, but we can trigger repository sync
-                val currentUserId = budgetSelectionUseCase.getCurrentFirebaseUserId()
+                budgetSelectionUseCase.getCurrentFirebaseUserId()
                 // Repository sync logic will be handled automatically by Firestore
                 _uiState.update { it.copy(isSyncLoading = false) }
             } catch (e: Exception) {

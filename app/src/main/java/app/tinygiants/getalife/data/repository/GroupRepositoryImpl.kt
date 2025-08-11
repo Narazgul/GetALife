@@ -7,7 +7,7 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Group
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
-import app.tinygiants.getalife.domain.usecase.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async

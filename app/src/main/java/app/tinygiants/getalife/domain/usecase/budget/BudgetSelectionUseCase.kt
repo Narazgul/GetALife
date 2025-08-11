@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.domain.usecase
+package app.tinygiants.getalife.domain.usecase.budget
 
 import android.content.Context
 import androidx.datastore.core.DataStore

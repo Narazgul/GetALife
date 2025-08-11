@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.domain.usecase
+package app.tinygiants.getalife.domain.usecase.budget
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
