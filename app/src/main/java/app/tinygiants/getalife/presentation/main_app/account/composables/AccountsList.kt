@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
@@ -27,14 +28,20 @@ fun AccountsList(
 ) {
     val listState = rememberLazyListState()
 
+    // Calculate bottom padding based on FAB configuration
+    // ExtendedFAB height ≈ 56dp + Transfer FAB height ≈ 56dp + spacing ≈ 16dp + extra margin ≈ 16dp
+    val bottomPadding = if (accounts.size >= 2) 144.dp else 88.dp // Two FABs vs one FAB
+
     LazyColumn(
         state = listState,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = spacing.l,
-                vertical = spacing.s
-            )
+            .fillMaxWidth(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            start = spacing.l,
+            end = spacing.l,
+            top = spacing.s,
+            bottom = bottomPadding // Prevent FAB overlap
+        )
     ) {
         items(
             items = accounts,
@@ -59,6 +66,11 @@ fun AccountsList(
         }
     }
 
+    // Track if user has actually scrolled - FABs visible until first scroll up
+    val hasUserScrolled = listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
+    val isCurrentlyScrollingDown = listState.isScrollingDown()
+
+    // Custom behavior: FABs visible by default, hide when scrolling UP, show when scrolling DOWN
     onUserScrolling(listState.isScrollingDown())
 }
 

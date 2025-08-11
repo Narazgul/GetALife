@@ -147,7 +147,7 @@ fun AccountScreen(
                 AccountsList(
                     accounts = uiState.accounts,
                     onNavigateToTransactionScreen = onNavigateToTransactionScreen,
-                    onUserScrolling = { isUserScrollingDown -> areFabButtonsVisible = isUserScrollingDown },
+                    onUserScrolling = { shouldShowFABs -> areFabButtonsVisible = shouldShowFABs },
                     onUserClickEvent = onUserClickEvent
                 )
                 LoadingIndicator(
