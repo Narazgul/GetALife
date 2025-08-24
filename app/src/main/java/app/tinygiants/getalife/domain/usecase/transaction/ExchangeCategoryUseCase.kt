@@ -6,33 +6,24 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Clock
 
 class ExchangeCategoryUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository,
-    @Default private val defaultDispatcher: CoroutineDispatcher
+    private val categoryRepository: CategoryRepository
 ) {
 
     suspend operator fun invoke(transaction: Transaction, oldCategory: Category?) {
-
         if (transaction.category == null) return
 
-        withContext(defaultDispatcher) {
-
-            updateTransaction(transaction = transaction)
-            updateOldCategory(category = oldCategory, amount = transaction.amount)
-            updateNewCategory(category = transaction.category, amount = transaction.amount)
-        }
+        updateTransaction(transaction)
+        updateOldCategory(oldCategory, transaction.amount)
+        updateNewCategory(transaction.category!!, transaction.amount)
     }
 
     private suspend fun updateTransaction(transaction: Transaction) {
-
         val updatedTransaction = transaction.copy(updatedAt = Clock.System.now())
-
         transactionRepository.updateTransaction(updatedTransaction)
     }
 
