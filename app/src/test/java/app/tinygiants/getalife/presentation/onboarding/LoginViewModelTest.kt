@@ -1,28 +1,29 @@
 package app.tinygiants.getalife.presentation.onboarding
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
-import assertk.assertions.isNotNull
-import assertk.assertions.isNull
-import assertk.assertions.isTrue
+import app.tinygiants.getalife.presentation.onboarding.auth.LoginViewModel
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,41 +34,35 @@ class LoginViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
-    private val testScope = TestScope(testDispatcher)
+    private val testDispatcher = UnconfinedTestDispatcher()
 
-    @MockK
-    private lateinit var firebaseAuth: FirebaseAuth
-
-    @MockK
-    private lateinit var crashlytics: FirebaseCrashlytics
-
-    @MockK
-    private lateinit var authResult: AuthResult
+    private val firebaseAuth: FirebaseAuth = mockk(relaxed = true)
+    private val crashlytics: FirebaseCrashlytics = mockk(relaxed = true)
+    private val authResult: AuthResult = mockk(relaxed = true)
 
     private lateinit var viewModel: LoginViewModel
 
     @Before
     fun setup() {
-        MockKAnnotations.init(this, relaxed = true)
+        Dispatchers.setMain(testDispatcher)
         viewModel = LoginViewModel(firebaseAuth, crashlytics)
     }
 
     @Test
-    fun `initial state is correct`() = testScope.runTest {
+    fun `initial state is correct`() = runTest {
         val uiState = viewModel.uiState.first()
 
-        assertThat(uiState.email).isEqualTo("")
-        assertThat(uiState.password).isEqualTo("")
-        assertThat(uiState.isLoading).isFalse()
-        assertThat(uiState.loginSuccess).isFalse()
-        assertThat(uiState.emailError).isNull()
-        assertThat(uiState.passwordError).isNull()
-        assertThat(uiState.errorMessage).isNull()
+        assertEquals("", uiState.email)
+        assertEquals("", uiState.password)
+        assertFalse(uiState.isLoading)
+        assertFalse(uiState.loginSuccess)
+        assertNull(uiState.emailError)
+        assertNull(uiState.passwordError)
+        assertNull(uiState.errorMessage)
     }
 
     @Test
-    fun `onEmailChanged updates email and clears error`() = testScope.runTest {
+    fun `onEmailChanged updates email and clears error`() = runTest {
         // Given
         val email = "test@example.com"
 
@@ -76,12 +71,12 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.email).isEqualTo(email)
-        assertThat(uiState.emailError).isNull()
+        assertEquals(email, uiState.email)
+        assertNull(uiState.emailError)
     }
 
     @Test
-    fun `onPasswordChanged updates password and clears error`() = testScope.runTest {
+    fun `onPasswordChanged updates password and clears error`() = runTest {
         // Given
         val password = "password123"
 
@@ -90,12 +85,28 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.password).isEqualTo(password)
-        assertThat(uiState.passwordError).isNull()
+        assertEquals(password, uiState.password)
+        assertNull(uiState.passwordError)
     }
 
     @Test
-    fun `signInWithEmail with invalid email shows error`() = testScope.runTest {
+    fun `signInWithEmail with empty email shows error`() = runTest {
+        // Given
+        viewModel.onEmailChanged("")
+        viewModel.onPasswordChanged("password123")
+
+        // When
+        viewModel.signInWithEmail()
+
+        // Then
+        val uiState = viewModel.uiState.first()
+        assertEquals("E-Mail ist erforderlich", uiState.emailError)
+        assertFalse(uiState.isLoading)
+        assertFalse(uiState.loginSuccess)
+    }
+
+    @Test
+    fun `signInWithEmail with invalid email shows error`() = runTest {
         // Given
         viewModel.onEmailChanged("invalid-email")
         viewModel.onPasswordChanged("password123")
@@ -105,12 +116,13 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.emailError).isEqualTo("Ungültige E-Mail-Adresse")
-        assertThat(uiState.isLoading).isFalse()
+        assertEquals("Ungültige E-Mail-Adresse", uiState.emailError)
+        assertFalse(uiState.isLoading)
+        assertFalse(uiState.loginSuccess)
     }
 
     @Test
-    fun `signInWithEmail with empty password shows error`() = testScope.runTest {
+    fun `signInWithEmail with empty password shows error`() = runTest {
         // Given
         viewModel.onEmailChanged("test@example.com")
         viewModel.onPasswordChanged("")
@@ -120,17 +132,37 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.passwordError).isEqualTo("Passwort ist erforderlich")
-        assertThat(uiState.isLoading).isFalse()
+        assertEquals("Passwort ist erforderlich", uiState.passwordError)
+        assertFalse(uiState.isLoading)
+        assertFalse(uiState.loginSuccess)
     }
 
     @Test
-    fun `signInWithEmail success flow`() = testScope.runTest {
+    fun `signInWithEmail with short password shows error`() = runTest {
+        // Given
+        viewModel.onEmailChanged("test@example.com")
+        viewModel.onPasswordChanged("12345")
+
+        // When
+        viewModel.signInWithEmail()
+
+        // Then
+        val uiState = viewModel.uiState.first()
+        assertEquals("Passwort muss mindestens 6 Zeichen haben", uiState.passwordError)
+        assertFalse(uiState.isLoading)
+        assertFalse(uiState.loginSuccess)
+    }
+
+    @Test
+    fun `signInWithEmail success flow`() = runTest {
         // Given
         val email = "test@example.com"
         val password = "password123"
+        val successTask: Task<AuthResult> = Tasks.forResult(authResult)
 
-        every { firebaseAuth.signInWithEmailAndPassword(email, password) } returns Tasks.forResult(authResult)
+        every {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+        } returns successTask
 
         viewModel.onEmailChanged(email)
         viewModel.onPasswordChanged(password)
@@ -141,21 +173,24 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.loginSuccess).isTrue()
-        assertThat(uiState.isLoading).isFalse()
-        assertThat(uiState.errorMessage).isNull()
+        assertTrue(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertNull(uiState.errorMessage)
 
         verify { firebaseAuth.signInWithEmailAndPassword(email, password) }
     }
 
     @Test
-    fun `signInWithEmail with invalid credentials shows error`() = testScope.runTest {
+    fun `signInWithEmail with invalid credentials shows error`() = runTest {
         // Given
         val email = "test@example.com"
         val password = "wrongpassword"
         val exception = FirebaseAuthInvalidCredentialsException("invalid-credential", "Invalid credentials")
+        val failureTask: Task<AuthResult> = Tasks.forException(exception)
 
-        every { firebaseAuth.signInWithEmailAndPassword(email, password) } returns Tasks.forException(exception)
+        every {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+        } returns failureTask
 
         viewModel.onEmailChanged(email)
         viewModel.onPasswordChanged(password)
@@ -166,21 +201,24 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.loginSuccess).isFalse()
-        assertThat(uiState.isLoading).isFalse()
-        assertThat(uiState.errorMessage).isEqualTo("Ungültige E-Mail oder Passwort")
+        assertFalse(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertEquals("Ungültige E-Mail oder Passwort", uiState.errorMessage)
 
         verify { crashlytics.recordException(exception) }
     }
 
     @Test
-    fun `signInWithEmail with invalid user shows error`() = testScope.runTest {
+    fun `signInWithEmail with invalid user shows error`() = runTest {
         // Given
         val email = "nonexistent@example.com"
         val password = "password123"
         val exception = FirebaseAuthInvalidUserException("user-not-found", "User not found")
+        val failureTask: Task<AuthResult> = Tasks.forException(exception)
 
-        every { firebaseAuth.signInWithEmailAndPassword(email, password) } returns Tasks.forException(exception)
+        every {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+        } returns failureTask
 
         viewModel.onEmailChanged(email)
         viewModel.onPasswordChanged(password)
@@ -191,17 +229,116 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.loginSuccess).isFalse()
-        assertThat(uiState.isLoading).isFalse()
-        assertThat(uiState.errorMessage).isEqualTo("Kein Benutzer mit dieser E-Mail gefunden")
+        assertFalse(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertEquals("Kein Benutzer mit dieser E-Mail gefunden", uiState.errorMessage)
 
         verify { crashlytics.recordException(exception) }
     }
 
     @Test
-    fun `clearError clears error message`() = testScope.runTest {
+    fun `signInWithEmail with weak password shows error`() = runTest {
+        // Given
+        val email = "test@example.com"
+        val password = "weak"
+        val exception = FirebaseAuthWeakPasswordException("weak-password", "Password too weak", "WEAK_PASSWORD")
+        val failureTask: Task<AuthResult> = Tasks.forException(exception)
+
+        every {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+        } returns failureTask
+
+        viewModel.onEmailChanged(email)
+        viewModel.onPasswordChanged(password)
+
+        // When
+        viewModel.signInWithEmail()
+        advanceUntilIdle()
+
+        // Then
+        val uiState = viewModel.uiState.first()
+        assertFalse(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertEquals("Passwort ist zu schwach", uiState.errorMessage)
+
+        verify { crashlytics.recordException(exception) }
+    }
+
+    @Test
+    fun `signInWithGoogle success flow`() = runTest {
+        // Given
+        val idToken = "google-id-token"
+        val successTask: Task<AuthResult> = Tasks.forResult(authResult)
+
+        every {
+            firebaseAuth.signInWithCredential(any())
+        } returns successTask
+
+        // When
+        viewModel.signInWithGoogle(idToken)
+        advanceUntilIdle()
+
+        // Then
+        val uiState = viewModel.uiState.first()
+        assertTrue(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertNull(uiState.errorMessage)
+
+        verify { firebaseAuth.signInWithCredential(any()) }
+    }
+
+    @Test
+    fun `signInWithFacebook success flow`() = runTest {
+        // Given
+        val accessToken = "facebook-access-token"
+        val successTask: Task<AuthResult> = Tasks.forResult(authResult)
+
+        every {
+            firebaseAuth.signInWithCredential(any())
+        } returns successTask
+
+        // When
+        viewModel.signInWithFacebook(accessToken)
+        advanceUntilIdle()
+
+        // Then
+        val uiState = viewModel.uiState.first()
+        assertTrue(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertNull(uiState.errorMessage)
+
+        verify { firebaseAuth.signInWithCredential(any()) }
+    }
+
+    @Test
+    fun `signInWithTwitter success flow`() = runTest {
+        // Given
+        val token = "twitter-token"
+        val secret = "twitter-secret"
+        val successTask: Task<AuthResult> = Tasks.forResult(authResult)
+
+        every {
+            firebaseAuth.signInWithCredential(any())
+        } returns successTask
+
+        // When
+        viewModel.signInWithTwitter(token, secret)
+        advanceUntilIdle()
+
+        // Then
+        val uiState = viewModel.uiState.first()
+        assertTrue(uiState.loginSuccess)
+        assertFalse(uiState.isLoading)
+        assertNull(uiState.errorMessage)
+
+        verify { firebaseAuth.signInWithCredential(any()) }
+    }
+
+    @Test
+    fun `clearError clears error message`() = runTest {
         // Given - force an error state first
         viewModel.onEmailChanged("invalid-email")
+        viewModel.onPasswordChanged("password123")
         viewModel.signInWithEmail()
 
         // When
@@ -209,33 +346,43 @@ class LoginViewModelTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        assertThat(uiState.errorMessage).isNull()
+        assertNull(uiState.errorMessage)
     }
 
     @Test
-    fun `email validation works correctly`() = testScope.runTest {
+    fun `valid email addresses pass validation`() = runTest {
         val validEmails = listOf(
             "test@example.com",
             "user.name@domain.co.uk",
-            "user+tag@example.org"
-        )
-
-        val invalidEmails = listOf(
-            "",
-            "invalid-email",
-            "@example.com",
-            "user@",
-            "user@@example.com"
+            "user+tag@example.org",
+            "123@numbers.com"
         )
 
         validEmails.forEach { email ->
             viewModel.onEmailChanged(email)
             viewModel.onPasswordChanged("password123")
+
+            // Set up success mock for each call
+            every {
+                firebaseAuth.signInWithEmailAndPassword(email, "password123")
+            } returns Tasks.forResult(authResult)
+
             viewModel.signInWithEmail()
 
             val uiState = viewModel.uiState.first()
-            assertThat(uiState.emailError).isNull()
+            assertNull("Email $email should be valid", uiState.emailError)
         }
+    }
+
+    @Test
+    fun `invalid email addresses fail validation`() = runTest {
+        val invalidEmails = listOf(
+            "invalid-email",
+            "@example.com",
+            "user@",
+            "user@@example.com",
+            "user..name@example.com"
+        )
 
         invalidEmails.forEach { email ->
             viewModel.onEmailChanged(email)
@@ -243,39 +390,53 @@ class LoginViewModelTest {
             viewModel.signInWithEmail()
 
             val uiState = viewModel.uiState.first()
-            assertThat(uiState.emailError).isNotNull()
+            assertEquals("Ungültige E-Mail-Adresse", uiState.emailError)
         }
     }
 
     @Test
-    fun `password validation works correctly`() = testScope.runTest {
+    fun `valid passwords pass validation`() = runTest {
         val validPasswords = listOf(
             "password123",
             "123456",
-            "strongPassword!"
-        )
-
-        val invalidPasswords = listOf(
-            "",
-            "12345" // too short
+            "strongPassword!",
+            "abcdef" // exactly 6 characters
         )
 
         validPasswords.forEach { password ->
             viewModel.onEmailChanged("test@example.com")
             viewModel.onPasswordChanged(password)
+
+            // Set up success mock for each call
+            every {
+                firebaseAuth.signInWithEmailAndPassword("test@example.com", password)
+            } returns Tasks.forResult(authResult)
+
             viewModel.signInWithEmail()
 
             val uiState = viewModel.uiState.first()
-            assertThat(uiState.passwordError).isNull()
+            assertNull("Password $password should be valid", uiState.passwordError)
         }
+    }
 
-        invalidPasswords.forEach { password ->
+    @Test
+    fun `short passwords fail validation`() = runTest {
+        val shortPasswords = listOf(
+            "12345", // 5 characters
+            "abc",   // 3 characters
+            ""       // empty
+        )
+
+        shortPasswords.forEach { password ->
             viewModel.onEmailChanged("test@example.com")
             viewModel.onPasswordChanged(password)
             viewModel.signInWithEmail()
 
             val uiState = viewModel.uiState.first()
-            assertThat(uiState.passwordError).isNotNull()
+            when {
+                password.isEmpty() -> assertEquals("Passwort ist erforderlich", uiState.passwordError)
+                else -> assertEquals("Passwort muss mindestens 6 Zeichen haben", uiState.passwordError)
+            }
         }
     }
 }
