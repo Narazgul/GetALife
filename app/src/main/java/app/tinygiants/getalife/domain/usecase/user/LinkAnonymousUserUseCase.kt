@@ -1,51 +1,55 @@
 package app.tinygiants.getalife.domain.usecase.user
 
 import android.util.Log
+import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.data.repository.BudgetRepository
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Use case responsible for linking anonymous Firebase accounts to authenticated accounts.
+ * Ensures proper data migration and user account continuity.
+ */
 class LinkAnonymousUserUseCase @Inject constructor(
+    private val budgetRepository: BudgetRepository,
     private val firebaseAuth: FirebaseAuth,
-    private val budgetRepository: BudgetRepository
+    @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
-    suspend operator fun invoke(anonymousUserId: String, newUserId: String) {
-        val currentUser = firebaseAuth.currentUser ?: return
 
-        Log.d("LinkAnonymousUser", "Linking account: anonymous=$anonymousUserId, new=$newUserId")
+    /**
+     * Links an anonymous user account to an authenticated account.
+     * Migrates budget data and ensures user continuity.
+     */
+    suspend operator fun invoke(
+        authenticatedUserId: String,
+        previousAnonymousUserId: String? = null
+    ): Unit = withContext(defaultDispatcher) {
 
-        // Skip if the anonymous user ID and new user ID are the same
-        if (anonymousUserId == newUserId) {
-            Log.d("LinkAnonymousUser", "User IDs are the same, skipping link")
-            return
-        }
+        val anonymousUserId = previousAnonymousUserId ?: getCurrentFirebaseUserId()
+        val userName = firebaseAuth.currentUser?.displayName ?: "Mein Budget"
 
-        val userName = currentUser.displayName ?: "My Budget"
+        Log.d("LinkAnonymousUserUseCase", "Linking anonymous user $anonymousUserId to authenticated user $authenticatedUserId")
 
-        Log.d("LinkAnonymousUser", "Starting budget linking process for user: $userName")
+        // Only link if we have a valid anonymous user ID and it's different from authenticated ID
+        if (anonymousUserId != authenticatedUserId && anonymousUserId != "anonymous") {
+            Log.d("LinkAnonymousUserUseCase", "Proceeding with account linking")
 
-        budgetRepository.linkAnonymousAccount(
-            anonymousUserId = anonymousUserId,
-            authenticatedUserId = newUserId,
-            userName = userName
-        )
-
-        Log.d("LinkAnonymousUser", "Budget linking completed")
-    }
-
-    // Legacy method for backward compatibility - deprecated
-    @Deprecated("Use the overload that accepts anonymousUserId parameter")
-    suspend operator fun invoke(newUserId: String) {
-        val currentUser = firebaseAuth.currentUser ?: return
-        val anonymousUserId = currentUser.uid.takeIf { currentUser.isAnonymous } ?: return
-
-        if (anonymousUserId != newUserId) {
-            val userName = currentUser.displayName ?: "My Budget"
+            // Link anonymous account data using the repository method
             budgetRepository.linkAnonymousAccount(
                 anonymousUserId = anonymousUserId,
-                authenticatedUserId = newUserId,
+                authenticatedUserId = authenticatedUserId,
                 userName = userName
             )
+
+            Log.d("LinkAnonymousUserUseCase", "Successfully linked anonymous account data")
+        } else {
+            Log.d("LinkAnonymousUserUseCase", "No linking needed - user IDs are same or invalid")
         }
+    }
+
+    private fun getCurrentFirebaseUserId(): String {
+        return firebaseAuth.currentUser?.uid ?: "anonymous"
     }
 }

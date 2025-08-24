@@ -8,9 +8,20 @@ import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
 import app.tinygiants.getalife.data.remote.ai.FirebaseAi
 import app.tinygiants.getalife.domain.repository.AiRepository
+import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import app.tinygiants.getalife.domain.usecase.budget.CalculateTargetContributionUseCase
+import app.tinygiants.getalife.domain.usecase.budget.initialization.InitializeBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.user.LinkAnonymousUserUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.credit_card.EnsureCreditCardPaymentCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.recurrence.CalculateRecurrenceDatesUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.validation.ValidateTransactionDataUseCase
+import app.tinygiants.getalife.domain.usecase.budget.calculation.CarryOverCalculator
+import app.tinygiants.getalife.domain.usecase.budget.calculation.CreditCardCategoryCalculator
+import app.tinygiants.getalife.domain.usecase.budget.calculation.NormalCategoryCalculator
 import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase
@@ -29,6 +40,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -109,9 +121,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Provides
+    @Singleton
     @ApplicationScope
-    fun provideApplicationScope(): CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    fun provideApplicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
     @Singleton
@@ -124,11 +139,38 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideInitializeBudgetUseCase(
+        budgetRepository: app.tinygiants.getalife.data.repository.BudgetRepository,
+        firebaseAuth: FirebaseAuth,
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): InitializeBudgetUseCase = InitializeBudgetUseCase(
+        budgetRepository,
+        firebaseAuth,
+        defaultDispatcher
+    )
+
+    @Provides
+    @Singleton
+    fun provideLinkAnonymousUserUseCase(
+        budgetRepository: app.tinygiants.getalife.data.repository.BudgetRepository,
+        firebaseAuth: FirebaseAuth,
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): LinkAnonymousUserUseCase = LinkAnonymousUserUseCase(
+        budgetRepository,
+        firebaseAuth,
+        defaultDispatcher
+    )
+
+    @Provides
+    @Singleton
     fun provideBudgetSelectionUseCase(
         @ApplicationContext context: Context,
         budgetRepository: app.tinygiants.getalife.data.repository.BudgetRepository,
-        firebaseAuth: FirebaseAuth
-    ): BudgetSelectionUseCase = BudgetSelectionUseCase(context, budgetRepository, firebaseAuth)
+        firebaseAuth: FirebaseAuth,
+        initializeBudget: InitializeBudgetUseCase,
+        linkAnonymousUser: LinkAnonymousUserUseCase
+    ): BudgetSelectionUseCase =
+        BudgetSelectionUseCase(context, budgetRepository, firebaseAuth, initializeBudget, linkAnonymousUser)
 
     @Provides
     @Singleton
@@ -140,6 +182,42 @@ object AppModule {
     fun provideCalculateTargetContributionUseCase(): CalculateTargetContributionUseCase {
         return CalculateTargetContributionUseCase()
     }
+
+    @Provides
+    fun provideCarryOverCalculator(
+        statusRepository: CategoryMonthlyStatusRepository,
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): CarryOverCalculator = CarryOverCalculator(statusRepository, defaultDispatcher)
+
+    @Provides
+    fun provideNormalCategoryCalculator(
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): NormalCategoryCalculator = NormalCategoryCalculator(defaultDispatcher)
+
+    @Provides
+    fun provideCreditCardCategoryCalculator(
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): CreditCardCategoryCalculator = CreditCardCategoryCalculator(defaultDispatcher)
+
+    @Provides
+    fun provideValidateTransactionDataUseCase(
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): ValidateTransactionDataUseCase = ValidateTransactionDataUseCase(defaultDispatcher)
+
+    @Provides
+    fun provideCalculateRecurrenceDatesUseCase(
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): CalculateRecurrenceDatesUseCase = CalculateRecurrenceDatesUseCase(defaultDispatcher)
+
+    @Provides
+    fun provideEnsureCreditCardPaymentCategoryUseCase(
+        categoryRepository: CategoryRepository,
+        groupRepository: GroupRepository,
+        categoryMonthlyStatusRepository: CategoryMonthlyStatusRepository,
+        @Default defaultDispatcher: CoroutineDispatcher
+    ): EnsureCreditCardPaymentCategoryUseCase = EnsureCreditCardPaymentCategoryUseCase(
+        categoryRepository, groupRepository, categoryMonthlyStatusRepository, defaultDispatcher
+    )
 
     @Provides
     @Singleton

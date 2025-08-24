@@ -1,7 +1,6 @@
 package app.tinygiants.getalife.domain.usecase.budget
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -9,32 +8,32 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.data.repository.BudgetRepository
+import app.tinygiants.getalife.domain.usecase.budget.initialization.InitializeBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.user.LinkAnonymousUserUseCase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Clock
 
 // Extension property for DataStore
 private val Context.budgetPrefs: DataStore<Preferences> by preferencesDataStore(name = "budget_preferences")
 
 /**
- * Use case for managing active budget selection and Firebase user operations.
- * Handles budget switching, account linking, and automatic budget initialization.
+ * Use case for managing active budget selection and coordination.
+ * Handles budget switching and DataStore persistence, delegates complex operations to specialized use cases.
  */
 @Singleton
 class BudgetSelectionUseCase @Inject constructor(
     private val context: Context,
     private val budgetRepository: BudgetRepository,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val initializeBudget: InitializeBudgetUseCase,
+    private val linkAnonymousUser: LinkAnonymousUserUseCase
 ) {
     private val activeBudgetIdKey = stringPreferencesKey("active_budget_id")
     private val dataStore = context.budgetPrefs
-    private val budgetMutex = Mutex()
 
     /**
      * Flow of the currently active budget ID
@@ -86,73 +85,26 @@ class BudgetSelectionUseCase @Inject constructor(
             setActiveBudgetId(budget.id)
         }
 
-        Log.d("BudgetSelectionUseCase", "Budget created with name $name and id ${budget.id}")
         return budget
     }
 
     /**
-     * Initialize default budget for new users
-     * IMPORTANT: Handles Firebase user ID changes from anonymous to authenticated
+     * Initialize default budget for new users - delegates to specialized use case
      */
     suspend fun initializeDefaultBudget(): BudgetEntity {
-        val currentUserId = getCurrentFirebaseUserId()
-        val userName = firebaseAuth.currentUser?.displayName ?: "Mein Budget"
+        val budget = initializeBudget()
 
-        Log.d("BudgetSelectionUseCase", "Initializing default budget for user $currentUserId")
+        // Ensure this budget is set as active
+        setActiveBudgetId(budget.id)
 
-        return budgetMutex.withLock {
-            // Check for existing budgets with current user ID
-            var existingBudgets = budgetRepository.getBudgets(currentUserId)
-            Log.d("BudgetSelectionUseCase", "Found ${existingBudgets.size} existing budgets for user $currentUserId")
-
-            // If no budgets for current user ID, check if we have anonymous budgets that need updating
-            if (existingBudgets.isEmpty() && currentUserId != "anonymous") {
-                Log.d("BudgetSelectionUseCase", "No budgets for current user, checking for anonymous budgets to update")
-
-                val updatedCount = budgetRepository.updateBudgetUserId("anonymous", currentUserId)
-                if (updatedCount > 0) {
-                    Log.d("BudgetSelectionUseCase", "Successfully updated $updatedCount anonymous budgets to $currentUserId")
-                    // Refresh the existing budgets list
-                    existingBudgets = budgetRepository.getBudgets(currentUserId)
-                }
-            }
-
-            if (existingBudgets.isEmpty()) {
-                // Create first budget only if we truly have no budgets
-                Log.d("BudgetSelectionUseCase", "No existing budgets found after checking anonymous, creating first budget")
-                return createBudget(userName, setAsActive = true)
-            } else {
-                // Set first budget as active if none is selected
-                val activeBudgetId = getActiveBudgetId()
-                Log.d("BudgetSelectionUseCase", "Existing budgets found, active budget ID: $activeBudgetId")
-                if (activeBudgetId == null || !existingBudgets.any { it.id == activeBudgetId }) {
-                    Log.d(
-                        "BudgetSelectionUseCase",
-                        "No valid active budget set, setting first budget as active: ${existingBudgets.first().id}"
-                    )
-                    setActiveBudgetId(existingBudgets.first().id)
-                }
-                return existingBudgets.first()
-            }
-        }
+        return budget
     }
 
     /**
-     * Handle Firebase account linking from anonymous to authenticated
+     * Handle Firebase account linking - delegates to specialized use case
      */
     suspend fun handleAccountLinking(authenticatedUserId: String, previousAnonymousUserId: String? = null) {
-        val anonymousUserId = previousAnonymousUserId ?: getCurrentFirebaseUserId()
-        val userName = firebaseAuth.currentUser?.displayName ?: "Mein Budget"
-
-        // Only link if we have a valid anonymous user ID and it's different from authenticated ID
-        if (anonymousUserId != authenticatedUserId && anonymousUserId != "anonymous") {
-            // Link anonymous account data using the new UseCase signature
-            budgetRepository.linkAnonymousAccount(
-                anonymousUserId = anonymousUserId,
-                authenticatedUserId = authenticatedUserId,
-                userName = userName
-            )
-        }
+        linkAnonymousUser(authenticatedUserId, previousAnonymousUserId)
 
         // Ensure we have an active budget for the authenticated user
         initializeDefaultBudget()
