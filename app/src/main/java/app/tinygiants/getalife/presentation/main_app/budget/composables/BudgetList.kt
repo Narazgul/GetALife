@@ -198,10 +198,31 @@ private fun LazyListScope.categories(
                         assignedMoney = monthlyStatus.assignedAmount,
                         availableMoney = monthlyStatus.availableAmount,
                         progress = monthlyStatus.progress,
+                        monthlyTarget = monthlyStatus.category.monthlyTargetAmount,
+                        targetType = monthlyStatus.category.targetType,
+                        targetAmount = monthlyStatus.category.targetAmount,
+                        targetDate = monthlyStatus.category.targetDate,
+                        targetContribution = monthlyStatus.targetContribution,
                         onUpdateEmojiClicked = onUpdateEmojiClicked,
                         onUpdateCategoryClicked = onUpdateName,
                         onUpdateBudgetTargetClicked = onUpdateBudgetTargetClicked,
                         onUpdateAssignedMoneyClicked = onUpdateAssignedMoneyClicked,
+                        onMonthlyTargetChanged = { amount ->
+                            val updatedCategory = monthlyStatus.category.copy(monthlyTargetAmount = amount)
+                            onUserClickEvent(UserClickEvent.UpdateCategory(updatedCategory))
+                        },
+                        onTargetTypeChanged = { type ->
+                            val updatedCategory = monthlyStatus.category.copy(targetType = type)
+                            onUserClickEvent(UserClickEvent.UpdateCategory(updatedCategory))
+                        },
+                        onTargetAmountChanged = { amount ->
+                            val updatedCategory = monthlyStatus.category.copy(targetAmount = amount)
+                            onUserClickEvent(UserClickEvent.UpdateCategory(updatedCategory))
+                        },
+                        onTargetDateChanged = { date ->
+                            val updatedCategory = monthlyStatus.category.copy(targetDate = date)
+                            onUserClickEvent(UserClickEvent.UpdateCategory(updatedCategory))
+                        },
                         onDeleteCategoryClicked = onDeleteCategoryClicked
                     )
                     if (monthlyStatus != lastCategoryItem)

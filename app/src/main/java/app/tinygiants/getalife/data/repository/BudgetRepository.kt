@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.data.repository
 
+import android.util.Log
 import app.tinygiants.getalife.data.local.dao.BudgetDao
 import app.tinygiants.getalife.data.local.entities.BudgetEntity
 import app.tinygiants.getalife.data.remote.FirestoreDataSource
@@ -98,6 +99,28 @@ class BudgetRepository @Inject constructor(
     }
 
     /**
+     * Update Firebase User ID for existing budgets (handles anonymous -> authenticated transition)
+     * This prevents creating duplicate budgets when Firebase user ID changes
+     */
+    suspend fun updateBudgetUserId(oldUserId: String, newUserId: String): Int {
+        if (oldUserId == newUserId) return 0
+
+        val budgetsToUpdate = budgetDao.getBudgets(oldUserId)
+        Log.d("BudgetRepository", "Updating ${budgetsToUpdate.size} budgets from $oldUserId to $newUserId")
+
+        budgetsToUpdate.forEach { budget ->
+            val updatedBudget = budget.copy(
+                firebaseUserId = newUserId,
+                lastModifiedAt = Clock.System.now(),
+                isSynced = false
+            )
+            updateBudget(updatedBudget)
+        }
+
+        return budgetsToUpdate.size
+    }
+
+    /**
      * Delete budget
      */
     suspend fun deleteBudget(budget: BudgetEntity) {
@@ -133,63 +156,118 @@ class BudgetRepository @Inject constructor(
 
     /**
      * Handle account linking - merge anonymous user data with authenticated user
+     * This method properly updates anonymous budgets to use the authenticated user ID
      */
     suspend fun linkAnonymousAccount(
         anonymousUserId: String, 
         authenticatedUserId: String,
         userName: String
     ) {
+        Log.d("BudgetRepository", "Linking anonymous account $anonymousUserId to $authenticatedUserId")
+        // Skip if same user ID
+        if (anonymousUserId == authenticatedUserId) return
+
         // Get all budgets from anonymous user
         val anonymousBudgets = budgetDao.getBudgets(anonymousUserId)
-        
-        if (anonymousBudgets.isNotEmpty()) {
-            // First, try to get existing remote budgets
-            val existingRemoteBudgets = try {
-                firestoreDataSource.getBudgets(authenticatedUserId)
-            } catch (e: Exception) {
-                emptyList()
-            }
-            
-            if (existingRemoteBudgets.isEmpty()) {
-                // No existing online budgets - link anonymous budgets to authenticated user
-                anonymousBudgets.forEach { budget ->
-                    val linkedBudget = budget.copy(
-                        firebaseUserId = authenticatedUserId,
-                        lastModifiedAt = Clock.System.now(),
-                        isSynced = false
-                    )
-                    budgetDao.updateBudget(linkedBudget)
+        Log.d("BudgetRepository", "Found ${anonymousBudgets.size} anonymous budgets")
 
-                    // Save to Firestore in background
-                    externalScope.async {
-                        try {
-                            firestoreDataSource.saveBudget(linkedBudget)
-                            budgetDao.markBudgetAsSynced(linkedBudget.id, Clock.System.now().toEpochMilliseconds())
-                        } catch (e: Exception) {
-                            // Will sync later when connection is available
-                        }
+        if (anonymousBudgets.isEmpty()) {
+            // No anonymous budgets to link - just ensure default budget exists
+            val existingBudgets = budgetDao.getBudgets(authenticatedUserId)
+            Log.d("BudgetRepository", "No anonymous budgets, found ${existingBudgets.size} existing authenticated budgets")
+            if (existingBudgets.isEmpty()) {
+                Log.d("BudgetRepository", "Creating default budget for authenticated user")
+                createBudget(userName, authenticatedUserId)
+            }
+            return
+        }
+
+        // Get existing budgets for authenticated user (from remote/other devices)
+        val existingAuthenticatedBudgets = try {
+            firestoreDataSource.getBudgets(authenticatedUserId)
+        } catch (e: Exception) {
+            Log.w("BudgetRepository", "Failed to fetch remote budgets: ${e.message}")
+            emptyList()
+        }
+
+        Log.d("BudgetRepository", "Found ${existingAuthenticatedBudgets.size} existing authenticated budgets from Firestore")
+
+        if (existingAuthenticatedBudgets.isEmpty()) {
+            // No existing authenticated budgets - simply update anonymous budgets to use new user ID
+            Log.d("BudgetRepository", "No existing authenticated budgets, updating anonymous budgets to use new user ID")
+            anonymousBudgets.forEach { anonymousBudget ->
+                Log.d(
+                    "BudgetRepository",
+                    "Updating budget ${anonymousBudget.name} (${anonymousBudget.id}) from $anonymousUserId to $authenticatedUserId"
+                )
+                val linkedBudget = anonymousBudget.copy(
+                    firebaseUserId = authenticatedUserId,
+                    lastModifiedAt = Clock.System.now(),
+                    isSynced = false // Mark for sync to Firestore
+                )
+
+                // Update in place - don't create new budget
+                budgetDao.updateBudget(linkedBudget)
+
+                // Sync to Firestore in background
+                externalScope.async {
+                    try {
+                        firestoreDataSource.saveBudget(linkedBudget)
+                        budgetDao.markBudgetAsSynced(linkedBudget.id, Clock.System.now().toEpochMilliseconds())
+                        Log.d("BudgetRepository", "Successfully synced budget ${linkedBudget.id} to Firestore")
+                    } catch (e: Exception) {
+                        Log.w("BudgetRepository", "Failed to sync budget ${linkedBudget.id}: ${e.message}")
+                        // Will retry when connection is available
                     }
                 }
-            } else {
-                // User has existing online budgets - create new budget with unique name
-                val newBudgetName = generateUniqueBudgetName(userName, existingRemoteBudgets.map { it.name })
-                val mergedBudget = anonymousBudgets.first().copy(
-                    name = newBudgetName,
+            }
+        } else {
+            // User has existing budgets from other devices
+            Log.d("BudgetRepository", "User has existing budgets, merging anonymous budgets")
+            // Add remote budgets to local database first
+            existingAuthenticatedBudgets.forEach { remoteBudget ->
+                val localBudget = budgetDao.getBudget(remoteBudget.id)
+                if (localBudget == null) {
+                    Log.d("BudgetRepository", "Adding remote budget ${remoteBudget.name} to local database")
+                    budgetDao.addBudget(remoteBudget)
+                }
+            }
+
+            // Then handle anonymous budgets - either merge or create with unique name
+            anonymousBudgets.forEach { anonymousBudget ->
+                val existingNames = existingAuthenticatedBudgets.map { it.name }
+                val uniqueName = generateUniqueBudgetName(anonymousBudget.name, existingNames)
+                Log.d("BudgetRepository", "Merging anonymous budget ${anonymousBudget.name} with unique name $uniqueName")
+
+                val linkedBudget = anonymousBudget.copy(
+                    name = uniqueName,
                     firebaseUserId = authenticatedUserId,
                     lastModifiedAt = Clock.System.now(),
                     isSynced = false
                 )
-                budgetDao.updateBudget(mergedBudget)
 
-                // Also add existing remote budgets to local database
-                existingRemoteBudgets.forEach { remoteBudget ->
-                    budgetDao.addBudget(remoteBudget)
+                budgetDao.updateBudget(linkedBudget)
+
+                // Sync to Firestore
+                externalScope.async {
+                    try {
+                        firestoreDataSource.saveBudget(linkedBudget)
+                        budgetDao.markBudgetAsSynced(linkedBudget.id, Clock.System.now().toEpochMilliseconds())
+                        Log.d("BudgetRepository", "Successfully synced merged budget ${linkedBudget.id} to Firestore")
+                    } catch (e: Exception) {
+                        Log.w("BudgetRepository", "Failed to sync merged budget ${linkedBudget.id}: ${e.message}")
+                        // Will retry later
+                    }
                 }
             }
         }
 
-        // Trigger a full sync
+        // Clean up: Remove old anonymous budgets from database (they now have new user ID)
+        // Note: We don't delete them, we just updated their firebaseUserId
+
+        // Final sync to ensure consistency
         syncWithFirestore(authenticatedUserId)
+        Log.d("BudgetRepository", "Finished linking anonymous account")
     }
 
     /**

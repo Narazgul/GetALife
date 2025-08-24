@@ -19,6 +19,9 @@ import app.tinygiants.getalife.data.local.entities.CategoryMonthlyStatusEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
+import app.tinygiants.getalife.domain.model.RepeatFrequency
+import app.tinygiants.getalife.domain.model.TargetType
+import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 @Database(
@@ -33,15 +36,15 @@ import kotlin.time.Instant
     version = 1,
     exportSchema = false
 )
-@TypeConverters(Converters::class)
+@TypeConverters(GetALifeDatabase.Converters::class)
 abstract class GetALifeDatabase : RoomDatabase() {
 
-    abstract fun groupDao(): GroupDao
-    abstract fun categoryDao(): CategoryDao
-    abstract fun accountsDao(): AccountDao
-    abstract fun transactionDao(): TransactionDao
-    abstract fun categoryMonthlyStatusDao(): CategoryMonthlyStatusDao
-    abstract fun budgetDao(): BudgetDao
+    abstract val accountDao: AccountDao
+    abstract val categoryDao: CategoryDao
+    abstract val transactionDao: TransactionDao
+    abstract val groupDao: GroupDao
+    abstract val categoryMonthlyStatusDao: CategoryMonthlyStatusDao
+    abstract val budgetDao: BudgetDao
 
     companion object {
         @Volatile
@@ -49,61 +52,87 @@ abstract class GetALifeDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): GetALifeDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    GetALifeDatabase::class.java,
-                    "budget_database"
-                )
+                val instance = Room
+                    .databaseBuilder(
+                        context.applicationContext,
+                        GetALifeDatabase::class.java,
+                        "budget_database"
+                    )
+                    .fallbackToDestructiveMigration(dropAllTables = false)
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
     }
-}
 
-// region TypConverters
+    // region Type Converters
 
-private const val UNKNOWN = 0
-private const val CASH = 10
-private const val CHECKING = 11
-private const val SAVINGS = 12
-private const val CREDIT_CARD = 13
-private const val DEPOT = 14
-private const val LOAN = 15
-private const val MORTGAGE = 16
+    class Converters {
 
-class Converters {
+        @TypeConverter
+        fun fromAccountType(value: AccountType) = when (value) {
+            AccountType.Unknown -> 0
+            AccountType.Cash -> 10
+            AccountType.Checking -> 11
+            AccountType.Savings -> 12
+            AccountType.CreditCard -> 13
+            AccountType.Depot -> 14
+            AccountType.Loan -> 15
+            AccountType.Mortgage -> 16
+        }
 
-    @TypeConverter
-    fun fromAccountType(value: AccountType) = when (value) {
-        AccountType.Unknown -> UNKNOWN
-        AccountType.Cash -> CASH
-        AccountType.Checking -> CHECKING
-        AccountType.Savings -> SAVINGS
-        AccountType.CreditCard -> CREDIT_CARD
-        AccountType.Depot -> DEPOT
-        AccountType.Loan -> LOAN
-        AccountType.Mortgage -> MORTGAGE
+        @TypeConverter
+        fun toAccountType(value: Int) = when (value) {
+            10 -> AccountType.Cash
+            11 -> AccountType.Checking
+            12 -> AccountType.Savings
+            13 -> AccountType.CreditCard
+            14 -> AccountType.Depot
+            15 -> AccountType.Loan
+            16 -> AccountType.Mortgage
+            else -> AccountType.Unknown
+        }
+
+        @TypeConverter
+        fun fromInstant(value: Instant): Long = value.toEpochMilliseconds()
+
+        @TypeConverter
+        fun toInstant(value: Long): Instant = Instant.fromEpochMilliseconds(value)
+
+        // TargetType Converters
+        @TypeConverter
+        fun fromTargetType(value: TargetType) = when (value) {
+            TargetType.NONE -> 0
+            TargetType.NEEDED_FOR_SPENDING -> 1
+            TargetType.SAVINGS_BALANCE -> 2
+        }
+
+        @TypeConverter
+        fun toTargetType(value: Int) = when (value) {
+            1 -> TargetType.NEEDED_FOR_SPENDING
+            2 -> TargetType.SAVINGS_BALANCE
+            else -> TargetType.NONE
+        }
+
+        // RepeatFrequency Converters
+        @TypeConverter
+        fun fromRepeatFrequency(value: RepeatFrequency) = when (value) {
+            RepeatFrequency.NEVER -> 0
+            RepeatFrequency.YEARLY -> 1
+        }
+
+        @TypeConverter
+        fun toRepeatFrequency(value: Int) = when (value) {
+            1 -> RepeatFrequency.YEARLY
+            else -> RepeatFrequency.NEVER
+        }
+
+        // LocalDate converters (ISO string)
+        @TypeConverter
+        fun fromLocalDate(value: LocalDate?): String? = value?.toString()
+
+        @TypeConverter
+        fun toLocalDate(value: String?): LocalDate? = value?.let { LocalDate.parse(it) }
     }
-
-    @TypeConverter
-    fun toAccountType(value: Int) = when (value) {
-        CASH -> AccountType.Cash
-        CHECKING -> AccountType.Checking
-        SAVINGS -> AccountType.Savings
-        CREDIT_CARD -> AccountType.CreditCard
-        DEPOT -> AccountType.Depot
-        LOAN -> AccountType.Loan
-        MORTGAGE -> AccountType.Mortgage
-        else -> AccountType.Unknown
-    }
-
-    @TypeConverter
-    fun fromInstant(value: Instant): Long = value.toEpochMilliseconds()
-
-    @TypeConverter
-    fun toInstant(value: Long): Instant = Instant.fromEpochMilliseconds(value)
-
-    // endregion
 }

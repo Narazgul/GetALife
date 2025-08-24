@@ -24,12 +24,12 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.time.Clock
-import kotlinx.datetime.toInstant
 
 class AddTransactionUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
@@ -137,7 +137,8 @@ class AddTransactionUseCase @Inject constructor(
             spentAmount = Money(0.0),
             availableAmount = Money(0.0),
             progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
-            suggestedAmount = null
+            suggestedAmount = null,
+            targetContribution = null // No target contribution for credit card payment categories
         )
         categoryMonthlyStatusRepository.saveStatus(initialStatus, yearMonth)
 

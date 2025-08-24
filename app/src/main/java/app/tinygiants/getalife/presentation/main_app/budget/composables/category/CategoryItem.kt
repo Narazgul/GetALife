@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -50,6 +53,7 @@ import app.tinygiants.getalife.domain.model.EmptyProgress
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Progress
 import app.tinygiants.getalife.domain.model.ProgressColor
+import app.tinygiants.getalife.domain.model.TargetType
 import app.tinygiants.getalife.domain.model.UserHint
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
@@ -58,6 +62,10 @@ import app.tinygiants.getalife.theme.spacing
 import app.tinygiants.getalife.theme.success
 import app.tinygiants.getalife.theme.warning
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaLocalDate
+import java.time.temporal.ChronoUnit
+import java.time.LocalDate as JavaLocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -68,10 +76,19 @@ fun Category(
     assignedMoney: Money = Money(value = 0.0),
     availableMoney: Money = Money(value = 0.0),
     progress: Progress = EmptyProgress(),
+    monthlyTarget: Money? = null,
+    targetType: TargetType = TargetType.NONE,
+    targetAmount: Money? = null,
+    targetDate: LocalDate? = null,
+    targetContribution: Money? = null,
     onUpdateEmojiClicked: (String) -> Unit = { },
     onUpdateCategoryClicked: (String) -> Unit = { },
     onUpdateBudgetTargetClicked: (Money) -> Unit = { },
     onUpdateAssignedMoneyClicked: (Money) -> Unit = { },
+    onMonthlyTargetChanged: (Money?) -> Unit = { },
+    onTargetTypeChanged: (TargetType) -> Unit = { },
+    onTargetAmountChanged: (Money?) -> Unit = { },
+    onTargetDateChanged: (LocalDate?) -> Unit = { },
     onDeleteCategoryClicked: () -> Unit = { }
 ) {
     var showAssignMoneyBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -111,13 +128,139 @@ fun Category(
         CategoryProgress(progress = progress)
         Spacer(modifier = Modifier.height(spacing.m))
         OptionalText(userHint = progress.userHint)
+
+        // Display target information based on UseCase calculations
+        when (targetType) {
+            TargetType.NEEDED_FOR_SPENDING -> {
+                if (targetAmount != null) {
+                    Spacer(modifier = Modifier.height(spacing.xs))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.size(spacing.xs))
+                        Text(
+                            text = LocalContext.current.getString(R.string.target_monthly_spending, targetAmount.formattedMoney),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            TargetType.SAVINGS_BALANCE -> {
+                if (targetAmount != null) {
+                    Spacer(modifier = Modifier.height(spacing.xs))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = null,
+                            tint = when {
+                                targetContribution == null || targetContribution.asDouble() == 0.0 -> MaterialTheme.colorScheme.primary
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                        Spacer(modifier = Modifier.size(spacing.xs))
+
+                        val displayText = when {
+                            targetDate == null -> "💡 Sparziel: ${targetAmount.formattedMoney} - Setzen Sie ein Zieldatum für monatliche Berechnung"
+                            targetContribution == null || targetContribution.asDouble() == 0.0 -> "✅ Sparziel bereits erreicht! 🎉"
+                            else -> {
+                                // Calculate days and months until target for adaptive display
+                                val today = JavaLocalDate.now()
+                                val targetJavaDate = targetDate.toJavaLocalDate()
+                                val daysUntil = ChronoUnit.DAYS.between(today, targetJavaDate)
+
+                                val currentMonth = today.monthValue
+                                val currentYear = today.year
+                                val targetMonth = targetJavaDate.monthValue
+                                val targetYear = targetJavaDate.year
+
+                                // Calculate total months (same logic as UseCase)
+                                val totalMonths = if (targetYear == currentYear) {
+                                    (targetMonth - currentMonth + 1).coerceAtLeast(1)
+                                } else {
+                                    val monthsInCurrentYear = 12 - currentMonth + 1
+                                    val fullYears = (targetYear - currentYear - 1) * 12
+                                    val monthsInTargetYear = targetMonth
+                                    monthsInCurrentYear + fullYears + monthsInTargetYear
+                                }
+
+                                // targetContribution now represents what's needed for THIS month specifically
+                                // Adaptive display strategy based on time remaining
+                                when {
+                                    // 🔴 VERY URGENT (1-7 days)
+                                    daysUntil <= 7 -> {
+                                        when (daysUntil.toInt()) {
+                                            0 -> "🚨 HEUTE FÄLLIG! Noch benötigt: ${targetContribution.formattedMoney}"
+                                            1 -> "⏰ MORGEN FÄLLIG! Noch benötigt: ${targetContribution.formattedMoney}"
+                                            else -> "🚨 DRINGEND! Nur noch ${daysUntil} Tage - ${targetContribution.formattedMoney} benötigt!"
+                                        }
+                                    }
+
+                                    // 🟠 SHORT TERM (8-30 days)
+                                    daysUntil <= 30 -> {
+                                        if (targetContribution.asDouble() > 0) {
+                                            "⚡ Noch ${daysUntil} Tage! Diesen Monat noch: ${targetContribution.formattedMoney}"
+                                        } else {
+                                            "✅ Monatsziel erreicht! Weiter so für die nächsten Monate"
+                                        }
+                                    }
+
+                                    // 🟡 MEDIUM TERM (31-90 days)
+                                    daysUntil <= 90 -> {
+                                        if (targetContribution.asDouble() > 0) {
+                                            "📅 Diesen Monat noch: ${targetContribution.formattedMoney} (${daysUntil} Tage bis Ziel)"
+                                        } else {
+                                            "✅ Monatsziel erreicht! (${daysUntil} Tage bis Ziel)"
+                                        }
+                                    }
+
+                                    // 🔵 LONG TERM (> 90 days)
+                                    else -> {
+                                        if (targetContribution.asDouble() > 0) {
+                                            "💡 Diesen Monat noch: ${targetContribution.formattedMoney} von ${totalMonths} Monaten"
+                                        } else {
+                                            "✅ Monatsziel erreicht! Gleichmäßig auf ${totalMonths} Monate verteilt"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Text(
+                            text = displayText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = when {
+                                targetContribution == null || targetContribution.asDouble() == 0.0 -> MaterialTheme.colorScheme.primary
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
+                }
+            }
+
+            TargetType.NONE -> {
+                // No target information to display
+            }
+        }
     }
 
     if (showGeneralEditBottomSheet) EditCategoryBottomSheet(
         categoryName = categoryName,
         budgetTarget = budgetTarget,
+        monthlyTarget = monthlyTarget,
+        targetType = targetType,
+        targetAmount = targetAmount,
+        targetDate = targetDate,
         onUpdateCategoryName = onUpdateCategoryClicked,
         onBudgetTargetChanged = { money -> onUpdateBudgetTargetClicked(money) },
+        onMonthlyTargetChanged = onMonthlyTargetChanged,
+        onTargetTypeChanged = onTargetTypeChanged,
+        onTargetAmountChanged = onTargetAmountChanged,
+        onTargetDateChanged = onTargetDateChanged,
         onDeleteCategoryClicked = onDeleteCategoryClicked,
         onDismissRequest = { showGeneralEditBottomSheet = false },
     )
@@ -393,7 +536,7 @@ fun getComposableColor(progressColor: ProgressColor): Color = when (progressColo
 
 @PreviewLightDark
 @Composable
-fun SetTargetAssignedBeyondTargetOverspentBeyondTargetPreview() {
+fun SecondPreview() {
     GetALifeTheme {
         Surface {
             Category(
@@ -430,11 +573,12 @@ fun SetTargetAllAssignedOverspentBeyondTargetPreview() {
                 availableMoney = Money(-20.00),
                 progress = Progress(
                     bar1 = (100.0 / 120.0).toFloat(),
+                    bar1Lite = (100.0 / 120.0).toFloat(),
+                    bar1Color = ProgressColor.GreenLite,
                     bar2 = (100.0 / 120.0).toFloat(),
                     bar2Lite = (100.0 / 120.0).toFloat(),
-                    bar1Color = ProgressColor.GreenLite,
-                    bar2Color = ProgressColor.Red,
                     showColorOnSecondBar = true,
+                    bar2Color = ProgressColor.PrimaryLite,
                     userHint = UserHint.AssignMoreOrRemoveSpending(amount = "20,-€")
                 )
             )
@@ -570,26 +714,23 @@ fun SetTargetOverBudgetAssignedLittleSpentOverBudgetPreview() {
 
 @PreviewLightDark
 @Composable
-fun SecondPreview() {
+fun SetTargetOverBudgetAssignedNothingSpentPreview() {
     GetALifeTheme {
         Surface {
             Category(
                 emoji = "🏠",
                 categoryName = "Rent",
-                budgetTarget = Money(200.00),
-                assignedMoney = Money(460.00),
-                availableMoney = Money(10.00),
+                budgetTarget = Money(100.00),
+                assignedMoney = Money(120.00),
+                availableMoney = Money(120.00),
                 progress = Progress(
-                    bar1 = (200.0 / 460.0).toFloat(),
-                    bar1Lite = (200.0 / 460.0).toFloat(),
+                    bar1 = (100.00 / 120.00).toFloat(),
+                    bar2 = (100.00 / 120.00).toFloat(),
+                    bar2Lite = (100.00 / 120.00).toFloat(),
                     bar1Color = ProgressColor.Green,
-                    bar1LiteColor = ProgressColor.GreenLite,
-                    bar2 = (200.0 / 460.0).toFloat(),
-                    bar2Lite = (450.0 / 460.0).toFloat(),
+                    bar2Color = ProgressColor.Primary,
                     showColorOnSecondBar = true,
-                    bar2Color = ProgressColor.PrimaryLite,
-                    bar2LiteColor = ProgressColor.Primary,
-                    userHint = UserHint.NoHint
+                    userHint = UserHint.ExtraMoney(amount = "20,-€")
                 )
             )
         }
@@ -738,7 +879,7 @@ fun SetTargetSomethingAssignedLittleSpentPreview() {
 
 @PreviewLightDark
 @Composable
-fun SetTargetOverBudgetAssignedNothingSpentPreview() {
+fun OverBudgetAssignedNothingSpentPreview() {
     GetALifeTheme {
         Surface {
             Category(

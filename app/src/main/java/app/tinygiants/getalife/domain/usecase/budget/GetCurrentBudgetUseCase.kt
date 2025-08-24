@@ -34,9 +34,11 @@ class GetCurrentBudgetUseCase @Inject constructor(
     }
 
     /**
-     * Get the current budget ID or create a default budget if none exists.
-     * This method automatically handles the case when no budget is selected by creating
-     * a default budget for new users, preventing the "No budget selected" error.
+     * Get the current budget ID or perform emergency initialization if none exists.
+     * This method tries to avoid automatic budget creation but provides a fallback
+     * for backward compatibility and crash prevention.
+     *
+     * IMPORTANT: Budget should be initialized centrally in Authentication.kt
      */
     suspend fun requireCurrentBudgetId(): String {
         val currentBudgetId = getCurrentBudgetId()
@@ -44,7 +46,14 @@ class GetCurrentBudgetUseCase @Inject constructor(
             return currentBudgetId
         }
 
-        // Auto-initialize default budget for new users or when no budget is selected
+        // Log warning - budget should have been initialized centrally
+        android.util.Log.w(
+            "GetCurrentBudgetUseCase",
+            "ARCHITECTURE WARNING: Budget not initialized centrally! " +
+                    "This indicates a timing issue. Budget initialization should happen in Authentication.kt"
+        )
+
+        // Emergency fallback to prevent crashes (but this is not the intended flow)
         val defaultBudget = budgetSelectionUseCase.initializeDefaultBudget()
         return defaultBudget.id
     }

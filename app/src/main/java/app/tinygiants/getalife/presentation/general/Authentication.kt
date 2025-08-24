@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
 import app.tinygiants.getalife.domain.usecase.user.LinkAnonymousUserUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -35,7 +36,8 @@ class AuthViewModel @Inject constructor(
     private val purchases: Purchases,
     private val superwall: Superwall,
     private val crashlytics: FirebaseCrashlytics,
-    private val linkAnonymousUserUseCase: LinkAnonymousUserUseCase
+    private val linkAnonymousUserUseCase: LinkAnonymousUserUseCase,
+    private val budgetSelectionUseCase: BudgetSelectionUseCase
 ) : ViewModel() {
 
     private var previousUserId: String? = null
@@ -109,11 +111,22 @@ class AuthViewModel @Inject constructor(
             crashlytics.recordException(e)
         }
 
+        // Initialize budget system for this user (CENTRALIZED BUDGET MANAGEMENT)
+        viewModelScope.launch {
+            try {
+                // This ensures we have a budget available for all subsequent operations
+                budgetSelectionUseCase.initializeDefaultBudget()
+            } catch (e: Exception) {
+                crashlytics.recordException(e)
+            }
+        }
+
         // If user was previously anonymous and now has a full account, link the data
-        if (wasAnonymous) {
+        if (wasAnonymous && previousUserId != null) {
             viewModelScope.launch {
                 try {
-                    linkAnonymousUserUseCase(userId)
+                    // Pass the previous anonymous user ID since current user is no longer anonymous
+                    linkAnonymousUserUseCase(previousUserId!!, userId)
                 } catch (e: Exception) {
                     crashlytics.recordException(e)
                 }

@@ -94,4 +94,33 @@
     <string name="recurrence_frequency_label">ความถี่</string>
     <string name="next_execution">การดำเนินการครั้งถัดไป</string>
     <string name="automatically_created">สร้างโดยอัตโนมัติ</string>
+    <string name="change_monthly_target">เป้าหมายรายเดือน</string>
+    <string name="target_type">ประเภทเป้าหมาย: %1$s</string>
+    <string name="target_amount">จำนวนเป้าหมาย</string>
+    <string name="target_end_date_hint">วันที่เป้าหมาย (yyyy-MM-dd)</string>
+    <string name="savings_monthly_needed">ต้องการต่อเดือน: %1$s</string>
+    <string name="target_type_none">ไม่มีเป้าหมาย</string>
+    <string name="target_type_monthly">เป้าหมายรายเดือน</string>
+    <string name="target_type_savings">สะสมเงินออม</string>
+    <string name="invalid_amount">กรุณาใส่จำนวนเงินที่ถูกต้องและไม่เป็นค่าลบ</string>
+    <string name="invalid_date">กรุณาใส่วันที่ที่ถูกต้อง (yyyy-MM-dd)</string>
+    <!-- Enhanced validation messages -->
+    <string name="validation_invalid_format">รูปแบบไม่ถูกต้อง ใช้จุดทศนิยมเพียงจุดเดียว (เช่น 123.45)</string>
+    <string name="validation_only_numbers">อนุญาตเฉพาะตัวเลขและจุดทศนิยมเท่านั้น (เช่น 123.45)</string>
+    <string name="validation_invalid_amount">จำนวนเงินไม่ถูกต้อง ใช้รูปแบบ: 123.45</string>
+    <string name="validation_negative_amount">จำนวนเงินไม่สามารถเป็นค่าลบได้</string>
+    <string name="validation_amount_too_large">จำนวนเงินใหญ่เกินไป (สูงสุด: 999,999,999.99฿)</string>
+    <string name="validation_enter_valid_amount">กรุณาใส่จำนวนเงินที่ถูกต้อง</string>
+    <!-- Target type descriptions -->
+    <string name="target_monthly_spending">เป้าหมายค่าใช้จ่ายรายเดือน: %1$s</string>
+    <!-- Adaptive savings display -->
+    <string name="savings_urgent_today">🚨 ครบกำหนดวันนี้! ยังต้องการ: %1$s</string>
+    <string name="savings_urgent_tomorrow">⏰ ครบกำหนดพรุ่งนี้! ยังต้องการ: %1$s</string>
+    <string name="savings_very_urgent">🚨 เร่งด่วน! เหลืออีก %1$d วัน - ต้องการ %2$s!</string>
+    <string name="savings_short_term">⚡ เหลืออีก %1$d วัน! เดือนนี้ต้องการ: %2$s</string>
+    <string name="savings_medium_term">📅 รายเดือน: %1$s - เป้าหมายใน %2$d %3$s (%4$d วัน)</string>
+    <string name="savings_long_term_this_month">💡 สำหรับเดือนนี้: วางแผน %1$s</string>
+    <string name="savings_long_term">📈 ออมรายเดือน: %1$s (ตลอด %2$d เดือน)</string>
+    <string name="month_singular">เดือน</string>
+    <string name="month_plural">เดือน</string>
 </resources>

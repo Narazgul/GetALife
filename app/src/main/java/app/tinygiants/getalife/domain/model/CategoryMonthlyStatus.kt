@@ -11,5 +11,6 @@ data class CategoryMonthlyStatus(
     val spentAmount: Money,
     val availableAmount: Money,
     val progress: Progress,
-    val suggestedAmount: Money?
+    val suggestedAmount: Money?,
+    val targetContribution: Money? // Monthly contribution needed for target (calculated by UseCase)
 )

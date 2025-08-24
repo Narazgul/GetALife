@@ -62,7 +62,8 @@ class CalculateCategoryProgressUseCaseTest {
             spentAmount = Money(spentAmount),
             availableAmount = Money(availableAmount),
             progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
-            suggestedAmount = null
+            suggestedAmount = null,
+            targetContribution = null
         )
     }
 
@@ -78,7 +79,8 @@ class CalculateCategoryProgressUseCaseTest {
             spentAmount = EmptyMoney(),
             availableAmount = EmptyMoney(),
             progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
-            suggestedAmount = null
+            suggestedAmount = null,
+            targetContribution = null
         )
 
         val progress = calculateCategoryProgress(categoryMonthlyStatus)
@@ -134,7 +136,8 @@ class CalculateCategoryProgressUseCaseTest {
             spentAmount = Money(20.0),
             availableAmount = Money(-20.0),
             progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
-            suggestedAmount = null
+            suggestedAmount = null,
+            targetContribution = null
         )
 
         val progress = calculateCategoryProgress(categoryMonthlyStatus)

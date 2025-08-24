@@ -13,7 +13,8 @@ import kotlin.time.Clock
 class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
     private val statusRepository: CategoryMonthlyStatusRepository,
     private val categoryRepository: CategoryRepository,
-    private val recalculateCategoryMonthlyStatusUseCase: RecalculateCategoryMonthlyStatusUseCase
+    private val recalculateCategoryMonthlyStatusUseCase: RecalculateCategoryMonthlyStatusUseCase,
+    private val calculateTargetContribution: CalculateTargetContributionUseCase
 ) {
     suspend operator fun invoke(
         categoryId: Long,
@@ -25,8 +26,12 @@ class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
 
         val status = if (existingStatus != null) {
             existingStatus.copy(
-                assignedAmount = newAssignedAmount
+                assignedAmount = newAssignedAmount,
                 // availableAmount and spentAmount will be calculated reactively by GetBudgetForMonthUseCase
+                targetContribution = calculateTargetContribution.calculateCurrentMonthNeed(
+                    existingStatus.category,
+                    existingStatus.availableAmount
+                )
             )
         } else {
             // Create new status - we need to get the category
@@ -40,7 +45,8 @@ class UpdateCategoryMonthlyStatusUseCase @Inject constructor(
                 spentAmount = EmptyMoney(), // Will be calculated reactively
                 availableAmount = EmptyMoney(), // Will be calculated reactively
                 progress = EmptyProgress(), // Will be calculated reactively
-                suggestedAmount = null
+                suggestedAmount = null,
+                targetContribution = calculateTargetContribution.calculateCurrentMonthNeed(category, EmptyMoney())
             )
         }
 

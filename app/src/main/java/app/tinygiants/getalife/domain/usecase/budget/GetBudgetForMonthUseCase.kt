@@ -24,7 +24,8 @@ class GetBudgetForMonthUseCase @Inject constructor(
     private val groupRepository: GroupRepository,
     private val accountRepository: AccountRepository,
     private val getCategories: GetCategoriesUseCase,
-    private val calculateCategoryProgress: CalculateCategoryProgressUseCase
+    private val calculateCategoryProgress: CalculateCategoryProgressUseCase,
+    private val calculateTargetContribution: CalculateTargetContributionUseCase
 ) {
     operator fun invoke(yearMonth: YearMonth): Flow<Result<BudgetMonth>> {
         return combine(
@@ -59,7 +60,8 @@ class GetBudgetForMonthUseCase @Inject constructor(
                 spentAmount = EmptyMoney(),
                 availableAmount = EmptyMoney(),
                 progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
-                suggestedAmount = null
+                suggestedAmount = null,
+                targetContribution = calculateTargetContribution(category)
             )
         }
 
@@ -73,7 +75,12 @@ class GetBudgetForMonthUseCase @Inject constructor(
             statusesOfGroup.map { status ->
                 // Use pre-calculated values from database for optimal performance
                 val progress = calculateCategoryProgress(status)
-                status.copy(progress = progress)
+                val targetContribution =
+                    calculateTargetContribution.calculateCurrentMonthNeed(status.category, status.availableAmount)
+                status.copy(
+                    progress = progress,
+                    targetContribution = targetContribution
+                )
             }
         }
 

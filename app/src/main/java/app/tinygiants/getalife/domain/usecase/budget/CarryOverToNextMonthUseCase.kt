@@ -31,7 +31,8 @@ class CarryOverToNextMonthUseCase @Inject constructor(
                     spentAmount = status.spentAmount,
                     availableAmount = status.assignedAmount,
                     progress = status.progress,
-                    suggestedAmount = status.suggestedAmount
+                    suggestedAmount = status.suggestedAmount,
+                    targetContribution = status.targetContribution // Carry over existing target contribution
                 )
                 statusRepository.saveStatus(newStatus, toMonth)
             }

@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 fun AddTransaction() {
     val viewModel: AddTransactionViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val partnerSuggestions by viewModel.partners.collectAsStateWithLifecycle()
 
     val onAddTransactionClicked =
         { amount: Money,
@@ -70,6 +71,7 @@ fun AddTransaction() {
     AddTransactionContent(
         categories = uiState.categories,
         accounts = uiState.accounts,
+        partnerSuggestions = partnerSuggestions,
         onAddTransactionClicked = onAddTransactionClicked
     )
 }
@@ -78,6 +80,7 @@ fun AddTransaction() {
 fun AddTransactionContent(
     categories: List<Category>,
     accounts: List<Account>,
+    partnerSuggestions: List<String>,
     onAddTransactionClicked: (amount: Money, account: Account, category: Category?, direction: TransactionDirection, description: Description, transactionPartner: TransactionPartner, dateOfTransaction: kotlin.time.Instant, recurrenceFrequency: RecurrenceFrequency?) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -110,6 +113,7 @@ fun AddTransactionContent(
             AddTransactionItem(
                 categories = categories,
                 accounts = accounts,
+                partnerSuggestions = partnerSuggestions,
                 onTransactionDirectionClicked = { transactionDirection ->
                     waveColor = when (transactionDirection) {
                         TransactionDirection.Inflow -> inflowBackground
@@ -146,6 +150,7 @@ private fun AddTransactionPreview() {
             AddTransactionContent(
                 categories = emptyList(),
                 accounts = emptyList(),
+                partnerSuggestions = emptyList(),
                 onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> }
             )
         }

@@ -1,7 +1,6 @@
 package app.tinygiants.getalife.presentation.main_app.account.composables
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -67,8 +66,8 @@ fun AccountsList(
     }
 
     // Track if user has actually scrolled - FABs visible until first scroll up
-    val hasUserScrolled = listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
-    val isCurrentlyScrollingDown = listState.isScrollingDown()
+    listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
+    listState.isScrollingDown()
 
     // Custom behavior: FABs visible by default, hide when scrolling UP, show when scrolling DOWN
     onUserScrolling(listState.isScrollingDown())

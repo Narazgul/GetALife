@@ -8,6 +8,7 @@ import app.tinygiants.getalife.domain.model.BudgetMonth
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.usecase.budget.AssignableMoneyException
 import app.tinygiants.getalife.domain.usecase.budget.CarryOverToNextMonthUseCase
+import app.tinygiants.getalife.domain.usecase.budget.CalculateTargetContributionUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetBudgetForMonthUseCase
 import app.tinygiants.getalife.domain.usecase.budget.UpdateCategoryMonthlyStatusUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.AddCategoryUseCase
@@ -59,6 +60,7 @@ class BudgetViewModel @Inject constructor(
     private val updateCategory: UpdateCategoryUseCase,
     private val deleteCategory: DeleteCategoryUseCase,
     private val getAccounts: app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase,
+    private val calculateTargetContribution: app.tinygiants.getalife.domain.usecase.budget.CalculateTargetContributionUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

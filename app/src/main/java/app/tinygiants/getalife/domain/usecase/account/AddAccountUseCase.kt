@@ -139,12 +139,13 @@ class AddAccountUseCase @Inject constructor(
 
         val initialStatus = app.tinygiants.getalife.domain.model.CategoryMonthlyStatus(
             category = category,
-            assignedAmount = Money(0.0),
+            assignedAmount = EmptyMoney(), // User needs to assign manually
             isCarryOverEnabled = true,
-            spentAmount = Money(0.0),
-            availableAmount = Money(0.0),
-            progress = app.tinygiants.getalife.domain.model.EmptyProgress(),
-            suggestedAmount = null
+            spentAmount = EmptyMoney(),
+            availableAmount = EmptyMoney(), // Will be calculated
+            progress = app.tinygiants.getalife.domain.model.EmptyProgress(), // Will be calculated
+            suggestedAmount = category.targetAmount, // Suggest the target amount for convenience
+            targetContribution = category.targetAmount // For credit card payments, contribution equals target
         )
         categoryMonthlyStatusRepository.saveStatus(initialStatus, yearMonth)
 

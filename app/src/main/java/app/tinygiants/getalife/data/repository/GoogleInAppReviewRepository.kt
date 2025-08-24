@@ -10,7 +10,8 @@ import javax.inject.Singleton
 @Singleton
 class GoogleInAppReviewRepository @Inject constructor() : InAppReviewRepository {
 
-    private val _inAppReviewRequests = MutableSharedFlow<Unit>()
+    // Use replay and extra buffer to avoid missing a one-shot trigger
+    private val _inAppReviewRequests = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
 
     override fun observeInAppReviewRequests(): SharedFlow<Unit> = _inAppReviewRequests.asSharedFlow()
     override suspend fun showInAppReview() = _inAppReviewRequests.emit(Unit)

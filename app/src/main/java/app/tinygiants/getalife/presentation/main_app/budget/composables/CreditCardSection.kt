@@ -55,7 +55,6 @@ import app.tinygiants.getalife.presentation.main_app.budget.UserClickEvent
 import app.tinygiants.getalife.presentation.main_app.budget.composables.category.AssignableMoneyBottomSheet
 import app.tinygiants.getalife.presentation.main_app.budget.composables.category.EditCategoryBottomSheet
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.theme.onWarning
 import app.tinygiants.getalife.theme.spacing
 import kotlin.time.Clock
 
@@ -457,11 +456,43 @@ private fun CreditCardItem(
         EditCategoryBottomSheet(
             categoryName = monthlyStatus.category.name,
             budgetTarget = monthlyStatus.category.budgetTarget,
+            monthlyTarget = monthlyStatus.category.monthlyTargetAmount,
+            targetType = monthlyStatus.category.targetType,
+            targetAmount = monthlyStatus.category.targetAmount,
+            targetDate = monthlyStatus.category.targetDate,
             onUpdateCategoryName = { name ->
                 onUserClickEvent(UserClickEvent.UpdateCategory(category = monthlyStatus.category.copy(name = name)))
             },
             onBudgetTargetChanged = { target ->
                 onUserClickEvent(UserClickEvent.UpdateCategory(category = monthlyStatus.category.copy(budgetTarget = target)))
+            },
+            onMonthlyTargetChanged = { amount ->
+                onUserClickEvent(
+                    UserClickEvent.UpdateCategory(
+                        category = monthlyStatus.category.copy(monthlyTargetAmount = amount)
+                    )
+                )
+            },
+            onTargetTypeChanged = { type ->
+                onUserClickEvent(
+                    UserClickEvent.UpdateCategory(
+                        category = monthlyStatus.category.copy(targetType = type)
+                    )
+                )
+            },
+            onTargetAmountChanged = { amount ->
+                onUserClickEvent(
+                    UserClickEvent.UpdateCategory(
+                        category = monthlyStatus.category.copy(targetAmount = amount)
+                    )
+                )
+            },
+            onTargetDateChanged = { date ->
+                onUserClickEvent(
+                    UserClickEvent.UpdateCategory(
+                        category = monthlyStatus.category.copy(targetDate = date)
+                    )
+                )
             },
             onDeleteCategoryClicked = {
                 onUserClickEvent(UserClickEvent.DeleteCategory(category = monthlyStatus.category))
@@ -513,7 +544,8 @@ private fun CreditCardSectionPreview() {
                         spentAmount = Money(150.0),
                         availableAmount = Money(50.0),
                         progress = EmptyProgress(),
-                        suggestedAmount = null
+                        suggestedAmount = null,
+                        targetContribution = null // Credit card payments don't have target contributions
                     ),
                     CategoryMonthlyStatus(
                         category = Category(
@@ -535,7 +567,8 @@ private fun CreditCardSectionPreview() {
                         spentAmount = Money(75.0),
                         availableAmount = Money(-25.0),
                         progress = EmptyProgress(),
-                        suggestedAmount = null
+                        suggestedAmount = null,
+                        targetContribution = null // Credit card payments don't have target contributions
                     ),
                     CategoryMonthlyStatus(
                         category = Category(
@@ -557,7 +590,8 @@ private fun CreditCardSectionPreview() {
                         spentAmount = Money(250.0),
                         availableAmount = Money(150.0),
                         progress = EmptyProgress(),
-                        suggestedAmount = null
+                        suggestedAmount = null,
+                        targetContribution = null // Credit card payments don't have target contributions
                     )
                 ),
                 creditCardAccountBalances = mapOf(

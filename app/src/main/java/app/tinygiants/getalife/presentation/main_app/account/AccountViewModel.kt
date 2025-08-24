@@ -60,12 +60,13 @@ class AccountViewModel @Inject constructor(
 
     private fun initializeBudgetAndLoadData() {
         viewModelScope.launch {
-            // Initialize default budget if needed
-            try {
-                budgetSelectionUseCase.initializeDefaultBudget()
-            } catch (e: Exception) {
-                Firebase.crashlytics.recordException(e)
-            }
+            // Don't automatically initialize budget here - this causes duplicate budgets
+            // Budget initialization is handled by Authentication.kt and BudgetViewModel
+            // try {
+            //     budgetSelectionUseCase.initializeDefaultBudget()
+            // } catch (e: Exception) {
+            //     Firebase.crashlytics.recordException(e)
+            // }
 
             // Observe budget changes and reload data accordingly
             launch {
@@ -84,6 +85,9 @@ class AccountViewModel @Inject constructor(
                     
                     if (selectedBudget != null) {
                         loadAccountsAndCategories()
+                    } else if (budgets.isNotEmpty()) {
+                        // If we have budgets but no active budget, set the first one as active
+                        budgetSelectionUseCase.setActiveBudgetId(budgets.first().id)
                     }
                 }
             }

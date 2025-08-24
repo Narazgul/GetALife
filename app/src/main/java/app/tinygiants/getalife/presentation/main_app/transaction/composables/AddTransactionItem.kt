@@ -60,13 +60,14 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.asStringRes
+import app.tinygiants.getalife.presentation.shared_composables.AutoCompleteTextField
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlinx.datetime.number
 
 typealias Description = String
 typealias TransactionPartner = String
@@ -76,6 +77,7 @@ typealias TransactionPartner = String
 fun AddTransactionItem(
     categories: List<Category>,
     accounts: List<Account>,
+    partnerSuggestions: List<String> = emptyList(),
     onTransactionDirectionClicked: (TransactionDirection) -> Unit,
     onAddTransactionClicked: (
         amount: Money,
@@ -263,33 +265,13 @@ fun AddTransactionItem(
         }
         Spacer(modifier = Modifier.height(spacing.l))
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(spacing.l)
-        ) {
-            TextField(
-                value = transactionPartnerUserInput,
-                onValueChange = { userInput -> transactionPartnerUserInput = userInput },
-                label = {
-                    Text(
-                        stringResource(R.string.transaction_partner),
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(spacing.m)
-            )
-        }
+        AutoCompleteTextField(
+            value = transactionPartnerUserInput,
+            onValueChange = { transactionPartnerUserInput = it },
+            suggestions = partnerSuggestions,
+            label = stringResource(R.string.transaction_partner),
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(spacing.l))
 
@@ -530,6 +512,7 @@ private fun EnterTransactionPreview() {
             AddTransactionItem(
                 categories = emptyList(),
                 accounts = emptyList(),
+                partnerSuggestions = emptyList(),
                 onTransactionDirectionClicked = { _ -> },
                 onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> })
         }

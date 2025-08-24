@@ -22,6 +22,7 @@ data class CategoryMonthlyStatusEntity(
     val spentAmount: Double = 0.0,
     val carryOverFromPrevious: Double = 0.0,
     val availableAmount: Double = 0.0,
+    val targetContribution: Double? = null, // Monthly target contribution (calculated by UseCase)
     val updatedAt: Long = 0L, // Timestamp when last calculated
     val isSynced: Boolean = false // tracks if this monthly status has been synced to Firestore
 ) {
@@ -40,7 +41,8 @@ data class CategoryMonthlyStatusEntity(
             spentAmount = Money(value = spentAmount),
             availableAmount = Money(value = availableAmount),
             progress = progress,
-            suggestedAmount = suggestedAmount
+            suggestedAmount = suggestedAmount,
+            targetContribution = targetContribution?.let { Money(value = it) }
         )
     }
 
@@ -63,6 +65,7 @@ data class CategoryMonthlyStatusEntity(
                 spentAmount = status.spentAmount.asDouble(),
                 carryOverFromPrevious = carryOverFromPrevious.asDouble(),
                 availableAmount = status.availableAmount.asDouble(),
+                targetContribution = status.targetContribution?.asDouble(),
                 updatedAt = System.currentTimeMillis(),
                 isSynced = false
             )

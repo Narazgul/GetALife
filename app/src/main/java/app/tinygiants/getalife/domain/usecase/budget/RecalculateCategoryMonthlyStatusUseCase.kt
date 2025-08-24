@@ -2,6 +2,7 @@ package app.tinygiants.getalife.domain.usecase.budget
 
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.CategoryBehaviorType
+import app.tinygiants.getalife.domain.model.CategoryMonthlyStatus
 import app.tinygiants.getalife.domain.model.EmptyMoney
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.Transaction
@@ -73,7 +74,7 @@ class RecalculateCategoryMonthlyStatusUseCase @Inject constructor(
     }
 
     private suspend fun updateStatus(
-        currentStatus: app.tinygiants.getalife.domain.model.CategoryMonthlyStatus,
+        currentStatus: CategoryMonthlyStatus,
         spentAmount: Money,
         availableAmount: Money,
         yearMonth: YearMonth,

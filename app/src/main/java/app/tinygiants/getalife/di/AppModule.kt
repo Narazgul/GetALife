@@ -10,6 +10,7 @@ import app.tinygiants.getalife.data.remote.ai.FirebaseAi
 import app.tinygiants.getalife.domain.repository.AiRepository
 import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.budget.CalculateTargetContributionUseCase
 import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.firebase.Firebase
@@ -76,22 +77,22 @@ object AppModule {
         GetALifeDatabase.getDatabase(context)
 
     @Provides
-    fun provideBudgetDao(database: GetALifeDatabase) = database.budgetDao()
+    fun provideBudgetDao(database: GetALifeDatabase) = database.budgetDao
 
     @Provides
-    fun provideAccountDao(database: GetALifeDatabase) = database.accountsDao()
+    fun provideAccountDao(database: GetALifeDatabase) = database.accountDao
 
     @Provides
-    fun provideCategoryDao(database: GetALifeDatabase) = database.categoryDao()
+    fun provideCategoryDao(database: GetALifeDatabase) = database.categoryDao
 
     @Provides
-    fun provideGroupDao(database: GetALifeDatabase) = database.groupDao()
+    fun provideGroupDao(database: GetALifeDatabase) = database.groupDao
 
     @Provides
-    fun provideTransactionDao(database: GetALifeDatabase) = database.transactionDao()
+    fun provideTransactionDao(database: GetALifeDatabase) = database.transactionDao
 
     @Provides
-    fun provideCategoryMonthlyStatusDao(database: GetALifeDatabase) = database.categoryMonthlyStatusDao()
+    fun provideCategoryMonthlyStatusDao(database: GetALifeDatabase) = database.categoryMonthlyStatusDao
 
     @Provides
     @Singleton
@@ -134,6 +135,11 @@ object AppModule {
     fun provideGetCurrentBudgetUseCase(
         budgetSelectionUseCase: BudgetSelectionUseCase
     ): GetCurrentBudgetUseCase = GetCurrentBudgetUseCase(budgetSelectionUseCase)
+
+    @Provides
+    fun provideCalculateTargetContributionUseCase(): CalculateTargetContributionUseCase {
+        return CalculateTargetContributionUseCase()
+    }
 
     @Provides
     @Singleton

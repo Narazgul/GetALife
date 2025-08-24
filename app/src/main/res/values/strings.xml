@@ -92,4 +92,33 @@
     <string name="recurrence_frequency_label">Frequency</string>
     <string name="next_execution">Next execution</string>
     <string name="automatically_created">Automatically created</string>
+    <string name="change_monthly_target">Monthly target</string>
+    <string name="target_type">Target type: %1$s</string>
+    <string name="target_amount">Target amount</string>
+    <string name="target_end_date_hint">Target date (yyyy-MM-dd)</string>
+    <string name="savings_monthly_needed">Monthly needed: %1$s</string>
+    <string name="target_type_none">None</string>
+    <string name="target_type_monthly">Monthly funding</string>
+    <string name="target_type_savings">Savings build-up</string>
+    <string name="invalid_amount">Please enter a valid non-negative amount</string>
+    <string name="invalid_date">Please enter a valid date (yyyy-MM-dd)</string>
+    <!-- Enhanced validation messages -->
+    <string name="validation_invalid_format">Invalid format. Use only one decimal point (e.g. 123.45)</string>
+    <string name="validation_only_numbers">Only numbers and decimal point allowed (e.g. 123.45)</string>
+    <string name="validation_invalid_amount">Invalid amount. Use format: 123.45</string>
+    <string name="validation_negative_amount">Amount cannot be negative</string>
+    <string name="validation_amount_too_large">Amount too large (Maximum: 999,999,999.99€)</string>
+    <string name="validation_enter_valid_amount">Please enter a valid amount</string>
+    <!-- Target type descriptions -->
+    <string name="target_monthly_spending">Monthly spending target: %1$s</string>
+    <!-- Adaptive savings display -->
+    <string name="savings_urgent_today">🚨 DUE TODAY! Still needed: %1$s</string>
+    <string name="savings_urgent_tomorrow">⏰ DUE TOMORROW! Still needed: %1$s</string>
+    <string name="savings_very_urgent">🚨 URGENT! Only %1$d days left - %2$s needed!</string>
+    <string name="savings_short_term">⚡ Only %1$d days left! This month needed: %2$s</string>
+    <string name="savings_medium_term">📅 Monthly: %1$s - Target in %2$d %3$s (%4$d days)</string>
+    <string name="savings_long_term_this_month">💡 For this month: %1$s to plan</string>
+    <string name="savings_long_term">📈 Monthly savings: %1$s (over %2$d months)</string>
+    <string name="month_singular">month</string>
+    <string name="month_plural">months</string>
 </resources>

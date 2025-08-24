@@ -229,7 +229,8 @@ fun fakeCategoryBudgets() = mapOf(
             spentAmount = Money(100.0),
             availableAmount = Money(900.0),
             progress = EmptyProgress(),
-            suggestedAmount = null
+            suggestedAmount = null,
+            targetContribution = null
         )
     )
 )

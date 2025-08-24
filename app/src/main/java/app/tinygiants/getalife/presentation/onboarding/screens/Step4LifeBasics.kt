@@ -399,13 +399,6 @@ fun LifeBasicsContinueButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shimmer by animateFloatAsState(
-        targetValue = if (enabled) 1f else 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000),
-            repeatMode = RepeatMode.Restart
-        ), label = "button_shimmer"
-    )
 
     Button(
         onClick = onClick,

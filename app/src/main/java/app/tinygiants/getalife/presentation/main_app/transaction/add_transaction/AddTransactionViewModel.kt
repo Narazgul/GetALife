@@ -9,6 +9,7 @@ import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
+import app.tinygiants.getalife.domain.repository.TransactionRepository
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,17 +26,36 @@ import kotlin.time.Instant
 class AddTransactionViewModel @Inject constructor(
     private val getCategories: GetCategoriesUseCase,
     private val getAccounts: GetAccountsUseCase,
-    private val addTransaction: AddTransactionUseCase
+    private val addTransaction: AddTransactionUseCase,
+    private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTransactionUiState(categories = emptyList(), accounts = emptyList()))
     val uiState = _uiState.asStateFlow()
+
+    // Recent transaction partners for Auto-Complete
+    private val _partners = MutableStateFlow<List<String>>(emptyList())
+    val partners = _partners.asStateFlow()
 
     // region Init
 
     init {
         loadCategories()
         loadAccounts()
+
+        // Load recent partners once at startup
+        viewModelScope.launch {
+            transactionRepository.getTransactionsFlow()
+                .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
+                .collect { transactions ->
+                    val recentPartners = transactions
+                        .map { it.transactionPartner }
+                        .filter { it.isNotBlank() }
+                        .distinct()
+                        .take(25)
+                    _partners.value = recentPartners
+                }
+        }
     }
 
     private fun loadCategories() {
