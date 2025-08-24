@@ -97,4 +97,9 @@ class GroupRepositoryImpl @Inject constructor(
         val groups = getGroupsFlow().first()
         return groups.firstOrNull { it.name == name }
     }
+
+    override suspend fun getAllGroups(): List<Group> {
+        val budgetId = getCurrentBudget.getCurrentBudgetIdOrDefault()
+        return groupDao.getGroupsFlow(budgetId).first().map { entity -> entity.toDomain() }
+    }
 }

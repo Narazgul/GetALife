@@ -39,9 +39,18 @@ class CategoryRepositoryImpl @Inject constructor(
         return categoryDao.getCategoriesInGroup(groupId = groupId, budgetId = budgetId).map { entity -> entity.toDomain() }
     }
 
+    override suspend fun getAllCategories(): List<Category> {
+        val budgetId = getCurrentBudget.getCurrentBudgetIdOrDefault()
+        return categoryDao.getCategoriesFlow(budgetId).first().map { entity -> entity.toDomain() }
+    }
+
     override suspend fun getCategory(categoryId: Long): Category? {
         val budgetId = getCurrentBudget.getCurrentBudgetIdOrDefault()
         return categoryDao.getCategory(categoryId = categoryId, budgetId = budgetId)?.toDomain()
+    }
+
+    override suspend fun getCategoryById(categoryId: Long): Category? {
+        return getCategory(categoryId)
     }
 
     override suspend fun addCategory(category: Category) {

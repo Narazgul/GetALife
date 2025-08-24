@@ -177,6 +177,41 @@ class TransactionRepositoryImpl @Inject constructor(
         transactionDao.updateNextPaymentDate(transactionId, budgetId, nextDate)
     }
 
+    // Smart categorization methods
+    override suspend fun getTransactionsByPartner(partner: String): List<Transaction> {
+        val budgetId = getCurrentBudget.getCurrentBudgetIdOrDefault()
+        val entities = transactionDao.getTransactionsByPartner(partner, budgetId)
+        return entities.mapNotNull { entity ->
+            val account = accountRepository.getAccount(entity.accountId) ?: return@mapNotNull null
+            val category = entity.categoryId?.let { categoryRepository.getCategory(it) }
+            entity.toDomain(account = account, category = category)
+        }
+    }
+
+    override suspend fun findSimilarTransactions(
+        partner: String,
+        description: String,
+        amount: Money
+    ): List<Transaction> {
+        val budgetId = getCurrentBudget.getCurrentBudgetIdOrDefault()
+        val entities = transactionDao.findSimilarTransactions(partner, description, amount.asDouble(), budgetId)
+        return entities.mapNotNull { entity ->
+            val account = accountRepository.getAccount(entity.accountId) ?: return@mapNotNull null
+            val category = entity.categoryId?.let { categoryRepository.getCategory(it) }
+            entity.toDomain(account = account, category = category)
+        }
+    }
+
+    override suspend fun getUncategorizedTransactions(): List<Transaction> {
+        val budgetId = getCurrentBudget.getCurrentBudgetIdOrDefault()
+        val entities = transactionDao.getUncategorizedTransactions(budgetId)
+        return entities.mapNotNull { entity ->
+            val account = accountRepository.getAccount(entity.accountId) ?: return@mapNotNull null
+            // No category for uncategorized transactions
+            entity.toDomain(account = account, category = null)
+        }
+    }
+
     private fun syncTransactionInBackground(entity: TransactionEntity) {
         externalScope.async {
             try {

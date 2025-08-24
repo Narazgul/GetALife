@@ -64,4 +64,29 @@ interface TransactionDao {
 
     @Query("UPDATE transactions SET nextPaymentDate = :nextDate WHERE id = :transactionId AND budgetId = :budgetId")
     suspend fun updateNextPaymentDate(transactionId: Long, budgetId: String, nextDate: Instant)
+
+    // Smart categorization queries
+    @Query("SELECT * FROM transactions WHERE transactionPartner LIKE '%' || :partner || '%' AND budgetId = :budgetId")
+    suspend fun getTransactionsByPartner(partner: String, budgetId: String): List<TransactionEntity>
+
+    @Query(
+        """
+        SELECT * FROM transactions 
+        WHERE budgetId = :budgetId 
+        AND (transactionPartner LIKE '%' || :partner || '%' 
+             OR description LIKE '%' || :description || '%')
+        AND ABS(amount - :amount) <= (:amount * 0.2)
+        ORDER BY dateOfTransaction DESC 
+        LIMIT 20
+    """
+    )
+    suspend fun findSimilarTransactions(
+        partner: String,
+        description: String,
+        amount: Double,
+        budgetId: String
+    ): List<TransactionEntity>
+
+    @Query("SELECT * FROM transactions WHERE categoryId IS NULL AND budgetId = :budgetId ORDER BY dateOfTransaction DESC")
+    suspend fun getUncategorizedTransactions(budgetId: String): List<TransactionEntity>
 }

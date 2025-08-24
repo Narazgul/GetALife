@@ -8,4 +8,48 @@
         <key>flexible_update</key>
         <value>false</value>
     </entry>
+
+    <!-- Smart Categorization Feature Flags -->
+    <entry>
+        <key>smart_categorization_enabled</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>smart_categorization_confidence_threshold</key>
+        <value>0.7</value>
+    </entry>
+    <entry>
+        <key>smart_categorization_max_suggestions</key>
+        <value>3</value>
+    </entry>
+    <entry>
+        <key>smart_categorization_enable_learning</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>smart_categorization_enable_bulk</key>
+        <value>false</value>
+    </entry>
+
+    <!-- AI Financial Advisor Feature Flags -->
+    <entry>
+        <key>ai_financial_advisor_enabled</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>ai_financial_advisor_max_insights</key>
+        <value>3</value>
+    </entry>
+    <entry>
+        <key>ai_financial_advisor_min_transactions</key>
+        <value>10</value>
+    </entry>
+    <entry>
+        <key>ai_financial_advisor_enable_contextual</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>ai_financial_advisor_refresh_interval_hours</key>
+        <value>24</value>
+    </entry>
 </defaultsMap>

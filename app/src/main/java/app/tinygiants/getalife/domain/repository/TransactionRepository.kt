@@ -23,4 +23,13 @@ interface TransactionRepository {
     suspend fun updateRecurrenceStatus(transactionId: Long, isActive: Boolean)
     suspend fun updateNextPaymentDate(transactionId: Long, nextDate: kotlin.time.Instant)
 
+    // Smart categorization methods
+    suspend fun getTransactionsByPartner(partner: String): List<Transaction>
+    suspend fun findSimilarTransactions(
+        partner: String,
+        description: String,
+        amount: Money
+    ): List<Transaction>
+
+    suspend fun getUncategorizedTransactions(): List<Transaction>
 }
