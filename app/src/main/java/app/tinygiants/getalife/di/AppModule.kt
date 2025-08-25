@@ -83,6 +83,15 @@ object AppModule {
         crashlytics = crashlytics
     )
 
+    // Default AiRepository for smart categorization features
+    @Provides
+    fun provideDefaultAiRepository(
+        crashlytics: FirebaseCrashlytics
+    ): AiRepository = FirebaseAi(
+        generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash"),
+        crashlytics = crashlytics
+    )
+
     @Provides
     @Singleton
     fun provideGetALifeDatabase(@ApplicationContext context: Context): GetALifeDatabase =
