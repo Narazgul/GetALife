@@ -6,4 +6,5 @@ import app.tinygiants.getalife.domain.model.Category
 data class AddTransactionUiState(
     val categories: List<Category>,
     val accounts: List<Account>,
+    val selectedCategory: Category? = null
 )
