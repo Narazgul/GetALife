@@ -12,7 +12,7 @@
     <!-- Smart Categorization Feature Flags -->
     <entry>
         <key>smart_categorization_enabled</key>
-        <value>false</value>
+        <value>true</value>
     </entry>
     <entry>
         <key>smart_categorization_confidence_threshold</key>
@@ -28,7 +28,7 @@
     </entry>
     <entry>
         <key>smart_categorization_enable_bulk</key>
-        <value>false</value>
+        <value>true</value>
     </entry>
 
     <!-- AI Financial Advisor Feature Flags -->
