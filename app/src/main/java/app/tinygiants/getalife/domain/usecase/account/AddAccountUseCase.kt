@@ -1,5 +1,7 @@
 package app.tinygiants.getalife.domain.usecase.account
 
+import androidx.room.withTransaction
+import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.di.Default
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
@@ -24,6 +26,7 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 class AddAccountUseCase @Inject constructor(
+    private val database: GetALifeDatabase,
     private val accountRepository: AccountRepository,
     private val addTransaction: AddTransactionUseCase,
     private val categoryRepository: CategoryRepository,
@@ -32,6 +35,10 @@ class AddAccountUseCase @Inject constructor(
     @Default private val defaultDispatcher: CoroutineDispatcher
 ) {
 
+    /**
+     * Creates an account with starting balance transaction atomically.
+     * All operations run in a single database transaction to ensure consistency.
+     */
     suspend operator fun invoke(
         name: String,
         balance: Money,
@@ -39,25 +46,30 @@ class AddAccountUseCase @Inject constructor(
         startingBalanceName: String,
         startingBalanceDescription: String
     ) {
-        val accountId = abs(Random.nextLong())
+        // Run all operations in a single atomic database transaction
+        database.withTransaction {
+            val accountId = abs(Random.nextLong())
 
-        createAccount(
-            accountId = accountId,
-            name = name,
-            type = type
-        )
+            // Step 1: Create the account
+            createAccount(
+                accountId = accountId,
+                name = name,
+                type = type
+            )
 
-        addStartingBalanceTransaction(
-            accountId = accountId,
-            amount = balance,
-            startingBalanceName = startingBalanceName,
-            startingBalanceDescription = startingBalanceDescription
-        )
+            // Step 2: Add starting balance transaction
+            addStartingBalanceTransaction(
+                accountId = accountId,
+                amount = balance,
+                startingBalanceName = startingBalanceName,
+                startingBalanceDescription = startingBalanceDescription
+            )
 
-        // If this is a credit card account, create the credit card payment group and category
-        if (type == AccountType.CreditCard) {
-            val account = accountRepository.getAccount(accountId)!!
-            createCreditCardPaymentCategory(account)
+            // Step 3: If this is a credit card account, create the credit card payment group and category
+            if (type == AccountType.CreditCard) {
+                val account = accountRepository.getAccount(accountId)!!
+                createCreditCardPaymentCategory(account)
+            }
         }
     }
 
@@ -149,8 +161,7 @@ class AddAccountUseCase @Inject constructor(
         )
         categoryMonthlyStatusRepository.saveStatus(initialStatus, yearMonth)
 
-        // Force a small delay to ensure database consistency
-        delay(100)
+        // No need for delay anymore - transaction handles consistency
     }
 
     /**
@@ -184,9 +195,7 @@ class AddAccountUseCase @Inject constructor(
 
         groupRepository.addGroup(creditCardPaymentsGroup)
 
-        // Force a small delay to ensure database consistency
-        delay(100)
-
+        // No need for delay anymore - transaction handles consistency
         return groupId
     }
 }
