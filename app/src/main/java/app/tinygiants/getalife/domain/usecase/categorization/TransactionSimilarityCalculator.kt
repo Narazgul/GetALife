@@ -138,4 +138,55 @@ class TransactionSimilarityCalculator @Inject constructor(
         // This is a placeholder - in real implementation, we'd lookup the category name
         return "Category_$categoryId"
     }
+
+    /**
+     * Calculate similarity between two transactions for bulk categorization
+     */
+    suspend fun calculateSimilarity(
+        transaction1: app.tinygiants.getalife.domain.model.Transaction,
+        transaction2: app.tinygiants.getalife.domain.model.Transaction,
+        config: SimilarityConfig = SimilarityConfig()
+    ): Float {
+        return withContext(dispatcher) {
+            val partnerSimilarity = calculateKeywordSimilarity(
+                transaction1.transactionPartner.lowercase(),
+                transaction2.transactionPartner.lowercase()
+            )
+
+            val descriptionSimilarity = calculateKeywordSimilarity(
+                transaction1.description.lowercase(),
+                transaction2.description.lowercase()
+            )
+
+            val amountSimilarity = calculateAmountSimilarity(
+                transaction1.amount,
+                transaction2.amount
+            )
+
+            // Weighted combination for transaction-to-transaction similarity
+            val finalSimilarity = (partnerSimilarity * 0.5f +
+                    descriptionSimilarity * 0.3f +
+                    amountSimilarity * 0.2f)
+
+            finalSimilarity.coerceIn(0f, 1f)
+        }
+    }
+
+    /**
+     * Calculate amount similarity between two Money values
+     */
+    private fun calculateAmountSimilarity(
+        amount1: app.tinygiants.getalife.domain.model.Money,
+        amount2: app.tinygiants.getalife.domain.model.Money
+    ): Float {
+        val diff = kotlin.math.abs(amount1.asDouble() - amount2.asDouble())
+        val maxAmount = kotlin.math.max(kotlin.math.abs(amount1.asDouble()), kotlin.math.abs(amount2.asDouble()))
+
+        return if (maxAmount == 0.0) {
+            1f // Both amounts are zero
+        } else {
+            val similarity = 1f - (diff.toFloat() / maxAmount.toFloat())
+            similarity.coerceIn(0f, 1f)
+        }
+    }
 }

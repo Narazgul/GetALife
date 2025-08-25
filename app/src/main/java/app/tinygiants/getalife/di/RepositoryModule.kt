@@ -8,9 +8,9 @@ import app.tinygiants.getalife.data.local.dao.GroupDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.repository.AccountRepositoryImpl
+import app.tinygiants.getalife.data.repository.CategorizationFeedbackRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryMonthlyStatusRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
-import app.tinygiants.getalife.data.repository.CategorizationFeedbackRepositoryImpl
 import app.tinygiants.getalife.data.repository.CrispChatRepository
 import app.tinygiants.getalife.data.repository.FirebaseRemoteConfigRepository
 import app.tinygiants.getalife.data.repository.GoogleInAppReviewRepository
@@ -18,16 +18,21 @@ import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.RevenueCatRepository
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
 import app.tinygiants.getalife.domain.repository.AccountRepository
+import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
-import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.repository.InAppReviewRepository
 import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
 import app.tinygiants.getalife.domain.repository.SubscriptionRepository
 import app.tinygiants.getalife.domain.repository.SupportChatRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.FeatureFlagUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.categorization.BulkCategorizationUseCase
+import app.tinygiants.getalife.domain.usecase.categorization.SmartCategorizationLearningUseCase
+import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
+import app.tinygiants.getalife.domain.usecase.categorization.TransactionSimilarityCalculator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -121,5 +126,35 @@ object RepositoryModule {
     ): CategorizationFeedbackRepository = CategorizationFeedbackRepositoryImpl(
         feedbackDao = database.categorizationFeedbackDao,
         dispatcher = dispatcher
+    )
+
+    @Provides
+    @Singleton
+    fun provideSmartCategorizationLearningUseCase(
+        feedbackRepository: CategorizationFeedbackRepository,
+        featureFlagUseCase: FeatureFlagUseCase,
+        dispatcher: CoroutineDispatcher
+    ): SmartCategorizationLearningUseCase = SmartCategorizationLearningUseCase(
+        feedbackRepository = feedbackRepository,
+        featureFlagUseCase = featureFlagUseCase,
+        dispatcher = dispatcher
+    )
+
+    @Provides
+    @Singleton
+    fun provideBulkCategorizationUseCase(
+        transactionRepository: TransactionRepository,
+        categoryRepository: CategoryRepository,
+        getCurrentBudgetUseCase: GetCurrentBudgetUseCase,
+        smartCategorizerUseCase: SmartTransactionCategorizerUseCase,
+        similarityCalculator: TransactionSimilarityCalculator,
+        featureFlagUseCase: FeatureFlagUseCase
+    ): BulkCategorizationUseCase = BulkCategorizationUseCase(
+        transactionRepository = transactionRepository,
+        categoryRepository = categoryRepository,
+        getCurrentBudgetUseCase = getCurrentBudgetUseCase,
+        smartCategorizerUseCase = smartCategorizerUseCase,
+        similarityCalculator = similarityCalculator,
+        featureFlagUseCase = featureFlagUseCase
     )
 }

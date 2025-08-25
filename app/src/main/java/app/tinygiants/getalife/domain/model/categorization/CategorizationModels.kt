@@ -2,6 +2,8 @@ package app.tinygiants.getalife.domain.model.categorization
 
 import androidx.compose.runtime.Immutable
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.domain.model.Transaction
+import app.tinygiants.getalife.domain.model.Category
 import kotlin.time.Instant
 
 /**
@@ -75,3 +77,33 @@ data class SimilarityConfig(
     val aiWeight: Float = 0.2f,
     val minConfidenceThreshold: Float = 0.3f
 )
+
+/**
+ * Represents a group of similar transactions for bulk categorization
+ */
+data class TransactionGroup(
+    val id: Long,
+    val transactions: List<Transaction>,
+    val groupName: String,
+    val totalAmount: Money,
+    val transactionCount: Int,
+    val suggestedCategory: Category? = null,
+    val confidence: Float = 0.0f,
+    val dateRange: Pair<Instant?, Instant?> = null to null
+)
+
+/**
+ * Result of bulk categorization operation
+ */
+sealed class BulkCategorizationResult {
+    data class Success(
+        val processedCount: Int,
+        val category: Category,
+        val totalAmount: Money,
+        val errors: List<String>? = null
+    ) : BulkCategorizationResult()
+
+    data class Error(
+        val message: String
+    ) : BulkCategorizationResult()
+}
