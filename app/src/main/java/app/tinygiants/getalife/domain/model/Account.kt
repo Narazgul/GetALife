@@ -10,7 +10,7 @@ data class Account(
     val balance: Money,
     val type: AccountType,
     val listPosition: Int,
-    val isClosed: Boolean = false, // Accounts can be closed instead of deleted if they have transactions
+    val isClosed: Boolean = false,
     val updatedAt: Instant,
     val createdAt: Instant
 )

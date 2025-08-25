@@ -4,43 +4,64 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
-import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
-import app.tinygiants.getalife.domain.model.categorization.CategoryMatch
-import app.tinygiants.getalife.domain.model.categorization.CategorizationResult
+import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
+import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.GroupRepository
+import app.tinygiants.getalife.domain.repository.TransactionRepository
+import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
+import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
+import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
-import app.tinygiants.getalife.domain.repository.TransactionRepository
-import app.tinygiants.getalife.domain.repository.CategoryRepository
-import app.tinygiants.getalife.domain.repository.GroupRepository
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+sealed interface GuidedTransactionStep {
+    data object Type : GuidedTransactionStep
+    data object Amount : GuidedTransactionStep
+    data object Account : GuidedTransactionStep
+    data object ToAccount : GuidedTransactionStep // For transfers only
+    data object Partner : GuidedTransactionStep
+    data object Category : GuidedTransactionStep
+    data object Date : GuidedTransactionStep
+    data object Optional : GuidedTransactionStep
+    data object Done : GuidedTransactionStep
+
+    companion object {
+        val entries = listOf(Type, Amount, Account, ToAccount, Partner, Category, Date, Optional, Done)
+    }
+}
+
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
     private val getCategories: GetCategoriesUseCase,
     private val getAccounts: GetAccountsUseCase,
+    private val addAccount: AddAccountUseCase,
     private val addTransaction: AddTransactionUseCase,
     private val transactionRepository: TransactionRepository,
     private val smartCategorizer: SmartTransactionCategorizerUseCase,
     private val categoryRepository: CategoryRepository,
-    private val groupRepository: GroupRepository
+    private val groupRepository: GroupRepository,
+    private val onboardingPrefsUseCase: OnboardingPrefsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTransactionUiState(categories = emptyList(), accounts = emptyList()))
@@ -59,12 +80,15 @@ class AddTransactionViewModel @Inject constructor(
     private val _transactionDescription = MutableStateFlow("")
     private val _transactionAmount = MutableStateFlow(Money(0.0))
 
+    val transactionPartner: StateFlow<String> get() = _transactionPartner
+
     // region Init
 
     init {
         loadCategories()
         loadAccounts()
         setupSmartCategorization()
+        initializeUiMode()
 
         // Load recent partners once at startup
         viewModelScope.launch {
@@ -78,6 +102,18 @@ class AddTransactionViewModel @Inject constructor(
                         .take(25)
                     _partners.value = recentPartners
                 }
+        }
+    }
+
+    private fun initializeUiMode() {
+        viewModelScope.launch {
+            val isTransactionOnboardingCompleted = onboardingPrefsUseCase.isTransactionOnboardingCompletedFlow.first()
+            _uiState.update {
+                it.copy(
+                    isGuidedMode = !isTransactionOnboardingCompleted,
+                    guidedStep = if (isTransactionOnboardingCompleted) GuidedTransactionStep.Done else GuidedTransactionStep.Type
+                )
+            }
         }
     }
 
@@ -127,7 +163,100 @@ class AddTransactionViewModel @Inject constructor(
 
     // endregion
 
+    /**
+     * Create a temporary new category for guided mode dialog (will be saved when transaction is saved)
+     */
+    fun onCreateNewCategory(categoryName: String) {
+        viewModelScope.launch {
+            try {
+                // Get all groups to find a suitable group
+                val groups = groupRepository.getAllGroups()
+                val defaultGroup = groups.firstOrNull() // Use first available group or create logic for default group
+
+                if (defaultGroup != null) {
+                    // Create temporary category (not saved to repository yet)
+                    val tempCategory = Category(
+                        id = -System.currentTimeMillis(), // Use negative ID to indicate it's temporary
+                        groupId = defaultGroup.id,
+                        emoji = "📁", // Default emoji, can be updated later by AI
+                        name = categoryName,
+                        budgetTarget = Money(0.0),
+                        monthlyTargetAmount = null,
+                        targetMonthsRemaining = null,
+                        listPosition = 999, // Add at end
+                        isInitialCategory = false,
+                        linkedAccountId = null,
+                        updatedAt = Clock.System.now(),
+                        createdAt = Clock.System.now()
+                    )
+
+                    // Update UI state with temporary category (will be saved when transaction is saved)
+                    _uiState.update {
+                        it.copy(
+                            categories = it.categories + tempCategory,
+                            selectedCategory = tempCategory
+                        )
+                    }
+
+                    // Automatically proceed to next step after creating and selecting category
+                    moveToNextStep()
+                }
+            } catch (e: Exception) {
+                Firebase.crashlytics.recordException(e)
+                // Could show error to user here
+            }
+        }
+    }
+
     // region Smart Categorization
+
+    /**
+     * Create a new account (used in guided mode when user creates account in workflow)
+     */
+    fun onCreateNewAccount(
+        name: String,
+        initialBalance: Money = Money(0.0),
+        accountType: AccountType = AccountType.Checking
+    ) {
+        viewModelScope.launch {
+            try {
+                // Create new account with AddAccountUseCase
+                addAccount(
+                    name = name,
+                    balance = initialBalance,
+                    type = accountType,
+                    startingBalanceName = "Startsaldo",
+                    startingBalanceDescription = "Anfangsbestand des Kontos"
+                )
+
+                // Small delay to ensure account is saved before reloading
+                kotlinx.coroutines.delay(200)
+
+                // Reload accounts after creation to get the new account
+                getAccounts()
+                    .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
+                    .collect { result ->
+                        result.onSuccess { accounts ->
+                            _uiState.update { uiState ->
+                                uiState.copy(accounts = accounts)
+                            }
+
+                            // Auto-select the newly created account
+                            val newAccount = accounts.find { it.name == name }
+                            newAccount?.let { account ->
+                                _uiState.update { it.copy(selectedAccount = account) }
+                                // Automatically proceed to next step after selecting account
+                                moveToNextStep()
+                            }
+                        }
+                    }
+
+            } catch (e: Exception) {
+                Firebase.crashlytics.recordException(e)
+                // Could show error to user here
+            }
+        }
+    }
 
     /**
      * Update transaction partner input and trigger smart categorization
@@ -206,7 +335,7 @@ class AddTransactionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // Find the target group
-                val group = groupRepository.getAllGroups().find { it.id == suggestion.groupId }
+                groupRepository.getAllGroups().find { it.id == suggestion.groupId }
                     ?: return@launch
 
                 // Create new category
@@ -265,6 +394,142 @@ class AddTransactionViewModel @Inject constructor(
 
     // endregion
 
+    // region Guided Mode Functions
+
+    fun moveToNextStep() {
+        val currentStep = uiState.value.guidedStep
+        val currentIndex = GuidedTransactionStep.entries.indexOf(currentStep)
+
+        // Determine next step based on transaction type
+        val nextStep = when {
+            currentIndex >= GuidedTransactionStep.entries.size - 1 -> return // Already at last step
+
+            // For transfers, after Account selection go to ToAccount
+            uiState.value.selectedDirection == TransactionDirection.Unknown &&
+                    currentStep == GuidedTransactionStep.Account -> GuidedTransactionStep.ToAccount
+
+            // For transfers, skip Partner and Category steps after ToAccount
+            uiState.value.selectedDirection == TransactionDirection.Unknown &&
+                    currentStep == GuidedTransactionStep.ToAccount -> GuidedTransactionStep.Date
+
+            // For Inflow and Outflow, skip ToAccount step entirely
+            (uiState.value.selectedDirection == TransactionDirection.Inflow ||
+                    uiState.value.selectedDirection == TransactionDirection.Outflow) &&
+                    currentStep == GuidedTransactionStep.Account -> GuidedTransactionStep.Partner
+
+            else -> GuidedTransactionStep.entries[currentIndex + 1]
+        }
+
+        _uiState.update { it.copy(guidedStep = nextStep) }
+    }
+
+    fun goToStep(step: GuidedTransactionStep) {
+        _uiState.update { it.copy(guidedStep = step) }
+    }
+
+    fun onGuidedTransactionTypeSelected(direction: TransactionDirection) {
+        _uiState.update { it.copy(selectedDirection = direction) }
+        moveToNextStep()
+    }
+
+    fun onGuidedAmountEntered(amount: Money) {
+        _uiState.update { it.copy(selectedAmount = amount) }
+    }
+
+    fun onGuidedAccountSelected(account: app.tinygiants.getalife.domain.model.Account) {
+        _uiState.update { it.copy(selectedAccount = account) }
+        moveToNextStep()
+    }
+
+    /**
+     * Function to handle selection of destination account for transfers
+     */
+    fun onGuidedToAccountSelected(toAccount: app.tinygiants.getalife.domain.model.Account) {
+        _uiState.update { it.copy(selectedToAccount = toAccount) }
+        moveToNextStep()
+    }
+
+    fun onGuidedPartnerEntered(partner: String) {
+        _uiState.update { it.copy(selectedPartner = partner) }
+        updateTransactionPartner(partner) // Trigger smart categorization
+    }
+
+    fun onGuidedCategorySelected(category: Category?) {
+        _uiState.update { it.copy(selectedCategory = category) }
+        moveToNextStep()
+    }
+
+    fun onGuidedDateSelected(date: java.time.LocalDate) {
+        _uiState.update { it.copy(selectedDate = date) }
+    }
+
+    fun onGuidedDescriptionChanged(description: String) {
+        _uiState.update { it.copy(selectedDescription = description) }
+    }
+
+    fun onGuidedTransactionComplete() {
+        val state = uiState.value
+        viewModelScope.launch {
+            // Save the transaction with all collected data
+            state.selectedDirection?.let { direction ->
+                state.selectedAmount?.let { amount ->
+                    state.selectedAccount?.let { account ->
+
+                        // If selected category has negative ID, it's temporary and needs to be saved first
+                        val finalCategory = state.selectedCategory?.let { category ->
+                            if (category.id < 0) {
+                                // Create and save the new category
+                                val newCategory = category.copy(id = 0) // Reset ID for auto-generation
+                                categoryRepository.addCategory(newCategory)
+                                // Return the category with ID 0, the repository will handle ID assignment
+                                newCategory
+                            } else {
+                                category
+                            }
+                        }
+
+                        addTransaction(
+                            accountId = account.id,
+                            category = finalCategory,
+                            amount = amount,
+                            direction = direction,
+                            transactionPartner = state.selectedPartner,
+                            description = state.selectedDescription,
+                            dateOfTransaction = state.selectedDate?.let {
+                                kotlin.time.Instant.fromEpochSeconds(
+                                    it.toEpochDay() * 24 * 60 * 60
+                                )
+                            } ?: kotlin.time.Clock.System.now(),
+                            recurrenceFrequency = null
+                        )
+
+                        // Mark transaction onboarding as completed
+                        onboardingPrefsUseCase.markTransactionOnboardingCompleted()
+
+                        // Move to Done step
+                        _uiState.update { it.copy(guidedStep = GuidedTransactionStep.Done) }
+                    }
+                }
+            }
+        }
+    }
+
+    fun getProgressText(): String {
+        return when (uiState.value.guidedStep) {
+            GuidedTransactionStep.Type -> "Beginnen wir mit den Grundlagen"
+            GuidedTransactionStep.Amount -> "Super, weiter so! Noch 6 Schritte"
+            GuidedTransactionStep.Account -> "Noch 5 Schritte"
+            GuidedTransactionStep.ToAccount -> "Wohin soll das Geld?"
+            GuidedTransactionStep.Partner -> "Noch 4 Schritte"
+            GuidedTransactionStep.Category -> "Fast geschafft..."
+            GuidedTransactionStep.Date -> "Vorletzter Schritt"
+            GuidedTransactionStep.Optional -> "Letzter Schritt!"
+            GuidedTransactionStep.Done -> "Geschafft!"
+        }
+    }
+
+    // endregion
+
     // region User interaction
 
     fun onSaveTransactionClicked(
@@ -278,9 +543,20 @@ class AddTransactionViewModel @Inject constructor(
         recurrenceFrequency: RecurrenceFrequency? = null
     ) {
         viewModelScope.launch {
+            // If selected category has negative ID, it's temporary and needs to be saved first
+            val finalCategory = category?.let { cat ->
+                if (cat.id < 0) {
+                    val newCategory = cat.copy(id = 0)
+                    categoryRepository.addCategory(newCategory)
+                    newCategory
+                } else {
+                    cat
+                }
+            }
+
             addTransaction(
                 accountId = accountId,
-                category = category,
+                category = finalCategory,
                 amount = amount,
                 direction = direction,
                 transactionPartner = transactionPartner,
@@ -288,8 +564,32 @@ class AddTransactionViewModel @Inject constructor(
                 dateOfTransaction = dateOfTransaction,
                 recurrenceFrequency = recurrenceFrequency
             )
+            if (uiState.value.isGuidedMode) {
+                onboardingPrefsUseCase.markTransactionOnboardingCompleted()
+            }
         }
     }
 
     // endregion
+
+    /**
+     * Switch from guided mode to standard mode and reset transaction data for new transaction
+     */
+    fun switchToStandardMode() {
+        _uiState.update {
+            it.copy(
+                isGuidedMode = false,
+                guidedStep = GuidedTransactionStep.Done,
+                // Clear transaction data for new transaction
+                selectedDirection = null,
+                selectedAmount = null,
+                selectedAccount = null,
+                selectedToAccount = null,
+                selectedPartner = "",
+                selectedCategory = null,
+                selectedDate = null,
+                selectedDescription = ""
+            )
+        }
+    }
 }

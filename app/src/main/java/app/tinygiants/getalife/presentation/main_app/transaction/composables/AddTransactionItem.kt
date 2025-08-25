@@ -60,6 +60,8 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.asStringRes
+import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.presentation.shared_composables.AutoCompleteTextField
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -78,6 +80,11 @@ fun AddTransactionItem(
     categories: List<Category>,
     accounts: List<Account>,
     partnerSuggestions: List<String> = emptyList(),
+    selectedCategory: Category? = null,
+    transactionPartner: String = "",
+    smartCategorizationUiState: SmartCategorizationUiState = SmartCategorizationUiState(),
+    onTransactionPartnerChanged: (String) -> Unit = {},
+    onAcceptCategorySuggestion: (NewCategorySuggestion) -> Unit = {},
     onTransactionDirectionClicked: (TransactionDirection) -> Unit,
     onAddTransactionClicked: (
         amount: Money,
@@ -102,7 +109,7 @@ fun AddTransactionItem(
     var descriptionUserInput by rememberSaveable { mutableStateOf("") }
     var transactionPartnerUserInput by rememberSaveable { mutableStateOf("") }
     var directionUserInput by rememberSaveable { mutableStateOf(TransactionDirection.Unknown) }
-    var categoryUserInput by remember { mutableStateOf(categories.firstOrNull()) }
+    var categoryUserInput by remember { mutableStateOf(selectedCategory ?: categories.firstOrNull()) }
     var accountUserInput by remember { mutableStateOf(accounts.firstOrNull()) }
     var selectedDate by remember { mutableStateOf(Clock.System.now()) }
     var recurrenceFrequency by rememberSaveable { mutableStateOf(RecurrenceFrequency.NEVER) }
@@ -142,6 +149,63 @@ fun AddTransactionItem(
                 shape = RoundedCornerShape(topEnd = spacing.l, bottomEnd = spacing.l),
             ) {
                 Text(text = stringResource(R.string.outflow))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(spacing.l))
+
+        AutoCompleteTextField(
+            value = transactionPartner,
+            onValueChange = onTransactionPartnerChanged,
+            suggestions = partnerSuggestions,
+            label = stringResource(R.string.transaction_partner),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Smart Categorization Suggestion
+        AnimatedVisibility(
+            visible = smartCategorizationUiState.hasValidSuggestion
+        ) {
+            smartCategorizationUiState.categorizationResult?.let { result ->
+                // Show existing category match
+                result.existingCategoryMatch?.let { match ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = spacing.xs),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        shape = RoundedCornerShape(spacing.m)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(spacing.m)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${match.categoryEmoji} ${match.categoryName}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Button(
+                                onClick = {
+                                    // Set the suggested category as selected
+                                    categoryUserInput = categories.find { it.id == match.categoryId }
+                                },
+                                shape = RoundedCornerShape(spacing.s)
+                            ) {
+                                Text(
+                                    text = "Verwenden",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -265,16 +329,6 @@ fun AddTransactionItem(
         }
         Spacer(modifier = Modifier.height(spacing.l))
 
-        AutoCompleteTextField(
-            value = transactionPartnerUserInput,
-            onValueChange = { transactionPartnerUserInput = it },
-            suggestions = partnerSuggestions,
-            label = stringResource(R.string.transaction_partner),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(spacing.l))
-
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -371,7 +425,7 @@ fun AddTransactionItem(
                     categoryUserInput,
                     directionUserInput,
                     descriptionUserInput,
-                    transactionPartnerUserInput,
+                    transactionPartner,
                     selectedDate,
                     if (recurrenceFrequency != RecurrenceFrequency.NEVER) recurrenceFrequency else null
                 )
@@ -379,9 +433,8 @@ fun AddTransactionItem(
                 amountMoney = Money(value = 0.0)
                 amountUserInputText = ""
                 descriptionUserInput = ""
-                transactionPartnerUserInput = ""
                 directionUserInput = TransactionDirection.Unknown
-                categoryUserInput = categories.firstOrNull()
+                categoryUserInput = selectedCategory ?: categories.firstOrNull()
                 accountUserInput = accounts.firstOrNull()
                 selectedDate = Clock.System.now()
                 recurrenceFrequency = RecurrenceFrequency.NEVER
@@ -513,6 +566,7 @@ private fun EnterTransactionPreview() {
                 categories = emptyList(),
                 accounts = emptyList(),
                 partnerSuggestions = emptyList(),
+                transactionPartner = "",
                 onTransactionDirectionClicked = { _ -> },
                 onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> })
         }

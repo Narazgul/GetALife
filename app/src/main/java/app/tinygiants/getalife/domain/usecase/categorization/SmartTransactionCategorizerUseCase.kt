@@ -76,12 +76,17 @@ class SmartTransactionCategorizerUseCase @Inject constructor(
         userCategories: List<app.tinygiants.getalife.domain.model.Category>,
         config: SmartCategorizationConfig
     ): CategoryMatch {
-        if (userCategories.isEmpty()) {
+        // Filter out internal/system categories that shouldn't be suggested
+        val filteredCategories = userCategories.filter { category ->
+            !isInternalCategory(category.name)
+        }
+
+        if (filteredCategories.isEmpty()) {
             return CategoryMatch.noMatch()
         }
 
         // Calculate similarity for each category
-        val matches = userCategories.map { category ->
+        val matches = filteredCategories.map { category ->
             val confidence = transactionSimilarityCalculator.calculateSimilarity(
                 partner = partner,
                 description = description,
@@ -97,7 +102,20 @@ class SmartTransactionCategorizerUseCase @Inject constructor(
             )
         }.sortedByDescending { it.confidence }
 
-        return matches.first()
+        return matches.firstOrNull() ?: CategoryMatch.noMatch()
+    }
+
+    private fun isInternalCategory(categoryName: String): Boolean {
+        val internalCategoryNames = setOf(
+            "Starting balance",
+            "Startguthaben",
+            "Initial balance",
+            "Anfangssaldo",
+            "System category"
+        )
+        return internalCategoryNames.any { internalName ->
+            categoryName.equals(internalName, ignoreCase = true)
+        }
     }
 
     private suspend fun generateNewCategorySuggestion(

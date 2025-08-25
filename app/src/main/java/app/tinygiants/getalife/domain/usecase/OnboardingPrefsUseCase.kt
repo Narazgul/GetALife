@@ -27,15 +27,26 @@ class OnboardingPrefsUseCase @Inject constructor(
 
     companion object {
         private val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
+        private val TRANSACTION_ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("transaction_onboarding_completed")
     }
 
     val isOnboardingCompletedFlow: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[ONBOARDING_COMPLETED_KEY] ?: false
     }
 
+    val isTransactionOnboardingCompletedFlow: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[TRANSACTION_ONBOARDING_COMPLETED_KEY] ?: false
+    }
+
     suspend fun markOnboardingCompleted() {
         dataStore.edit { prefs ->
             prefs[ONBOARDING_COMPLETED_KEY] = true
+        }
+    }
+
+    suspend fun markTransactionOnboardingCompleted() {
+        dataStore.edit { prefs ->
+            prefs[TRANSACTION_ONBOARDING_COMPLETED_KEY] = true
         }
     }
 
