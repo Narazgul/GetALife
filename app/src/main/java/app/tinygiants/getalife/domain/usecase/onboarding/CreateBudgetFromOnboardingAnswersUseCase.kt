@@ -41,7 +41,7 @@ class CreateBudgetFromOnboardingAnswersUseCase @Inject constructor(
 
             val group = withContext(defaultDispatcher) {
                 Group(
-                    id = Random.nextLong(),
+                    id = kotlin.math.abs(Random.nextLong()),
                     name = groupName,
                     sumOfAvailableMoney = EmptyMoney(),
                     listPosition = groupPosition++,
@@ -54,7 +54,7 @@ class CreateBudgetFromOnboardingAnswersUseCase @Inject constructor(
                 val category = withContext(defaultDispatcher) {
                     val now = Clock.System.now()
                     Category(
-                        id = Random.nextLong(),
+                        id = kotlin.math.abs(Random.nextLong()),
                         groupId = group.id,
                         emoji = "",
                         name = categoryName,

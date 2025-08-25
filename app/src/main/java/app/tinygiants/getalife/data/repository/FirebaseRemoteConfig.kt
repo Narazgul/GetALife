@@ -39,11 +39,11 @@ class FirebaseRemoteConfigRepository @Inject constructor(private val remoteConfi
     override fun getSmartCategorizationConfig(): Flow<SmartCategorizationConfig> = flow {
         emit(
             SmartCategorizationConfig(
-                isEnabled = remoteConfig.getBoolean("smart_categorization_enabled"),
+                isEnabled = true,//remoteConfig.getBoolean("smart_categorization_enabled"),
                 confidenceThreshold = remoteConfig.getDouble("smart_categorization_confidence_threshold").toFloat(),
                 maxSuggestions = remoteConfig.getLong("smart_categorization_max_suggestions").toInt(),
                 enableLearning = remoteConfig.getBoolean("smart_categorization_enable_learning"),
-                enableBulkCategorization = remoteConfig.getBoolean("smart_categorization_enable_bulk")
+                enableBulkCategorization = true //remoteConfig.getBoolean("smart_categorization_enable_bulk")
             )
         )
     }

@@ -39,7 +39,7 @@ class AddAccountUseCase @Inject constructor(
         startingBalanceName: String,
         startingBalanceDescription: String
     ) {
-        val accountId = Random.nextLong()
+        val accountId = abs(Random.nextLong())
 
         createAccount(
             accountId = accountId,

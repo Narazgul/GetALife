@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 class AddGroupUseCase @Inject constructor(
@@ -30,7 +31,7 @@ class AddGroupUseCase @Inject constructor(
             val trimmedGroupName = groupName.trim()
 
             val group = Group(
-                id = Random.nextLong(),
+                id = Random.nextLong().absoluteValue,
                 name = trimmedGroupName,
                 sumOfAvailableMoney = EmptyMoney(),
                 listPosition = endOfListPosition,

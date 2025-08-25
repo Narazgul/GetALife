@@ -30,7 +30,7 @@ class AddCategoryUseCase @Inject constructor(
             val timeOfCreation = Clock.System.now()
 
             Category(
-                id = Random.nextLong(),
+                id = Random.nextLong().let { if (it < 0) -it else it },
                 groupId = groupId,
                 emoji = "",
                 name = trimmedCategoryName,
