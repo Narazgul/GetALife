@@ -2,6 +2,7 @@ package app.tinygiants.getalife.domain.usecase.categorization
 
 import app.tinygiants.getalife.domain.model.categorization.SimilarityConfig
 import app.tinygiants.getalife.domain.repository.AiRepository
+import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class TransactionSimilarityCalculator @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val aiRepository: AiRepository,
+    private val feedbackRepository: CategorizationFeedbackRepository,
     private val dispatcher: CoroutineDispatcher
 ) {
 
@@ -63,10 +65,15 @@ class TransactionSimilarityCalculator @Inject constructor(
 
     /**
      * Get similarity based on historical categorization patterns
+     * Enhanced with feedback data for better accuracy
      */
     private suspend fun getHistoricalSimilarity(partner: String, categoryName: String): Float {
         return try {
-            // Find similar transactions from history (simplified implementation)
+            // First check user feedback for similar transactions
+            val feedbackSimilarity = getFeedbackBasedSimilarity(partner, categoryName)
+            if (feedbackSimilarity > 0f) return feedbackSimilarity
+
+            // Fallback to transaction history
             val similarTransactions = transactionRepository.getTransactionsByPartner(partner)
 
             if (similarTransactions.isEmpty()) return 0f
@@ -76,6 +83,39 @@ class TransactionSimilarityCalculator @Inject constructor(
             categorizedSimilar.size.toFloat() / similarTransactions.size.toFloat()
         } catch (e: Exception) {
             0f // Graceful fallback
+        }
+    }
+
+    /**
+     * Get similarity based on user feedback data
+     */
+    private suspend fun getFeedbackBasedSimilarity(partner: String, categoryName: String): Float {
+        return try {
+            val successfulFeedback = feedbackRepository.getSuccessfulCategorizationsForPartner(partner)
+
+            if (successfulFeedback.isEmpty()) return 0f
+
+            // Count how often this partner was successfully categorized to this category
+            val categoryMatches = successfulFeedback.count { feedback ->
+                feedback.userChosenCategoryId != null &&
+                        getCategoryName(feedback.userChosenCategoryId!!) == categoryName
+            }
+
+            if (categoryMatches == 0) return 0f
+
+            // Calculate success rate with confidence boost for frequently correct matches
+            val successRate = categoryMatches.toFloat() / successfulFeedback.size.toFloat()
+
+            // Boost confidence for categories that were chosen multiple times
+            val frequencyBonus = when {
+                categoryMatches >= 5 -> 0.2f
+                categoryMatches >= 3 -> 0.1f
+                else -> 0f
+            }
+
+            (successRate + frequencyBonus).coerceAtMost(1f)
+        } catch (e: Exception) {
+            0f
         }
     }
 
@@ -91,5 +131,11 @@ class TransactionSimilarityCalculator @Inject constructor(
             text1 = "$partner $description",
             text2 = categoryName
         ).getOrElse { 0f }
+    }
+
+    // TODO: This should be moved to a proper category lookup service
+    private fun getCategoryName(categoryId: Long): String {
+        // This is a placeholder - in real implementation, we'd lookup the category name
+        return "Category_$categoryId"
     }
 }

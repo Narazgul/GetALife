@@ -8,6 +8,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import app.tinygiants.getalife.data.local.dao.AccountDao
 import app.tinygiants.getalife.data.local.dao.BudgetDao
+import app.tinygiants.getalife.data.local.dao.CategorizationFeedbackDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.dao.CategoryMonthlyStatusDao
 import app.tinygiants.getalife.data.local.dao.GroupDao
@@ -18,6 +19,7 @@ import app.tinygiants.getalife.data.local.entities.CategoryEntity
 import app.tinygiants.getalife.data.local.entities.CategoryMonthlyStatusEntity
 import app.tinygiants.getalife.data.local.entities.GroupEntity
 import app.tinygiants.getalife.data.local.entities.TransactionEntity
+import app.tinygiants.getalife.data.local.entity.CategorizationFeedbackEntity
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.RepeatFrequency
 import app.tinygiants.getalife.domain.model.TargetType
@@ -31,9 +33,10 @@ import kotlin.time.Instant
         AccountEntity::class,
         TransactionEntity::class,
         CategoryMonthlyStatusEntity::class,
-        BudgetEntity::class
+        BudgetEntity::class,
+        CategorizationFeedbackEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(GetALifeDatabase.Converters::class)
@@ -45,6 +48,7 @@ abstract class GetALifeDatabase : RoomDatabase() {
     abstract val groupDao: GroupDao
     abstract val categoryMonthlyStatusDao: CategoryMonthlyStatusDao
     abstract val budgetDao: BudgetDao
+    abstract val categorizationFeedbackDao: CategorizationFeedbackDao
 
     companion object {
         @Volatile

@@ -1,5 +1,6 @@
 package app.tinygiants.getalife.di
 
+import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.local.dao.AccountDao
 import app.tinygiants.getalife.data.local.dao.CategoryDao
 import app.tinygiants.getalife.data.local.dao.CategoryMonthlyStatusDao
@@ -9,6 +10,7 @@ import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.repository.AccountRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryMonthlyStatusRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
+import app.tinygiants.getalife.data.repository.CategorizationFeedbackRepositoryImpl
 import app.tinygiants.getalife.data.repository.CrispChatRepository
 import app.tinygiants.getalife.data.repository.FirebaseRemoteConfigRepository
 import app.tinygiants.getalife.data.repository.GoogleInAppReviewRepository
@@ -18,6 +20,7 @@ import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
+import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.repository.InAppReviewRepository
 import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
@@ -29,6 +32,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
@@ -108,4 +112,14 @@ object RepositoryModule {
         getCurrentBudget: GetCurrentBudgetUseCase
     ): CategoryMonthlyStatusRepository =
         CategoryMonthlyStatusRepositoryImpl(categoryMonthlyStatusDao, categoryRepository, getCurrentBudget)
+
+    @Provides
+    @Singleton
+    fun provideCategorizationFeedbackRepository(
+        database: GetALifeDatabase,
+        @Default dispatcher: CoroutineDispatcher
+    ): CategorizationFeedbackRepository = CategorizationFeedbackRepositoryImpl(
+        feedbackDao = database.categorizationFeedbackDao,
+        dispatcher = dispatcher
+    )
 }
