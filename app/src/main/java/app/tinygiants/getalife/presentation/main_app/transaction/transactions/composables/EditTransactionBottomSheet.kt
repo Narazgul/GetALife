@@ -52,6 +52,7 @@ import app.tinygiants.getalife.domain.model.Transaction
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
@@ -191,7 +192,8 @@ fun EditTransactionBottomSheet(
                 value = amountUserInputText,
                 onValueChange = { userInput ->
                     amountUserInputText = userInput
-                    amountMoney = Money(value = userInput.toDoubleOrNull() ?: amountMoney.asDouble())
+                    val parsedAmount = InputValidationUtils.parseAmountInput(userInput, Money(amountMoney.asDouble()))
+                    amountMoney = parsedAmount
 
                     onUpdateTransactionClicked(transaction.copy(amount = amountMoney))
                 },

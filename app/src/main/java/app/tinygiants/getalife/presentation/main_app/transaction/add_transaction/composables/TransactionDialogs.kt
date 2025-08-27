@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
+import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 
 /**
  * Dialog for creating a new category.
@@ -107,7 +108,7 @@ fun AddAccountDialog(
     var showAccountTypeDropdown by rememberSaveable { mutableStateOf(false) }
 
     val isValid = name.isNotBlank() && selectedAccountType != AccountType.Unknown
-    val balance = balanceInput.replace(',', '.').toDoubleOrNull() ?: 0.0
+    val balance = InputValidationUtils.parseBalanceInput(balanceInput)
 
     AlertDialog(
         onDismissRequest = onDismiss,

@@ -65,6 +65,7 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.GuidedTransactionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.theme.onSuccess
+import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -148,7 +149,7 @@ fun AmountInputStep(
     onNextClicked: () -> Unit
 ) {
     var amountInput by rememberSaveable { mutableStateOf(currentAmount?.asDouble()?.toString() ?: "") }
-    val isValid = amountInput.toDoubleOrNull()?.let { it > 0 } == true
+    val isValid = InputValidationUtils.isValidAmountInput(amountInput)
     val keyboardController = LocalSoftwareKeyboardController.current
 
     // Add focus requester for auto-focus
@@ -174,15 +175,14 @@ fun AmountInputStep(
         ) {
             BasicTextField(
                 value = amountInput,
-                onValueChange = {
-                    // Only allow numbers and decimal separator
-                    val newValue = it.replace(',', '.')
-                        .filter { char -> char.isDigit() || char == '.' }
-                    // Prevent more than one decimal point
+                onValueChange = { newValue ->
+                    // Only allow one decimal point
                     if (newValue.count { c -> c == '.' } <= 1) {
                         amountInput = newValue
-                        val value = newValue.toDoubleOrNull()
-                        if (value != null && value > 0) onAmountChanged(Money(value))
+                        val parsedAmount = InputValidationUtils.parseAmountInput(newValue)
+                        if (parsedAmount.asDouble() > 0) {
+                            onAmountChanged(parsedAmount)
+                        }
                     }
                 },
                 singleLine = true,

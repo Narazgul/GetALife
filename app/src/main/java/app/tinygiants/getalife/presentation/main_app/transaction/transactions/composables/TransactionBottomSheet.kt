@@ -64,6 +64,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.Instant
+import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -253,7 +254,9 @@ fun TransactionBottomSheet(
                             value = amountUserInputText,
                             onValueChange = { userInput ->
                                 amountUserInputText = userInput.replace(oldChar = ',', newChar = '.')
-                                amountMoney = Money(value = amountUserInputText.toDoubleOrNull() ?: amountMoney.asDouble())
+                                val parsedAmount =
+                                    InputValidationUtils.parseAmountInput(amountUserInputText, Money(amountMoney.asDouble()))
+                                amountMoney = parsedAmount
                             },
                             label = {
                                 Text(

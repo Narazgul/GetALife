@@ -64,6 +64,7 @@ import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.presentation.shared_composables.AutoCompleteTextField
+import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 import kotlinx.datetime.TimeZone
@@ -303,7 +304,9 @@ fun AddTransactionItem(
                         value = amountUserInputText,
                         onValueChange = { userInput ->
                             amountUserInputText = userInput.replace(oldChar = ',', newChar = '.')
-                            amountMoney = Money(value = amountUserInputText.toDoubleOrNull() ?: amountMoney.asDouble())
+                            val parsedAmount =
+                                InputValidationUtils.parseAmountInput(amountUserInputText, Money(amountMoney.asDouble()))
+                            amountMoney = parsedAmount
                         },
                         label = {
                             Text(
