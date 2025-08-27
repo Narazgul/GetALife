@@ -37,7 +37,7 @@ class DeleteTransactionUseCase @Inject constructor(
                 val transformedAmount = transformAmount(direction = transaction.transactionDirection, amount = transaction.amount)
                 val transactionWithTransformedAmount = transaction.copy(amount = transformedAmount)
                 updateAccount(transaction = transactionWithTransformedAmount)
-                updateCategory(transaction = transactionWithTransformedAmount)
+                // Removed updateCategory call as it's already handled by RecalculateCategoryMonthlyStatusUseCase
             }
 
             // Trigger recalculation for the affected category and month
@@ -70,14 +70,6 @@ class DeleteTransactionUseCase @Inject constructor(
         )
 
         accountRepository.updateAccount(updatedAccount)
-    }
-
-    private suspend fun updateCategory(transaction: Transaction) {
-        updateCategory(transaction.category, transaction.amount)
-    }
-
-    private suspend fun updateCategory(category: Category?, amount: Money) {
-        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
     }
 
     private suspend fun handleAccountTransferDeletion(transaction: Transaction) {

@@ -25,14 +25,9 @@ class ExchangeTransactionDirectionUseCase @Inject constructor(
 
         withContext(defaultDispatcher) {
 
-            updateCategory(transaction = transaction)
             updateAccount(transaction = transaction)
             updateTransaction(transaction = transaction)
         }
-    }
-
-    private suspend fun updateCategory(transaction: Transaction) {
-        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
     }
 
     private suspend fun updateAccount(transaction: Transaction) {

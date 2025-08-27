@@ -33,7 +33,7 @@ class UpdateTransactionUseCase @Inject constructor(
             )
 
             updateAccount(transaction = transformedTransaction)
-            updateCategory(transaction = transformedTransaction)
+            // Removed updateCategory call as it's already handled by RecalculateCategoryMonthlyStatusUseCase
             updateTransaction(transaction = transformedTransaction)
 
             // Trigger recalculation for the affected category and month
@@ -62,10 +62,6 @@ class UpdateTransactionUseCase @Inject constructor(
         )
 
         accountRepository.updateAccount(updatedAccount)
-    }
-
-    private suspend fun updateCategory(transaction: Transaction) {
-        // TODO: Category-Update muss auf MonthlyBudget umgestellt werden
     }
 
     private suspend fun calculateUpdatedBalance(
