@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.composables
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables
 
 import android.graphics.RuntimeShader
 import android.os.Build

@@ -514,20 +514,6 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun getProgressText(): String {
-        return when (uiState.value.guidedStep) {
-            GuidedTransactionStep.Type -> "Beginnen wir mit den Grundlagen"
-            GuidedTransactionStep.Amount -> "Super, weiter so! Noch 6 Schritte"
-            GuidedTransactionStep.Account -> "Noch 5 Schritte"
-            GuidedTransactionStep.ToAccount -> "Wohin soll das Geld?"
-            GuidedTransactionStep.Partner -> "Noch 4 Schritte"
-            GuidedTransactionStep.Category -> "Fast geschafft..."
-            GuidedTransactionStep.Date -> "Vorletzter Schritt"
-            GuidedTransactionStep.Optional -> "Letzter Schritt!"
-            GuidedTransactionStep.Done -> "Geschafft!"
-        }
-    }
-
     // endregion
 
     // region User interaction
@@ -591,5 +577,84 @@ class AddTransactionViewModel @Inject constructor(
                 selectedDescription = ""
             )
         }
+    }
+
+    /**
+     * Clear current error state
+     */
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
+    }
+
+    /**
+     * Retry the last failed action
+     */
+    fun retryLastAction() {
+        // Clear error state - specific retry logic can be added later based on error type
+        clearError()
+    }
+
+    /**
+     * Validate transaction form and update validation errors
+     */
+    private fun validateTransactionForm() {
+        val currentState = uiState.value
+        val errors = mutableSetOf<ValidationError>()
+
+        // Validate amount
+        val amount = currentState.selectedAmount?.asDouble() ?: 0.0
+        when {
+            amount <= 0 -> errors.add(ValidationError.AMOUNT_ZERO_OR_NEGATIVE)
+            amount > 999_999_999 -> errors.add(ValidationError.AMOUNT_TOO_LARGE)
+        }
+
+        // Validate partner
+        when {
+            currentState.selectedPartner.isBlank() -> errors.add(ValidationError.PARTNER_EMPTY)
+            currentState.selectedPartner.length > 100 -> errors.add(ValidationError.PARTNER_TOO_LONG)
+        }
+
+        // Validate accounts
+        if (currentState.selectedAccount == null) {
+            errors.add(ValidationError.ACCOUNT_NOT_SELECTED)
+        }
+
+        // For transfers, validate destination account
+        if (currentState.selectedDirection == TransactionDirection.Unknown) {
+            when {
+                currentState.selectedToAccount == null -> errors.add(ValidationError.TO_ACCOUNT_NOT_SELECTED)
+                currentState.selectedAccount?.id == currentState.selectedToAccount?.id ->
+                    errors.add(ValidationError.TO_ACCOUNT_SAME_AS_FROM)
+            }
+        }
+
+        // Validate description length
+        if (currentState.selectedDescription.length > 500) {
+            errors.add(ValidationError.DESCRIPTION_TOO_LONG)
+        }
+
+        // Update state with validation errors
+        _uiState.update {
+            it.copy(
+                validationErrors = errors,
+                isFormValid = errors.isEmpty()
+            )
+        }
+    }
+
+    /**
+     * Handle errors with appropriate user feedback
+     */
+    private fun handleError(throwable: Throwable, context: String = "") {
+        val uiError = when (throwable) {
+            is java.net.UnknownHostException,
+            is java.net.ConnectException -> UiError.NetworkError("Keine Internetverbindung")
+
+            is IllegalArgumentException -> UiError.ValidationError(context, throwable.message ?: "Ungültige Eingabe")
+            else -> UiError.UnknownError(throwable.message ?: "Ein unbekannter Fehler ist aufgetreten")
+        }
+
+        _uiState.update { it.copy(error = uiError) }
+        Firebase.crashlytics.recordException(throwable)
     }
 }

@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.tinygiants.getalife.presentation.main_app.transaction.composables.TransactionsList
+import app.tinygiants.getalife.presentation.main_app.transaction.transactions.composables.TransactionsList
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.ScreenPreview
 

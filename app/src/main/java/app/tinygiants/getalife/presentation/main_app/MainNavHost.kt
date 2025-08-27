@@ -14,7 +14,7 @@ import app.tinygiants.getalife.R
 import app.tinygiants.getalife.presentation.main_app.account.AccountScreen
 import app.tinygiants.getalife.presentation.main_app.budget.BudgetScreen
 import app.tinygiants.getalife.presentation.main_app.bulk_categorization.BulkCategorizationScreen
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransaction
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionScreen
 import app.tinygiants.getalife.presentation.main_app.transaction.transactions.TransactionScreen
 
 // Navigation Constants
@@ -124,7 +124,7 @@ fun NavGraphBuilder.addTransactionGraph() {
             startDestination = MainScreens.AddTransaction.route
         ) {
             composable(MainScreens.AddTransaction.route) {
-                AddTransaction()
+                AddTransactionScreen()
             }
         }
     }

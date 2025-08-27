@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.composables
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -490,7 +491,7 @@ private fun SelectionCard(
     label: String,
     selectedText: String,
     onClick: () -> Unit,
-    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    icon: ImageVector? = null,
     isCompact: Boolean = false,
     modifier: Modifier = Modifier
 ) {

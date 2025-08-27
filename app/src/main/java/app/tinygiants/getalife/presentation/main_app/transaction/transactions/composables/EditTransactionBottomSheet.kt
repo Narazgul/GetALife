@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.composables
+package app.tinygiants.getalife.presentation.main_app.transaction.transactions.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
