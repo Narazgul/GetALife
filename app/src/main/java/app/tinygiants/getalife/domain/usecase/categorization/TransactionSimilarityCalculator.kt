@@ -3,6 +3,7 @@ package app.tinygiants.getalife.domain.usecase.categorization
 import app.tinygiants.getalife.domain.model.categorization.SimilarityConfig
 import app.tinygiants.getalife.domain.repository.AiRepository
 import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
+import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -14,6 +15,7 @@ import javax.inject.Inject
  */
 class TransactionSimilarityCalculator @Inject constructor(
     private val transactionRepository: TransactionRepository,
+    private val categoryRepository: CategoryRepository,
     private val aiRepository: AiRepository,
     private val feedbackRepository: CategorizationFeedbackRepository,
     private val dispatcher: CoroutineDispatcher
@@ -96,9 +98,14 @@ class TransactionSimilarityCalculator @Inject constructor(
             if (successfulFeedback.isEmpty()) return 0f
 
             // Count how often this partner was successfully categorized to this category
-            val categoryMatches = successfulFeedback.count { feedback ->
-                feedback.userChosenCategoryId != null &&
-                        getCategoryName(feedback.userChosenCategoryId!!) == categoryName
+            var categoryMatches = 0
+
+            for (feedback in successfulFeedback) {
+                if (feedback.userChosenCategoryId != null &&
+                    getCategoryName(feedback.userChosenCategoryId!!) == categoryName
+                ) {
+                    categoryMatches++
+                }
             }
 
             if (categoryMatches == 0) return 0f
@@ -133,10 +140,15 @@ class TransactionSimilarityCalculator @Inject constructor(
         ).getOrElse { 0f }
     }
 
-    // TODO: This should be moved to a proper category lookup service
-    private fun getCategoryName(categoryId: Long): String {
-        // This is a placeholder - in real implementation, we'd lookup the category name
-        return "Category_$categoryId"
+    /**
+     * Get category name by ID using CategoryRepository
+     */
+    private suspend fun getCategoryName(categoryId: Long): String {
+        return try {
+            categoryRepository.getCategory(categoryId)?.name ?: "Unknown Category"
+        } catch (e: Exception) {
+            "Unknown Category"
+        }
     }
 
     /**
