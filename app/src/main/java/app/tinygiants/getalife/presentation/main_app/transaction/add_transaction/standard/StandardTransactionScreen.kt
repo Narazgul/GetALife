@@ -45,7 +45,6 @@ import kotlin.time.Clock
  * Provides full-featured transaction form with smart categorization and animated background.
  * Performance optimized - receives ViewModel as parameter to avoid multiple injections.
  */
-@Suppress("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StandardTransactionScreen(
     viewModel: AddTransactionViewModel,
