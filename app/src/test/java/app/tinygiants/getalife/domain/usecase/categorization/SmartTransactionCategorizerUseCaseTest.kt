@@ -64,8 +64,7 @@ class SmartTransactionCategorizerUseCaseTest {
             isEnabled = false,
             confidenceThreshold = 0.7f,
             maxSuggestions = 3,
-            enableLearning = true,
-            enableBulkCategorization = false
+            enableLearning = true
         )
         every { featureFlagUseCase.getSmartCategorizationConfig() } returns flowOf(config)
 
@@ -86,8 +85,7 @@ class SmartTransactionCategorizerUseCaseTest {
             isEnabled = true,
             confidenceThreshold = 0.7f,
             maxSuggestions = 3,
-            enableLearning = true,
-            enableBulkCategorization = false
+            enableLearning = true
         )
 
         val categories = listOf(
@@ -122,8 +120,7 @@ class SmartTransactionCategorizerUseCaseTest {
             isEnabled = true,
             confidenceThreshold = 0.7f,
             maxSuggestions = 3,
-            enableLearning = true,
-            enableBulkCategorization = false
+            enableLearning = true
         )
 
         val categories = listOf(
@@ -167,8 +164,7 @@ class SmartTransactionCategorizerUseCaseTest {
             isEnabled = true,
             confidenceThreshold = 0.7f,
             maxSuggestions = 3,
-            enableLearning = true,
-            enableBulkCategorization = false
+            enableLearning = true
         )
 
         val categories = listOf(createTestCategory(1L, "🛒", "Groceries"))

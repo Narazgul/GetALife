@@ -42,8 +42,7 @@ class FirebaseRemoteConfigRepository @Inject constructor(private val remoteConfi
                 isEnabled = true,//remoteConfig.getBoolean("smart_categorization_enabled"),
                 confidenceThreshold = remoteConfig.getDouble("smart_categorization_confidence_threshold").toFloat(),
                 maxSuggestions = remoteConfig.getLong("smart_categorization_max_suggestions").toInt(),
-                enableLearning = remoteConfig.getBoolean("smart_categorization_enable_learning"),
-                enableBulkCategorization = true //remoteConfig.getBoolean("smart_categorization_enable_bulk")
+                enableLearning = remoteConfig.getBoolean("smart_categorization_enable_learning")
             )
         )
     }

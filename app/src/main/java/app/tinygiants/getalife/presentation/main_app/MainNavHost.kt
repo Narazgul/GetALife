@@ -13,7 +13,6 @@ import androidx.navigation.navArgument
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.presentation.main_app.account.AccountScreen
 import app.tinygiants.getalife.presentation.main_app.budget.BudgetScreen
-import app.tinygiants.getalife.presentation.main_app.bulk_categorization.BulkCategorizationScreen
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionScreen
 import app.tinygiants.getalife.presentation.main_app.transaction.transactions.TransactionScreen
 
@@ -29,7 +28,6 @@ object NavigationConstants {
         const val BUDGET_SCREEN = "budget"
         const val ADD_TRANSACTION_SCREEN = "add_transaction"
         const val ACCOUNT_SCREEN = "account"
-        const val BULK_CATEGORIZATION_SCREEN = "bulk_categorization"
         const val TRANSACTIONS_SCREEN = "transaction/{$ARG_ACCOUNT_ID}"
     }
 
@@ -76,7 +74,6 @@ sealed class MainScreens(val route: String) {
     data object AddTransaction : MainScreens(route = NavigationConstants.Routes.ADD_TRANSACTION_SCREEN)
     data object Transactions : MainScreens(route = NavigationConstants.Routes.TRANSACTIONS_SCREEN)
     data object Account : MainScreens(route = NavigationConstants.Routes.ACCOUNT_SCREEN)
-    data object BulkCategorization : MainScreens(route = NavigationConstants.Routes.BULK_CATEGORIZATION_SCREEN)
 }
 
 @Composable
@@ -104,13 +101,6 @@ fun NavGraphBuilder.budgetGraph() {
         ) {
             composable(MainScreens.Budget.route) {
                 BudgetScreen()
-            }
-            composable(MainScreens.BulkCategorization.route) {
-                BulkCategorizationScreen(
-                    onNavigateUp = {
-                        budgetNavController.navigateUp()
-                    }
-                )
             }
         }
     }

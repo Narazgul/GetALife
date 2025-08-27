@@ -140,7 +140,13 @@ class TransactionSimilarityCalculator @Inject constructor(
     }
 
     /**
-     * Calculate similarity between two transactions for bulk categorization
+     * Calculate similarity between two transactions for smart categorization
+     *
+     * @param partner1 Transaction partner of first transaction
+     * @param description1 Description of first transaction
+     * @param partner2 Transaction partner of second transaction
+     * @param description2 Description of second transaction
+     * @return Similarity score between 0.0 and 1.0
      */
     suspend fun calculateSimilarity(
         transaction1: app.tinygiants.getalife.domain.model.Transaction,

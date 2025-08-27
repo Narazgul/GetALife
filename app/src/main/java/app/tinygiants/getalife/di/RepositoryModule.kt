@@ -18,6 +18,7 @@ import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.RevenueCatRepository
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
 import app.tinygiants.getalife.domain.repository.AccountRepository
+import app.tinygiants.getalife.domain.repository.AiRepository
 import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
@@ -29,7 +30,6 @@ import app.tinygiants.getalife.domain.repository.SupportChatRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.FeatureFlagUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
-import app.tinygiants.getalife.domain.usecase.categorization.BulkCategorizationUseCase
 import app.tinygiants.getalife.domain.usecase.categorization.SmartCategorizationLearningUseCase
 import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
 import app.tinygiants.getalife.domain.usecase.categorization.TransactionSimilarityCalculator
@@ -141,20 +141,21 @@ object RepositoryModule {
     )
 
     @Provides
-    @Singleton
-    fun provideBulkCategorizationUseCase(
-        transactionRepository: TransactionRepository,
+    fun provideSmartTransactionCategorizerUseCase(
         categoryRepository: CategoryRepository,
-        getCurrentBudgetUseCase: GetCurrentBudgetUseCase,
-        smartCategorizerUseCase: SmartTransactionCategorizerUseCase,
-        similarityCalculator: TransactionSimilarityCalculator,
-        featureFlagUseCase: FeatureFlagUseCase
-    ): BulkCategorizationUseCase = BulkCategorizationUseCase(
-        transactionRepository = transactionRepository,
+        groupRepository: GroupRepository,
+        transactionRepository: TransactionRepository,
+        aiRepository: AiRepository,
+        featureFlagUseCase: FeatureFlagUseCase,
+        transactionSimilarityCalculator: TransactionSimilarityCalculator,
+        @Io dispatcher: CoroutineDispatcher
+    ): SmartTransactionCategorizerUseCase = SmartTransactionCategorizerUseCase(
         categoryRepository = categoryRepository,
-        getCurrentBudgetUseCase = getCurrentBudgetUseCase,
-        smartCategorizerUseCase = smartCategorizerUseCase,
-        similarityCalculator = similarityCalculator,
-        featureFlagUseCase = featureFlagUseCase
+        groupRepository = groupRepository,
+        transactionRepository = transactionRepository,
+        aiRepository = aiRepository,
+        featureFlagUseCase = featureFlagUseCase,
+        transactionSimilarityCalculator = transactionSimilarityCalculator,
+        dispatcher = dispatcher
     )
 }

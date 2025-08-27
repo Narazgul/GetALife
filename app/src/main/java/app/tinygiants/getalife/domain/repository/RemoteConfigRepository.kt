@@ -14,11 +14,10 @@ interface RemoteConfigRepository {
 }
 
 data class SmartCategorizationConfig(
-    val isEnabled: Boolean,
-    val confidenceThreshold: Float,
-    val maxSuggestions: Int,
-    val enableLearning: Boolean,
-    val enableBulkCategorization: Boolean
+    val isEnabled: Boolean = false,
+    val confidenceThreshold: Float = 0.7f,
+    val maxSuggestions: Int = 3,
+    val enableLearning: Boolean = false
 )
 
 data class AiFinancialAdvisorConfig(
