@@ -6,8 +6,11 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
+import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
@@ -46,7 +49,8 @@ class AddTransactionViewModel @Inject constructor(
     private val getAccounts: GetAccountsUseCase,
     private val addTransaction: AddTransactionUseCase,
     private val categoryRepository: CategoryRepository,
-    private val onboardingPrefsUseCase: OnboardingPrefsUseCase
+    private val onboardingPrefsUseCase: OnboardingPrefsUseCase,
+    private val addAccount: AddAccountUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTransactionUiState(categories = emptyList(), accounts = emptyList()))
@@ -95,6 +99,78 @@ class AddTransactionViewModel @Inject constructor(
     // endregion
 
     // region Guided Mode Functions
+
+    /**
+     * Create and persist a new account, then reload the accounts list.
+     * The AddAccountUseCase creates the account with starting balance transaction.
+     */
+    fun onAccountCreated(name: String, initialBalance: Money, type: AccountType) {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isCreatingAccount = true) }
+
+                addAccount(
+                    name = name,
+                    balance = initialBalance,
+                    type = type,
+                    startingBalanceName = "Startsaldo",
+                    startingBalanceDescription = "Anfangsguthaben für $name"
+                )
+
+                // Accounts list will be automatically reloaded via flow
+                _uiState.update { it.copy(isCreatingAccount = false) }
+            } catch (e: Exception) {
+                Firebase.crashlytics.recordException(e)
+                _uiState.update {
+                it.copy(
+                        isCreatingAccount = false,
+                        error = null
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Create and persist a new category, then reload the categories list.
+     * Categories created during guided mode will be auto-selected.
+     */
+    fun onCategoryCreated(name: String) {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isCreatingCategory = true) }
+
+                // Create temporary category - the repository will assign proper ID
+                val newCategory = Category(
+                    id = 0, // Will be assigned by repository
+                    groupId = 1L, // Default group - TODO: Make this configurable
+                    emoji = "", // Will be filled by AI
+                    name = name,
+                    budgetTarget = Money(0.0), // Default target
+                    monthlyTargetAmount = null,
+                    targetMonthsRemaining = null,
+                    listPosition = uiState.value.categories.size,
+                    isInitialCategory = false,
+                    linkedAccountId = null,
+                    updatedAt = kotlin.time.Clock.System.now(),
+                    createdAt = kotlin.time.Clock.System.now()
+                )
+
+                categoryRepository.addCategory(newCategory)
+
+                // Categories list will be automatically reloaded via flow
+                _uiState.update { it.copy(isCreatingCategory = false, error = null) }
+            } catch (e: Exception) {
+                Firebase.crashlytics.recordException(e)
+                _uiState.update {
+                it.copy(
+                        isCreatingCategory = false,
+                    error = null
+                    )
+                }
+            }
+        }
+    }
 
     fun moveToNextStep() {
         val currentStep = uiState.value.guidedStep
