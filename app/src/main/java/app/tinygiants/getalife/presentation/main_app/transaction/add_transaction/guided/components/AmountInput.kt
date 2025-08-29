@@ -1,6 +1,5 @@
 package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +38,6 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun AmountInput(
-    currentAmount: Money?,
     amountText: String,
     onAmountTextChanged: (String) -> Unit,
     onAmountChanged: (Money) -> Unit,
@@ -59,9 +55,7 @@ fun AmountInput(
     val stableAmountChangeCallback = remember(onAmountChanged) {
         { textValue: String ->
             val amount = InputValidationUtils.parseAmountInput(textValue)
-            if (amount != null) {
-                onAmountChanged(amount)
-            }
+            onAmountChanged(amount)
         }
     }
     val stableNextCallback = remember(onNextClicked) { onNextClicked }
@@ -164,7 +158,6 @@ fun AmountInput(
 private fun AmountInputEmptyPreview() {
     GetALifeTheme {
         AmountInput(
-            currentAmount = null,
             amountText = "",
             onAmountTextChanged = { },
             onAmountChanged = { },
@@ -180,7 +173,6 @@ private fun AmountInputEmptyPreview() {
 private fun AmountInputWithValuePreview() {
     GetALifeTheme {
         AmountInput(
-            currentAmount = Money(25.99),
             amountText = "25.99",
             onAmountTextChanged = { },
             onAmountChanged = { },
@@ -196,7 +188,6 @@ private fun AmountInputWithValuePreview() {
 private fun AmountInputNoButtonPreview() {
     GetALifeTheme {
         AmountInput(
-            currentAmount = null,
             amountText = "",
             onAmountTextChanged = { },
             onAmountChanged = { },

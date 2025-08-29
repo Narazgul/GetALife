@@ -51,7 +51,6 @@ fun TransferAmountStep(
     modifier: Modifier = Modifier
 ) {
     AmountInput(
-        currentAmount = currentAmount,
         amountText = amountText,
         onAmountTextChanged = onAmountTextChanged,
         onAmountChanged = onAmountChanged,
