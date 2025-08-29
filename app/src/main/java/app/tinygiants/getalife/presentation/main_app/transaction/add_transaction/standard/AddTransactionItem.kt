@@ -61,7 +61,6 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.asStringRes
-import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -80,10 +79,10 @@ typealias TransactionPartner = String
 fun AddTransactionItem(
     categories: List<Category>,
     accounts: List<Account>,
+    modifier: Modifier = Modifier,
     selectedCategory: Category? = null,
     transactionPartner: String = "",
     smartCategorizationUiState: SmartCategorizationUiState = SmartCategorizationUiState(),
-    onAcceptCategorySuggestion: (NewCategorySuggestion) -> Unit = {},
     onTransactionDirectionClicked: (TransactionDirection) -> Unit,
     onAddTransactionClicked: (
         amount: Money,
@@ -94,8 +93,7 @@ fun AddTransactionItem(
         transactionPartner: TransactionPartner,
         dateOfTransaction: Instant,
         recurrenceFrequency: RecurrenceFrequency?
-    ) -> Unit,
-    modifier: Modifier = Modifier
+    ) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -499,9 +497,9 @@ private fun SelectionCard(
     label: String,
     selectedText: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    isCompact: Boolean = false,
-    modifier: Modifier = Modifier
+    isCompact: Boolean = false
 ) {
     Card(
         modifier = modifier

@@ -2,7 +2,6 @@ package app.tinygiants.getalife.presentation.main_app.transaction.add_transactio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
@@ -11,7 +10,6 @@ import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
-import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
@@ -54,7 +52,6 @@ sealed interface GuidedTransactionStep {
 class AddTransactionViewModel @Inject constructor(
     private val getCategories: GetCategoriesUseCase,
     private val getAccounts: GetAccountsUseCase,
-    private val addAccount: AddAccountUseCase,
     private val addTransaction: AddTransactionUseCase,
     private val smartCategorizer: SmartTransactionCategorizerUseCase,
     private val categoryRepository: CategoryRepository,
@@ -143,114 +140,7 @@ class AddTransactionViewModel @Inject constructor(
 
     // endregion
 
-    /**
-     * Create a temporary new category for guided mode dialog (will be saved when transaction is saved)
-     */
-    fun onCreateNewCategory(categoryName: String) {
-        viewModelScope.launch {
-            try {
-                // Get all groups to find a suitable group
-                val groups = groupRepository.getAllGroups()
-                val defaultGroup = groups.firstOrNull() // Use first available group or create logic for default group
-
-                if (defaultGroup != null) {
-                    // Create temporary category (not saved to repository yet)
-                    val tempCategory = Category(
-                        id = -System.currentTimeMillis(), // Use negative ID to indicate it's temporary
-                        groupId = defaultGroup.id,
-                        emoji = "📁", // Default emoji, can be updated later by AI
-                        name = categoryName,
-                        budgetTarget = Money(0.0),
-                        monthlyTargetAmount = null,
-                        targetMonthsRemaining = null,
-                        listPosition = 999, // Add at end
-                        isInitialCategory = false,
-                        linkedAccountId = null,
-                        updatedAt = Clock.System.now(),
-                        createdAt = Clock.System.now()
-                    )
-
-                    // Update UI state with temporary category (will be saved when transaction is saved)
-                    _uiState.update {
-                        it.copy(
-                            categories = it.categories + tempCategory,
-                            selectedCategory = tempCategory
-                        )
-                    }
-
-                    // Automatically proceed to next step after creating and selecting category
-                    moveToNextStep()
-                }
-            } catch (e: Exception) {
-                Firebase.crashlytics.recordException(e)
-                // Could show error to user here
-            }
-        }
-    }
-
     // region Smart Categorization
-
-    /**
-     * Create a new account (used in guided mode when user creates account in workflow)
-     */
-    fun onCreateNewAccount(
-        name: String,
-        initialBalance: Money = Money(0.0),
-        accountType: AccountType = AccountType.Checking
-    ) {
-        viewModelScope.launch {
-            try {
-                // Create new account with AddAccountUseCase
-                addAccount(
-                    name = name,
-                    balance = initialBalance,
-                    type = accountType,
-                    startingBalanceName = "Startsaldo",
-                    startingBalanceDescription = "Anfangsbestand des Kontos"
-                )
-
-                // Small delay to ensure account is saved before reloading
-                kotlinx.coroutines.delay(200)
-
-                // Reload accounts after creation to get the new account
-                getAccounts()
-                    .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
-                    .collect { result ->
-                        result.onSuccess { accounts ->
-                            _uiState.update { uiState ->
-                                uiState.copy(accounts = accounts)
-                            }
-
-                            // Auto-select the newly created account
-                            val newAccount = accounts.find { it.name == name }
-                            newAccount?.let { account ->
-                                _uiState.update { it.copy(selectedAccount = account) }
-                                // Automatically proceed to next step after selecting account
-                                moveToNextStep()
-                            }
-                        }
-                    }
-
-            } catch (e: Exception) {
-                Firebase.crashlytics.recordException(e)
-                // Could show error to user here
-            }
-        }
-    }
-
-    /**
-     * Update transaction description input and trigger smart categorization
-     */
-    fun updateTransactionDescription(description: String) {
-        _transactionDescription.value = description
-    }
-
-    /**
-     * Update transaction amount input and trigger smart categorization
-     */
-    fun updateTransactionAmount(amount: Money) {
-        _transactionAmount.value = amount
-    }
 
     /**
      * Manually trigger smart categorization suggestion
@@ -353,15 +243,6 @@ class AddTransactionViewModel @Inject constructor(
     fun dismissCategorizationBottomSheet() {
         _smartCategorizationState.update {
             it.copy(showBottomSheet = false)
-        }
-    }
-
-    /**
-     * Clear smart categorization error
-     */
-    fun clearCategorizationError() {
-        _smartCategorizationState.update {
-            it.copy(error = null)
         }
     }
 
@@ -550,84 +431,5 @@ class AddTransactionViewModel @Inject constructor(
                 selectedDescription = ""
             )
         }
-    }
-
-    /**
-     * Clear current error state
-     */
-    fun clearError() {
-        _uiState.update { it.copy(error = null) }
-    }
-
-    /**
-     * Retry the last failed action
-     */
-    fun retryLastAction() {
-        // Clear error state - specific retry logic can be added later based on error type
-        clearError()
-    }
-
-    /**
-     * Validate transaction form and update validation errors
-     */
-    private fun validateTransactionForm() {
-        val currentState = uiState.value
-        val errors = mutableSetOf<ValidationError>()
-
-        // Validate amount
-        val amount = currentState.selectedAmount?.asDouble() ?: 0.0
-        when {
-            amount <= 0 -> errors.add(ValidationError.AMOUNT_ZERO_OR_NEGATIVE)
-            amount > 999_999_999 -> errors.add(ValidationError.AMOUNT_TOO_LARGE)
-        }
-
-        // Validate partner
-        when {
-            currentState.selectedPartner.isBlank() -> errors.add(ValidationError.PARTNER_EMPTY)
-            currentState.selectedPartner.length > 100 -> errors.add(ValidationError.PARTNER_TOO_LONG)
-        }
-
-        // Validate accounts
-        if (currentState.selectedAccount == null) {
-            errors.add(ValidationError.ACCOUNT_NOT_SELECTED)
-        }
-
-        // For transfers, validate destination account
-        if (currentState.selectedDirection == TransactionDirection.Unknown) {
-            when {
-                currentState.selectedToAccount == null -> errors.add(ValidationError.TO_ACCOUNT_NOT_SELECTED)
-                currentState.selectedAccount?.id == currentState.selectedToAccount?.id ->
-                    errors.add(ValidationError.TO_ACCOUNT_SAME_AS_FROM)
-            }
-        }
-
-        // Validate description length
-        if (currentState.selectedDescription.length > 500) {
-            errors.add(ValidationError.DESCRIPTION_TOO_LONG)
-        }
-
-        // Update state with validation errors
-        _uiState.update {
-            it.copy(
-                validationErrors = errors,
-                isFormValid = errors.isEmpty()
-            )
-        }
-    }
-
-    /**
-     * Handle errors with appropriate user feedback
-     */
-    private fun handleError(throwable: Throwable, context: String = "") {
-        val uiError = when (throwable) {
-            is java.net.UnknownHostException,
-            is java.net.ConnectException -> UiError.NetworkError("Keine Internetverbindung")
-
-            is IllegalArgumentException -> UiError.ValidationError(context, throwable.message ?: "Ungültige Eingabe")
-            else -> UiError.UnknownError(throwable.message ?: "Ein unbekannter Fehler ist aufgetreten")
-        }
-
-        _uiState.update { it.copy(error = uiError) }
-        Firebase.crashlytics.recordException(throwable)
     }
 }

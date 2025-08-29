@@ -54,8 +54,6 @@ fun GuidedTransactionScreen(
     uiState: AddTransactionUiState
 ) {
     // Collect additional states needed for guided mode
-    val categories by viewModel.uiState.collectAsStateWithLifecycle()
-    val accounts by viewModel.uiState.collectAsStateWithLifecycle()
     val smartCategorizationUiState by viewModel.smartCategorizationState.collectAsStateWithLifecycle()
 
     val progress = remember(uiState.guidedStep) {
@@ -184,7 +182,6 @@ fun GuidedTransactionScreen(
 
                             GuidedTransactionStep.Partner -> PartnerInputStep(
                                 currentPartner = uiState.selectedPartner,
-                                selectedDirection = uiState.selectedDirection,
                                 onPartnerChanged = viewModel::onGuidedPartnerEntered,
                                 onNextClicked = viewModel::moveToNextStep
                             )

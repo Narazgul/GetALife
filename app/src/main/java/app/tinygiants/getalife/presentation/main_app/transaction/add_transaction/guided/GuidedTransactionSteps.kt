@@ -61,8 +61,8 @@ import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionUiState
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.GuidedTransactionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
-import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
+import app.tinygiants.getalife.theme.onSuccess
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -417,12 +417,11 @@ fun ToAccountSelectionStep(
 }
 
 /**
- * Step 5: Partner input with smart suggestions
+ * Step 5: Partner input
  */
 @Composable
 fun PartnerInputStep(
     currentPartner: String,
-    selectedDirection: TransactionDirection?,
     onPartnerChanged: (String) -> Unit,
     onNextClicked: () -> Unit
 ) {
