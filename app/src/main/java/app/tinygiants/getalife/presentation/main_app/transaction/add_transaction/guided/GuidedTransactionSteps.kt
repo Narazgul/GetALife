@@ -121,7 +121,6 @@ fun GuidedTransactionStep(
         GuidedTransactionStep.Amount -> {
             when (uiState.selectedDirection) {
                 TransactionDirection.Inflow -> InflowAmountStep(
-                    currentAmount = uiState.selectedAmount,
                     amountText = amountText,
                     onAmountTextChanged = { amountText = it },
                     onAmountChanged = viewModel::onGuidedAmountEntered,
@@ -130,7 +129,6 @@ fun GuidedTransactionStep(
                 )
 
                 TransactionDirection.Outflow -> OutflowAmountStep(
-                    currentAmount = uiState.selectedAmount,
                     amountText = amountText,
                     onAmountTextChanged = { amountText = it },
                     onAmountChanged = viewModel::onGuidedAmountEntered,
@@ -139,7 +137,6 @@ fun GuidedTransactionStep(
                 )
 
                 TransactionDirection.Unknown -> TransferAmountStep( // Transfer
-                    currentAmount = uiState.selectedAmount,
                     amountText = amountText,
                     onAmountTextChanged = { amountText = it },
                     onAmountChanged = viewModel::onGuidedAmountEntered,
@@ -148,7 +145,6 @@ fun GuidedTransactionStep(
                 )
 
                 else -> InflowAmountStep(
-                    currentAmount = uiState.selectedAmount,
                     amountText = amountText,
                     onAmountTextChanged = { amountText = it },
                     onAmountChanged = viewModel::onGuidedAmountEntered,

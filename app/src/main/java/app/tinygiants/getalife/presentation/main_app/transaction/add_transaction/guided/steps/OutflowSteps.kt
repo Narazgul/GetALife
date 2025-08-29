@@ -8,11 +8,11 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.AccountSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.AmountInput
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.CategorySelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.CompletionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.DateSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.AccountSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.CategorySelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.TextInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components.TransactionTypeSelector
 import app.tinygiants.getalife.theme.GetALifeTheme
@@ -45,7 +45,6 @@ fun OutflowTypeStep(
 // Step 2: Amount Input (shared with all flows)
 @Composable
 fun OutflowAmountStep(
-    currentAmount: Money?,
     amountText: String,
     onAmountTextChanged: (String) -> Unit,
     onAmountChanged: (Money) -> Unit,
@@ -246,7 +245,6 @@ private fun OutflowTypeStepPreview() {
 private fun OutflowAmountStepPreview() {
     GetALifeTheme {
         OutflowAmountStep(
-            currentAmount = Money(45.99),
             amountText = "45.99",
             onAmountTextChanged = { },
             onAmountChanged = { },
