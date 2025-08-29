@@ -38,6 +38,8 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionViewModel
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.GuidedTransactionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.CompletedStepsChecklist
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.GuidedTransactionStepWithDialogs
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
@@ -149,96 +151,65 @@ fun GuidedTransactionScreen(
                                     fadeOut(animationSpec = tween(400))
                         }
                     ) { targetStep ->
-                        when (targetStep) {
-                            GuidedTransactionStep.Type -> TransactionTypeStep(
-                                selectedDirection = uiState.selectedDirection,
-                                availableAccounts = uiState.accounts,
-                                onTypeSelected = viewModel::onGuidedTransactionTypeSelected
-                            )
-
-                            GuidedTransactionStep.Amount -> AmountInputStep(
-                                currentAmount = uiState.selectedAmount,
-                                onAmountChanged = viewModel::onGuidedAmountEntered,
-                                onNextClicked = viewModel::moveToNextStep
-                            )
-
-                            GuidedTransactionStep.Account -> AccountSelectionStep(
-                                accounts = uiState.accounts,
-                                selectedAccount = uiState.selectedAccount,
-                                onAccountSelected = viewModel::onGuidedAccountSelected,
-                                onCreateAccountClicked = { /* Dialog handling inside step */ }
-                            )
-
-                            GuidedTransactionStep.ToAccount -> ToAccountSelectionStep(
-                                accounts = uiState.accounts.filter { it != uiState.selectedAccount }, // Exclude source account
-                                selectedToAccount = uiState.selectedToAccount,
-                                onToAccountSelected = viewModel::onGuidedToAccountSelected
-                            )
-
-                            GuidedTransactionStep.Partner -> PartnerInputStep(
-                                currentPartner = uiState.selectedPartner,
-                                onPartnerChanged = viewModel::onGuidedPartnerEntered,
-                                onNextClicked = viewModel::moveToNextStep
-                            )
-
-                            GuidedTransactionStep.Category -> CategorySelectionStep(
-                                categories = uiState.categories,
-                                selectedCategory = uiState.selectedCategory,
-                                onCategorySelected = viewModel::onGuidedCategorySelected,
-                                onCreateCategoryClicked = { /* Dialog handling inside step */ }
-                            )
-
-                            GuidedTransactionStep.Date -> DateSelectionStep(
-                                selectedDate = uiState.selectedDate,
-                                onDateSelected = viewModel::onGuidedDateSelected,
-                                onNextClicked = viewModel::moveToNextStep
-                            )
-
-                            GuidedTransactionStep.Optional -> OptionalStep(
-                                description = uiState.selectedDescription,
-                                onDescriptionChanged = viewModel::onGuidedDescriptionChanged,
-                                onFinishClicked = viewModel::onGuidedTransactionComplete
-                            )
-
-                            GuidedTransactionStep.Done -> TransactionCompletedStep(
-                                onSwitchToStandardMode = viewModel::switchToStandardMode
-                            )
-                        }
+                        GuidedTransactionStepWithDialogs(
+                            step = targetStep,
+                            uiState = uiState,
+                            viewModel = viewModel
+                        )
                     }
                 }
             }
         }
     }
+
 }
 
+// Helper functions previously imported, now redefined here (public/reused scope)
+
 /**
- * Helper function for progress text based on current step.
- * Pure function for better testability.
+ * Returns a string representing the current progress header text for the given step.
  */
-fun getProgressText(guidedStep: GuidedTransactionStep): String {
-    return when (guidedStep) {
-        GuidedTransactionStep.Type -> "Beginnen wir mit den Grundlagen 💪"
-        GuidedTransactionStep.Amount -> "Super, weiter so! Noch 6 Schritte 🚀"
-        GuidedTransactionStep.Account -> "Noch 5 Schritte 📈"
-        GuidedTransactionStep.ToAccount -> "Wohin soll das Geld? 💸"
-        GuidedTransactionStep.Partner -> "Noch 4 Schritte ⭐"
-        GuidedTransactionStep.Category -> "Fast geschafft! 🎯"
-        GuidedTransactionStep.Date -> "Vorletzter Schritt! 📅"
-        GuidedTransactionStep.Optional -> "Letzter Schritt! 🏁"
-        GuidedTransactionStep.Done -> "Stark! Du hast alle Schritte abgeschlossen 🎉"
+fun getProgressText(step: GuidedTransactionStep): String {
+    return when (step) {
+        GuidedTransactionStep.Type -> "Beginnen wir mit den Grundlagen "
+        GuidedTransactionStep.Amount -> "Super, weiter so! Noch 6 Schritte "
+        GuidedTransactionStep.Account -> "Noch 5 Schritte "
+        GuidedTransactionStep.ToAccount -> "Wohin soll das Geld? "
+        GuidedTransactionStep.Partner -> "Noch 4 Schritte "
+        GuidedTransactionStep.Category -> "Fast geschafft! "
+        GuidedTransactionStep.Date -> "Vorletzter Schritt! "
+        GuidedTransactionStep.Optional -> "Letzter Schritt! "
+        GuidedTransactionStep.Done -> "Stark! Du hast alle Schritte abgeschlossen "
     }
 }
 
 /**
- * Helper functions for step values and localization.
- * Moved here from main screen for better organization.
+ * Returns the human-readable name of a GuidedTransactionStep for display.
+ */
+fun GuidedTransactionStep.localizedName(): String {
+    return when (this) {
+        GuidedTransactionStep.Type -> "Typ"
+        GuidedTransactionStep.Amount -> "Betrag"
+        GuidedTransactionStep.Account -> "Konto"
+        GuidedTransactionStep.ToAccount -> "Zielkonto"
+        GuidedTransactionStep.Partner -> "Partner"
+        GuidedTransactionStep.Category -> "Kategorie"
+        GuidedTransactionStep.Date -> "Datum"
+        GuidedTransactionStep.Optional -> "Optionen"
+        GuidedTransactionStep.Done -> "Fertig"
+    }
+}
+
+/**
+ * Returns the display value for a completed step
  */
 fun getStepValue(step: GuidedTransactionStep, uiState: AddTransactionUiState): String {
     return when (step) {
         GuidedTransactionStep.Type -> when (uiState.selectedDirection) {
             TransactionDirection.Inflow -> "Einnahme"
             TransactionDirection.Outflow -> "Ausgabe"
-            else -> "Transfer"
+            TransactionDirection.Unknown -> "Transfer"
+            else -> ""
         }
 
         GuidedTransactionStep.Amount -> uiState.selectedAmount?.formattedMoney ?: ""
@@ -247,21 +218,9 @@ fun getStepValue(step: GuidedTransactionStep, uiState: AddTransactionUiState): S
         GuidedTransactionStep.Partner -> uiState.selectedPartner
         GuidedTransactionStep.Category -> uiState.selectedCategory?.name ?: ""
         GuidedTransactionStep.Date -> uiState.selectedDate?.toString() ?: ""
-        GuidedTransactionStep.Optional -> if (uiState.selectedDescription.isNotEmpty()) "Beschreibung hinzugef\u00FCgt" else "\u00DCbersprungen"
+        GuidedTransactionStep.Optional -> if (uiState.selectedDescription.isNotEmpty()) "Beschreibung hinzugefügt" else "Übersprungen"
         GuidedTransactionStep.Done -> "Fertig"
     }
-}
-
-fun GuidedTransactionStep.localizedName(): String = when (this) {
-    GuidedTransactionStep.Type -> "Typ"
-    GuidedTransactionStep.Amount -> "Betrag"
-    GuidedTransactionStep.Account -> "Konto"
-    GuidedTransactionStep.ToAccount -> "Zielkonto"
-    GuidedTransactionStep.Partner -> "Partner"
-    GuidedTransactionStep.Category -> "Kategorie"
-    GuidedTransactionStep.Date -> "Datum"
-    GuidedTransactionStep.Optional -> "Optionen"
-    GuidedTransactionStep.Done -> "Fertig"
 }
 
 // ================================

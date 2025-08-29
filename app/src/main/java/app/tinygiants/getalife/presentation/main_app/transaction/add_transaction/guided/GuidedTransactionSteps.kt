@@ -3,818 +3,374 @@ package app.tinygiants.getalife.presentation.main_app.transaction.add_transactio
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MultiChoiceSegmentedButtonRow
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionUiState
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionViewModel
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.GuidedTransactionStep
-import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
-import app.tinygiants.getalife.theme.onSuccess
-import kotlinx.coroutines.delay
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowAccountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowAmountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowCompletionStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowDateStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowOptionalStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowPartnerStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.InflowTypeStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowAccountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowAmountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowCategoryStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowCompletionStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowDateStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowOptionalStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowPartnerStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.OutflowTypeStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferAmountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferCompletionStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferDateStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferFromAccountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferOptionalStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferToAccountStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.steps.TransferTypeStep
+import app.tinygiants.getalife.theme.GetALifeTheme
 import kotlin.time.Clock
 
 /**
- * Step 1: Transaction type selection (Inflow, Outflow, Transfer)
- * Performance optimized - receives ViewModel as parameter instead of injection
+ * Refactored guided transaction steps using modular components.
+ * Each step is now flow-specific and uses reusable UI components.
+ *
+ * This replaces the original monolithic GuidedTransactionSteps.kt (851 lines)
+ * with a clean, modular approach that's easier to maintain and test.
  */
-@Composable
-fun TransactionTypeStep(
-    selectedDirection: TransactionDirection?,
-    availableAccounts: List<Account>, // For determining if Transfer should be shown
-    onTypeSelected: (TransactionDirection) -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Was für eine Transaktion ist das?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            textAlign = TextAlign.Center
-        )
 
-        val options = buildList {
-            add(TransactionDirection.Inflow to "💰 Einnahme")
-            // Only show Transfer if there are at least 2 accounts
-            if (availableAccounts.size >= 2) {
-                add(TransactionDirection.Unknown to "↔️ Transfer")
-            }
-            add(TransactionDirection.Outflow to "💸 Ausgabe")
-        }
-
-        MultiChoiceSegmentedButtonRow {
-            options.forEachIndexed { idx, (direction, label) ->
-                SegmentedButton(
-                    checked = direction == selectedDirection,
-                    onCheckedChange = {
-                        // Always call onTypeSelected regardless of checked state
-                        // This allows re-selection of the same option
-                        onTypeSelected(direction)
-                    },
-                    shape = when {
-                        options.size == 1 -> RoundedCornerShape(16.dp)
-                        idx == 0 -> RoundedCornerShape(
-                            topStart = 16.dp,
-                            bottomStart = 16.dp,
-                            topEnd = 0.dp,
-                            bottomEnd = 0.dp
-                        )
-
-                        idx == options.lastIndex -> RoundedCornerShape(
-                            topEnd = 16.dp,
-                            bottomEnd = 16.dp,
-                            topStart = 0.dp,
-                            bottomStart = 0.dp
-                        )
-
-                        else -> RoundedCornerShape(0.dp)
-                    }
-                ) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
-        }
-    }
-}
+// ================================
+// FLOW ORCHESTRATION
+// ================================
 
 /**
- * Step 2: Amount input with auto-focus and validation
+ * Main step orchestrator that routes to the appropriate flow-specific step.
+ * Uses the current transaction direction to determine which step components to show.
  */
 @Composable
-fun AmountInputStep(
-    currentAmount: Money?,
-    onAmountChanged: (Money) -> Unit,
-    onNextClicked: () -> Unit
+fun GuidedTransactionStep(
+    step: GuidedTransactionStep,
+    uiState: AddTransactionUiState,
+    viewModel: AddTransactionViewModel,
+    modifier: Modifier = Modifier
 ) {
-    var amountInput by rememberSaveable { mutableStateOf(currentAmount?.asDouble()?.toString() ?: "") }
-    val isValid = InputValidationUtils.isValidAmountInput(amountInput)
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    // Add focus requester for auto-focus
-    val focusRequester = remember { FocusRequester() }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Gib den Betrag ein (in Euro)",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            textAlign = TextAlign.Center
-        )
-
-        // Custom large number input, borderless, with euro symbol
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .width(280.dp)
-                .padding(vertical = 16.dp)
-        ) {
-            BasicTextField(
-                value = amountInput,
-                onValueChange = { newValue ->
-                    // Only allow one decimal point
-                    if (newValue.count { c -> c == '.' } <= 1) {
-                        amountInput = newValue
-                        val parsedAmount = InputValidationUtils.parseAmountInput(newValue)
-                        if (parsedAmount.asDouble() > 0) {
-                            onAmountChanged(parsedAmount)
-                        }
-                    }
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (isValid) {
-                            keyboardController?.hide()
-                            onNextClicked()
-                        }
-                    }
-                ),
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = MaterialTheme.typography.displayLarge.fontSize,
-                    fontWeight = MaterialTheme.typography.displayLarge.fontWeight,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = MaterialTheme.typography.displayLarge.letterSpacing
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(focusRequester)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = "€",
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.displayLarge
-            )
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                keyboardController?.hide()
-                onNextClicked()
-            },
-            enabled = isValid
-        ) {
-            Text("Weiter")
-        }
-    }
-
-    // Auto-focus the text field when the composable is first displayed
-    LaunchedEffect(Unit) {
-        delay(100) // Small delay to ensure UI is ready
-        focusRequester.requestFocus()
-    }
-}
-
-/**
- * Step 3: Account selection with create account option
- */
-@Composable
-fun AccountSelectionStep(
-    accounts: List<Account>,
-    selectedAccount: Account?,
-    onAccountSelected: (Account) -> Unit,
-    onCreateAccountClicked: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Von welchem Konto?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        if (accounts.isEmpty()) {
-            // No accounts available - show add account option prominently
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onCreateAccountClicked() }
-                    .clip(RoundedCornerShape(12.dp)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(20.dp)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "➕ Neues Konto erstellen",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = "Es sind noch keine Konten vorhanden",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.height(200.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(accounts) { account ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onAccountSelected(account) }
-                            .clip(RoundedCornerShape(12.dp)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = if (account == selectedAccount)
-                                        MaterialTheme.colorScheme.primaryContainer
-                                    else MaterialTheme.colorScheme.surface
-                                )
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                text = account.name,
-                                color = if (account == selectedAccount)
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                }
-
-                // Add new account option at the bottom
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onCreateAccountClicked() }
-                            .clip(RoundedCornerShape(12.dp)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "➕",
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = "Neues Konto erstellen",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Step 4: ToAccount selection for transfers
- */
-@Composable
-fun ToAccountSelectionStep(
-    accounts: List<Account>,
-    selectedToAccount: Account?,
-    onToAccountSelected: (Account) -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Auf welches Konto soll transferiert werden?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        if (accounts.isEmpty()) {
-            Text(
-                text = "Kein verfügbares Zielkonto.",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier.height(200.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(accounts) { account ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onToAccountSelected(account) }
-                            .clip(RoundedCornerShape(12.dp)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = if (account == selectedToAccount)
-                                        MaterialTheme.colorScheme.primaryContainer
-                                    else MaterialTheme.colorScheme.surface
-                                )
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                text = account.name,
-                                color = if (account == selectedToAccount)
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Step 5: Partner input
- */
-@Composable
-fun PartnerInputStep(
-    currentPartner: String,
-    onPartnerChanged: (String) -> Unit,
-    onNextClicked: () -> Unit
-) {
-    var input by rememberSaveable { mutableStateOf(currentPartner) }
-    val isValid = input.trim().isNotEmpty()
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Mit wem war die Transaktion?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            textAlign = TextAlign.Center
-        )
-
-        OutlinedTextField(
-            value = input,
-            onValueChange = {
-                input = it
-                onPartnerChanged(it)
-            },
-            label = { Text("z.B. Netflix, Edeka, Max Mustermann") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if (isValid) {
-                        keyboardController?.hide()
-                        onNextClicked()
-                    }
-                }
-            ),
-            modifier = Modifier.width(280.dp)
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        Button(
-            onClick = onNextClicked,
-            enabled = isValid
-        ) {
-            Text("Weiter")
-        }
-    }
-}
-
-/**
- * Step 6: Category selection
- */
-@Composable
-fun CategorySelectionStep(
-    categories: List<Category>,
-    selectedCategory: Category?,
-    onCategorySelected: (Category) -> Unit,
-    onCreateCategoryClicked: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Zu welcher Kategorie gehört das?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            textAlign = TextAlign.Center
-        )
-
-        if (categories.isEmpty()) {
-            // No categories available - show add category option prominently
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onCreateCategoryClicked() }
-                    .clip(RoundedCornerShape(12.dp)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(20.dp)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "➕ Neue Kategorie erstellen",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = "Es sind noch keine Kategorien vorhanden",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            }
-        } else {
-            // Categories available - show list with add option at bottom
-            LazyColumn(
-                modifier = Modifier.height(200.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(categories) { category ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onCategorySelected(category) }
-                            .clip(RoundedCornerShape(12.dp)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = if (category == selectedCategory)
-                                        MaterialTheme.colorScheme.primaryContainer
-                                    else MaterialTheme.colorScheme.surface
-                                )
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = category.emoji,
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = category.name,
-                                    color = if (category == selectedCategory)
-                                        MaterialTheme.colorScheme.onPrimaryContainer
-                                    else MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Add new category option at the bottom
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onCreateCategoryClicked() }
-                            .clip(RoundedCornerShape(12.dp)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "➕",
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text(
-                                    text = "Neue Kategorie erstellen",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Step 7: Date selection with localized formatting
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DateSelectionStep(
-    selectedDate: LocalDate?,
-    onDateSelected: (LocalDate) -> Unit,
-    onNextClicked: () -> Unit
-) {
-    // Use rememberSaveable for dialog visibility, and the picked date (in millis)
+    // Local state for UI interactions
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
-    // DatePicker uses milliseconds since epoch
-    val initialMillis = selectedDate?.atStartOfDay(java.time.ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
-        ?: Clock.System.now().toEpochMilliseconds()
+    var amountText by rememberSaveable { mutableStateOf(uiState.selectedAmount?.asDouble()?.toString() ?: "") }
 
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialMillis
-    )
+    when (step) {
+        // Step 1: Transaction Type (shared by all flows)
+        GuidedTransactionStep.Type -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowTypeStep(
+                    selectedDirection = uiState.selectedDirection,
+                    availableAccounts = uiState.accounts,
+                    onTypeSelected = viewModel::onGuidedTransactionTypeSelected,
+                    modifier = modifier
+                )
 
-    // Update the currently shown date
-    val pickedDateMillis = datePickerState.selectedDateMillis
-    val pickedDate = pickedDateMillis?.let {
-        java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
-    }
-    val isValid = pickedDate != null
+                TransactionDirection.Outflow -> OutflowTypeStep(
+                    selectedDirection = uiState.selectedDirection,
+                    availableAccounts = uiState.accounts,
+                    onTypeSelected = viewModel::onGuidedTransactionTypeSelected,
+                    modifier = modifier
+                )
 
-    // Get current locale for formatting
-    val locale = java.util.Locale.getDefault()
-    val dateFormatter = remember(locale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale) }
+                TransactionDirection.Unknown -> TransferTypeStep( // Transfer
+                    selectedDirection = uiState.selectedDirection,
+                    availableAccounts = uiState.accounts,
+                    onTypeSelected = viewModel::onGuidedTransactionTypeSelected,
+                    modifier = modifier
+                )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Wann war die Transaktion?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        // Date display button - now a TextButton with locale-based formatting
-        TextButton(
-            onClick = { showDatePicker = true },
-            modifier = Modifier.width(240.dp)
-        ) {
-            val dateStr = pickedDate?.let { dateFormatter.format(it) } ?: "Datum wählen"
-            Text(dateStr)
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                pickedDate?.let {
-                    onDateSelected(it)
-                    onNextClicked()
-                }
-            },
-            enabled = isValid
-        ) {
-            Text("Weiter")
-        }
-    }
-
-    // Show DatePickerDialog if toggled on
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (pickedDate != null) {
-                            onDateSelected(pickedDate)
-                            showDatePicker = false
-                        }
-                    },
-                    enabled = isValid
-                ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Abbrechen")
-                }
+                else -> InflowTypeStep( // Default to Inflow if nothing selected
+                    selectedDirection = uiState.selectedDirection,
+                    availableAccounts = uiState.accounts,
+                    onTypeSelected = viewModel::onGuidedTransactionTypeSelected,
+                    modifier = modifier
+                )
             }
-        ) {
-            DatePicker(state = datePickerState)
+        }
+
+        // Step 2: Amount Input (flow-specific titles)
+        GuidedTransactionStep.Amount -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowAmountStep(
+                    currentAmount = uiState.selectedAmount,
+                    amountText = amountText,
+                    onAmountTextChanged = { amountText = it },
+                    onAmountChanged = viewModel::onGuidedAmountEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Outflow -> OutflowAmountStep(
+                    currentAmount = uiState.selectedAmount,
+                    amountText = amountText,
+                    onAmountTextChanged = { amountText = it },
+                    onAmountChanged = viewModel::onGuidedAmountEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Unknown -> TransferAmountStep( // Transfer
+                    currentAmount = uiState.selectedAmount,
+                    amountText = amountText,
+                    onAmountTextChanged = { amountText = it },
+                    onAmountChanged = viewModel::onGuidedAmountEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                else -> InflowAmountStep(
+                    currentAmount = uiState.selectedAmount,
+                    amountText = amountText,
+                    onAmountTextChanged = { amountText = it },
+                    onAmountChanged = viewModel::onGuidedAmountEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+            }
+        }
+
+        // Step 3: Account Selection (from account for all flows)
+        GuidedTransactionStep.Account -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowAccountStep(
+                    accounts = uiState.accounts,
+                    selectedAccount = uiState.selectedAccount,
+                    onAccountSelected = viewModel::onGuidedAccountSelected,
+                    onCreateAccountClicked = { /* TODO: Show account creation dialog */ },
+                    modifier = modifier
+                )
+
+                TransactionDirection.Outflow -> OutflowAccountStep(
+                    accounts = uiState.accounts,
+                    selectedAccount = uiState.selectedAccount,
+                    onAccountSelected = viewModel::onGuidedAccountSelected,
+                    onCreateAccountClicked = { /* TODO: Show account creation dialog */ },
+                    modifier = modifier
+                )
+
+                TransactionDirection.Unknown -> TransferFromAccountStep( // Transfer
+                    accounts = uiState.accounts,
+                    selectedAccount = uiState.selectedAccount,
+                    onAccountSelected = viewModel::onGuidedAccountSelected,
+                    onCreateAccountClicked = { /* TODO: Show account creation dialog */ },
+                    modifier = modifier
+                )
+
+                else -> InflowAccountStep(
+                    accounts = uiState.accounts,
+                    selectedAccount = uiState.selectedAccount,
+                    onAccountSelected = viewModel::onGuidedAccountSelected,
+                    onCreateAccountClicked = { /* TODO: Show account creation dialog */ },
+                    modifier = modifier
+                )
+            }
+        }
+
+        // Step 4: To Account Selection (only for transfers)
+        GuidedTransactionStep.ToAccount -> {
+            TransferToAccountStep(
+                accounts = uiState.accounts.filter { it != uiState.selectedAccount },
+                selectedToAccount = uiState.selectedToAccount,
+                onToAccountSelected = viewModel::onGuidedToAccountSelected,
+                modifier = modifier
+            )
+        }
+
+        // Step 5: Partner Input (skipped for transfers)
+        GuidedTransactionStep.Partner -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowPartnerStep(
+                    currentPartner = uiState.selectedPartner,
+                    onPartnerChanged = viewModel::onGuidedPartnerEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Outflow -> OutflowPartnerStep(
+                    currentPartner = uiState.selectedPartner,
+                    onPartnerChanged = viewModel::onGuidedPartnerEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                else -> InflowPartnerStep(
+                    currentPartner = uiState.selectedPartner,
+                    onPartnerChanged = viewModel::onGuidedPartnerEntered,
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+            }
+        }
+
+        // Step 6: Category Selection (only for outflow)
+        GuidedTransactionStep.Category -> {
+            OutflowCategoryStep(
+                categories = uiState.categories,
+                selectedCategory = uiState.selectedCategory,
+                onCategorySelected = viewModel::onGuidedCategorySelected,
+                onCreateCategoryClicked = { /* TODO: Show category creation dialog */ },
+                modifier = modifier
+            )
+        }
+
+        // Step 7: Date Selection (flow-specific titles)
+        GuidedTransactionStep.Date -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowDateStep(
+                    selectedDate = uiState.selectedDate,
+                    showDatePicker = showDatePicker,
+                    onDateSelected = viewModel::onGuidedDateSelected,
+                    onShowDatePickerChanged = { showDatePicker = it },
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Outflow -> OutflowDateStep(
+                    selectedDate = uiState.selectedDate,
+                    showDatePicker = showDatePicker,
+                    onDateSelected = viewModel::onGuidedDateSelected,
+                    onShowDatePickerChanged = { showDatePicker = it },
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Unknown -> TransferDateStep( // Transfer
+                    selectedDate = uiState.selectedDate,
+                    showDatePicker = showDatePicker,
+                    onDateSelected = viewModel::onGuidedDateSelected,
+                    onShowDatePickerChanged = { showDatePicker = it },
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+
+                else -> InflowDateStep(
+                    selectedDate = uiState.selectedDate,
+                    showDatePicker = showDatePicker,
+                    onDateSelected = viewModel::onGuidedDateSelected,
+                    onShowDatePickerChanged = { showDatePicker = it },
+                    onNextClicked = viewModel::moveToNextStep,
+                    modifier = modifier
+                )
+            }
+        }
+
+        // Step 8: Optional Details (flow-specific button text)
+        GuidedTransactionStep.Optional -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowOptionalStep(
+                    description = uiState.selectedDescription,
+                    onDescriptionChanged = viewModel::onGuidedDescriptionChanged,
+                    onFinishClicked = viewModel::onGuidedTransactionComplete,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Outflow -> OutflowOptionalStep(
+                    description = uiState.selectedDescription,
+                    onDescriptionChanged = viewModel::onGuidedDescriptionChanged,
+                    onFinishClicked = viewModel::onGuidedTransactionComplete,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Unknown -> TransferOptionalStep( // Transfer
+                    description = uiState.selectedDescription,
+                    onDescriptionChanged = viewModel::onGuidedDescriptionChanged,
+                    onFinishClicked = viewModel::onGuidedTransactionComplete,
+                    modifier = modifier
+                )
+
+                else -> InflowOptionalStep(
+                    description = uiState.selectedDescription,
+                    onDescriptionChanged = viewModel::onGuidedDescriptionChanged,
+                    onFinishClicked = viewModel::onGuidedTransactionComplete,
+                    modifier = modifier
+                )
+            }
+        }
+
+        // Step 9: Completion (flow-specific celebration)
+        GuidedTransactionStep.Done -> {
+            when (uiState.selectedDirection) {
+                TransactionDirection.Inflow -> InflowCompletionStep(
+                    onSwitchToStandardMode = viewModel::switchToStandardMode,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Outflow -> OutflowCompletionStep(
+                    onSwitchToStandardMode = viewModel::switchToStandardMode,
+                    modifier = modifier
+                )
+
+                TransactionDirection.Unknown -> TransferCompletionStep( // Transfer
+                    onSwitchToStandardMode = viewModel::switchToStandardMode,
+                    modifier = modifier
+                )
+
+                else -> InflowCompletionStep(
+                    onSwitchToStandardMode = viewModel::switchToStandardMode,
+                    modifier = modifier
+                )
+            }
         }
     }
 }
 
-/**
- * Step 8: Optional description input
- */
-@Composable
-fun OptionalStep(
-    description: String,
-    onDescriptionChanged: (String) -> Unit,
-    onFinishClicked: () -> Unit
-) {
-    var desc by rememberSaveable { mutableStateOf(description) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Möchtest du eine Notiz hinzufügen?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            textAlign = TextAlign.Center
-        )
-
-        OutlinedTextField(
-            value = desc,
-            onValueChange = {
-                desc = it
-                onDescriptionChanged(it)
-            },
-            label = { Text("Notiz (optional)") },
-            singleLine = false,
-            maxLines = 3,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardController?.hide()
-                    onFinishClicked()
-                }
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        Button(
-            onClick = onFinishClicked,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text("✨ Transaktion speichern")
-        }
-    }
-}
+// ================================
+// COMPLETED STEPS CHECKLIST
+// ================================
 
 /**
- * Step 9: Transaction completion celebration
- */
-@Composable
-fun TransactionCompletedStep(
-    onSwitchToStandardMode: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Check,
-            contentDescription = null,
-            tint = onSuccess,
-            modifier = Modifier.size(80.dp)
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        Text(
-            text = "🎉 Geschafft!",
-            style = MaterialTheme.typography.headlineMedium,
-            color = onSuccess,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Text(
-            text = "Deine erste Transaktion wurde erfolgreich gespeichert.\nAb sofort siehst du die Schnellansicht.",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        Button(
-            onClick = onSwitchToStandardMode,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-        ) {
-            Text("Weitere Transaktion hinzufügen")
-        }
-    }
-}
-
-/**
- * Checklist showing completed steps in guided mode
- * Performance optimized - no ViewModel injection needed
+ * Shows completed steps in a compact checklist format.
+ * Allows users to go back and edit previous steps.
  */
 @Composable
 fun CompletedStepsChecklist(
     uiState: AddTransactionUiState,
-    onStepClicked: (GuidedTransactionStep) -> Unit
+    onStepClicked: (GuidedTransactionStep) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val steps = GuidedTransactionStep.entries
 
-    // Filter out ToAccount step if it's not a transfer
+    // Filter out steps not relevant to current flow
     val relevantSteps = steps.filter { step ->
         when (step) {
             GuidedTransactionStep.ToAccount -> uiState.selectedDirection == TransactionDirection.Unknown
+            GuidedTransactionStep.Partner -> uiState.selectedDirection != TransactionDirection.Unknown
+            GuidedTransactionStep.Category -> uiState.selectedDirection == TransactionDirection.Outflow
             else -> true
         }
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -839,7 +395,7 @@ fun CompletedStepsChecklist(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${step.localizedName()}: ${getStepValue(step, uiState)}",
+                    text = "${step.getLocalizedName()}: ${getStepDisplayValue(step, uiState)}",
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f)
@@ -849,3 +405,74 @@ fun CompletedStepsChecklist(
     }
 }
 
+// ================================
+// HELPER FUNCTIONS
+// ================================
+
+/**
+ * Get display value for completed step
+ */
+private fun getStepDisplayValue(step: GuidedTransactionStep, uiState: AddTransactionUiState): String {
+    return when (step) {
+        GuidedTransactionStep.Type -> when (uiState.selectedDirection) {
+            TransactionDirection.Inflow -> "Einnahme"
+            TransactionDirection.Outflow -> "Ausgabe"
+            TransactionDirection.Unknown -> "Transfer"
+            else -> ""
+        }
+
+        GuidedTransactionStep.Amount -> uiState.selectedAmount?.formattedMoney ?: ""
+        GuidedTransactionStep.Account -> uiState.selectedAccount?.name ?: ""
+        GuidedTransactionStep.ToAccount -> uiState.selectedToAccount?.name ?: ""
+        GuidedTransactionStep.Partner -> uiState.selectedPartner
+        GuidedTransactionStep.Category -> uiState.selectedCategory?.name ?: ""
+        GuidedTransactionStep.Date -> uiState.selectedDate?.toString() ?: ""
+        GuidedTransactionStep.Optional -> if (uiState.selectedDescription.isNotEmpty()) "Beschreibung hinzugefügt" else "Übersprungen"
+        GuidedTransactionStep.Done -> "Fertig"
+    }
+}
+
+/**
+ * Get localized step name
+ */
+private fun GuidedTransactionStep.getLocalizedName(): String = when (this) {
+    GuidedTransactionStep.Type -> "Typ"
+    GuidedTransactionStep.Amount -> "Betrag"
+    GuidedTransactionStep.Account -> "Konto"
+    GuidedTransactionStep.ToAccount -> "Zielkonto"
+    GuidedTransactionStep.Partner -> "Partner"
+    GuidedTransactionStep.Category -> "Kategorie"
+    GuidedTransactionStep.Date -> "Datum"
+    GuidedTransactionStep.Optional -> "Optionen"
+    GuidedTransactionStep.Done -> "Fertig"
+}
+
+// ================================
+// PREVIEW
+// ================================
+
+@Preview(name = "Guided Step - Outflow Category Selection", showBackground = true)
+@Composable
+private fun GuidedStepOutflowCategoryPreview() {
+    GetALifeTheme {
+        val mockUiState = AddTransactionUiState(
+            selectedDirection = TransactionDirection.Outflow,
+            categories = listOf(
+                Category(
+                    id = 1L, groupId = 1L, emoji = "🍕", name = "Lebensmittel",
+                    budgetTarget = Money(400.0), monthlyTargetAmount = null, targetMonthsRemaining = null,
+                    listPosition = 1, isInitialCategory = false, linkedAccountId = null,
+                    updatedAt = Clock.System.now(), createdAt = Clock.System.now()
+                )
+            ),
+            guidedStep = GuidedTransactionStep.Category
+        )
+
+        OutflowCategoryStep(
+            categories = mockUiState.categories,
+            selectedCategory = null,
+            onCategorySelected = { },
+            onCreateCategoryClicked = { }
+        )
+    }
+}
