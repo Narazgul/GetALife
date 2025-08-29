@@ -27,12 +27,12 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.CompletedStepsChecklist
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.GuidedTransactionScreen
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.TransactionCompletedStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard.AddTransactionItem
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard.StandardTransactionScreen
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.theme.GetALifeTheme
 import java.time.LocalDate
 import kotlin.time.Clock
@@ -279,11 +279,9 @@ private fun AddTransactionScreenStandardPreview() {
             AddTransactionItem(
                 categories = previewCategories,
                 accounts = previewAccounts,
-                partnerSuggestions = listOf("Netflix", "Edeka", "Amazon", "Spotify"),
                 selectedCategory = mockUiState.selectedCategory,
                 transactionPartner = mockUiState.selectedPartner,
                 smartCategorizationUiState = SmartCategorizationUiState(),
-                onTransactionPartnerChanged = { },
                 onTransactionDirectionClicked = { },
                 onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> },
                 modifier = Modifier

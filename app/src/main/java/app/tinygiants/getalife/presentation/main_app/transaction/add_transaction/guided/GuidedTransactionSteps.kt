@@ -5,8 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -422,11 +419,9 @@ fun ToAccountSelectionStep(
 /**
  * Step 5: Partner input with smart suggestions
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PartnerInputStep(
     currentPartner: String,
-    partnerSuggestions: List<String>,
     selectedDirection: TransactionDirection?,
     onPartnerChanged: (String) -> Unit,
     onNextClicked: () -> Unit
@@ -466,69 +461,6 @@ fun PartnerInputStep(
             ),
             modifier = Modifier.width(280.dp)
         )
-
-        // Show suggestions based on transaction direction
-        if (selectedDirection == TransactionDirection.Inflow) {
-            // Zeige typische Einkommen/Partner und Nutzerhistorie für Einnahmen
-            Spacer(Modifier.height(12.dp))
-            val typicalInflowSources = if (partnerSuggestions.isNotEmpty()) {
-                // Kombiniere Partner aus Nutzerhistorie und typischen Quellen
-                (partnerSuggestions.take(5) + listOf(
-                    "Arbeitgeber", "Freelance-Kunde", "Verkauf privat", "Steuererstattung", "Rückerstattung",
-                    "Familie", "Freunde", "Zinsen Bank", "Dividenden"
-                )).distinct().take(10)
-            } else {
-                // Nur typische Quellen, falls keine eigenen Partner
-                listOf(
-                    "Arbeitgeber", "Freelance-Kunde", "Verkauf privat", "Steuererstattung", "Rückerstattung",
-                    "Familie", "Freunde", "Zinsen Bank", "Dividenden", "Cashback"
-                )
-            }
-
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                typicalInflowSources.forEach { source ->
-                    SuggestionChip(
-                        onClick = {
-                            input = source
-                            onPartnerChanged(source)
-                        },
-                        label = {
-                            Text(text = source)
-                        },
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                }
-            }
-        } else if (partnerSuggestions.isNotEmpty()) {
-            // Zeige tatsächliche, aus Ausgabenhistorie extrahierte Partner für Ausgaben/Übertragungen
-            Spacer(Modifier.height(12.dp))
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                partnerSuggestions.take(10).forEach { suggestion ->
-                    SuggestionChip(
-                        onClick = {
-                            input = suggestion
-                            onPartnerChanged(suggestion)
-                        },
-                        label = {
-                            Text(text = suggestion)
-                        },
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                }
-            }
-        }
 
         Spacer(Modifier.height(24.dp))
 

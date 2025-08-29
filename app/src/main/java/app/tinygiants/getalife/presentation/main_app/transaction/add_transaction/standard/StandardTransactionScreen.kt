@@ -51,7 +51,6 @@ fun StandardTransactionScreen(
     uiState: AddTransactionUiState
 ) {
     // Collect additional states needed for standard mode
-    val partnerSuggestions by viewModel.partners.collectAsStateWithLifecycle()
     val smartCategorizationState by viewModel.smartCategorizationState.collectAsStateWithLifecycle()
     val transactionPartner by viewModel.transactionPartner.collectAsStateWithLifecycle()
 
@@ -94,11 +93,9 @@ fun StandardTransactionScreen(
             AddTransactionItem(
                 categories = uiState.categories,
                 accounts = uiState.accounts,
-                partnerSuggestions = partnerSuggestions,
                 selectedCategory = uiState.selectedCategory,
                 transactionPartner = transactionPartner,
                 smartCategorizationUiState = smartCategorizationState,
-                onTransactionPartnerChanged = viewModel::updateTransactionPartner,
                 onTransactionDirectionClicked = { direction ->
                     // Update wave color based on transaction direction
                     waveColor = when (direction) {
@@ -203,11 +200,9 @@ private fun StandardTransactionScreenPreview() {
         AddTransactionItem(
             categories = previewCategories,
             accounts = previewAccounts,
-            partnerSuggestions = listOf("Netflix", "Edeka", "Amazon", "Spotify"),
             selectedCategory = previewCategories[0],
             transactionPartner = "",
             smartCategorizationUiState = SmartCategorizationUiState(),
-            onTransactionPartnerChanged = { },
             onTransactionDirectionClicked = { },
             onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> }
         )

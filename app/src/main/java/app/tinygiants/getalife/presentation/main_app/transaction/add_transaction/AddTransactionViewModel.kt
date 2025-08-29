@@ -2,6 +2,7 @@ package app.tinygiants.getalife.presentation.main_app.transaction.add_transactio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
@@ -9,11 +10,9 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
-import app.tinygiants.getalife.domain.repository.TransactionRepository
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
-import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
-import app.tinygiants.getalife.domain.model.AccountType
+import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
 import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
@@ -39,7 +38,7 @@ sealed interface GuidedTransactionStep {
     data object Type : GuidedTransactionStep
     data object Amount : GuidedTransactionStep
     data object Account : GuidedTransactionStep
-    data object ToAccount : GuidedTransactionStep // For transfers only
+    data object ToAccount : GuidedTransactionStep
     data object Partner : GuidedTransactionStep
     data object Category : GuidedTransactionStep
     data object Date : GuidedTransactionStep
@@ -57,7 +56,6 @@ class AddTransactionViewModel @Inject constructor(
     private val getAccounts: GetAccountsUseCase,
     private val addAccount: AddAccountUseCase,
     private val addTransaction: AddTransactionUseCase,
-    private val transactionRepository: TransactionRepository,
     private val smartCategorizer: SmartTransactionCategorizerUseCase,
     private val categoryRepository: CategoryRepository,
     private val groupRepository: GroupRepository,
@@ -66,10 +64,6 @@ class AddTransactionViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AddTransactionUiState(categories = emptyList(), accounts = emptyList()))
     val uiState = _uiState.asStateFlow()
-
-    // Recent transaction partners for Auto-Complete
-    private val _partners = MutableStateFlow<List<String>>(emptyList())
-    val partners = _partners.asStateFlow()
 
     // Smart categorization state
     private val _smartCategorizationState = MutableStateFlow(SmartCategorizationUiState())
@@ -89,20 +83,6 @@ class AddTransactionViewModel @Inject constructor(
         loadAccounts()
         setupSmartCategorization()
         initializeUiMode()
-
-        // Load recent partners once at startup
-        viewModelScope.launch {
-            transactionRepository.getTransactionsFlow()
-                .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
-                .collect { transactions ->
-                    val recentPartners = transactions
-                        .map { it.transactionPartner }
-                        .filter { it.isNotBlank() }
-                        .distinct()
-                        .take(25)
-                    _partners.value = recentPartners
-                }
-        }
     }
 
     private fun initializeUiMode() {
@@ -256,13 +236,6 @@ class AddTransactionViewModel @Inject constructor(
                 // Could show error to user here
             }
         }
-    }
-
-    /**
-     * Update transaction partner input and trigger smart categorization
-     */
-    fun updateTransactionPartner(partner: String) {
-        _transactionPartner.value = partner
     }
 
     /**
@@ -451,7 +424,7 @@ class AddTransactionViewModel @Inject constructor(
 
     fun onGuidedPartnerEntered(partner: String) {
         _uiState.update { it.copy(selectedPartner = partner) }
-        updateTransactionPartner(partner) // Trigger smart categorization
+        _transactionPartner.value = partner // Trigger smart categorization
     }
 
     fun onGuidedCategorySelected(category: Category?) {
@@ -496,10 +469,10 @@ class AddTransactionViewModel @Inject constructor(
                             transactionPartner = state.selectedPartner,
                             description = state.selectedDescription,
                             dateOfTransaction = state.selectedDate?.let {
-                                kotlin.time.Instant.fromEpochSeconds(
+                                Instant.fromEpochSeconds(
                                     it.toEpochDay() * 24 * 60 * 60
                                 )
-                            } ?: kotlin.time.Clock.System.now(),
+                            } ?: Clock.System.now(),
                             recurrenceFrequency = null
                         )
 

@@ -63,7 +63,6 @@ import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.asStringRes
 import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
-import app.tinygiants.getalife.presentation.shared_composables.AutoCompleteTextField
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -81,11 +80,9 @@ typealias TransactionPartner = String
 fun AddTransactionItem(
     categories: List<Category>,
     accounts: List<Account>,
-    partnerSuggestions: List<String> = emptyList(),
     selectedCategory: Category? = null,
     transactionPartner: String = "",
     smartCategorizationUiState: SmartCategorizationUiState = SmartCategorizationUiState(),
-    onTransactionPartnerChanged: (String) -> Unit = {},
     onAcceptCategorySuggestion: (NewCategorySuggestion) -> Unit = {},
     onTransactionDirectionClicked: (TransactionDirection) -> Unit,
     onAddTransactionClicked: (
@@ -109,7 +106,7 @@ fun AddTransactionItem(
     var amountMoney by remember { mutableStateOf(Money(value = 0.0)) }
     var amountUserInputText by rememberSaveable { mutableStateOf("") }
     var descriptionUserInput by rememberSaveable { mutableStateOf("") }
-    var transactionPartnerUserInput by rememberSaveable { mutableStateOf("") }
+    var transactionPartnerUserInput by rememberSaveable { mutableStateOf(transactionPartner) }
     var directionUserInput by rememberSaveable { mutableStateOf(TransactionDirection.Unknown) }
     var categoryUserInput by remember { mutableStateOf(selectedCategory ?: categories.firstOrNull()) }
     var accountUserInput by remember { mutableStateOf(accounts.firstOrNull()) }
@@ -156,12 +153,19 @@ fun AddTransactionItem(
 
         Spacer(modifier = Modifier.height(spacing.l))
 
-        AutoCompleteTextField(
-            value = transactionPartner,
-            onValueChange = onTransactionPartnerChanged,
-            suggestions = partnerSuggestions,
-            label = stringResource(R.string.transaction_partner),
-            modifier = Modifier.fillMaxWidth()
+        TextField(
+            value = transactionPartnerUserInput,
+            onValueChange = { userInput ->
+                transactionPartnerUserInput = userInput
+            },
+            label = { Text(text = stringResource(R.string.transaction_partner)) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(spacing.m)
         )
 
         // Smart Categorization Suggestion
@@ -429,7 +433,7 @@ fun AddTransactionItem(
                     categoryUserInput,
                     directionUserInput,
                     descriptionUserInput,
-                    transactionPartner,
+                    transactionPartnerUserInput,
                     selectedDate,
                     if (recurrenceFrequency != RecurrenceFrequency.NEVER) recurrenceFrequency else null
                 )
@@ -442,6 +446,7 @@ fun AddTransactionItem(
                 accountUserInput = accounts.firstOrNull()
                 selectedDate = Clock.System.now()
                 recurrenceFrequency = RecurrenceFrequency.NEVER
+                transactionPartnerUserInput = ""
 
                 focusManager.clearFocus()
             },
@@ -569,7 +574,6 @@ private fun EnterTransactionPreview() {
             AddTransactionItem(
                 categories = emptyList(),
                 accounts = emptyList(),
-                partnerSuggestions = emptyList(),
                 transactionPartner = "",
                 onTransactionDirectionClicked = { _ -> },
                 onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> })

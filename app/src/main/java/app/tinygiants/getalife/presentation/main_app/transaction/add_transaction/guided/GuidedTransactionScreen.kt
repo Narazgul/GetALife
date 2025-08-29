@@ -54,11 +54,14 @@ fun GuidedTransactionScreen(
     uiState: AddTransactionUiState
 ) {
     // Collect additional states needed for guided mode
-    val partnerSuggestions by viewModel.partners.collectAsStateWithLifecycle()
-    val smartCategorizationState by viewModel.smartCategorizationState.collectAsStateWithLifecycle()
+    val categories by viewModel.uiState.collectAsStateWithLifecycle()
+    val accounts by viewModel.uiState.collectAsStateWithLifecycle()
+    val smartCategorizationUiState by viewModel.smartCategorizationState.collectAsStateWithLifecycle()
 
     val progress = remember(uiState.guidedStep) {
-        (GuidedTransactionStep.entries.indexOf(uiState.guidedStep) + 1).toFloat() / GuidedTransactionStep.entries.size.toFloat()
+        val currentStepIndex = GuidedTransactionStep.entries.indexOf(uiState.guidedStep)
+        val totalSteps = GuidedTransactionStep.entries.size - 1 // Exclude Done step from progress
+        (currentStepIndex.toFloat() / totalSteps).coerceAtMost(1.0f)
     }
 
     val neutralBackground = MaterialTheme.colorScheme.primary.toArgb()
@@ -181,7 +184,6 @@ fun GuidedTransactionScreen(
 
                             GuidedTransactionStep.Partner -> PartnerInputStep(
                                 currentPartner = uiState.selectedPartner,
-                                partnerSuggestions = partnerSuggestions,
                                 selectedDirection = uiState.selectedDirection,
                                 onPartnerChanged = viewModel::onGuidedPartnerEntered,
                                 onNextClicked = viewModel::moveToNextStep
@@ -190,7 +192,7 @@ fun GuidedTransactionScreen(
                             GuidedTransactionStep.Category -> CategorySelectionStep(
                                 categories = uiState.categories,
                                 selectedCategory = uiState.selectedCategory,
-                                smartCategorizationState = smartCategorizationState,
+                                smartCategorizationState = smartCategorizationUiState,
                                 onCategorySelected = viewModel::onGuidedCategorySelected,
                                 onCreateCategoryClicked = { /* Dialog handling inside step */ },
                                 onAISuggestionAccepted = viewModel::onCategorySuggestionAccepted,
@@ -256,7 +258,7 @@ fun getStepValue(step: GuidedTransactionStep, uiState: AddTransactionUiState): S
         GuidedTransactionStep.Partner -> uiState.selectedPartner
         GuidedTransactionStep.Category -> uiState.selectedCategory?.name ?: ""
         GuidedTransactionStep.Date -> uiState.selectedDate?.toString() ?: ""
-        GuidedTransactionStep.Optional -> if (uiState.selectedDescription.isNotEmpty()) "Beschreibung hinzugefügt" else "Übersprungen"
+        GuidedTransactionStep.Optional -> if (uiState.selectedDescription.isNotEmpty()) "Beschreibung hinzugef\u00FCgt" else "\u00DCbersprungen"
         GuidedTransactionStep.Done -> "Fertig"
     }
 }
