@@ -21,7 +21,6 @@ import app.tinygiants.getalife.data.local.entities.TransactionEntity
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.RepeatFrequency
 import app.tinygiants.getalife.domain.model.TargetType
-import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 @Database(
@@ -127,12 +126,5 @@ abstract class GetALifeDatabase : RoomDatabase() {
             1 -> RepeatFrequency.YEARLY
             else -> RepeatFrequency.NEVER
         }
-
-        // LocalDate converters (ISO string)
-        @TypeConverter
-        fun fromLocalDate(value: LocalDate?): String? = value?.toString()
-
-        @TypeConverter
-        fun toLocalDate(value: String?): LocalDate? = value?.let { LocalDate.parse(it) }
     }
 }

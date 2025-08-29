@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionUiState
@@ -53,9 +51,6 @@ fun GuidedTransactionScreen(
     viewModel: AddTransactionViewModel,
     uiState: AddTransactionUiState
 ) {
-    // Collect additional states needed for guided mode
-    val smartCategorizationUiState by viewModel.smartCategorizationState.collectAsStateWithLifecycle()
-
     val progress = remember(uiState.guidedStep) {
         val currentStepIndex = GuidedTransactionStep.entries.indexOf(uiState.guidedStep)
         val totalSteps = GuidedTransactionStep.entries.size - 1 // Exclude Done step from progress
@@ -189,11 +184,8 @@ fun GuidedTransactionScreen(
                             GuidedTransactionStep.Category -> CategorySelectionStep(
                                 categories = uiState.categories,
                                 selectedCategory = uiState.selectedCategory,
-                                smartCategorizationState = smartCategorizationUiState,
                                 onCategorySelected = viewModel::onGuidedCategorySelected,
-                                onCreateCategoryClicked = { /* Dialog handling inside step */ },
-                                onAISuggestionAccepted = viewModel::onCategorySuggestionAccepted,
-                                onNewAICategoryCreated = viewModel::onCreateCategoryFromSuggestion
+                                onCreateCategoryClicked = { /* Dialog handling inside step */ }
                             )
 
                             GuidedTransactionStep.Date -> DateSelectionStep(

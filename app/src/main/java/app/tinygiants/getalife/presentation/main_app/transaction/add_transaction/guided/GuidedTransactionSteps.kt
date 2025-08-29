@@ -57,10 +57,8 @@ import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionUiState
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.GuidedTransactionStep
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.onSuccess
 import kotlinx.coroutines.delay
@@ -473,17 +471,14 @@ fun PartnerInputStep(
 }
 
 /**
- * Step 6: Category selection with AI suggestions
+ * Step 6: Category selection
  */
 @Composable
 fun CategorySelectionStep(
     categories: List<Category>,
     selectedCategory: Category?,
-    smartCategorizationState: SmartCategorizationUiState,
     onCategorySelected: (Category) -> Unit,
-    onCreateCategoryClicked: () -> Unit,
-    onAISuggestionAccepted: (Long) -> Unit,
-    onNewAICategoryCreated: (NewCategorySuggestion) -> Unit
+    onCreateCategoryClicked: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -494,113 +489,6 @@ fun CategorySelectionStep(
             modifier = Modifier.padding(bottom = 24.dp),
             textAlign = TextAlign.Center
         )
-
-        // Show AI suggestion if available
-        smartCategorizationState.categorizationResult?.let { result ->
-            result.existingCategoryMatch?.let { match ->
-                if (match.confidence > 0.5f) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp)
-                            .clickable {
-                                onAISuggestionAccepted(match.categoryId)
-                            }
-                            .clip(RoundedCornerShape(12.dp)),
-                        colors = androidx.compose.material3.CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "✨ KI-Vorschlag",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                                    )
-                                    Text(
-                                        text = "${match.categoryEmoji} ${match.categoryName}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    if (match.confidence > 0.8f) {
-                                        Text(
-                                            text = "Sehr sicher",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                                        )
-                                    }
-                                }
-                                Button(
-                                    onClick = { onAISuggestionAccepted(match.categoryId) },
-                                    modifier = Modifier.padding(start = 8.dp)
-                                ) {
-                                    Text("Verwenden")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            result.newCategorySuggestion?.let { suggestion ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp)
-                        .clickable { onNewAICategoryCreated(suggestion) }
-                        .clip(RoundedCornerShape(12.dp)),
-                    colors = androidx.compose.material3.CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "🤖 Neue Kategorie vorgeschlagen",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                                )
-                                Text(
-                                    text = "${suggestion.emoji} ${suggestion.categoryName}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
-                                Text(
-                                    text = suggestion.reasoning,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
-                                )
-                            }
-                            Button(
-                                onClick = { onNewAICategoryCreated(suggestion) },
-                                modifier = Modifier.padding(start = 8.dp)
-                            ) {
-                                Text("Erstellen")
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         if (categories.isEmpty()) {
             // No categories available - show add category option prominently

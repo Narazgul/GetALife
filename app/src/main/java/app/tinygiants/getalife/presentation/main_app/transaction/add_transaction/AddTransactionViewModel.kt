@@ -7,7 +7,6 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.repository.CategoryRepository
-import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
@@ -47,7 +46,6 @@ class AddTransactionViewModel @Inject constructor(
     private val getAccounts: GetAccountsUseCase,
     private val addTransaction: AddTransactionUseCase,
     private val categoryRepository: CategoryRepository,
-    private val groupRepository: GroupRepository,
     private val onboardingPrefsUseCase: OnboardingPrefsUseCase
 ) : ViewModel() {
 
@@ -76,25 +74,21 @@ class AddTransactionViewModel @Inject constructor(
 
     private fun loadCategories() {
         viewModelScope.launch {
-            launch {
-                getCategories()
-                    .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
-                    .collect { categories ->
-                        _uiState.update { uiState -> uiState.copy(categories = categories) }
-                    }
-            }
+            getCategories()
+                .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
+                .collect { categories ->
+                    _uiState.update { uiState -> uiState.copy(categories = categories) }
+                }
         }
     }
 
     private fun loadAccounts() {
         viewModelScope.launch {
-            launch {
-                getAccounts()
-                    .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
-                    .collect { result ->
-                        result.onSuccess { accounts -> _uiState.update { uiState -> uiState.copy(accounts = accounts) } }
-                    }
-            }
+            getAccounts()
+                .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
+                .collect { result ->
+                    result.onSuccess { accounts -> _uiState.update { uiState -> uiState.copy(accounts = accounts) } }
+                }
         }
     }
 
