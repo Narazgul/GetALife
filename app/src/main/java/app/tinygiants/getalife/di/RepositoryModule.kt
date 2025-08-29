@@ -8,7 +8,6 @@ import app.tinygiants.getalife.data.local.dao.GroupDao
 import app.tinygiants.getalife.data.local.dao.TransactionDao
 import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.repository.AccountRepositoryImpl
-import app.tinygiants.getalife.data.repository.CategorizationFeedbackRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryMonthlyStatusRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
 import app.tinygiants.getalife.data.repository.CrispChatRepository
@@ -19,7 +18,6 @@ import app.tinygiants.getalife.data.repository.RevenueCatRepository
 import app.tinygiants.getalife.data.repository.TransactionRepositoryImpl
 import app.tinygiants.getalife.domain.repository.AccountRepository
 import app.tinygiants.getalife.domain.repository.AiRepository
-import app.tinygiants.getalife.domain.repository.CategorizationFeedbackRepository
 import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
@@ -28,11 +26,8 @@ import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
 import app.tinygiants.getalife.domain.repository.SubscriptionRepository
 import app.tinygiants.getalife.domain.repository.SupportChatRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
-import app.tinygiants.getalife.domain.usecase.FeatureFlagUseCase
 import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
-import app.tinygiants.getalife.domain.usecase.categorization.SmartCategorizationLearningUseCase
-import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
-import app.tinygiants.getalife.domain.usecase.categorization.TransactionSimilarityCalculator
+import app.tinygiants.getalife.domain.usecase.FeatureFlagUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -117,45 +112,4 @@ object RepositoryModule {
         getCurrentBudget: GetCurrentBudgetUseCase
     ): CategoryMonthlyStatusRepository =
         CategoryMonthlyStatusRepositoryImpl(categoryMonthlyStatusDao, categoryRepository, getCurrentBudget)
-
-    @Provides
-    @Singleton
-    fun provideCategorizationFeedbackRepository(
-        database: GetALifeDatabase,
-        @Default dispatcher: CoroutineDispatcher
-    ): CategorizationFeedbackRepository = CategorizationFeedbackRepositoryImpl(
-        feedbackDao = database.categorizationFeedbackDao,
-        dispatcher = dispatcher
-    )
-
-    @Provides
-    @Singleton
-    fun provideSmartCategorizationLearningUseCase(
-        feedbackRepository: CategorizationFeedbackRepository,
-        featureFlagUseCase: FeatureFlagUseCase,
-        dispatcher: CoroutineDispatcher
-    ): SmartCategorizationLearningUseCase = SmartCategorizationLearningUseCase(
-        feedbackRepository = feedbackRepository,
-        featureFlagUseCase = featureFlagUseCase,
-        dispatcher = dispatcher
-    )
-
-    @Provides
-    fun provideSmartTransactionCategorizerUseCase(
-        categoryRepository: CategoryRepository,
-        groupRepository: GroupRepository,
-        transactionRepository: TransactionRepository,
-        aiRepository: AiRepository,
-        featureFlagUseCase: FeatureFlagUseCase,
-        transactionSimilarityCalculator: TransactionSimilarityCalculator,
-        @Io dispatcher: CoroutineDispatcher
-    ): SmartTransactionCategorizerUseCase = SmartTransactionCategorizerUseCase(
-        categoryRepository = categoryRepository,
-        groupRepository = groupRepository,
-        transactionRepository = transactionRepository,
-        aiRepository = aiRepository,
-        featureFlagUseCase = featureFlagUseCase,
-        transactionSimilarityCalculator = transactionSimilarityCalculator,
-        dispatcher = dispatcher
-    )
 }

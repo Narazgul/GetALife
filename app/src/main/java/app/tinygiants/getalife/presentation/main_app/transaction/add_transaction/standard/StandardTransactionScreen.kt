@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.R
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.AccountType
@@ -30,7 +29,6 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionUiState
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionViewModel
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
@@ -42,7 +40,7 @@ import kotlin.time.Clock
  * Standard transaction input screen using AddTransactionItem.
  *
  * Used for experienced users who don't need step-by-step guidance.
- * Provides full-featured transaction form with smart categorization and animated background.
+ * Provides full-featured transaction form with animated background.
  * Performance optimized - receives ViewModel as parameter to avoid multiple injections.
  */
 @Composable
@@ -50,10 +48,6 @@ fun StandardTransactionScreen(
     viewModel: AddTransactionViewModel,
     uiState: AddTransactionUiState
 ) {
-    // Collect additional states needed for standard mode
-    val smartCategorizationState by viewModel.smartCategorizationState.collectAsStateWithLifecycle()
-    val transactionPartner by viewModel.transactionPartner.collectAsStateWithLifecycle()
-
     // UI state management
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -94,8 +88,7 @@ fun StandardTransactionScreen(
                 categories = uiState.categories,
                 accounts = uiState.accounts,
                 selectedCategory = uiState.selectedCategory,
-                transactionPartner = transactionPartner,
-                smartCategorizationUiState = smartCategorizationState,
+                transactionPartner = "",
                 onTransactionDirectionClicked = { direction ->
                     // Update wave color based on transaction direction
                     waveColor = when (direction) {
@@ -122,17 +115,6 @@ fun StandardTransactionScreen(
                     .align(Alignment.Center)
                     .padding(spacing.m)
             )
-
-            // Smart categorization bottom sheet
-            smartCategorizationState.categorizationResult?.let { result ->
-                SmartCategorizationBottomSheet(
-                    categorizationResult = result,
-                    isVisible = smartCategorizationState.showBottomSheet,
-                    onDismiss = viewModel::dismissCategorizationBottomSheet,
-                    onCategorySelected = viewModel::onCategorySuggestionAccepted,
-                    onNewCategoryCreated = viewModel::onCreateCategoryFromSuggestion
-                )
-            }
         }
     }
 }
@@ -202,7 +184,6 @@ private fun StandardTransactionScreenPreview() {
             accounts = previewAccounts,
             selectedCategory = previewCategories[0],
             transactionPartner = "",
-            smartCategorizationUiState = SmartCategorizationUiState(),
             onTransactionDirectionClicked = { },
             onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> }
         )

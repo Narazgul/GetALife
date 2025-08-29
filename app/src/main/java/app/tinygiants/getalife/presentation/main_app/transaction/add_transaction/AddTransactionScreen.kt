@@ -281,7 +281,6 @@ private fun AddTransactionScreenStandardPreview() {
                 accounts = previewAccounts,
                 selectedCategory = mockUiState.selectedCategory,
                 transactionPartner = mockUiState.selectedPartner,
-                smartCategorizationUiState = SmartCategorizationUiState(),
                 onTransactionDirectionClicked = { },
                 onAddTransactionClicked = { _, _, _, _, _, _, _, _ -> },
                 modifier = Modifier

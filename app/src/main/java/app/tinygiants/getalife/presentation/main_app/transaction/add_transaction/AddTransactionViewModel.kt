@@ -6,25 +6,18 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.domain.model.categorization.NewCategorySuggestion
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
 import app.tinygiants.getalife.domain.usecase.account.GetAccountsUseCase
 import app.tinygiants.getalife.domain.usecase.budget.groups_and_categories.category.GetCategoriesUseCase
-import app.tinygiants.getalife.domain.usecase.categorization.SmartTransactionCategorizerUseCase
 import app.tinygiants.getalife.domain.usecase.transaction.AddTransactionUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,7 +46,6 @@ class AddTransactionViewModel @Inject constructor(
     private val getCategories: GetCategoriesUseCase,
     private val getAccounts: GetAccountsUseCase,
     private val addTransaction: AddTransactionUseCase,
-    private val smartCategorizer: SmartTransactionCategorizerUseCase,
     private val categoryRepository: CategoryRepository,
     private val groupRepository: GroupRepository,
     private val onboardingPrefsUseCase: OnboardingPrefsUseCase
@@ -62,23 +54,11 @@ class AddTransactionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddTransactionUiState(categories = emptyList(), accounts = emptyList()))
     val uiState = _uiState.asStateFlow()
 
-    // Smart categorization state
-    private val _smartCategorizationState = MutableStateFlow(SmartCategorizationUiState())
-    val smartCategorizationState = _smartCategorizationState.asStateFlow()
-
-    // Transaction input fields for smart categorization
-    private val _transactionPartner = MutableStateFlow("")
-    private val _transactionDescription = MutableStateFlow("")
-    private val _transactionAmount = MutableStateFlow(Money(0.0))
-
-    val transactionPartner: StateFlow<String> get() = _transactionPartner
-
     // region Init
 
     init {
         loadCategories()
         loadAccounts()
-        setupSmartCategorization()
         initializeUiMode()
     }
 
@@ -91,26 +71,6 @@ class AddTransactionViewModel @Inject constructor(
                     guidedStep = if (isTransactionOnboardingCompleted) GuidedTransactionStep.Done else GuidedTransactionStep.Type
                 )
             }
-        }
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun setupSmartCategorization() {
-        viewModelScope.launch {
-            // Monitor transaction input changes for smart categorization
-            kotlinx.coroutines.flow.combine(
-                _transactionPartner,
-                _transactionDescription,
-                _transactionAmount
-            ) { partner, description, amount ->
-                Triple(partner, description, amount)
-            }
-                .debounce(500) // Wait 500ms after user stops typing
-                .filter { (partner, _, _) -> partner.length >= 3 } // Only trigger for meaningful input
-                .distinctUntilChanged()
-                .collect { (partner, description, amount) ->
-                    suggestCategoryForTransaction(partner, description, amount)
-                }
         }
     }
 
@@ -135,114 +95,6 @@ class AddTransactionViewModel @Inject constructor(
                         result.onSuccess { accounts -> _uiState.update { uiState -> uiState.copy(accounts = accounts) } }
                     }
             }
-        }
-    }
-
-    // endregion
-
-    // region Smart Categorization
-
-    /**
-     * Manually trigger smart categorization suggestion
-     */
-    private suspend fun suggestCategoryForTransaction(partner: String, description: String, amount: Money) {
-        if (partner.isBlank()) return
-
-        _smartCategorizationState.update { it.copy(isLoading = true, error = null) }
-
-        try {
-            val result = smartCategorizer(partner, description, amount)
-
-            _smartCategorizationState.update {
-                it.copy(
-                    isLoading = false,
-                    categorizationResult = result,
-                    showBottomSheet = result.hasAnyMatch,
-                    error = null
-                )
-            }
-        } catch (e: Exception) {
-            Firebase.crashlytics.recordException(e)
-            _smartCategorizationState.update {
-                it.copy(
-                    isLoading = false,
-                    error = "Kategorievorschlag fehlgeschlagen",
-                    showBottomSheet = false
-                )
-            }
-        }
-    }
-
-    /**
-     * User accepted a category match suggestion
-     */
-    fun onCategorySuggestionAccepted(categoryId: Long) {
-        viewModelScope.launch {
-            try {
-                val category = categoryRepository.getCategoryById(categoryId)
-                category?.let {
-                    // Update UI state with selected category
-                    _uiState.update { it.copy(selectedCategory = category) }
-                }
-                dismissCategorizationBottomSheet()
-            } catch (e: Exception) {
-                Firebase.crashlytics.recordException(e)
-            }
-        }
-    }
-
-    /**
-     * User wants to create a new category from AI suggestion
-     */
-    fun onCreateCategoryFromSuggestion(suggestion: NewCategorySuggestion) {
-        viewModelScope.launch {
-            try {
-                // Find the target group
-                groupRepository.getAllGroups().find { it.id == suggestion.groupId }
-                    ?: return@launch
-
-                // Create new category
-                val newCategory = Category(
-                    id = 0, // Will be auto-generated
-                    groupId = suggestion.groupId,
-                    emoji = suggestion.emoji,
-                    name = suggestion.categoryName,
-                    budgetTarget = suggestion.suggestedBudget ?: Money(0.0),
-                    monthlyTargetAmount = null,
-                    targetMonthsRemaining = null,
-                    listPosition = 999, // Add at end
-                    isInitialCategory = false,
-                    linkedAccountId = null,
-                    updatedAt = Clock.System.now(),
-                    createdAt = Clock.System.now()
-                )
-
-                categoryRepository.addCategory(newCategory)
-
-                // Update UI state with new category
-                _uiState.update {
-                    it.copy(
-                        categories = it.categories + newCategory,
-                        selectedCategory = newCategory
-                    )
-                }
-
-                dismissCategorizationBottomSheet()
-            } catch (e: Exception) {
-                Firebase.crashlytics.recordException(e)
-                _smartCategorizationState.update {
-                    it.copy(error = "Kategorie konnte nicht erstellt werden")
-                }
-            }
-        }
-    }
-
-    /**
-     * Dismiss the smart categorization bottom sheet
-     */
-    fun dismissCategorizationBottomSheet() {
-        _smartCategorizationState.update {
-            it.copy(showBottomSheet = false)
         }
     }
 
@@ -305,7 +157,6 @@ class AddTransactionViewModel @Inject constructor(
 
     fun onGuidedPartnerEntered(partner: String) {
         _uiState.update { it.copy(selectedPartner = partner) }
-        _transactionPartner.value = partner // Trigger smart categorization
     }
 
     fun onGuidedCategorySelected(category: Category?) {

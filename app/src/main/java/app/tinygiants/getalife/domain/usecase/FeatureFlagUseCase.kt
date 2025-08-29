@@ -1,49 +1,34 @@
 package app.tinygiants.getalife.domain.usecase
 
-import app.tinygiants.getalife.domain.repository.AiFinancialAdvisorConfig
 import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
-import app.tinygiants.getalife.domain.repository.SmartCategorizationConfig
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Use case for managing feature flags from Firebase Remote Config.
- * Provides a centralized way to check feature availability across the app.
+ * Use case for handling feature flags and remote configuration.
+ *
+ * This centralizes all feature flag logic and provides a clean interface
+ * for the rest of the application to check feature availability.
  */
 @Singleton
 class FeatureFlagUseCase @Inject constructor(
-    private val remoteConfigRepository: RemoteConfigRepository,
-    private val dispatcher: CoroutineDispatcher
+    private val remoteConfigRepository: RemoteConfigRepository
 ) {
 
     /**
-     * Check if smart categorization feature is enabled
+     * Check if a specific feature flag is enabled
      */
-    fun isSmartCategorizationEnabled(): Flow<Boolean> =
-        remoteConfigRepository.isSmartCategorizationEnabled()
-            .flowOn(dispatcher)
+    fun isFeatureEnabled(flagName: String): Flow<Boolean> =
+        remoteConfigRepository.getFeatureFlagValue(flagName)
 
-    /**
-     * Check if AI financial advisor feature is enabled
-     */
-    fun isAiFinancialAdvisorEnabled(): Flow<Boolean> =
-        remoteConfigRepository.isAiFinancialAdvisorEnabled()
-            .flowOn(dispatcher)
+    // Specific feature flag checks for common features
+    fun isAnalyticsEnabled(): Flow<Boolean> =
+        isFeatureEnabled("analytics_enabled")
 
-    /**
-     * Get complete smart categorization configuration
-     */
-    fun getSmartCategorizationConfig(): Flow<SmartCategorizationConfig> =
-        remoteConfigRepository.getSmartCategorizationConfig()
-            .flowOn(dispatcher)
+    fun isDebugModeEnabled(): Flow<Boolean> =
+        isFeatureEnabled("debug_mode_enabled")
 
-    /**
-     * Get complete AI financial advisor configuration
-     */
-    fun getAiFinancialAdvisorConfig(): Flow<AiFinancialAdvisorConfig> =
-        remoteConfigRepository.getAiFinancialAdvisorConfig()
-            .flowOn(dispatcher)
+    fun isPremiumFeaturesEnabled(): Flow<Boolean> =
+        isFeatureEnabled("premium_features_enabled")
 }

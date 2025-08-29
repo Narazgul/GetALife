@@ -4,12 +4,14 @@ import app.tinygiants.getalife.domain.repository.AiRepository
 
 class AiRepositoryFake: AiRepository {
 
-    private val hasFailedToRetrieveEmoji = false
-
     override suspend fun generateEmojiBy(tag: String): Result<String?> {
+        return Result.success("🏷️")
+    }
 
-        if (hasFailedToRetrieveEmoji) return Result.failure(exception = Exception("Could not retrieve emoji successfully"))
-
-        return Result.success(value = "✅")
+    override suspend fun generateFinancialInsights(
+        spendingPattern: String,
+        userContext: String
+    ): Result<String> {
+        return Result.success("Test financial insights")
     }
 }

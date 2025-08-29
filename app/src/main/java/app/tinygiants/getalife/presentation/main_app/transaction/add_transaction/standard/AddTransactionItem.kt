@@ -61,7 +61,6 @@ import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.domain.model.asStringRes
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.SmartCategorizationUiState
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
@@ -82,7 +81,6 @@ fun AddTransactionItem(
     modifier: Modifier = Modifier,
     selectedCategory: Category? = null,
     transactionPartner: String = "",
-    smartCategorizationUiState: SmartCategorizationUiState = SmartCategorizationUiState(),
     onTransactionDirectionClicked: (TransactionDirection) -> Unit,
     onAddTransactionClicked: (
         amount: Money,
@@ -165,53 +163,6 @@ fun AddTransactionItem(
             ),
             shape = RoundedCornerShape(spacing.m)
         )
-
-        // Smart Categorization Suggestion
-        AnimatedVisibility(
-            visible = smartCategorizationUiState.hasValidSuggestion
-        ) {
-            smartCategorizationUiState.categorizationResult?.let { result ->
-                // Show existing category match
-                result.existingCategoryMatch?.let { match ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = spacing.xs),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
-                        shape = RoundedCornerShape(spacing.m)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(spacing.m)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "${match.categoryEmoji} ${match.categoryName}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Button(
-                                onClick = {
-                                    // Set the suggested category as selected
-                                    categoryUserInput = categories.find { it.id == match.categoryId }
-                                },
-                                shape = RoundedCornerShape(spacing.s)
-                            ) {
-                                Text(
-                                    text = "Verwenden",
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         Spacer(modifier = Modifier.height(spacing.l))
 
