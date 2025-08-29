@@ -2,7 +2,6 @@ package app.tinygiants.getalife.di
 
 import android.content.Context
 import app.tinygiants.getalife.BuildConfig
-import app.tinygiants.getalife.R
 import app.tinygiants.getalife.data.local.GetALifeDatabase
 import app.tinygiants.getalife.data.remote.FirestoreDataSource
 import app.tinygiants.getalife.data.remote.ai.ChatGptAi
@@ -12,27 +11,22 @@ import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.usecase.budget.BudgetSelectionUseCase
-import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import app.tinygiants.getalife.domain.usecase.budget.CalculateTargetContributionUseCase
-import app.tinygiants.getalife.domain.usecase.budget.initialization.InitializeBudgetUseCase
-import app.tinygiants.getalife.domain.usecase.user.LinkAnonymousUserUseCase
-import app.tinygiants.getalife.domain.usecase.transaction.credit_card.EnsureCreditCardPaymentCategoryUseCase
-import app.tinygiants.getalife.domain.usecase.transaction.recurrence.CalculateRecurrenceDatesUseCase
-import app.tinygiants.getalife.domain.usecase.transaction.validation.ValidateTransactionDataUseCase
+import app.tinygiants.getalife.domain.usecase.budget.GetCurrentBudgetUseCase
 import app.tinygiants.getalife.domain.usecase.budget.calculation.CarryOverCalculator
 import app.tinygiants.getalife.domain.usecase.budget.calculation.CreditCardCategoryCalculator
 import app.tinygiants.getalife.domain.usecase.budget.calculation.NormalCategoryCalculator
+import app.tinygiants.getalife.domain.usecase.budget.initialization.InitializeBudgetUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.credit_card.EnsureCreditCardPaymentCategoryUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.recurrence.CalculateRecurrenceDatesUseCase
+import app.tinygiants.getalife.domain.usecase.transaction.validation.ValidateTransactionDataUseCase
+import app.tinygiants.getalife.domain.usecase.user.LinkAnonymousUserUseCase
 import com.aallam.openai.client.OpenAI
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.remoteConfig
 import com.revenuecat.purchases.Purchases
 import com.superwall.sdk.Superwall
 import dagger.Module
@@ -59,13 +53,6 @@ object AppModule {
     fun provideFirebaseCrashlytics(): FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     @Provides
-    fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig {
-        val remoteConfig = Firebase.remoteConfig
-        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-        return remoteConfig
-    }
-
-    @Provides
     @Singleton
     fun provideFirebaseAnalytics(@ApplicationContext context: Context): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(context)
@@ -79,7 +66,6 @@ object AppModule {
     fun provideFirebaseAi(
         crashlytics: FirebaseCrashlytics
     ): AiRepository = FirebaseAi(
-        generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash"),
         crashlytics = crashlytics
     )
 
@@ -88,7 +74,6 @@ object AppModule {
     fun provideDefaultAiRepository(
         crashlytics: FirebaseCrashlytics
     ): AiRepository = FirebaseAi(
-        generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-1.5-flash"),
         crashlytics = crashlytics
     )
 

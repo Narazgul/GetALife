@@ -10,7 +10,6 @@ import app.tinygiants.getalife.data.repository.AccountRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryMonthlyStatusRepositoryImpl
 import app.tinygiants.getalife.data.repository.CategoryRepositoryImpl
 import app.tinygiants.getalife.data.repository.CrispChatRepository
-import app.tinygiants.getalife.data.repository.FirebaseRemoteConfigRepository
 import app.tinygiants.getalife.data.repository.GoogleInAppReviewRepository
 import app.tinygiants.getalife.data.repository.GroupRepositoryImpl
 import app.tinygiants.getalife.data.repository.RevenueCatRepository
@@ -20,7 +19,6 @@ import app.tinygiants.getalife.domain.repository.CategoryMonthlyStatusRepository
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.repository.GroupRepository
 import app.tinygiants.getalife.domain.repository.InAppReviewRepository
-import app.tinygiants.getalife.domain.repository.RemoteConfigRepository
 import app.tinygiants.getalife.domain.repository.SubscriptionRepository
 import app.tinygiants.getalife.domain.repository.SupportChatRepository
 import app.tinygiants.getalife.domain.repository.TransactionRepository
@@ -85,11 +83,6 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideSubscriptionRepository(revenueCatRepository: RevenueCatRepository): SubscriptionRepository = revenueCatRepository
-
-    @Provides
-    @Singleton
-    fun provideRemoteConfigRepository(firebaseRemoteConfigRepository: FirebaseRemoteConfigRepository): RemoteConfigRepository =
-        firebaseRemoteConfigRepository
 
     @Provides
     @Singleton

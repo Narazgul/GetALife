@@ -1,87 +1,81 @@
 package app.tinygiants.getalife.presentation.general
 
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
-import app.tinygiants.getalife.domain.usecase.appupdate.GetAppUpdateTypeUseCase
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @Composable
-fun AppUpdate(appUpdateLauncher: ActivityResultLauncher<IntentSenderRequest>) {
+fun AppUpdate() {
 
     val viewModel: AppUpdateViewModel = hiltViewModel()
-    val appUpdateType by viewModel.appUpdateType.collectAsStateWithLifecycle()
+    val updateType by viewModel.updateType.collectAsStateWithLifecycle()
 
-    if (appUpdateType == null) return
+    if (updateType == null) return
 
     val appUpdateManager = AppUpdateManagerFactory.create(LocalContext.current)
+    val updateLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result -> }
 
-    LifecycleEventEffect(Lifecycle.Event.ON_CREATE) {
-
+    LaunchedEffect(Unit) {
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             val isUpdateAvailable = appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-            val isUpdateAllowed = appUpdateInfo.isUpdateTypeAllowed(appUpdateType!!)
-            val appUpdateOptions = AppUpdateOptions.newBuilder(appUpdateType!!).build()
+            val isUpdateAllowed = appUpdateInfo.isUpdateTypeAllowed(updateType!!)
+            val appUpdateOptions = AppUpdateOptions.newBuilder(updateType!!).build()
 
             if (isUpdateAvailable && isUpdateAllowed) {
                 appUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,
-                    appUpdateLauncher,
-                    appUpdateOptions,
+                    updateLauncher,
+                    appUpdateOptions
                 )
             }
         }
     }
 
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        appUpdateManager
-            .appUpdateInfo
-            .addOnSuccessListener { appUpdateInfo ->
-
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS)
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        appUpdateLauncher,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
-                    )
-
-                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                    // TODO Show Snackbar to restart App
-                }
+    // In-app updates lifecycle handling
+    DisposableEffect(Unit) {
+        val listener: (com.google.android.play.core.install.InstallState) -> Unit = { state ->
+            when (state.installStatus()) {
+                com.google.android.play.core.install.model.InstallStatus.DOWNLOADED -> { appUpdateManager.completeUpdate() }
+                com.google.android.play.core.install.model.InstallStatus.INSTALLED -> { }
+                com.google.android.play.core.install.model.InstallStatus.FAILED -> { }
+                else -> { }
             }
+        }
+
+        appUpdateManager.registerListener(listener)
+
+        onDispose {
+            appUpdateManager.unregisterListener(listener)
+        }
     }
 }
 
 @HiltViewModel
-class AppUpdateViewModel @Inject constructor(private val getUpdateType: GetAppUpdateTypeUseCase) : ViewModel() {
+class AppUpdateViewModel @Inject constructor() : ViewModel() {
 
-    private val _appUpdateType = MutableStateFlow<Int?>(null)
-    val appUpdateType = _appUpdateType.asStateFlow()
+    private val _updateType = MutableStateFlow<Int?>(AppUpdateType.IMMEDIATE)
+    val updateType: StateFlow<Int?> = _updateType.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            getUpdateType()
-                .catch { _appUpdateType.update { null } }
-                .collect { appUpdateType -> _appUpdateType.update { appUpdateType } }
-        }
+        _updateType.update { AppUpdateType.IMMEDIATE }
     }
 }
