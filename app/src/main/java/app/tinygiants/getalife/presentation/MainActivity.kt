@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
         enableEdgeToEdge()
 
         val notificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
-        val appUpdateLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
 
         setContent {
             GetALifeTheme {
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity(), SuperwallDelegate {
                 InAppReview()
                 SupportChat()
                 Notification(notificationLauncher = notificationLauncher)
-                AppUpdate(appUpdateLauncher = appUpdateLauncher)
+                AppUpdate()
 
                 GetALifeNavHost()
             }
