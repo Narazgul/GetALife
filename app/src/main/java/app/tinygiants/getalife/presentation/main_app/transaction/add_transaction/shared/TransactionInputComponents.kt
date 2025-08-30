@@ -60,11 +60,9 @@ import app.tinygiants.getalife.presentation.shared_composables.InputValidationUt
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.number
-import kotlinx.datetime.toLocalDateTime
 import java.time.LocalDate
-import kotlin.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * Unified input components for all transaction flows.
@@ -627,9 +625,9 @@ fun TransactionDateSelector(
                 TextButton(
                     onClick = {
                         datePickerState.selectedDateMillis?.let { millis ->
-                            val instant = Instant.fromEpochMilliseconds(millis)
-                            val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
-                            onDateSelected(LocalDate.of(localDate.year, localDate.month.number, localDate.dayOfMonth))
+                            val javaInstant = java.time.Instant.ofEpochMilli(millis)
+                            val date = ZonedDateTime.ofInstant(javaInstant, ZoneId.systemDefault()).toLocalDate()
+                            onDateSelected(date)
                         }
                         showDatePicker = false
                     },
