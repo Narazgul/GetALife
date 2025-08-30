@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,11 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.AccountType
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionStep
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
+import java.time.LocalDate
+import kotlin.time.Clock
 
 @Composable
 fun CompletedStepsChecklist(
@@ -148,7 +153,7 @@ private fun TransactionStep.getLocalizedName(): String = when (this) {
 /**
  * Format date for display in German format.
  */
-private fun formatDate(date: java.time.LocalDate): String {
+private fun formatDate(date: LocalDate): String {
     return "${date.dayOfMonth.toString().padStart(2, '0')}.${
         date.monthValue.toString().padStart(2, '0')
     }.${date.year}"
@@ -211,15 +216,15 @@ private fun CompletedStepsChecklistPreview() {
     GetALifeTheme {
         val mockTransactionInput = TransactionInput(
             direction = TransactionDirection.Outflow,
-            amount = app.tinygiants.getalife.domain.model.Money(25.99),
-            fromAccount = app.tinygiants.getalife.domain.model.Account(
+            amount = Money(25.99),
+            fromAccount = Account(
                 id = 1L,
                 name = "Girokonto",
-                type = app.tinygiants.getalife.domain.model.AccountType.Checking,
-                balance = app.tinygiants.getalife.domain.model.Money(1000.0),
+                type = AccountType.Checking,
+                balance = Money(1000.0),
                 listPosition = 0,
-                createdAt = kotlin.time.Clock.System.now(),
-                updatedAt = kotlin.time.Clock.System.now()
+                createdAt = Clock.System.now(),
+                updatedAt = Clock.System.now()
             ),
             partner = "Edeka"
         )

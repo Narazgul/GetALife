@@ -12,15 +12,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
+import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
 
@@ -44,6 +49,7 @@ fun TransactionStepContainer(
         TransactionDirection.AccountTransfer -> transferBackground
         else -> neutralBackground
     }
+
 
     Scaffold(modifier = modifier) { innerPadding ->
         Box(
@@ -205,5 +211,68 @@ fun getProgressText(step: TransactionStep, transactionInput: TransactionInput): 
         TransactionStep.Optional -> "Letzter Schritt! Möchtest du eine Notiz hinzufügen? ✏️"
 
         TransactionStep.Done -> "Perfekt! Du hast alles geschafft! 🎉"
+    }
+}
+
+@Preview(name = "Guided Mode - Inflow", showBackground = true)
+@Composable
+private fun TransactionStepContainerGuidedInflowPreview() {
+    GetALifeTheme {
+        TransactionStepContainer(
+            transactionInput = TransactionInput(
+                direction = TransactionDirection.Inflow,
+                amount = Money(123.45)
+            ),
+            currentStep = TransactionStep.Amount,
+            isGuidedMode = true
+        ) {
+            Text(
+                text = "Guided Mode - Inflow\n(Betrag eingeben)",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Preview(name = "Guided Mode - Outflow (Category)", showBackground = true)
+@Composable
+private fun TransactionStepContainerGuidedOutflowPreview() {
+    GetALifeTheme {
+        TransactionStepContainer(
+            transactionInput = TransactionInput(
+                direction = TransactionDirection.Outflow,
+                amount = Money(20.50)
+            ),
+            currentStep = TransactionStep.Category,
+            isGuidedMode = true
+        ) {
+            Text(
+                text = "Guided Mode - Outflow\n(Kategorie auswählen)",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Preview(name = "Standard Mode - Account Transfer", showBackground = true)
+@Composable
+private fun TransactionStepContainerStandardTransferPreview() {
+    GetALifeTheme {
+        TransactionStepContainer(
+            transactionInput = TransactionInput(
+                direction = TransactionDirection.AccountTransfer,
+                amount = Money(500.0)
+            ),
+            currentStep = TransactionStep.Date,
+            isGuidedMode = false
+        ) {
+            Text(
+                text = "Standard Mode\n(Überweisung - Datum wählen)",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

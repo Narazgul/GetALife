@@ -156,3 +156,18 @@ private fun CompactTransactionProgressIndicatorPreview() {
         )
     }
 }
+
+@Preview(name = "Progress - Almost Complete", showBackground = true)
+@Composable
+private fun TransactionProgressIndicatorAlmostCompletePreview() {
+    GetALifeTheme {
+        TransactionProgressIndicator(
+            currentStep = TransactionStep.Optional,
+            transactionInput = TransactionInput(
+                direction = TransactionDirection.Outflow,
+                amount = Money(42.99)
+            ),
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}

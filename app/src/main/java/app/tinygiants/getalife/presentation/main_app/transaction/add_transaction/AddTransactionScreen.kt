@@ -42,12 +42,12 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.AccountSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.AmountInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.CategorySelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.CompletedStepsChecklist
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.CompletionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.DateSelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.GuidedStepCounter
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.TextInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.TransactionTypeSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.CompletedStepsChecklist
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.GuidedStepCounter
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.TransactionAccountSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.TransactionAmountInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.TransactionCategorySelector
@@ -62,11 +62,9 @@ import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun AddTransactionScreen() {
-    // Single ViewModel injection point
     val viewModel: AddTransactionViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Dialog state management
     var showAddAccountDialog by rememberSaveable { mutableStateOf(false) }
     var showAddCategoryDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -79,7 +77,6 @@ fun AddTransactionScreen() {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Main content takes most of the space
             Box(
                 modifier = Modifier.weight(1f)
             ) {

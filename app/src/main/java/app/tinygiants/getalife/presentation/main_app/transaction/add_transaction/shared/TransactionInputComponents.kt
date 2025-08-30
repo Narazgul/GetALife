@@ -761,3 +761,155 @@ private fun TransactionAmountInputPreview() {
         )
     }
 }
+
+@Preview(name = "Account Selector", showBackground = true)
+@Composable
+private fun TransactionAccountSelectorPreview() {
+    GetALifeTheme {
+        val dummyAccounts = listOf(
+            Account(
+                id = 1L,
+                name = "Hauptkonto",
+                type = AccountType.Checking,
+                balance = Money(1250.75),
+                listPosition = 0,
+                updatedAt = kotlin.time.Clock.System.now(),
+                createdAt = kotlin.time.Clock.System.now()
+            ),
+            Account(
+                id = 2L,
+                name = "Sparkonto",
+                type = AccountType.Savings,
+                balance = Money(5000.0),
+                listPosition = 1,
+                updatedAt = kotlin.time.Clock.System.now(),
+                createdAt = kotlin.time.Clock.System.now()
+            ),
+            Account(
+                id = 3L,
+                name = "Bargeld",
+                type = AccountType.Cash,
+                balance = Money(-50.25),
+                listPosition = 2,
+                updatedAt = kotlin.time.Clock.System.now(),
+                createdAt = kotlin.time.Clock.System.now()
+            )
+        )
+        TransactionAccountSelector(
+            accounts = dummyAccounts,
+            selectedAccount = dummyAccounts[0],
+            onAccountSelected = { },
+            onCreateAccountClicked = { },
+            title = "Von welchem Konto?",
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(name = "Category Selector", showBackground = true)
+@Composable
+private fun TransactionCategorySelectorPreview() {
+    GetALifeTheme {
+        val dummyCategories = listOf(
+            Category(
+                id = 1L,
+                groupId = 1L,
+                emoji = "🍕",
+                name = "Lebensmittel",
+                budgetTarget = Money(400.0),
+                monthlyTargetAmount = null,
+                targetMonthsRemaining = null,
+                listPosition = 0,
+                isInitialCategory = false,
+                linkedAccountId = null,
+                updatedAt = kotlin.time.Clock.System.now(),
+                createdAt = kotlin.time.Clock.System.now()
+            ),
+            Category(
+                id = 2L,
+                groupId = 1L,
+                emoji = "🚗",
+                name = "Transport",
+                budgetTarget = Money(200.0),
+                monthlyTargetAmount = null,
+                targetMonthsRemaining = null,
+                listPosition = 1,
+                isInitialCategory = false,
+                linkedAccountId = null,
+                updatedAt = kotlin.time.Clock.System.now(),
+                createdAt = kotlin.time.Clock.System.now()
+            ),
+            Category(
+                id = 3L,
+                groupId = 2L,
+                emoji = "🎮",
+                name = "Unterhaltung",
+                budgetTarget = Money(150.0),
+                monthlyTargetAmount = null,
+                targetMonthsRemaining = null,
+                listPosition = 2,
+                isInitialCategory = false,
+                linkedAccountId = null,
+                updatedAt = kotlin.time.Clock.System.now(),
+                createdAt = kotlin.time.Clock.System.now()
+            )
+        )
+        TransactionCategorySelector(
+            categories = dummyCategories,
+            selectedCategory = dummyCategories[1],
+            onCategorySelected = { },
+            onCreateCategoryClicked = { },
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(name = "Partner Input - Inflow", showBackground = true)
+@Composable
+private fun TransactionPartnerInputInflowPreview() {
+    GetALifeTheme {
+        TransactionPartnerInput(
+            partner = "Mein Arbeitgeber",
+            onPartnerChanged = { },
+            transactionDirection = TransactionDirection.Inflow,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(name = "Partner Input - Outflow", showBackground = true)
+@Composable
+private fun TransactionPartnerInputOutflowPreview() {
+    GetALifeTheme {
+        TransactionPartnerInput(
+            partner = "Edeka Supermarkt",
+            onPartnerChanged = { },
+            transactionDirection = TransactionDirection.Outflow,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(name = "Date Selector", showBackground = true)
+@Composable
+private fun TransactionDateSelectorPreview() {
+    GetALifeTheme {
+        TransactionDateSelector(
+            selectedDate = LocalDate.of(2024, 3, 15),
+            onDateSelected = { },
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(name = "Description Input", showBackground = true)
+@Composable
+private fun TransactionDescriptionInputPreview() {
+    GetALifeTheme {
+        TransactionDescriptionInput(
+            description = "Wocheneinkauf mit Familie",
+            onDescriptionChanged = { },
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
