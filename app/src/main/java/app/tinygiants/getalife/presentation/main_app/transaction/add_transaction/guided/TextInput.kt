@@ -1,10 +1,11 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -48,7 +49,7 @@ fun TextInput(
     // Stable callbacks to prevent unnecessary recompositions
     val stableNextCallback = remember(onNextClicked) { onNextClicked }
     val stableKeyboardAction = remember(keyboardController, onNextClicked, isValid) {
-        { _: androidx.compose.foundation.text.KeyboardActionScope ->
+        { _: KeyboardActionScope ->
             if (isValid) {
                 keyboardController?.hide()
                 onNextClicked()

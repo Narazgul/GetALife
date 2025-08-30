@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

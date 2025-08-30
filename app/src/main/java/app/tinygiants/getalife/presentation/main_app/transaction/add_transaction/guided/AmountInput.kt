@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -60,7 +61,7 @@ fun AmountInput(
     }
     val stableNextCallback = remember(onNextClicked) { onNextClicked }
     val stableKeyboardAction = remember(keyboardController, onNextClicked, isValid) {
-        { _: androidx.compose.foundation.text.KeyboardActionScope ->
+        { _: KeyboardActionScope ->
             if (isValid && showNextButton) {
                 keyboardController?.hide()
                 onNextClicked()
@@ -86,8 +87,8 @@ fun AmountInput(
                 stableAmountChangeCallback(newValue)
             },
             modifier = Modifier
-                .width(280.dp)
-                .padding(vertical = 16.dp)
+                .width(320.dp)
+                .padding(vertical = 24.dp)
                 .focusRequester(focusRequester),
             textStyle = MaterialTheme.typography.displayLarge.copy(
                 color = MaterialTheme.colorScheme.onSurface,
@@ -109,7 +110,7 @@ fun AmountInput(
                 ) {
                     if (amountText.isEmpty()) {
                         Text(
-                            text = "0,00 €",
+                            text = "0,00",
                             style = MaterialTheme.typography.displayLarge.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                                 textAlign = TextAlign.Center

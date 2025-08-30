@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -8,9 +8,9 @@ import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,8 +38,9 @@ fun TransactionTypeSelector(
     ) {
         Text(
             text = "Was für eine Transaktion ist das?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 32.dp),
             textAlign = TextAlign.Center
         )
 
@@ -48,7 +49,7 @@ fun TransactionTypeSelector(
             add(TransactionDirection.Inflow to "💰 Einnahme")
             // Only show Transfer if there are at least 2 accounts
             if (availableAccounts.size >= 2) {
-                add(TransactionDirection.Unknown to "↔️ Transfer")
+                add(TransactionDirection.AccountTransfer to "🔄 Transfer")
             }
             add(TransactionDirection.Outflow to "💸 Ausgabe")
         }

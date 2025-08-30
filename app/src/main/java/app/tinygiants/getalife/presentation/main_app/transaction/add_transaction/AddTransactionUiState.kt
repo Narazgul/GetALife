@@ -2,17 +2,23 @@ package app.tinygiants.getalife.presentation.main_app.transaction.add_transactio
 
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
-import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import java.time.LocalDate
 
 /**
- * Enhanced UI State for Add Transaction screen with comprehensive error handling and loading states.
+ * Enhanced UI State for Add Transaction screen with centralized input model.
+ *
+ * Major Changes:
+ * - Replaced individual transaction fields with centralized TransactionInput
+ * - Maintained comprehensive error handling and loading states
+ * - Simplified validation using TransactionInput logic
  */
 data class AddTransactionUiState(
     // Core data
     val categories: List<Category> = emptyList(),
     val accounts: List<Account> = emptyList(),
+
+    // Centralized transaction input - replaces all individual transaction fields
+    val transactionInput: TransactionInput = TransactionInput(),
 
     // Loading states - improve UX during async operations
     val isLoading: Boolean = false,
@@ -24,27 +30,51 @@ data class AddTransactionUiState(
     val error: UiError? = null,
     val fieldErrors: Map<String, String> = emptyMap(),
 
-    // Guided mode state
+    // Mode and flow state
     val isGuidedMode: Boolean = true,
-    val guidedStep: GuidedTransactionStep = GuidedTransactionStep.Type,
+    val currentStep: TransactionStep = TransactionStep.FlowSelection,
 
-    // Transaction form data
-    val selectedDirection: TransactionDirection? = null,
-    val selectedAmount: Money? = null,
-    val selectedAccount: Account? = null,
-    val selectedToAccount: Account? = null, // For transfers
-    val selectedPartner: String = "",
-    val selectedCategory: Category? = null,
-    val selectedDate: LocalDate? = null,
-    val selectedDescription: String = "",
+    // Form validation state - now derived from TransactionInput
+    val isFormValid: Boolean = transactionInput.isValidForCurrentFlow()
+) {
+    /**
+     * Returns the next step in the transaction flow based on current input and selected direction.
+     * Used for guided mode progression.
+     */
+    fun getNextStep(): TransactionStep = when {
+        transactionInput.isInitialState() -> TransactionStep.FlowSelection
+        transactionInput.amount == null -> TransactionStep.Amount
+        transactionInput.fromAccount == null -> TransactionStep.FromAccount
+        transactionInput.direction == TransactionDirection.AccountTransfer && transactionInput.toAccount == null -> TransactionStep.ToAccount
+        transactionInput.direction != TransactionDirection.AccountTransfer && transactionInput.partner.isBlank() -> TransactionStep.Partner
+        transactionInput.direction == TransactionDirection.Outflow && transactionInput.category == null -> TransactionStep.Category
+        transactionInput.date == null -> TransactionStep.Date
+        else -> TransactionStep.Optional
+    }
+}
 
-    // Validation state - track which fields are valid
-    val isFormValid: Boolean = true
-)
+/**
+ * Unified step enum for both guided and standard modes.
+ * Replaces the old GuidedTransactionStep enum with a more flexible approach.
+ */
+enum class TransactionStep {
+    FlowSelection,  // Select Inflow, Outflow, or Transfer
+    Amount,         // Enter transaction amount
+    FromAccount,    // Select source account
+    ToAccount,      // Select destination account (transfers only)
+    Partner,        // Enter transaction partner (inflow/outflow only)
+    Category,       // Select category (outflow only) 
+    Date,           // Select transaction date
+    Optional,       // Optional details (description, recurrence)
+    Done            // Transaction completed
+}
 
 /**
  * Comprehensive error types for better user feedback
  */
 sealed class UiError(
     val message: String
-)
+) {
+    data class ValidationError(val field: String, val errorMessage: String) : UiError(errorMessage)
+    data class GenericError(val errorMessage: String) : UiError(errorMessage)
+}

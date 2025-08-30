@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.components
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +20,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.tinygiants.getalife.theme.GetALifeTheme
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 /**
  * Reusable date selection component with hoisted state.
@@ -51,22 +56,22 @@ fun DateSelector(
     val stableNextCallback = remember(onNextClicked) { onNextClicked }
 
     // DatePicker uses milliseconds since epoch
-    val initialMillis = selectedDate?.atStartOfDay(java.time.ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+    val initialMillis = selectedDate?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
         ?: System.currentTimeMillis()
 
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
 
     // Convert millis back to LocalDate
     val pickedDate = datePickerState.selectedDateMillis?.let { millis ->
-        java.time.Instant.ofEpochMilli(millis)
-            .atZone(java.time.ZoneId.systemDefault())
+        Instant.ofEpochMilli(millis)
+            .atZone(ZoneId.systemDefault())
             .toLocalDate()
     }
 
     // Date formatter for display
     val dateFormatter = remember {
-        java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.MEDIUM)
-            .withLocale(java.util.Locale.getDefault())
+        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(Locale.getDefault())
     }
 
     val isValid = pickedDate != null
@@ -85,12 +90,13 @@ fun DateSelector(
         // Date display button
         TextButton(
             onClick = stableShowPickerCallback,
-            modifier = Modifier.width(240.dp)
+            modifier = Modifier.width(280.dp)
         ) {
             val dateStr = pickedDate?.let { dateFormatter.format(it) } ?: "Datum wählen"
             Text(
                 text = dateStr,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
             )
         }
 

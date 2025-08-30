@@ -1,13 +1,12 @@
 package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.tinygiants.getalife.domain.model.Account
+import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.RecurrenceFrequency
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.domain.model.Account
-import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.repository.CategoryRepository
 import app.tinygiants.getalife.domain.usecase.OnboardingPrefsUseCase
 import app.tinygiants.getalife.domain.usecase.account.AddAccountUseCase
@@ -23,25 +22,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.time.Clock
 import kotlin.time.Instant
-
-sealed interface GuidedTransactionStep {
-    data object Type : GuidedTransactionStep
-    data object Amount : GuidedTransactionStep
-    data object Account : GuidedTransactionStep
-    data object ToAccount : GuidedTransactionStep
-    data object Partner : GuidedTransactionStep
-    data object Category : GuidedTransactionStep
-    data object Date : GuidedTransactionStep
-    data object Optional : GuidedTransactionStep
-    data object Done : GuidedTransactionStep
-
-    companion object {
-        val entries = listOf(Type, Amount, Account, ToAccount, Partner, Category, Date, Optional, Done)
-    }
-}
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
@@ -53,7 +37,7 @@ class AddTransactionViewModel @Inject constructor(
     private val addAccount: AddAccountUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AddTransactionUiState(categories = emptyList(), accounts = emptyList()))
+    private val _uiState = MutableStateFlow(AddTransactionUiState())
     val uiState = _uiState.asStateFlow()
 
     // region Init
@@ -70,7 +54,7 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isGuidedMode = !isTransactionOnboardingCompleted,
-                    guidedStep = if (isTransactionOnboardingCompleted) GuidedTransactionStep.Done else GuidedTransactionStep.Type
+                    currentStep = if (isTransactionOnboardingCompleted) TransactionStep.FlowSelection else TransactionStep.FlowSelection
                 )
             }
         }
@@ -91,18 +75,132 @@ class AddTransactionViewModel @Inject constructor(
             getAccounts()
                 .catch { throwable -> Firebase.crashlytics.recordException(throwable) }
                 .collect { result ->
-                    result.onSuccess { accounts -> _uiState.update { uiState -> uiState.copy(accounts = accounts) } }
+                    result.onSuccess { accounts ->
+                        _uiState.update { uiState -> uiState.copy(accounts = accounts) }
+                    }
                 }
         }
     }
 
     // endregion
 
-    // region Guided Mode Functions
+    // region Transaction Input Management
+
+    /**
+     * Updates the transaction input and handles flow-specific logic.
+     * This is the central method for all input changes.
+     */
+    private fun updateTransactionInput(update: (TransactionInput) -> TransactionInput) {
+        _uiState.update { currentState ->
+            val newInput = update(currentState.transactionInput)
+            currentState.copy(
+                transactionInput = newInput,
+                isFormValid = newInput.isValidForCurrentFlow()
+            )
+        }
+    }
+
+    /**
+     * Selects the transaction direction and cleans up irrelevant fields.
+     */
+    fun onTransactionDirectionSelected(direction: TransactionDirection) {
+        updateTransactionInput { it.updateDirection(direction) }
+
+        // Auto-advance to next step in guided mode
+        if (uiState.value.isGuidedMode) {
+            moveToNextStep()
+        }
+    }
+
+    /**
+     * Updates the transaction amount.
+     */
+    fun onAmountChanged(amount: Money) {
+        updateTransactionInput { it.copy(amount = amount) }
+    }
+
+    /**
+     * Selects the source account for the transaction.
+     */
+    fun onFromAccountSelected(account: Account) {
+        updateTransactionInput { it.copy(fromAccount = account) }
+
+        // Auto-advance to next step in guided mode
+        if (uiState.value.isGuidedMode) {
+            moveToNextStep()
+        }
+    }
+
+    /**
+     * Selects the destination account for transfers.
+     */
+    fun onToAccountSelected(account: Account) {
+        updateTransactionInput { it.copy(toAccount = account) }
+
+        // Auto-advance to next step in guided mode
+        if (uiState.value.isGuidedMode) {
+            moveToNextStep()
+        }
+    }
+
+    /**
+     * Updates the transaction partner.
+     */
+    fun onPartnerChanged(partner: String) {
+        updateTransactionInput { it.copy(partner = partner) }
+    }
+
+    /**
+     * Selects a category for outflow transactions.
+     */
+    fun onCategorySelected(category: Category?) {
+        updateTransactionInput { it.copy(category = category) }
+
+        // Auto-advance to next step in guided mode
+        if (uiState.value.isGuidedMode && category != null) {
+            moveToNextStep()
+        }
+    }
+
+    /**
+     * Updates the transaction date.
+     */
+    fun onDateSelected(date: LocalDate) {
+        updateTransactionInput { it.copy(date = date) }
+    }
+
+    /**
+     * Updates the transaction description.
+     */
+    fun onDescriptionChanged(description: String) {
+        updateTransactionInput { it.copy(description = description) }
+    }
+
+    // endregion
+
+    // region Step Navigation (Guided Mode)
+
+    /**
+     * Moves to the next step in the guided flow based on current input state.
+     */
+    fun moveToNextStep() {
+        val nextStep = uiState.value.getNextStep()
+        _uiState.update { it.copy(currentStep = nextStep) }
+    }
+
+    /**
+     * Navigates to a specific step (allows going back in guided mode).
+     */
+    fun goToStep(step: TransactionStep) {
+        _uiState.update { it.copy(currentStep = step) }
+    }
+
+    // endregion
+
+    // region Account and Category Creation
 
     /**
      * Create and persist a new account, then reload the accounts list.
-     * The AddAccountUseCase creates the account with starting balance transaction.
      */
     fun onAccountCreated(name: String, initialBalance: Money, type: AccountType) {
         viewModelScope.launch {
@@ -117,14 +215,13 @@ class AddTransactionViewModel @Inject constructor(
                     startingBalanceDescription = "Anfangsguthaben für $name"
                 )
 
-                // Accounts list will be automatically reloaded via flow
                 _uiState.update { it.copy(isCreatingAccount = false) }
             } catch (e: Exception) {
                 Firebase.crashlytics.recordException(e)
                 _uiState.update {
-                it.copy(
+                    it.copy(
                         isCreatingAccount = false,
-                        error = null
+                        error = UiError.GenericError("Fehler beim Erstellen des Kontos: ${e.message}")
                     )
                 }
             }
@@ -133,224 +230,238 @@ class AddTransactionViewModel @Inject constructor(
 
     /**
      * Create and persist a new category, then reload the categories list.
-     * Categories created during guided mode will be auto-selected.
      */
     fun onCategoryCreated(name: String) {
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isCreatingCategory = true) }
 
-                // Create temporary category - the repository will assign proper ID
                 val newCategory = Category(
-                    id = 0, // Will be assigned by repository
-                    groupId = 1L, // Default group - TODO: Make this configurable
-                    emoji = "", // Will be filled by AI
+                    id = 0,
+                    groupId = 1L,
+                    emoji = "",
                     name = name,
-                    budgetTarget = Money(0.0), // Default target
+                    budgetTarget = Money(0.0),
                     monthlyTargetAmount = null,
                     targetMonthsRemaining = null,
                     listPosition = uiState.value.categories.size,
                     isInitialCategory = false,
                     linkedAccountId = null,
-                    updatedAt = kotlin.time.Clock.System.now(),
-                    createdAt = kotlin.time.Clock.System.now()
+                    updatedAt = Clock.System.now(),
+                    createdAt = Clock.System.now()
                 )
 
                 categoryRepository.addCategory(newCategory)
-
-                // Categories list will be automatically reloaded via flow
                 _uiState.update { it.copy(isCreatingCategory = false, error = null) }
             } catch (e: Exception) {
                 Firebase.crashlytics.recordException(e)
                 _uiState.update {
-                it.copy(
+                    it.copy(
                         isCreatingCategory = false,
-                    error = null
+                        error = UiError.GenericError("Fehler beim Erstellen der Kategorie: ${e.message}")
                     )
                 }
             }
         }
     }
 
-    fun moveToNextStep() {
-        val currentStep = uiState.value.guidedStep
-        val currentIndex = GuidedTransactionStep.entries.indexOf(currentStep)
+    // endregion
 
-        // Determine next step based on transaction type
-        val nextStep = when {
-            currentIndex >= GuidedTransactionStep.entries.size - 1 -> return // Already at last step
-
-            // For transfers, after Account selection go to ToAccount
-            uiState.value.selectedDirection == TransactionDirection.Unknown &&
-                    currentStep == GuidedTransactionStep.Account -> GuidedTransactionStep.ToAccount
-
-            // For transfers, skip Partner and Category steps after ToAccount
-            uiState.value.selectedDirection == TransactionDirection.Unknown &&
-                    currentStep == GuidedTransactionStep.ToAccount -> GuidedTransactionStep.Date
-
-            // For Inflow and Outflow, skip ToAccount step entirely
-            (uiState.value.selectedDirection == TransactionDirection.Inflow ||
-                    uiState.value.selectedDirection == TransactionDirection.Outflow) &&
-                    currentStep == GuidedTransactionStep.Account -> GuidedTransactionStep.Partner
-
-            else -> GuidedTransactionStep.entries[currentIndex + 1]
-        }
-
-        _uiState.update { it.copy(guidedStep = nextStep) }
-    }
-
-    fun goToStep(step: GuidedTransactionStep) {
-        _uiState.update { it.copy(guidedStep = step) }
-    }
-
-    fun onGuidedTransactionTypeSelected(direction: TransactionDirection) {
-        _uiState.update { it.copy(selectedDirection = direction) }
-        moveToNextStep()
-    }
-
-    fun onGuidedAmountEntered(amount: Money) {
-        _uiState.update { it.copy(selectedAmount = amount) }
-    }
-
-    fun onGuidedAccountSelected(account: app.tinygiants.getalife.domain.model.Account) {
-        _uiState.update { it.copy(selectedAccount = account) }
-        moveToNextStep()
-    }
+    // region Transaction Saving
 
     /**
-     * Function to handle selection of destination account for transfers
+     * Saves the transaction using the current TransactionInput state.
+     * This is the unified save method for both guided and standard modes.
      */
-    fun onGuidedToAccountSelected(toAccount: app.tinygiants.getalife.domain.model.Account) {
-        _uiState.update { it.copy(selectedToAccount = toAccount) }
-        moveToNextStep()
-    }
+    fun saveTransaction(recurrenceFrequency: RecurrenceFrequency? = null) {
+        val input = uiState.value.transactionInput
 
-    fun onGuidedPartnerEntered(partner: String) {
-        _uiState.update { it.copy(selectedPartner = partner) }
-    }
+        if (!input.isValidForCurrentFlow()) {
+            _uiState.update {
+                it.copy(error = UiError.ValidationError("form", "Bitte füllen Sie alle erforderlichen Felder aus."))
+            }
+            return
+        }
 
-    fun onGuidedCategorySelected(category: Category?) {
-        _uiState.update { it.copy(selectedCategory = category) }
-        moveToNextStep()
-    }
-
-    fun onGuidedDateSelected(date: java.time.LocalDate) {
-        _uiState.update { it.copy(selectedDate = date) }
-    }
-
-    fun onGuidedDescriptionChanged(description: String) {
-        _uiState.update { it.copy(selectedDescription = description) }
-    }
-
-    fun onGuidedTransactionComplete() {
-        val state = uiState.value
         viewModelScope.launch {
-            // Save the transaction with all collected data
-            state.selectedDirection?.let { direction ->
-                state.selectedAmount?.let { amount ->
-                    state.selectedAccount?.let { account ->
+            try {
+                _uiState.update { it.copy(isSavingTransaction = true) }
 
-                        // If selected category has negative ID, it's temporary and needs to be saved first
-                        val finalCategory = state.selectedCategory?.let { category ->
-                            if (category.id < 0) {
-                                // Create and save the new category
-                                val newCategory = category.copy(id = 0) // Reset ID for auto-generation
-                                categoryRepository.addCategory(newCategory)
-                                // Return the category with ID 0, the repository will handle ID assignment
-                                newCategory
-                            } else {
-                                category
-                            }
-                        }
-
-                        addTransaction(
-                            accountId = account.id,
-                            category = finalCategory,
-                            amount = amount,
-                            direction = direction,
-                            transactionPartner = state.selectedPartner,
-                            description = state.selectedDescription,
-                            dateOfTransaction = state.selectedDate?.let {
-                                Instant.fromEpochSeconds(
-                                    it.toEpochDay() * 24 * 60 * 60
-                                )
-                            } ?: Clock.System.now(),
-                            recurrenceFrequency = null
-                        )
-
-                        // Mark transaction onboarding as completed
-                        onboardingPrefsUseCase.markTransactionOnboardingCompleted()
-
-                        // Move to Done step
-                        _uiState.update { it.copy(guidedStep = GuidedTransactionStep.Done) }
+                // Handle category creation if needed
+                val finalCategory = input.category?.let { category ->
+                    if (category.id < 0) {
+                        val newCategory = category.copy(id = 0)
+                        categoryRepository.addCategory(newCategory)
+                        newCategory
+                    } else {
+                        category
                     }
                 }
-            }
-        }
-    }
 
-    // endregion
+                // Save transaction using the appropriate flow
+                when (input.direction!!) {
+                    TransactionDirection.Inflow -> saveInflowTransaction(input, finalCategory, recurrenceFrequency)
+                    TransactionDirection.Outflow -> saveOutflowTransaction(input, finalCategory!!, recurrenceFrequency)
+                    TransactionDirection.AccountTransfer -> saveTransferTransaction(input, recurrenceFrequency)
+                    else -> throw IllegalStateException("Unsupported transaction direction: ${input.direction}")
+                }
 
-    // region User interaction
-
-    fun onSaveTransactionClicked(
-        amount: Money,
-        direction: TransactionDirection,
-        accountId: Long,
-        category: Category?,
-        transactionPartner: String,
-        description: String,
-        dateOfTransaction: Instant = Clock.System.now(),
-        recurrenceFrequency: RecurrenceFrequency? = null
-    ) {
-        viewModelScope.launch {
-            // If selected category has negative ID, it's temporary and needs to be saved first
-            val finalCategory = category?.let { cat ->
-                if (cat.id < 0) {
-                    val newCategory = cat.copy(id = 0)
-                    categoryRepository.addCategory(newCategory)
-                    newCategory
+                // Mark onboarding as completed if in guided mode
+                if (uiState.value.isGuidedMode) {
+                    onboardingPrefsUseCase.markTransactionOnboardingCompleted()
+                    _uiState.update { it.copy(currentStep = TransactionStep.Done) }
                 } else {
-                    cat
+                    // Reset form for new transaction in standard mode
+                    resetTransactionInput()
+                }
+
+                _uiState.update { it.copy(isSavingTransaction = false, error = null) }
+            } catch (e: Exception) {
+                Firebase.crashlytics.recordException(e)
+                _uiState.update {
+                    it.copy(
+                        isSavingTransaction = false,
+                        error = UiError.GenericError("Fehler beim Speichern der Transaktion: ${e.message}")
+                    )
                 }
             }
-
-            addTransaction(
-                accountId = accountId,
-                category = finalCategory,
-                amount = amount,
-                direction = direction,
-                transactionPartner = transactionPartner,
-                description = description,
-                dateOfTransaction = dateOfTransaction,
-                recurrenceFrequency = recurrenceFrequency
-            )
-            if (uiState.value.isGuidedMode) {
-                onboardingPrefsUseCase.markTransactionOnboardingCompleted()
-            }
         }
+    }
+
+    private suspend fun saveInflowTransaction(
+        input: TransactionInput,
+        category: Category?,
+        recurrenceFrequency: RecurrenceFrequency?
+    ) {
+        addTransaction(
+            accountId = input.fromAccount!!.id,
+            category = category,
+            amount = input.amount!!,
+            direction = TransactionDirection.Inflow,
+            transactionPartner = input.partner,
+            description = input.description,
+            dateOfTransaction = input.date?.let {
+                Instant.fromEpochSeconds(it.toEpochDay() * 24 * 60 * 60)
+            } ?: Clock.System.now(),
+            recurrenceFrequency = recurrenceFrequency
+        )
+    }
+
+    private suspend fun saveOutflowTransaction(
+        input: TransactionInput,
+        category: Category,
+        recurrenceFrequency: RecurrenceFrequency?
+    ) {
+        addTransaction(
+            accountId = input.fromAccount!!.id,
+            category = category,
+            amount = input.amount!!,
+            direction = TransactionDirection.Outflow,
+            transactionPartner = input.partner,
+            description = input.description,
+            dateOfTransaction = input.date?.let {
+                Instant.fromEpochSeconds(it.toEpochDay() * 24 * 60 * 60)
+            } ?: Clock.System.now(),
+            recurrenceFrequency = recurrenceFrequency
+        )
+    }
+
+    private suspend fun saveTransferTransaction(
+        input: TransactionInput,
+        recurrenceFrequency: RecurrenceFrequency?
+    ) {
+        addTransaction(
+            accountId = input.fromAccount!!.id,
+            category = null, // Transfers don't have categories
+            amount = input.amount!!,
+            direction = TransactionDirection.AccountTransfer,
+            transactionPartner = "Transfer zu ${input.toAccount!!.name}",
+            description = input.description.ifBlank { "Transfer zwischen Konten" },
+            dateOfTransaction = input.date?.let {
+                Instant.fromEpochSeconds(it.toEpochDay() * 24 * 60 * 60)
+            } ?: Clock.System.now(),
+            recurrenceFrequency = recurrenceFrequency
+        )
     }
 
     // endregion
 
+    // region Mode Switching and Reset
+
     /**
-     * Switch from guided mode to standard mode and reset transaction data for new transaction
+     * Switch from guided mode to standard mode.
      */
     fun switchToStandardMode() {
         _uiState.update {
             it.copy(
                 isGuidedMode = false,
-                guidedStep = GuidedTransactionStep.Done,
-                // Clear transaction data for new transaction
-                selectedDirection = null,
-                selectedAmount = null,
-                selectedAccount = null,
-                selectedToAccount = null,
-                selectedPartner = "",
-                selectedCategory = null,
-                selectedDate = null,
-                selectedDescription = ""
+                currentStep = TransactionStep.FlowSelection
+            )
+        }
+        resetTransactionInput()
+    }
+
+    /**
+     * Switch from standard mode to guided mode.
+     */
+    fun switchToGuidedMode() {
+        _uiState.update {
+            it.copy(
+                isGuidedMode = true,
+                currentStep = TransactionStep.FlowSelection
+            )
+        }
+        resetTransactionInput()
+    }
+
+    /**
+     * Resets the transaction input to start a new transaction.
+     */
+    fun resetTransactionInput() {
+        _uiState.update {
+            it.copy(
+                transactionInput = TransactionInput(),
+                currentStep = TransactionStep.FlowSelection,
+                isFormValid = false,
+                error = null,
+                fieldErrors = emptyMap()
             )
         }
     }
+
+    // endregion
+
+    // region Backward Compatibility (Legacy Methods)
+
+    // These methods maintain compatibility with existing UI code
+    // They delegate to the new centralized methods
+
+    @Deprecated("Use onTransactionDirectionSelected instead")
+    fun onGuidedTransactionTypeSelected(direction: TransactionDirection) = onTransactionDirectionSelected(direction)
+
+    @Deprecated("Use onAmountChanged instead")
+    fun onGuidedAmountEntered(amount: Money) = onAmountChanged(amount)
+
+    @Deprecated("Use onFromAccountSelected instead")
+    fun onGuidedAccountSelected(account: Account) = onFromAccountSelected(account)
+
+    @Deprecated("Use onToAccountSelected instead")
+    fun onGuidedToAccountSelected(account: Account) = onToAccountSelected(account)
+
+    @Deprecated("Use onPartnerChanged instead")
+    fun onGuidedPartnerEntered(partner: String) = onPartnerChanged(partner)
+
+    @Deprecated("Use onCategorySelected instead")
+    fun onGuidedCategorySelected(category: Category?) = onCategorySelected(category)
+
+    @Deprecated("Use onDateSelected instead")
+    fun onGuidedDateSelected(date: LocalDate) = onDateSelected(date)
+
+    @Deprecated("Use onDescriptionChanged instead")
+    fun onGuidedDescriptionChanged(description: String) = onDescriptionChanged(description)
+
+    @Deprecated("Use saveTransaction instead")
+    fun onGuidedTransactionComplete() = saveTransaction()
+
+    // endregion
 }
