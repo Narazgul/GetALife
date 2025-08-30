@@ -27,16 +27,16 @@ data class Transaction(
 enum class TransactionDirection { Unknown, Inflow, Outflow, AccountTransfer, CreditCardPayment }
 
 enum class RecurrenceFrequency(val daysInterval: Int) {
-    NEVER(0), // Default - not recurring
+    NEVER(0),
     DAILY(1),
     WEEKLY(7),
     EVERY_OTHER_WEEK(14),
-    TWICE_A_MONTH(15), // Approximation - real implementation should use calendar
+    TWICE_A_MONTH(15),
     MONTHLY(30),
     EVERY_4_WEEKS(28),
     EVERY_OTHER_MONTH(60),
     EVERY_3_MONTHS(90),
     EVERY_4_MONTHS(120),
-    TWICE_A_YEAR(182), // Approximation - 365/2 ≈ 182
+    TWICE_A_YEAR(182),
     YEARLY(365)
 }
