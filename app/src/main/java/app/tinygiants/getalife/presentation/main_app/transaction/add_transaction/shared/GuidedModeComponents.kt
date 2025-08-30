@@ -28,16 +28,6 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
-/**
- * Guided Mode specific UI components that were part of the original implementation.
- * These provide the familiar step-by-step experience for new users.
- */
-
-/**
- * Shows completed steps in a compact checklist format.
- * Allows users to go back and edit previous steps.
- * This was a key feature of the original Guided Mode.
- */
 @Composable
 fun CompletedStepsChecklist(
     transactionInput: TransactionInput,
@@ -47,7 +37,6 @@ fun CompletedStepsChecklist(
 ) {
     val allSteps = TransactionStep.entries.filter { it != TransactionStep.Done }
 
-    // Filter out steps not relevant to current flow
     val relevantSteps = allSteps.filter { step ->
         when (step) {
             TransactionStep.ToAccount -> transactionInput.direction == TransactionDirection.AccountTransfer
@@ -128,26 +117,15 @@ private fun getStepDisplayValue(step: TransactionStep, transactionInput: Transac
             TransactionDirection.Inflow -> "💰 Einnahme"
             TransactionDirection.Outflow -> "💸 Ausgabe"
             TransactionDirection.AccountTransfer -> "🔄 Transfer"
-            TransactionDirection.Unknown, null -> "" // Initial state - no display value
             else -> ""
         }
-
         TransactionStep.Amount -> transactionInput.amount?.formattedMoney ?: ""
-
         TransactionStep.FromAccount -> transactionInput.fromAccount?.name ?: ""
-
         TransactionStep.ToAccount -> transactionInput.toAccount?.name ?: ""
-
         TransactionStep.Partner -> transactionInput.partner.takeIf { it.isNotBlank() } ?: ""
-
         TransactionStep.Category -> transactionInput.category?.name ?: ""
-
         TransactionStep.Date -> transactionInput.date?.let { formatDate(it) } ?: ""
-
-        TransactionStep.Optional -> if (transactionInput.description.isNotEmpty()) {
-            "✏️ Beschreibung hinzugefügt"
-        } else ""
-
+        TransactionStep.Optional -> if (transactionInput.description.isNotEmpty()) "✏️ Beschreibung hinzugefügt" else ""
         TransactionStep.Done -> "✅ Fertig"
     }
 }
