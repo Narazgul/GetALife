@@ -95,7 +95,7 @@ class AddTransactionViewModel @Inject constructor(
             val newInput = update(currentState.transactionInput)
             currentState.copy(
                 transactionInput = newInput,
-                isFormValid = newInput.isValidForCurrentFlow()
+                isFormValid = newInput.isValid()
             )
         }
     }
@@ -205,7 +205,7 @@ class AddTransactionViewModel @Inject constructor(
     fun onAccountCreated(name: String, initialBalance: Money, type: AccountType) {
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(isCreatingAccount = true) }
+                _uiState.update { it.copy(loadingState = it.loadingState.copy(isCreatingAccount = true)) }
 
                 addAccount(
                     name = name,
@@ -215,13 +215,13 @@ class AddTransactionViewModel @Inject constructor(
                     startingBalanceDescription = "Anfangsguthaben für $name"
                 )
 
-                _uiState.update { it.copy(isCreatingAccount = false) }
+                _uiState.update { it.copy(loadingState = it.loadingState.copy(isCreatingAccount = false)) }
             } catch (e: Exception) {
                 Firebase.crashlytics.recordException(e)
                 _uiState.update {
                     it.copy(
-                        isCreatingAccount = false,
-                        error = UiError.GenericError("Fehler beim Erstellen des Kontos: ${e.message}")
+                        loadingState = it.loadingState.copy(isCreatingAccount = false),
+                        errorState = it.errorState.copy(error = UiError.GenericError("Fehler beim Erstellen des Kontos: ${e.message}"))
                     )
                 }
             }
@@ -234,7 +234,7 @@ class AddTransactionViewModel @Inject constructor(
     fun onCategoryCreated(name: String) {
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(isCreatingCategory = true) }
+                _uiState.update { it.copy(loadingState = it.loadingState.copy(isCreatingCategory = true)) }
 
                 val newCategory = Category(
                     id = 0,
@@ -252,13 +252,18 @@ class AddTransactionViewModel @Inject constructor(
                 )
 
                 categoryRepository.addCategory(newCategory)
-                _uiState.update { it.copy(isCreatingCategory = false, error = null) }
+                _uiState.update {
+                    it.copy(
+                        loadingState = it.loadingState.copy(isCreatingCategory = false),
+                        errorState = it.errorState.copy(error = null)
+                    )
+                }
             } catch (e: Exception) {
                 Firebase.crashlytics.recordException(e)
                 _uiState.update {
                     it.copy(
-                        isCreatingCategory = false,
-                        error = UiError.GenericError("Fehler beim Erstellen der Kategorie: ${e.message}")
+                        loadingState = it.loadingState.copy(isCreatingCategory = false),
+                        errorState = it.errorState.copy(error = UiError.GenericError("Fehler beim Erstellen der Kategorie: ${e.message}"))
                     )
                 }
             }
@@ -276,16 +281,23 @@ class AddTransactionViewModel @Inject constructor(
     fun saveTransaction(recurrenceFrequency: RecurrenceFrequency? = null) {
         val input = uiState.value.transactionInput
 
-        if (!input.isValidForCurrentFlow()) {
+        if (!input.isValid()) {
             _uiState.update {
-                it.copy(error = UiError.ValidationError("form", "Bitte füllen Sie alle erforderlichen Felder aus."))
+                it.copy(
+                    errorState = it.errorState.copy(
+                        error = UiError.ValidationError(
+                            "form",
+                            "Bitte füllen Sie alle erforderlichen Felder aus."
+                        )
+                    )
+                )
             }
             return
         }
 
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(isSavingTransaction = true) }
+                _uiState.update { it.copy(loadingState = it.loadingState.copy(isSavingTransaction = true)) }
 
                 // Handle category creation if needed
                 val finalCategory = input.category?.let { category ->
@@ -315,13 +327,18 @@ class AddTransactionViewModel @Inject constructor(
                     resetTransactionInput()
                 }
 
-                _uiState.update { it.copy(isSavingTransaction = false, error = null) }
+                _uiState.update {
+                    it.copy(
+                        loadingState = it.loadingState.copy(isSavingTransaction = false),
+                        errorState = it.errorState.copy(error = null)
+                    )
+                }
             } catch (e: Exception) {
                 Firebase.crashlytics.recordException(e)
                 _uiState.update {
                     it.copy(
-                        isSavingTransaction = false,
-                        error = UiError.GenericError("Fehler beim Speichern der Transaktion: ${e.message}")
+                        loadingState = it.loadingState.copy(isSavingTransaction = false),
+                        errorState = it.errorState.copy(error = UiError.GenericError("Fehler beim Speichern der Transaktion: ${e.message}"))
                     )
                 }
             }
@@ -423,45 +440,10 @@ class AddTransactionViewModel @Inject constructor(
                 transactionInput = TransactionInput(),
                 currentStep = TransactionStep.FlowSelection,
                 isFormValid = false,
-                error = null,
-                fieldErrors = emptyMap()
+                errorState = ErrorState()
             )
         }
     }
-
-    // endregion
-
-    // region Backward Compatibility (Legacy Methods)
-
-    // These methods maintain compatibility with existing UI code
-    // They delegate to the new centralized methods
-
-    @Deprecated("Use onTransactionDirectionSelected instead")
-    fun onGuidedTransactionTypeSelected(direction: TransactionDirection) = onTransactionDirectionSelected(direction)
-
-    @Deprecated("Use onAmountChanged instead")
-    fun onGuidedAmountEntered(amount: Money) = onAmountChanged(amount)
-
-    @Deprecated("Use onFromAccountSelected instead")
-    fun onGuidedAccountSelected(account: Account) = onFromAccountSelected(account)
-
-    @Deprecated("Use onToAccountSelected instead")
-    fun onGuidedToAccountSelected(account: Account) = onToAccountSelected(account)
-
-    @Deprecated("Use onPartnerChanged instead")
-    fun onGuidedPartnerEntered(partner: String) = onPartnerChanged(partner)
-
-    @Deprecated("Use onCategorySelected instead")
-    fun onGuidedCategorySelected(category: Category?) = onCategorySelected(category)
-
-    @Deprecated("Use onDateSelected instead")
-    fun onGuidedDateSelected(date: LocalDate) = onDateSelected(date)
-
-    @Deprecated("Use onDescriptionChanged instead")
-    fun onGuidedDescriptionChanged(description: String) = onDescriptionChanged(description)
-
-    @Deprecated("Use saveTransaction instead")
-    fun onGuidedTransactionComplete() = saveTransaction()
 
     // endregion
 }

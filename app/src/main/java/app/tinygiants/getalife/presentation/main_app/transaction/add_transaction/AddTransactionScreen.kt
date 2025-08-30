@@ -338,8 +338,7 @@ private fun StandardFormContent(
     onShowAddCategoryDialog: () -> Unit
 ) {
     // Animation state for flow selection
-    val isFlowSelected = transactionInput.direction != null &&
-            transactionInput.direction != TransactionDirection.Unknown
+    val isFlowSelected = transactionInput.direction != TransactionDirection.Unknown
 
     AnimatedContent(
         targetState = isFlowSelected,
@@ -461,7 +460,7 @@ private fun StandardFormContent(
                 // Save Button
                 Button(
                     onClick = { viewModel.saveTransaction() },
-                    enabled = transactionInput.isValidForCurrentFlow(),
+                    enabled = transactionInput.isValid(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
