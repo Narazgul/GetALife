@@ -2,45 +2,21 @@ package app.tinygiants.getalife.presentation.main_app.transaction.add_transactio
 
 import app.tinygiants.getalife.domain.model.Account
 import app.tinygiants.getalife.domain.model.Category
+import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.domain.model.TransactionDirection
+import java.time.LocalDate
 
-/**
- * Enhanced UI State for Add Transaction screen with centralized input model.
- *
- * Major Changes:
- * - Replaced individual transaction fields with centralized TransactionInput
- * - Maintained comprehensive error handling and loading states
- * - Simplified validation using TransactionInput logic
- */
+
 data class AddTransactionUiState(
-    // Core data
     val categories: List<Category> = emptyList(),
     val accounts: List<Account> = emptyList(),
-
-    // Centralized transaction input - replaces all individual transaction fields
     val transactionInput: TransactionInput = TransactionInput(),
-
-    // Loading states - improve UX during async operations
-    val isLoading: Boolean = false,
-    val isCreatingAccount: Boolean = false,
-    val isCreatingCategory: Boolean = false,
-    val isSavingTransaction: Boolean = false,
-
-    // Error handling - provide clear feedback to users
-    val error: UiError? = null,
-    val fieldErrors: Map<String, String> = emptyMap(),
-
-    // Mode and flow state
+    val loadingState: LoadingState = LoadingState(),
+    val errorState: ErrorState = ErrorState(),
     val isGuidedMode: Boolean = true,
     val currentStep: TransactionStep = TransactionStep.FlowSelection,
-
-    // Form validation state - now derived from TransactionInput
-    val isFormValid: Boolean = transactionInput.isValidForCurrentFlow()
+    val isFormValid: Boolean = transactionInput.isValid()
 ) {
-    /**
-     * Returns the next step in the transaction flow based on current input and selected direction.
-     * Used for guided mode progression.
-     */
     fun getNextStep(): TransactionStep = when {
         transactionInput.isInitialState() -> TransactionStep.FlowSelection
         transactionInput.amount == null -> TransactionStep.Amount
@@ -53,28 +29,86 @@ data class AddTransactionUiState(
     }
 }
 
-/**
- * Unified step enum for both guided and standard modes.
- * Replaces the old GuidedTransactionStep enum with a more flexible approach.
- */
 enum class TransactionStep {
-    FlowSelection,  // Select Inflow, Outflow, or Transfer
-    Amount,         // Enter transaction amount
-    FromAccount,    // Select source account
-    ToAccount,      // Select destination account (transfers only)
-    Partner,        // Enter transaction partner (inflow/outflow only)
-    Category,       // Select category (outflow only) 
-    Date,           // Select transaction date
-    Optional,       // Optional details (description, recurrence)
-    Done            // Transaction completed
+    FlowSelection,
+    Amount,
+    FromAccount,
+    ToAccount,
+    Partner,
+    Category,
+    Date,
+    Optional,
+    Done
 }
 
-/**
- * Comprehensive error types for better user feedback
- */
+data class LoadingState(
+    val isLoading: Boolean = false,
+    val isCreatingAccount: Boolean = false,
+    val isCreatingCategory: Boolean = false,
+    val isSavingTransaction: Boolean = false
+)
+
+data class ErrorState(
+    val error: UiError? = null,
+    val fieldErrors: Map<String, String> = emptyMap()
+)
+
 sealed class UiError(
     val message: String
 ) {
     data class ValidationError(val field: String, val errorMessage: String) : UiError(errorMessage)
     data class GenericError(val errorMessage: String) : UiError(errorMessage)
+}
+
+
+data class TransactionInput(
+    val direction: TransactionDirection = TransactionDirection.Unknown,
+    val amount: Money? = null,
+    val fromAccount: Account? = null,
+    val toAccount: Account? = null,
+    val partner: String = "",
+    val category: Category? = null,
+    val date: LocalDate? = null,
+    val description: String = ""
+) {
+
+    fun hasDirectionSelected(): Boolean = direction != TransactionDirection.Unknown
+
+    fun isValid(): Boolean = when (direction) {
+        TransactionDirection.Inflow -> isValidInflow()
+        TransactionDirection.Outflow -> isValidOutflow()
+        TransactionDirection.AccountTransfer -> isValidTransfer()
+        TransactionDirection.Unknown -> false
+        else -> false
+    }
+    fun isInitialState(): Boolean = direction == TransactionDirection.Unknown
+
+    private fun isValidInflow(): Boolean = amount != null && fromAccount != null
+    private fun isValidOutflow(): Boolean = amount != null && fromAccount != null && category != null
+    private fun isValidTransfer(): Boolean = amount != null && fromAccount != null && toAccount != null && fromAccount != toAccount
+
+    fun updateDirection(newDirection: TransactionDirection): TransactionInput {
+        if (newDirection == TransactionDirection.Unknown && hasDirectionSelected()) return this
+
+        return when (newDirection) {
+            TransactionDirection.Inflow -> copy(
+                direction = newDirection,
+                toAccount = null,
+                category = null
+            )
+
+            TransactionDirection.Outflow -> copy(
+                direction = newDirection,
+                toAccount = null
+            )
+
+            TransactionDirection.AccountTransfer -> copy(
+                direction = newDirection,
+                partner = "",
+                category = null
+            )
+
+            else -> copy(direction = newDirection)
+        }
+    }
 }
