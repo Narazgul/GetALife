@@ -24,17 +24,6 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
 
-/**
- * Unified container for all transaction steps in both Guided and Standard modes.
- *
- * Provides:
- * - Consistent animated wave background based on transaction type
- * - Unified layout structure
- * - Progress indication for guided mode
- * - Proper window insets handling
- *
- * This replaces the separate containers in GuidedTransactionScreen and StandardTransactionScreen.
- */
 @Composable
 fun TransactionStepContainer(
     transactionInput: TransactionInput,
@@ -44,11 +33,10 @@ fun TransactionStepContainer(
     showProgress: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    // Dynamic background color based on transaction direction
     val neutralBackground = MaterialTheme.colorScheme.primary.toArgb()
     val inflowBackground = onSuccess.toArgb()
     val outflowBackground = MaterialTheme.colorScheme.errorContainer.toArgb()
-    val transferBackground = MaterialTheme.colorScheme.tertiary.toArgb()
+    val transferBackground = MaterialTheme.colorScheme.primary.toArgb()
 
     val waveColor = when (transactionInput.direction) {
         TransactionDirection.Inflow -> inflowBackground
