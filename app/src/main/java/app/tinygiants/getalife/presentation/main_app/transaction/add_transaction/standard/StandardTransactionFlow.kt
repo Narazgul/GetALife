@@ -44,7 +44,7 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
-fun StandardTransactionForm(
+fun StandardTransactionFlow(
     transactionInput: TransactionInput,
     categories: List<Category>,
     accounts: List<Account>,

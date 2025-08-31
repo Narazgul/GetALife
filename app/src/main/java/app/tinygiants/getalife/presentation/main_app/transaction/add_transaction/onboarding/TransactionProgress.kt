@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -163,7 +163,7 @@ private fun formatDate(date: LocalDate): String {
  * Step counter component that shows current progress.
  */
 @Composable
-fun GuidedStepCounter(
+fun OnboardingStepCounter(
     currentStep: TransactionStep,
     transactionInput: TransactionInput,
     modifier: Modifier = Modifier
@@ -238,11 +238,11 @@ private fun CompletedStepsChecklistPreview() {
     }
 }
 
-@Preview(name = "Guided Step Counter", showBackground = true)
+@Preview(name = "Onboarding Step Counter", showBackground = true)
 @Composable
-private fun GuidedStepCounterPreview() {
+private fun OnboardingStepCounterPreview() {
     GetALifeTheme {
-        GuidedStepCounter(
+        OnboardingStepCounter(
             currentStep = TransactionStep.Category,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Outflow

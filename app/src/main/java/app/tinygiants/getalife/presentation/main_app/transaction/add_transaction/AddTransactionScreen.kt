@@ -27,9 +27,9 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.AddCategoryDialog
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.DebugModeToggle
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.GuidedTransactionFlow
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided.GuidedTransactionProgress
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard.StandardTransactionForm
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.OnboardingTransactionFlow
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.OnboardingTransactionProgress
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard.StandardTransactionFlow
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
 
@@ -78,7 +78,7 @@ fun AddTransactionScreen() {
             ) {
                 // Progress indicator for guided mode
                 if (uiState.isGuidedMode) {
-                    GuidedTransactionProgress(
+                    OnboardingTransactionProgress(
                         currentStep = uiState.currentStep,
                         transactionInput = uiState.transactionInput,
                         modifier = Modifier
@@ -99,7 +99,7 @@ fun AddTransactionScreen() {
                     contentAlignment = if (uiState.isGuidedMode) Alignment.Center else Alignment.TopCenter
                 ) {
                     if (uiState.isGuidedMode) {
-                        GuidedTransactionFlow(
+                        OnboardingTransactionFlow(
                             currentStep = uiState.currentStep,
                             transactionInput = uiState.transactionInput,
                             categories = uiState.categories,
@@ -110,7 +110,7 @@ fun AddTransactionScreen() {
                             currentStepTitle = uiState.currentStepTitle
                         )
                     } else {
-                        StandardTransactionForm(
+                        StandardTransactionFlow(
                             transactionInput = uiState.transactionInput,
                             categories = uiState.categories,
                             accounts = uiState.accounts,

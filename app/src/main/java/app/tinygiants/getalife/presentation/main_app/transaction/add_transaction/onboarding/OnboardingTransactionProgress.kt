@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
 /**
- * Progress indicator for guided transaction flows with motivational text.
+ * Progress indicator for onboarding transaction flows with motivational text.
  *
  * Features:
  * - Dynamic progress calculation based on transaction type
@@ -34,7 +34,7 @@ import app.tinygiants.getalife.theme.spacing
  * - Consistent styling across all flows
  */
 @Composable
-fun GuidedTransactionProgress(
+fun OnboardingTransactionProgress(
     currentStep: TransactionStep,
     transactionInput: TransactionInput,
     modifier: Modifier = Modifier
@@ -157,9 +157,9 @@ private fun getProgressText(step: TransactionStep, transactionInput: Transaction
 
 @Preview(name = "Progress - Inflow Amount Step", showBackground = true)
 @Composable
-private fun GuidedTransactionProgressInflowPreview() {
+private fun OnboardingTransactionProgressInflowPreview() {
     GetALifeTheme {
-        GuidedTransactionProgress(
+        OnboardingTransactionProgress(
             currentStep = TransactionStep.Amount,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Inflow
@@ -171,9 +171,9 @@ private fun GuidedTransactionProgressInflowPreview() {
 
 @Preview(name = "Progress - Outflow Category Step", showBackground = true)
 @Composable
-private fun GuidedTransactionProgressOutflowPreview() {
+private fun OnboardingTransactionProgressOutflowPreview() {
     GetALifeTheme {
-        GuidedTransactionProgress(
+        OnboardingTransactionProgress(
             currentStep = TransactionStep.Category,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Outflow,
@@ -186,9 +186,9 @@ private fun GuidedTransactionProgressOutflowPreview() {
 
 @Preview(name = "Progress - Transfer ToAccount Step", showBackground = true)
 @Composable
-private fun GuidedTransactionProgressTransferPreview() {
+private fun OnboardingTransactionProgressTransferPreview() {
     GetALifeTheme {
-        GuidedTransactionProgress(
+        OnboardingTransactionProgress(
             currentStep = TransactionStep.ToAccount,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.AccountTransfer,
@@ -203,9 +203,9 @@ private fun GuidedTransactionProgressTransferPreview() {
 
 @Preview(name = "Progress - Almost Complete", showBackground = true)
 @Composable
-private fun GuidedTransactionProgressAlmostCompletePreview() {
+private fun OnboardingTransactionProgressAlmostCompletePreview() {
     GetALifeTheme {
-        GuidedTransactionProgress(
+        OnboardingTransactionProgress(
             currentStep = TransactionStep.Optional,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Outflow,

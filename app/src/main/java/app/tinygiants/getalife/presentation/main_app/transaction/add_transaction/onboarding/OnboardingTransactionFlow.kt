@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -28,10 +28,13 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.DateSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TextInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TransactionTypeSelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.CompletedStepsChecklist
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.CompletionStep
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.OnboardingStepCounter
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
-fun GuidedTransactionFlow(
+fun OnboardingTransactionFlow(
     currentStep: TransactionStep,
     transactionInput: TransactionInput,
     categories: List<Category>,
@@ -57,7 +60,7 @@ fun GuidedTransactionFlow(
             onStepClicked = viewModel::goToStep
         )
 
-        GuidedStepCounter(
+        OnboardingStepCounter(
             currentStep = currentStep,
             transactionInput = transactionInput
         )
