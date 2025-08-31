@@ -35,16 +35,16 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionViewModel
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionInput
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.AccountSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.AmountInput
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.CategorySelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.DateSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TextInput
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TransactionTypeSelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.AccountSelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.AmountInput
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.CategorySelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.DateSelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.TextInput
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.TransactionTypeSelector
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
-fun StandardTransactionFlow(
+fun FullOverviewFlow(
     transactionInput: TransactionInput,
     categories: List<Category>,
     accounts: List<Account>,

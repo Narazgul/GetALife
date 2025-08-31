@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.tinygiants.getalife.domain.model.TransactionDirection
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.AddAccountDialog
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.AddCategoryDialog
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.DebugModeToggle
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.OnboardingTransactionFlow
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.StandardTransactionFlow
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.OnboardingTransactionProgress
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.FullOverviewFlow
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.OnboardingFlow
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.AddAccountDialog
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.AddCategoryDialog
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.DebugModeToggle
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.OnboardingTransactionProgress
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables.waveAnimationBackground
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
 
@@ -99,7 +99,7 @@ fun AddTransactionScreen() {
                     contentAlignment = if (uiState.isGuidedMode) Alignment.Center else Alignment.TopCenter
                 ) {
                     if (uiState.isGuidedMode) {
-                        OnboardingTransactionFlow(
+                        OnboardingFlow(
                             currentStep = uiState.currentStep,
                             transactionInput = uiState.transactionInput,
                             categories = uiState.categories,
@@ -110,7 +110,7 @@ fun AddTransactionScreen() {
                             currentStepTitle = uiState.currentStepTitle
                         )
                     } else {
-                        StandardTransactionFlow(
+                        FullOverviewFlow(
                             transactionInput = uiState.transactionInput,
                             categories = uiState.categories,
                             accounts = uiState.accounts,

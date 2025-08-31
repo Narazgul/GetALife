@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,11 +30,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.tinygiants.getalife.BuildConfig
 import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.GetALifeTheme
-import app.tinygiants.getalife.BuildConfig
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
