@@ -15,6 +15,7 @@ data class AddTransactionUiState(
     val errorState: ErrorState = ErrorState(),
     val isGuidedMode: Boolean = true,
     val currentStep: TransactionStep = TransactionStep.FlowSelection,
+    val currentStepTitle: String = "",
     val isFormValid: Boolean = transactionInput.isValid()
 ) {
     fun getNextStep(): TransactionStep = when {

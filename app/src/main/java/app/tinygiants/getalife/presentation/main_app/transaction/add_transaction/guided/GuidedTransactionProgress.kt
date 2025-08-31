@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import app.tinygiants.getalife.theme.GetALifeTheme
 import app.tinygiants.getalife.theme.spacing
 
 /**
- * Unified progress indicator for guided transaction flows.
+ * Progress indicator for guided transaction flows with motivational text.
  *
  * Features:
  * - Dynamic progress calculation based on transaction type
@@ -34,7 +34,7 @@ import app.tinygiants.getalife.theme.spacing
  * - Consistent styling across all flows
  */
 @Composable
-fun TransactionProgressIndicator(
+fun GuidedTransactionProgress(
     currentStep: TransactionStep,
     transactionInput: TransactionInput,
     modifier: Modifier = Modifier
@@ -75,24 +75,80 @@ fun TransactionProgressIndicator(
 }
 
 /**
- * Compact version for situations where space is limited.
+ * Calculates the progress percentage for the current step.
+ * Used by progress indicator components in this file.
  */
-@Composable
-fun CompactTransactionProgressIndicator(
+private fun calculateStepProgress(
     currentStep: TransactionStep,
-    transactionInput: TransactionInput,
-    modifier: Modifier = Modifier
-) {
-    val progress = calculateStepProgress(currentStep, transactionInput)
+    transactionInput: TransactionInput
+): Float {
+    // Total steps vary by transaction type
+    val totalSteps = when (transactionInput.direction) {
+        TransactionDirection.Inflow -> 6 // FlowSelection, Amount, FromAccount, Partner, Date, Optional
+        TransactionDirection.Outflow -> 7 // FlowSelection, Amount, FromAccount, Partner, Category, Date, Optional
+        TransactionDirection.AccountTransfer -> 6 // FlowSelection, Amount, FromAccount, ToAccount, Date, Optional
+        else -> 8 // Default maximum
+    }
 
-    LinearProgressIndicator(
-        progress = { progress },
-        modifier = modifier
-            .fillMaxWidth()
-            .height(4.dp),
-        color = MaterialTheme.colorScheme.primary,
-        trackColor = MaterialTheme.colorScheme.surfaceVariant
-    )
+    val currentStepIndex = when (currentStep) {
+        TransactionStep.FlowSelection -> 0
+        TransactionStep.Amount -> 1
+        TransactionStep.FromAccount -> 2
+        TransactionStep.ToAccount -> 3 // Only for transfers
+        TransactionStep.Partner -> 3 // For inflow/outflow (skip ToAccount)
+        TransactionStep.Category -> 4 // Only for outflow
+        TransactionStep.Date -> when (transactionInput.direction) {
+            TransactionDirection.AccountTransfer -> 4
+            TransactionDirection.Inflow -> 4
+            TransactionDirection.Outflow -> 5
+            else -> 5
+        }
+
+        TransactionStep.Optional -> totalSteps - 1
+        TransactionStep.Done -> totalSteps
+    }
+
+    return (currentStepIndex.toFloat() / totalSteps).coerceIn(0f, 1f)
+}
+
+/**
+ * Returns motivational progress text for the current step.
+ * Used by progress indicator components in this file.
+ */
+private fun getProgressText(step: TransactionStep, transactionInput: TransactionInput): String {
+    return when (step) {
+        TransactionStep.FlowSelection -> "Los geht's! Was möchtest du tun? 🚀"
+
+        TransactionStep.Amount -> when (transactionInput.direction) {
+            TransactionDirection.Inflow -> "Super! Wie viel Geld hast du erhalten? 💰"
+            TransactionDirection.Outflow -> "Perfekt! Wie viel hast du ausgegeben? 💸"
+            TransactionDirection.AccountTransfer -> "Toll! Wie viel möchtest du transferieren? 🔄"
+            else -> "Großartig! Gib den Betrag ein 💪"
+        }
+
+        TransactionStep.FromAccount -> when (transactionInput.direction) {
+            TransactionDirection.Inflow -> "Fast geschafft! Auf welches Konto? 🏦"
+            TransactionDirection.Outflow -> "Weiter so! Von welchem Konto? 🏦"
+            TransactionDirection.AccountTransfer -> "Prima! Von welchem Konto? 🏦"
+            else -> "Gut! Wähle dein Konto 🏦"
+        }
+
+        TransactionStep.ToAccount -> "Klasse! Wohin soll das Geld? 🎯"
+
+        TransactionStep.Partner -> when (transactionInput.direction) {
+            TransactionDirection.Inflow -> "Fantastisch! Von wem war das? 👤"
+            TransactionDirection.Outflow -> "Sehr gut! Wo warst du einkaufen? 🛍️"
+            else -> "Super! Wer war dein Partner? 👤"
+        }
+
+        TransactionStep.Category -> "Ausgezeichnet! Für welche Kategorie? 📂"
+
+        TransactionStep.Date -> "Fast fertig! Wann war das? 📅"
+
+        TransactionStep.Optional -> "Letzter Schritt! Möchtest du eine Notiz hinzufügen? ✏️"
+
+        TransactionStep.Done -> "Perfekt! Du hast alles geschafft! 🎉"
+    }
 }
 
 // ================================
@@ -101,9 +157,9 @@ fun CompactTransactionProgressIndicator(
 
 @Preview(name = "Progress - Inflow Amount Step", showBackground = true)
 @Composable
-private fun TransactionProgressIndicatorInflowPreview() {
+private fun GuidedTransactionProgressInflowPreview() {
     GetALifeTheme {
-        TransactionProgressIndicator(
+        GuidedTransactionProgress(
             currentStep = TransactionStep.Amount,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Inflow
@@ -115,9 +171,9 @@ private fun TransactionProgressIndicatorInflowPreview() {
 
 @Preview(name = "Progress - Outflow Category Step", showBackground = true)
 @Composable
-private fun TransactionProgressIndicatorOutflowPreview() {
+private fun GuidedTransactionProgressOutflowPreview() {
     GetALifeTheme {
-        TransactionProgressIndicator(
+        GuidedTransactionProgress(
             currentStep = TransactionStep.Category,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Outflow,
@@ -130,9 +186,9 @@ private fun TransactionProgressIndicatorOutflowPreview() {
 
 @Preview(name = "Progress - Transfer ToAccount Step", showBackground = true)
 @Composable
-private fun TransactionProgressIndicatorTransferPreview() {
+private fun GuidedTransactionProgressTransferPreview() {
     GetALifeTheme {
-        TransactionProgressIndicator(
+        GuidedTransactionProgress(
             currentStep = TransactionStep.ToAccount,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.AccountTransfer,
@@ -143,25 +199,13 @@ private fun TransactionProgressIndicatorTransferPreview() {
     }
 }
 
-@Preview(name = "Compact Progress Indicator", showBackground = true)
-@Composable
-private fun CompactTransactionProgressIndicatorPreview() {
-    GetALifeTheme {
-        CompactTransactionProgressIndicator(
-            currentStep = TransactionStep.Date,
-            transactionInput = TransactionInput(
-                direction = TransactionDirection.Outflow
-            ),
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
+
 
 @Preview(name = "Progress - Almost Complete", showBackground = true)
 @Composable
-private fun TransactionProgressIndicatorAlmostCompletePreview() {
+private fun GuidedTransactionProgressAlmostCompletePreview() {
     GetALifeTheme {
-        TransactionProgressIndicator(
+        GuidedTransactionProgress(
             currentStep = TransactionStep.Optional,
             transactionInput = TransactionInput(
                 direction = TransactionDirection.Outflow,

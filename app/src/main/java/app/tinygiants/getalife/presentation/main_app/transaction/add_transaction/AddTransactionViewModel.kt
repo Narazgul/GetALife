@@ -54,7 +54,8 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isGuidedMode = !isTransactionOnboardingCompleted,
-                    currentStep = if (isTransactionOnboardingCompleted) TransactionStep.FlowSelection else TransactionStep.FlowSelection
+                    currentStep = if (isTransactionOnboardingCompleted) TransactionStep.FlowSelection else TransactionStep.FlowSelection,
+                    currentStepTitle = getStepTitle(TransactionStep.FlowSelection, TransactionInput())
                 )
             }
         }
@@ -95,7 +96,8 @@ class AddTransactionViewModel @Inject constructor(
             val newInput = update(currentState.transactionInput)
             currentState.copy(
                 transactionInput = newInput,
-                isFormValid = newInput.isValid()
+                isFormValid = newInput.isValid(),
+                currentStepTitle = getStepTitle(currentState.currentStep, newInput)
             )
         }
     }
@@ -185,14 +187,58 @@ class AddTransactionViewModel @Inject constructor(
      */
     fun moveToNextStep() {
         val nextStep = uiState.value.getNextStep()
-        _uiState.update { it.copy(currentStep = nextStep) }
+        _uiState.update {
+            it.copy(
+                currentStep = nextStep,
+                currentStepTitle = getStepTitle(nextStep, it.transactionInput)
+            )
+        }
     }
 
     /**
      * Navigates to a specific step (allows going back in guided mode).
      */
     fun goToStep(step: TransactionStep) {
-        _uiState.update { it.copy(currentStep = step) }
+        _uiState.update {
+            it.copy(
+                currentStep = step,
+                currentStepTitle = getStepTitle(step, it.transactionInput)
+            )
+        }
+    }
+
+    /**
+     * Returns the current step title for display based on transaction context.
+     */
+    private fun getStepTitle(step: TransactionStep, transactionInput: TransactionInput): String {
+        return when (step) {
+            TransactionStep.FlowSelection -> "Was möchten Sie tun?"
+            TransactionStep.Amount -> when (transactionInput.direction) {
+                TransactionDirection.Inflow -> "Wie viel haben Sie erhalten?"
+                TransactionDirection.Outflow -> "Wie viel haben Sie ausgegeben?"
+                TransactionDirection.AccountTransfer -> "Wie viel möchten Sie überweisen?"
+                else -> "Betrag eingeben"
+            }
+
+            TransactionStep.FromAccount -> when (transactionInput.direction) {
+                TransactionDirection.Inflow -> "Auf welches Konto?"
+                TransactionDirection.Outflow -> "Von welchem Konto?"
+                TransactionDirection.AccountTransfer -> "Von welchem Konto?"
+                else -> "Konto auswählen"
+            }
+
+            TransactionStep.ToAccount -> "Auf welches Konto überweisen?"
+            TransactionStep.Partner -> when (transactionInput.direction) {
+                TransactionDirection.Inflow -> "Von wem haben Sie Geld erhalten?"
+                TransactionDirection.Outflow -> "Wo haben Sie das Geld ausgegeben?"
+                else -> "Partner eingeben"
+            }
+
+            TransactionStep.Category -> "Für welche Kategorie?"
+            TransactionStep.Date -> "Wann war das?"
+            TransactionStep.Optional -> "Möchten Sie eine Notiz hinzufügen?"
+            TransactionStep.Done -> "Geschafft! 🎉"
+        }
     }
 
     // endregion
@@ -412,7 +458,8 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isGuidedMode = false,
-                currentStep = TransactionStep.FlowSelection
+                currentStep = TransactionStep.FlowSelection,
+                currentStepTitle = getStepTitle(TransactionStep.FlowSelection, it.transactionInput)
             )
         }
         resetTransactionInput()
@@ -425,7 +472,8 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isGuidedMode = true,
-                currentStep = TransactionStep.FlowSelection
+                currentStep = TransactionStep.FlowSelection,
+                currentStepTitle = getStepTitle(TransactionStep.FlowSelection, it.transactionInput)
             )
         }
         resetTransactionInput()
@@ -440,7 +488,8 @@ class AddTransactionViewModel @Inject constructor(
                 transactionInput = TransactionInput(),
                 currentStep = TransactionStep.FlowSelection,
                 isFormValid = false,
-                errorState = ErrorState()
+                errorState = ErrorState(),
+                currentStepTitle = getStepTitle(TransactionStep.FlowSelection, TransactionInput())
             )
         }
     }

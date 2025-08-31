@@ -28,7 +28,6 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.DateSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TextInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TransactionTypeSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.getStepTitle
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
@@ -40,6 +39,7 @@ fun GuidedTransactionFlow(
     viewModel: AddTransactionViewModel,
     onShowAddAccountDialog: () -> Unit,
     onShowAddCategoryDialog: () -> Unit,
+    currentStepTitle: String,
     modifier: Modifier = Modifier
 ) {
     var amountText by rememberSaveable {
@@ -104,7 +104,7 @@ fun GuidedTransactionFlow(
 
                 TransactionStep.FromAccount -> {
                     AccountSelector(
-                        title = getStepTitle(step, transactionInput),
+                        title = currentStepTitle,
                         accounts = accounts,
                         selectedAccount = transactionInput.fromAccount,
                         onAccountSelected = viewModel::onFromAccountSelected,
@@ -115,7 +115,7 @@ fun GuidedTransactionFlow(
 
                 TransactionStep.ToAccount -> {
                     AccountSelector(
-                        title = getStepTitle(step, transactionInput),
+                        title = currentStepTitle,
                         accounts = accounts.filter { it.id != transactionInput.fromAccount?.id },
                         selectedAccount = transactionInput.toAccount,
                         onAccountSelected = viewModel::onToAccountSelected,

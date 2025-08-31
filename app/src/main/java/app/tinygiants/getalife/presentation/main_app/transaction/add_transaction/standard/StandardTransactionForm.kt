@@ -35,14 +35,12 @@ import app.tinygiants.getalife.domain.model.Category
 import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.AddTransactionViewModel
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionInput
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.TransactionStep
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.AccountSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.AmountInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.CategorySelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.DateSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TextInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TransactionTypeSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.shared.getStepTitle
 import app.tinygiants.getalife.theme.spacing
 
 @Composable
@@ -53,6 +51,7 @@ fun StandardTransactionForm(
     viewModel: AddTransactionViewModel,
     onShowAddAccountDialog: () -> Unit,
     onShowAddCategoryDialog: () -> Unit,
+    currentStepTitle: String,
     modifier: Modifier = Modifier
 ) {
     val isFlowSelected = transactionInput.direction != TransactionDirection.Unknown
@@ -122,7 +121,7 @@ fun StandardTransactionForm(
 
                 // From Account
                 AccountSelector(
-                    title = getStepTitle(TransactionStep.FromAccount, transactionInput),
+                    title = currentStepTitle,
                     accounts = accounts,
                     selectedAccount = transactionInput.fromAccount,
                     onAccountSelected = viewModel::onFromAccountSelected,
@@ -133,7 +132,7 @@ fun StandardTransactionForm(
                 // To Account (only for transfers)
                 if (transactionInput.direction == TransactionDirection.AccountTransfer) {
                     AccountSelector(
-                        title = getStepTitle(TransactionStep.ToAccount, transactionInput),
+                        title = currentStepTitle,
                         accounts = accounts.filter { it.id != transactionInput.fromAccount?.id },
                         selectedAccount = transactionInput.toAccount,
                         onAccountSelected = viewModel::onToAccountSelected,
