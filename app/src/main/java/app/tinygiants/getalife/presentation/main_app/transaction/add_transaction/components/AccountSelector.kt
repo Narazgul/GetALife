@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -73,7 +73,7 @@ fun AccountSelector(
             ) {
                 items(
                     items = accounts,
-                    key = { account -> account.id } // Stable key for performance
+                    key = { account -> account.id }
                 ) { account ->
                     // Create stable callback per account to prevent unnecessary recompositions
                     val stableAccountCallback = remember(account.id, onAccountSelected) {
@@ -88,8 +88,7 @@ fun AccountSelector(
                     )
                 }
 
-                // Add new account option at the bottom
-                item(key = "add_new_account") { // Stable key
+                item(key = "add_new_account") {
                     AddNewAccountCard(
                         onClick = stableCreateAccountCallback
                     )

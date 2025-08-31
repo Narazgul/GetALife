@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.guided
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,7 +72,7 @@ fun CategorySelector(
             ) {
                 items(
                     items = categories,
-                    key = { category -> category.id } // Stable key for performance
+                    key = { category -> category.id }
                 ) { category ->
                     // Create stable callback per category to prevent unnecessary recompositions
                     val stableCategoryCallback = remember(category.id, onCategorySelected) {
@@ -87,8 +87,7 @@ fun CategorySelector(
                     )
                 }
 
-                // Add new category option at the bottom
-                item(key = "add_new_category") { // Stable key
+                item(key = "add_new_category") {
                     AddNewCategoryCard(
                         onClick = stableCreateCategoryCallback
                     )
