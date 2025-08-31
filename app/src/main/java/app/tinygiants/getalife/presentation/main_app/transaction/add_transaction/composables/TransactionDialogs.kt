@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,6 +34,8 @@ import app.tinygiants.getalife.domain.model.AccountType
 import app.tinygiants.getalife.domain.model.Money
 import app.tinygiants.getalife.presentation.shared_composables.InputValidationUtils
 import app.tinygiants.getalife.theme.GetALifeTheme
+import app.tinygiants.getalife.BuildConfig
+import app.tinygiants.getalife.theme.spacing
 
 @Composable
 fun AddCategoryDialog(
@@ -233,6 +236,33 @@ private fun AddCategoryDialogPreview() {
         AddCategoryDialog(
             onDismiss = { },
             onCategoryCreated = { }
+        )
+    }
+}
+
+@Composable
+fun DebugModeToggle(
+    isGuidedMode: Boolean,
+    onToggleMode: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (!BuildConfig.DEBUG) return
+
+    Button(
+        onClick = onToggleMode,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(spacing.m),
+        colors = ButtonDefaults.outlinedButtonColors(),
+        shape = RoundedCornerShape(spacing.s)
+    ) {
+        Text(
+            text = if (isGuidedMode) {
+                "🔧 DEBUG: Switch to Standard Mode"
+            } else {
+                "🔧 DEBUG: Switch to Guided Mode"
+            },
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

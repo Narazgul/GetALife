@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -25,12 +25,12 @@ import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.AccountSelector
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.AmountInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.CategorySelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.CompletedStepsChecklist
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.DateSelector
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.OnboardingStepCounter
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TextInput
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.TransactionTypeSelector
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.CompletedStepsChecklist
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.CompletionStep
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.OnboardingStepCounter
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.CompletionStep
 import app.tinygiants.getalife.theme.spacing
 
 @Composable

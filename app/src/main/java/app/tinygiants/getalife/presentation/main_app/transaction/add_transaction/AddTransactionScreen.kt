@@ -23,13 +23,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.tinygiants.getalife.domain.model.TransactionDirection
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.AddAccountDialog
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.AddCategoryDialog
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.DebugModeToggle
 import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.composables.waveAnimationBackground
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.OnboardingTransactionFlow
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.onboarding.OnboardingTransactionProgress
-import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard.StandardTransactionFlow
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.OnboardingTransactionFlow
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows.StandardTransactionFlow
+import app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.components.OnboardingTransactionProgress
 import app.tinygiants.getalife.theme.onSuccess
 import app.tinygiants.getalife.theme.spacing
 
@@ -41,16 +42,15 @@ fun AddTransactionScreen() {
     var showAddAccountDialog by rememberSaveable { mutableStateOf(false) }
     var showAddCategoryDialog by rememberSaveable { mutableStateOf(false) }
 
-    // Wave background color based on transaction direction
     val neutralBackground = MaterialTheme.colorScheme.primary.toArgb()
     val inflowBackground = onSuccess.toArgb()
     val outflowBackground = MaterialTheme.colorScheme.errorContainer.toArgb()
     val transferBackground = MaterialTheme.colorScheme.primary.toArgb()
 
     val waveColor = when (uiState.transactionInput.direction) {
-        app.tinygiants.getalife.domain.model.TransactionDirection.Inflow -> inflowBackground
-        app.tinygiants.getalife.domain.model.TransactionDirection.Outflow -> outflowBackground
-        app.tinygiants.getalife.domain.model.TransactionDirection.AccountTransfer -> transferBackground
+        TransactionDirection.Inflow -> inflowBackground
+        TransactionDirection.Outflow -> outflowBackground
+        TransactionDirection.AccountTransfer -> transferBackground
         else -> neutralBackground
     }
 

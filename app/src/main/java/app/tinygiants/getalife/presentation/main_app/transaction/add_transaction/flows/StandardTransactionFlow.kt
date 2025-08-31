@@ -1,4 +1,4 @@
-package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.standard
+package app.tinygiants.getalife.presentation.main_app.transaction.add_transaction.flows
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
